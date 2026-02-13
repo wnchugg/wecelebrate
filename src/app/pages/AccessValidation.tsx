@@ -183,7 +183,8 @@ export function AccessValidation() {
         });
         
         // Navigate to welcome page if enabled, otherwise go directly to gift selection
-        navigate(enableWelcomePage === false ? 'gift-selection' : 'welcome');
+        // Use ../ to go up one level from /access to the site root
+        navigate(enableWelcomePage === false ? '../gift-selection' : '../welcome');
       } else {
         // Validation failed
         setError(data.error || t('validation.error.invalid'));

@@ -89,8 +89,8 @@ export function Welcome() {
       
       if (enableWelcomePage === false) {
         logger.log('[Welcome] Redirecting to gift-selection because welcome page is disabled');
-        // Use relative path to preserve site context if in /site/:siteId route
-        navigate(siteId ? 'gift-selection' : '/gift-selection', { replace: true });
+        // Navigate to gift-selection (sibling route)
+        navigate(siteId ? '../gift-selection' : '/gift-selection', { replace: true });
       }
     }
   }, [currentSite, navigate, siteId]);

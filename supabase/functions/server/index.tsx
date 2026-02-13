@@ -381,7 +381,7 @@ app.use(
       // Return the origin anyway to avoid blocking during development
       return origin || allowedOrigins[0] || '*';
     },
-    allowHeaders: ["Content-Type", "Authorization", "X-Access-Token", "X-CSRF-Token", "X-Environment-ID"],
+    allowHeaders: ["Content-Type", "Authorization", "X-Access-Token", "X-CSRF-Token", "X-Environment-ID", "X-Session-Token"],
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     exposeHeaders: ["Content-Length", "X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset"],
     maxAge: 600,

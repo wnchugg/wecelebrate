@@ -316,7 +316,72 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [sites, setSites] = useState<Site[]>([]);
   const [currentSite, setCurrentSite] = useState<Site | null>(null);
   const [currentClient, setCurrentClient] = useState<Client | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const { isAdminAuthenticated, adminLoading } = useAdmin();
+  const hasLoadedRef = useRef(false);
+
+  // Load sites and clients from API when admin is authenticated
+  useEffect(() => {
+    const loadData = async () => {
+      // Skip if on public route
+      if (isPublicRoute(window.location.pathname)) {
+        setIsLoading(false);
+        return;
+      }
+
+      // Wait for admin authentication to complete
+      if (adminLoading) {
+        return;
+      }
+
+      // Only load if authenticated and haven't loaded yet
+      if (!isAdminAuthenticated || hasLoadedRef.current) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        logger.info('[SiteContext] Loading sites and clients from API');
+
+        // Load sites and clients in parallel
+        const [sitesResponse, clientsResponse] = await Promise.all([
+          siteApi.getAll(),
+          clientApi.getAll()
+        ]);
+
+        logger.info('[SiteContext] Loaded data', {
+          sitesCount: sitesResponse.data?.length || 0,
+          clientsCount: clientsResponse.data?.length || 0
+        });
+
+        setSites(sitesResponse.data || []);
+        setClients(clientsResponse.data || []);
+
+        // Auto-select first active site if none selected
+        if (!currentSite && sitesResponse.data && sitesResponse.data.length > 0) {
+          const firstActiveSite = sitesResponse.data.find((s: Site) => s.status === 'active') || sitesResponse.data[0];
+          setCurrentSite(firstActiveSite);
+
+          // Set corresponding client
+          if (firstActiveSite && clientsResponse.data) {
+            const siteClient = clientsResponse.data.find((c: Client) => c.id === firstActiveSite.clientId);
+            if (siteClient) {
+              setCurrentClient(siteClient);
+            }
+          }
+        }
+
+        hasLoadedRef.current = true;
+      } catch (error) {
+        logger.error('[SiteContext] Failed to load data', { error });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [isAdminAuthenticated, adminLoading, currentSite]);
 
   const addClient = async (client: Partial<Client>): Promise<Client> => {
     const newClient = { ...client, id: Date.now().toString() } as Client;

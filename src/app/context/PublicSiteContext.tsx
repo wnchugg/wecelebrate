@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { publicSiteApi, PublicSite, PublicGift } from '../utils/api';
 
 export interface PublicSiteContextType {
@@ -21,7 +21,7 @@ export function PublicSiteProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [availableSites, setAvailableSites] = useState<PublicSite[]>([]);
 
-  const applyBranding = (branding: PublicSite['branding']) => {
+  const applyBranding = useCallback((branding: PublicSite['branding']) => {
     if (!branding) {
       console.warn('[PublicSiteContext] No branding provided');
       return;
@@ -36,9 +36,9 @@ export function PublicSiteProvider({ children }: { children: ReactNode }) {
     if (branding.accentColor) {
       document.documentElement.style.setProperty('--color-accent', branding.accentColor);
     }
-  };
+  }, []);
 
-  const loadGiftsForSite = async (siteId: string) => {
+  const loadGiftsForSite = useCallback(async (siteId: string) => {
     try {
       const { gifts: siteGifts } = await publicSiteApi.getSiteGifts(siteId);
       setGifts(siteGifts);
@@ -53,7 +53,7 @@ export function PublicSiteProvider({ children }: { children: ReactNode }) {
       // Don't set error state - gifts are optional
       setGifts([]);
     }
-  };
+  }, []);
 
   const loadSite = async () => {
     setIsLoading(true);
@@ -164,7 +164,7 @@ export function PublicSiteProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const setSiteById = async (siteId: string) => {
+  const setSiteById = useCallback(async (siteId: string) => {
     setIsLoading(true);
     setError(null);
     
@@ -264,7 +264,7 @@ export function PublicSiteProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [applyBranding, loadGiftsForSite]); // useCallback dependencies for setSiteById
 
   useEffect(() => {
     loadSite();

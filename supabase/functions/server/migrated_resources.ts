@@ -350,7 +350,11 @@ function setupSiteRoutes(app: Hono, verifyAdminMiddleware?: any): void {
     const siteId = c.req.param('siteId');
 
     try {
+      console.log('[Public API] Getting site:', { siteId, environmentId, key: `site:${environmentId}:${siteId}` });
+      
       const site = await kv.get<Site>(`site:${environmentId}:${siteId}`, environmentId);
+
+      console.log('[Public API] Site found:', !!site, site ? { id: site.id, name: site.name, status: site.status } : 'null');
 
       if (!site) {
         return c.json({ error: 'Site not found' }, 404);

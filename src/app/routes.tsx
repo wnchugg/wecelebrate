@@ -221,6 +221,31 @@ export const router = createBrowserRouter([
       { path: "cart", Component: Cart, HydrateFallback: LoadingFallback },
       { path: "client-portal", Component: ClientPortal, HydrateFallback: LoadingFallback },
       
+      // Site-specific routes - allows viewing different sites
+      {
+        path: "site/:siteId",
+        Component: SiteLoaderWrapper,
+        errorElement: <ErrorBoundary />,
+        HydrateFallback: LoadingFallback,
+        children: [
+          { index: true, Component: Welcome, HydrateFallback: LoadingFallback },
+          { path: "home", Component: Landing, HydrateFallback: LoadingFallback }, // Site home/landing page - route renamed from "landing" to "home" for clarity
+          { path: "access", Component: AccessValidation, HydrateFallback: LoadingFallback },
+          { path: "celebration", Component: Celebration, HydrateFallback: LoadingFallback },
+          { path: "magic-link", Component: MagicLinkRequest, HydrateFallback: LoadingFallback },
+          { path: "magic-link/validate", Component: MagicLinkValidation, HydrateFallback: LoadingFallback },
+          { path: "sso/validate", Component: SSOValidation, HydrateFallback: LoadingFallback },
+          { path: "privacy", Component: PrivacyPolicy, HydrateFallback: LoadingFallback },
+          { path: "gift-selection", Component: GiftSelection, HydrateFallback: LoadingFallback },
+          { path: "gift-detail", Component: GiftDetail, HydrateFallback: LoadingFallback },
+          { path: "shipping-information", Component: ShippingInformation, HydrateFallback: LoadingFallback },
+          { path: "select-shipping", Component: SelectShipping, HydrateFallback: LoadingFallback },
+          { path: "review-order", Component: ReviewOrder, HydrateFallback: LoadingFallback },
+          { path: "confirmation", Component: Confirmation, HydrateFallback: LoadingFallback },
+          { path: "*", Component: NotFound, HydrateFallback: LoadingFallback },
+        ],
+      },
+      
       // Test/Debug Routes (DEVELOPMENT ONLY - tree-shaken in production)
       ...(import.meta.env.DEV && CelebrationTest && DiagnosticPage && InitialSeed && SystemStatus && ValidationTest && PerformanceTest && JWTDebug && QuickDiagnostic && BackendTest && LanguageTest && AuthDiagnostic && TokenClear && TokenDebug ? [
         { path: "celebration/test", Component: CelebrationTest, HydrateFallback: LoadingFallback },
@@ -240,31 +265,6 @@ export const router = createBrowserRouter([
       ] : []),
       
       // Catch-all for public 404s - must be last
-      { path: "*", Component: NotFound, HydrateFallback: LoadingFallback },
-    ],
-  },
-  
-  // Site-specific routes - allows viewing different sites
-  {
-    path: "/site/:siteId",
-    Component: SiteLoaderWrapper,
-    errorElement: <ErrorBoundary />,
-    HydrateFallback: LoadingFallback,
-    children: [
-      { index: true, Component: Welcome, HydrateFallback: LoadingFallback },
-      { path: "home", Component: Landing, HydrateFallback: LoadingFallback }, // Site home/landing page - route renamed from "landing" to "home" for clarity
-      { path: "access", Component: AccessValidation, HydrateFallback: LoadingFallback },
-      { path: "celebration", Component: Celebration, HydrateFallback: LoadingFallback },
-      { path: "magic-link", Component: MagicLinkRequest, HydrateFallback: LoadingFallback },
-      { path: "magic-link/validate", Component: MagicLinkValidation, HydrateFallback: LoadingFallback },
-      { path: "sso/validate", Component: SSOValidation, HydrateFallback: LoadingFallback },
-      { path: "privacy", Component: PrivacyPolicy, HydrateFallback: LoadingFallback },
-      { path: "gift-selection", Component: GiftSelection, HydrateFallback: LoadingFallback },
-      { path: "gift-detail", Component: GiftDetail, HydrateFallback: LoadingFallback },
-      { path: "shipping-information", Component: ShippingInformation, HydrateFallback: LoadingFallback },
-      { path: "select-shipping", Component: SelectShipping, HydrateFallback: LoadingFallback },
-      { path: "review-order", Component: ReviewOrder, HydrateFallback: LoadingFallback },
-      { path: "confirmation", Component: Confirmation, HydrateFallback: LoadingFallback },
       { path: "*", Component: NotFound, HydrateFallback: LoadingFallback },
     ],
   },

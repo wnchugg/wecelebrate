@@ -1,8 +1,6 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useParams, Outlet } from 'react-router';
-import { useSite } from '../context/SiteContext';
-import { getCurrentEnvironment } from '../config/deploymentEnvironments';
-import { publicAnonKey } from '../../../utils/supabase/info';
+import { usePublicSite } from '../context/PublicSiteContext';
 import { logger } from '../utils/logger';
 
 /**
@@ -25,62 +23,14 @@ function SiteRouteFallback() {
  */
 export function SiteLoaderWrapper() {
   const { siteId } = useParams<{ siteId: string }>();
-  const { sites, currentSite, setCurrentSite } = useSite();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { loadSite, site, isLoading, error } = usePublicSite();
 
   useEffect(() => {
-    async function loadSite() {
-      if (!siteId) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        // First, try to find the site in the context (for authenticated admins)
-        const contextSite = sites.find(s => s.id === siteId);
-        if (contextSite) {
-          setCurrentSite(contextSite);
-          setIsLoading(false);
-          return;
-        }
-
-        // If not in context, fetch it from the public API (for demo sites)
-        logger.info('[SiteLoaderWrapper] Site not in context, fetching from API', { siteId });
-        const env = getCurrentEnvironment();
-        const response = await fetch(
-          `${env.apiBaseUrl}/public/sites/${siteId}`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${publicAnonKey}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`Failed to load site: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        if (data.site) {
-          setCurrentSite(data.site);
-        } else {
-          setError('Site not found');
-        }
-      } catch (err) {
-        console.error('[SiteLoaderWrapper] Error loading site:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load site');
-      } finally {
-        setIsLoading(false);
-      }
+    if (siteId) {
+      logger.info('[SiteLoaderWrapper] Loading site', { siteId });
+      loadSite(siteId);
     }
-
-    loadSite();
-  }, [siteId, sites, setCurrentSite]);
+  }, [siteId, loadSite]);
 
   // Show loading state while site is being loaded
   if (isLoading) {
@@ -116,7 +66,7 @@ export function SiteLoaderWrapper() {
   }
 
   // Show error if site doesn't match (shouldn't happen, but just in case)
-  if (!currentSite || currentSite.id !== siteId) {
+  if (!site || site.id !== siteId) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-blue-50 flex items-center justify-center">
         <div className="text-center">

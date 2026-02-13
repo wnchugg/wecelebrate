@@ -179,7 +179,9 @@ export function AccessValidation() {
         logger.log('[AccessValidation] Welcome page setting:', {
           enableWelcomePage,
           rawSetting: currentSite?.settings?.enableWelcomePage,
-          willNavigateTo: enableWelcomePage === false ? 'gift-selection' : 'welcome'
+          willNavigateTo: enableWelcomePage === false ? 'gift-selection' : 'welcome',
+          currentPath: window.location.pathname,
+          siteId: currentSite?.id
         });
         
         // Navigate to welcome page if enabled, otherwise go directly to gift selection

@@ -84,11 +84,16 @@ export function Welcome() {
         enableWelcomePage,
         rawSetting: currentSite.settings.enableWelcomePage,
         willRedirect: enableWelcomePage === false,
-        siteId
+        siteId,
+        currentPath: window.location.pathname,
+        fullSettings: currentSite.settings
       });
       
       if (enableWelcomePage === false) {
-        logger.log('[Welcome] Redirecting to gift-selection because welcome page is disabled');
+        logger.log('[Welcome] Redirecting to gift-selection because welcome page is disabled', {
+          from: window.location.pathname,
+          to: siteId ? '../gift-selection' : '/gift-selection'
+        });
         // Navigate to gift-selection (sibling route)
         navigate(siteId ? '../gift-selection' : '/gift-selection', { replace: true });
       }
@@ -151,8 +156,8 @@ export function Welcome() {
   };
 
   const handleContinue = () => {
-    // Use relative path to preserve site context if in /site/:siteId route
-    navigate(siteId ? 'gift-selection' : '/gift-selection');
+    // Use parent-relative path to navigate to sibling route
+    navigate(siteId ? '../gift-selection' : '/gift-selection');
   };
 
   const defaultTitle = t('welcome.defaultTitle') || 'Congratulations on Your Anniversary!';

@@ -3543,7 +3543,7 @@ app.put("/make-server-6fcaeea3/sites/:siteId/gift-config", verifyAdmin, async (c
       console.log('[Save Gift Config] Created', config.includedGiftIds.length, 'explicit gift assignments');
     } else if (config.assignmentStrategy === 'all') {
       // For 'all' strategy, create assignments for all active gifts
-      const allGifts = await kv.getByPrefix('gifts:', environmentId);
+      const allGifts = await kv.getByPrefix(`gift:${environmentId}:`, environmentId);
       const activeGifts = allGifts.filter((g: any) => g.status === 'active');
       for (const gift of activeGifts) {
         const assignmentKey = `site-gift-assignment:${siteId}:${gift.id}`;
@@ -3561,7 +3561,7 @@ app.put("/make-server-6fcaeea3/sites/:siteId/gift-config", verifyAdmin, async (c
       // For price levels, create assignments for gifts in the selected level
       const level = config.priceLevels.find((l: any) => l.id === config.selectedLevelId);
       if (level) {
-        const allGifts = await kv.getByPrefix('gifts:', environmentId);
+        const allGifts = await kv.getByPrefix(`gift:${environmentId}:`, environmentId);
         const levelGifts = allGifts.filter((g: any) => 
           g.status === 'active' && g.price >= level.minPrice && g.price < level.maxPrice
         );
@@ -3580,7 +3580,7 @@ app.put("/make-server-6fcaeea3/sites/:siteId/gift-config", verifyAdmin, async (c
       }
     } else if (config.assignmentStrategy === 'exclusions') {
       // For exclusions, create assignments for all gifts except excluded ones
-      const allGifts = await kv.getByPrefix('gifts:', environmentId);
+      const allGifts = await kv.getByPrefix(`gift:${environmentId}:`, environmentId);
       const includedGifts = allGifts.filter((g: any) => {
         if (g.status !== 'active') return false;
         if (config.excludedSkus?.includes(g.sku)) return false;
@@ -6522,7 +6522,7 @@ app.get("/make-server-6fcaeea3/public/sites/:siteId/gifts", async (c) => {
     // Fetch full gift details for each assignment
     const giftsWithDetails = await Promise.all(
       assignments.map(async (assignment) => {
-        const gift = await kv.get(`gift:${assignment.giftId}`, environmentId);
+        const gift = await kv.get(`gift:${environmentId}:${assignment.giftId}`, environmentId);
         
         if (!gift || gift.status !== 'active') {
           return null;

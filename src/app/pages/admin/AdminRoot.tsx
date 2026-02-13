@@ -4,6 +4,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { EmailTemplateProvider } from '../../context/EmailTemplateContext';
 import { ShippingConfigProvider } from '../../context/ShippingConfigContext';
 import { GiftProvider } from '../../context/GiftContext';
+import { SiteProvider } from '../../context/SiteContext';
 import { CookieConsent } from '../../components/CookieConsent';
 
 /**
@@ -42,27 +43,29 @@ export function AdminRoot() {
   }, [location.pathname]);
 
   return (
-    <GiftProvider>
-      <EmailTemplateProvider>
-        <ShippingConfigProvider>
-          <div className="min-h-screen bg-gray-50 flex flex-col">
-            {/* Skip to main content link for keyboard users */}
-            <a
-              href="#admin-main-content"
-              className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[#D91C81] focus:text-white focus:rounded-lg focus:shadow-lg"
-            >
-              Skip to admin content
-            </a>
-            <main id="admin-main-content" className="flex-1">
-              <Suspense fallback={<AdminRouteFallback />}>
-                <Outlet />
-              </Suspense>
-            </main>
-          </div>
-          <CookieConsent />
-        </ShippingConfigProvider>
-      </EmailTemplateProvider>
-    </GiftProvider>
+    <SiteProvider>
+      <GiftProvider>
+        <EmailTemplateProvider>
+          <ShippingConfigProvider>
+            <div className="min-h-screen bg-gray-50 flex flex-col">
+              {/* Skip to main content link for keyboard users */}
+              <a
+                href="#admin-main-content"
+                className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[#D91C81] focus:text-white focus:rounded-lg focus:shadow-lg"
+              >
+                Skip to admin content
+              </a>
+              <main id="admin-main-content" className="flex-1">
+                <Suspense fallback={<AdminRouteFallback />}>
+                  <Outlet />
+                </Suspense>
+              </main>
+            </div>
+            <CookieConsent />
+          </ShippingConfigProvider>
+        </EmailTemplateProvider>
+      </GiftProvider>
+    </SiteProvider>
   );
 }
 

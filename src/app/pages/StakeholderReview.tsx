@@ -35,7 +35,7 @@ import {
   type LucideIcon
 } from 'lucide-react';
 
-type TabType = 'overview' | 'features' | 'demos' | 'use-cases' | 'gaps' | 'roadmap';
+type TabType = 'overview' | 'features' | 'demos' | 'use-cases' | 'gaps' | 'roadmap' | 'documentation';
 
 interface UseCase {
   title: string;
@@ -69,6 +69,7 @@ export function StakeholderReview() {
     { id: 'features', label: 'Features & Capabilities', icon: CheckCircle },
     { id: 'demos', label: 'Interactive Demos', icon: Play },
     { id: 'use-cases', label: 'Use Cases', icon: Briefcase },
+    { id: 'documentation', label: 'Documentation', icon: Info },
     { id: 'gaps', label: 'Current Gaps', icon: AlertCircle },
     { id: 'roadmap', label: 'Development Status', icon: Clock }
   ];
@@ -1139,6 +1140,185 @@ export function StakeholderReview() {
                     </ul>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Documentation Tab */}
+        {activeTab === 'documentation' && (
+          <div className="space-y-6">
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+              <div className="flex items-start gap-3">
+                <Info className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Platform Documentation</h2>
+                  <p className="text-gray-700">
+                    Comprehensive documentation covering all aspects of the platform including features, architecture, deployment, and recent updates.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Latest Updates */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <Clock className="w-5 h-5" style={{ color: primaryColor }} />
+                Latest Updates (February 13, 2026)
+              </h3>
+              <div className="space-y-4">
+                <div className="border-l-4 border-green-500 pl-4">
+                  <h4 className="font-semibold text-gray-900">Site-Aware Navigation</h4>
+                  <p className="text-sm text-gray-600">Complete implementation of site-specific routing with 24 automated tests</p>
+                  <a href="/SITE_AWARE_NAVIGATION_COMPLETE.md" target="_blank" className="text-sm text-blue-600 hover:underline">View Documentation →</a>
+                </div>
+                <div className="border-l-4 border-green-500 pl-4">
+                  <h4 className="font-semibold text-gray-900">Gift Detail Page Improvements</h4>
+                  <p className="text-sm text-gray-600">Fixed headers, progress steps, and quantity selection settings</p>
+                </div>
+                <div className="border-l-4 border-green-500 pl-4">
+                  <h4 className="font-semibold text-gray-900">Welcome Page Toggle Fix</h4>
+                  <p className="text-sm text-gray-600">Enable/disable toggle now works correctly with cache management</p>
+                </div>
+                <div className="border-l-4 border-green-500 pl-4">
+                  <h4 className="font-semibold text-gray-900">Site Configuration Persistence</h4>
+                  <p className="text-sm text-gray-600">All configuration changes now save correctly to backend</p>
+                </div>
+              </div>
+              <div className="mt-4 pt-4 border-t">
+                <a href="/LATEST_UPDATES_SUMMARY.md" target="_blank" className="text-blue-600 hover:underline font-medium">
+                  View Complete Update Summary →
+                </a>
+              </div>
+            </div>
+
+            {/* Core Documentation */}
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <Eye className="w-5 h-5" style={{ color: primaryColor }} />
+                  Application Documentation
+                </h3>
+                <ul className="space-y-2 text-sm">
+                  <li>
+                    <a href="/APPLICATION_DOCUMENTATION.md" target="_blank" className="text-blue-600 hover:underline">
+                      Complete Application Documentation
+                    </a>
+                    <p className="text-gray-600 text-xs">Executive summary, features, user flows, admin portal</p>
+                  </li>
+                  <li>
+                    <a href="/ADMIN_README.md" target="_blank" className="text-blue-600 hover:underline">
+                      Admin Portal Guide
+                    </a>
+                    <p className="text-gray-600 text-xs">Admin features and configuration</p>
+                  </li>
+                  <li>
+                    <a href="/ACCESS_MANAGEMENT_ARCHITECTURE.md" target="_blank" className="text-blue-600 hover:underline">
+                      Access Management Architecture
+                    </a>
+                    <p className="text-gray-600 text-xs">Authentication and validation methods</p>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <Code className="w-5 h-5" style={{ color: secondaryColor }} />
+                  Technical Documentation
+                </h3>
+                <ul className="space-y-2 text-sm">
+                  <li>
+                    <a href="/ARCHITECTURE.md" target="_blank" className="text-blue-600 hover:underline">
+                      System Architecture
+                    </a>
+                    <p className="text-gray-600 text-xs">Technical architecture and design patterns</p>
+                  </li>
+                  <li>
+                    <a href="/BACKEND_API_README.md" target="_blank" className="text-blue-600 hover:underline">
+                      Backend API Documentation
+                    </a>
+                    <p className="text-gray-600 text-xs">API endpoints and integration guide</p>
+                  </li>
+                  <li>
+                    <a href="/AUTOMATED_TEST_EXAMPLES.md" target="_blank" className="text-blue-600 hover:underline">
+                      Testing Documentation
+                    </a>
+                    <p className="text-gray-600 text-xs">Test coverage and quality assurance</p>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <Settings className="w-5 h-5" style={{ color: tertiaryColor }} />
+                  Configuration & Setup
+                </h3>
+                <ul className="space-y-2 text-sm">
+                  <li>
+                    <a href="/NETLIFY_DEPLOYMENT_SETUP.md" target="_blank" className="text-blue-600 hover:underline">
+                      Netlify Deployment Guide
+                    </a>
+                    <p className="text-gray-600 text-xs">Frontend deployment configuration</p>
+                  </li>
+                  <li>
+                    <a href="/BACKEND_CONFIG.md" target="_blank" className="text-blue-600 hover:underline">
+                      Backend Configuration
+                    </a>
+                    <p className="text-gray-600 text-xs">Supabase and Edge Functions setup</p>
+                  </li>
+                  <li>
+                    <a href="/ADMIN_ENVIRONMENT_CONFIG_GUIDE.md" target="_blank" className="text-blue-600 hover:underline">
+                      Environment Configuration
+                    </a>
+                    <p className="text-gray-600 text-xs">Multi-environment setup guide</p>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <BarChart className="w-5 h-5" style={{ color: primaryColor }} />
+                  Recent Fixes & Improvements
+                </h3>
+                <ul className="space-y-2 text-sm">
+                  <li>
+                    <a href="/HEADER_LOGO_NAVIGATION_FIX.md" target="_blank" className="text-blue-600 hover:underline">
+                      Header Logo Navigation Fix
+                    </a>
+                    <p className="text-gray-600 text-xs">Logo click behavior based on landing page setting</p>
+                  </li>
+                  <li>
+                    <a href="/LANDING_PAGE_NAVIGATION_VALIDATION.md" target="_blank" className="text-blue-600 hover:underline">
+                      Landing Page Navigation Validation
+                    </a>
+                    <p className="text-gray-600 text-xs">Business logic validation for landing page</p>
+                  </li>
+                  <li>
+                    <a href="/NAVIGATION_AND_GIFTS_FIX.md" target="_blank" className="text-blue-600 hover:underline">
+                      Navigation and Gifts Fix
+                    </a>
+                    <p className="text-gray-600 text-xs">Gift assignment and navigation improvements</p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Links</h3>
+              <div className="grid md:grid-cols-3 gap-4">
+                <a href="/technical-review" className="flex items-center gap-2 text-blue-600 hover:underline font-medium">
+                  <Code className="w-4 h-4" />
+                  Technical Review Deck
+                </a>
+                <a href="/admin/login" className="flex items-center gap-2 text-blue-600 hover:underline font-medium">
+                  <Lock className="w-4 h-4" />
+                  Admin Portal
+                </a>
+                <a href="/site/demo-site" className="flex items-center gap-2 text-blue-600 hover:underline font-medium">
+                  <Play className="w-4 h-4" />
+                  Demo Site
+                </a>
               </div>
             </div>
           </div>

@@ -552,6 +552,10 @@ export function SiteConfiguration() {
         icon: '✅'
       });
       
+      // Clear PublicSiteContext cache to ensure fresh data on next load
+      sessionStorage.removeItem('selected_site_data');
+      sessionStorage.removeItem(`site_${currentSite.id}_data`);
+      
       // Clear saved status after 3 seconds
       setTimeout(() => {
         if (saveStatus === 'saved') {
@@ -643,6 +647,10 @@ export function SiteConfiguration() {
         description: 'Your site is now live and accessible to users',
         duration: 5000
       });
+      
+      // Clear PublicSiteContext cache to ensure fresh data on next load
+      sessionStorage.removeItem('selected_site_data');
+      sessionStorage.removeItem(`site_${currentSite.id}_data`);
       
       setTimeout(() => setSaveStatus('idle'), 2000);
       
@@ -815,6 +823,30 @@ export function SiteConfiguration() {
               </a>
             )}
 
+            {/* Publish Button - Visible when in draft mode and site is not published or has unpublished changes */}
+            {configMode === 'draft' && (currentSite.status === 'draft' || hasChanges) && (
+              <Button
+                onClick={handlePublish}
+                className="bg-green-600 hover:bg-green-700 text-white"
+                disabled={isPublishing || hasChanges}
+                size="default"
+                title={hasChanges ? 'Save changes before publishing' : 'Publish site to make it live'}
+              >
+                {isPublishing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Publishing...
+                  </>
+                ) : (
+                  <>
+                    <Rocket className="w-4 h-4 mr-2" />
+                    <span className="hidden sm:inline">Publish Site</span>
+                    <span className="sm:hidden">Publish</span>
+                  </>
+                )}
+              </Button>
+            )}
+
             {/* Save Button */}
             <button
               onClick={handleSave}
@@ -855,46 +887,17 @@ export function SiteConfiguration() {
       {configMode === 'draft' && currentSite.status === 'draft' && (
         <Alert className="border-amber-200 bg-amber-50">
           <AlertCircle className="w-4 h-4 text-amber-600" />
-          <AlertDescription className="text-amber-800 flex items-center justify-between">
-            <div>
-              <strong>✏️ Draft Mode:</strong> This site is not published yet. Configure your settings below, then publish when ready.
-            </div>
-            <Button
-              onClick={handlePublish}
-              className="bg-green-600 hover:bg-green-700 text-white ml-4"
-              disabled={isPublishing}
-              size="sm"
-            >
-              {isPublishing ? (
-                <>
-                  <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
-                  Publishing...
-                </>
-              ) : (
-                <>
-                  <Rocket className="w-3 h-3 mr-1.5" />
-                  Publish Site
-                </>
-              )}
-            </Button>
+          <AlertDescription className="text-amber-800">
+            <strong>✏️ Draft Mode:</strong> This site is not published yet. Configure your settings below, then click "Publish Site" in the header when ready.
           </AlertDescription>
         </Alert>
       )}
       
-      {configMode === 'draft' && currentSite.status === 'active' && (
+      {configMode === 'draft' && currentSite.status === 'active' && hasChanges && (
         <Alert className="border-amber-200 bg-amber-50">
           <AlertCircle className="w-4 h-4 text-amber-600" />
           <AlertDescription className="text-amber-800">
-            <strong>✏️ Editing Draft:</strong> Changes won't affect the live site until you save and publish them.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {hasChanges && saveStatus === 'idle' && (
-        <Alert className="border-amber-200 bg-amber-50">
-          <AlertCircle className="w-4 h-4 text-amber-600" />
-          <AlertDescription className="text-amber-800">
-            You have unsaved changes. Remember to save before leaving this page.
+            <strong>✏️ Editing Draft:</strong> You have unsaved changes. Remember to save before leaving this page.
           </AlertDescription>
         </Alert>
       )}

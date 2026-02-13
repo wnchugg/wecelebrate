@@ -4,20 +4,15 @@ import { useLanguage } from '../context/LanguageContext';
 import { useOrder } from '../context/OrderContext';
 import { Gift } from '../context/GiftContext';
 import { ArrowLeft, ShoppingCart, Package, Loader2, Check, Minus, Plus, ArrowRight } from 'lucide-react';
-import { LanguageSelector } from '../components/LanguageSelector';
-import Logo from '../../imports/Logo';
+import { ConfigurableHeader } from '../components/layout/ConfigurableHeader';
 import { getCurrentEnvironment, buildApiUrl } from '../config/deploymentEnvironments';
 import { toast } from 'sonner';
 import { logger } from '../utils/logger';
-
-// Mock company config - in real app, load from site settings
-const companyConfig = {
-  allowQuantitySelection: true,
-  maxQuantity: 5
-};
+import { usePublicSite } from '../context/PublicSiteContext';
+import { useSite } from '../context/SiteContext';
 
 export function GiftDetail() {
-  const { giftId } = useParams();
+  const { giftId, siteId } = useParams();
   const navigate = useNavigate();
   const { selectedGift, quantity, selectGift, setQuantity } = useOrder();
   const [localQuantity, setLocalQuantity] = useState(1);
@@ -25,15 +20,20 @@ export function GiftDetail() {
   const [gift, setGift] = useState<Gift | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { currentSite: publicSite } = usePublicSite();
+  const { currentSite } = useSite();
 
-  const allowQuantity = companyConfig.allowQuantitySelection;
-  const maxQuantity = companyConfig.maxQuantity || 1;
+  // Get site settings - prefer publicSite (for public users) or currentSite (for admin preview)
+  const site = publicSite || currentSite;
+  const siteSettings = site?.settings as { allowQuantitySelection?: boolean; giftsPerUser?: number } | undefined;
+  const allowQuantity = siteSettings?.allowQuantitySelection ?? false;
+  const maxQuantity = siteSettings?.giftsPerUser ?? 1;
 
   // Load gift details
   useEffect(() => {
     const loadGift = async () => {
       if (!giftId) {
-        navigate('/gift-selection');
+        navigate('../gift-selection');
         return;
       }
       
@@ -46,7 +46,7 @@ export function GiftDetail() {
         
         if (!sessionToken) {
           toast.error('Session expired. Please log in again.');
-          navigate('/access');
+          navigate('../access');
           return;
         }
         
@@ -71,7 +71,7 @@ export function GiftDetail() {
         if (!data.gift) {
           setError('Gift not found');
           toast.error('Gift not found');
-          setTimeout(() => navigate('/gift-selection'), 2000);
+          setTimeout(() => navigate('../gift-selection'), 2000);
         } else {
           setGift(data.gift);
         }
@@ -79,7 +79,7 @@ export function GiftDetail() {
         logger.error('Failed to load gift:', error);
         setError(error instanceof Error ? error.message : 'Failed to load gift details');
         toast.error(error instanceof Error ? error.message : 'Failed to load gift');
-        setTimeout(() => navigate('/gift-selection'), 2000);
+        setTimeout(() => navigate('../gift-selection'), 2000);
       } finally {
         setIsLoading(false);
       }
@@ -111,7 +111,8 @@ export function GiftDetail() {
   const handleSelectGift = () => {
     selectGift(gift);
     setQuantity(localQuantity);
-    navigate('/shipping');
+    // Use relative navigation to stay within site context
+    navigate('../shipping-information');
   };
 
   const isCurrentlySelected = selectedGift?.id === giftId;
@@ -140,30 +141,22 @@ export function GiftDetail() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate('/gift-selection')}
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-                aria-label={t('common.back')}
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div className="h-8 w-[88px]">
-                <Logo />
-              </div>
-            </div>
-            <LanguageSelector />
-          </div>
-        </div>
-      </header>
+      {/* Header with Progress Steps */}
+      <ConfigurableHeader />
 
       {/* Main Content */}
       <div className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
+          {/* Back Button */}
+          <button
+            onClick={() => navigate('../gift-selection')}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors mb-6"
+            aria-label={t('common.back')}
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="text-sm font-medium">{t('common.back')}</span>
+          </button>
+
           <div className="bg-white rounded-2xl overflow-hidden shadow-lg">
             <div className="grid md:grid-cols-2 gap-8">
               {/* Image Section */}

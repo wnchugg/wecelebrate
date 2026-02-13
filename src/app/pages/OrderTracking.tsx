@@ -49,7 +49,7 @@ interface Order {
 }
 
 export function OrderTracking() {
-  const { orderId } = useParams();
+  const { orderId, siteId } = useParams();
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [order, setOrder] = useState<Order | null>(null);
@@ -59,7 +59,7 @@ export function OrderTracking() {
   useEffect(() => {
     const loadOrder = async () => {
       if (!orderId) {
-        navigate('/gift-selection');
+        navigate('../gift-selection');
         return;
       }
       
@@ -72,7 +72,7 @@ export function OrderTracking() {
         
         if (!sessionToken) {
           toast.error('Session expired. Please log in again.');
-          navigate('/access');
+          navigate('../access');
           return;
         }
         

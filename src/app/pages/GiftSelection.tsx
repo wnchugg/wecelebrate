@@ -114,6 +114,12 @@ export function GiftSelection() {
           throw new Error(data.error || 'Failed to load gifts');
         }
         
+        // Debug logging for image fields
+        console.log('[GiftSelection] Received gifts:', data.gifts?.length || 0);
+        data.gifts?.forEach((gift: Gift) => {
+          console.log(`[GiftSelection] Gift ${gift.id} - imageUrl: "${gift.imageUrl}", name: "${gift.name}"`);
+        });
+        
         setGifts(data.gifts || []);
         setFilteredGifts(data.gifts || []);
         setSiteInfo(data.site);
@@ -207,11 +213,6 @@ export function GiftSelection() {
             <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
               {t('gifts.curatedSelection')}
             </p>
-            {gifts && (
-              <p className="text-sm text-gray-500 mt-2">
-                {gifts.length} {gifts.length !== 1 ? t('gifts.giftsAvailablePlural') : t('gifts.giftsAvailable')}
-              </p>
-            )}
           </div>
 
           {/* Search and Filter Bar */}
@@ -346,14 +347,24 @@ export function GiftSelection() {
                         config.display.imageAspectRatio === '16:9' ? 'h-40' :
                         'h-64'
                       }`}>
-                        <img
-                          src={gift.imageUrl}
-                          alt={gift.name}
-                          className={`w-full h-full object-cover transition-transform duration-500 ${
-                            isHovered && config.display.hoverEffect === 'zoom' ? 'scale-110' : 'scale-100'
-                          }`}
-                          loading="lazy"
-                        />
+                        {gift.imageUrl ? (
+                          <img
+                            src={gift.imageUrl}
+                            alt={gift.name}
+                            className={`w-full h-full object-cover transition-transform duration-500 ${
+                              isHovered && config.display.hoverEffect === 'zoom' ? 'scale-110' : 'scale-100'
+                            }`}
+                            loading="lazy"
+                            onError={(e) => {
+                              console.error(`[GiftSelection] Failed to load image for gift ${gift.id}: ${gift.imageUrl}`);
+                              e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23f3f4f6" width="400" height="300"/%3E%3Ctext fill="%239ca3af" font-family="sans-serif" font-size="18" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3ENo Image%3C/text%3E%3C/svg%3E';
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                            <span className="text-gray-400 text-sm">No Image Available</span>
+                          </div>
+                        )}
                         {/* Category Badge */}
                         <div className="absolute top-4 left-4">
                           <span className="inline-block bg-white/90 backdrop-blur-sm text-[#D91C81] px-3 py-1 rounded-full text-xs font-semibold">

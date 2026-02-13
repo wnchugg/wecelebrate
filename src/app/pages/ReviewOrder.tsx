@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useLanguage } from '../context/LanguageContext';
 import { useOrder } from '../context/OrderContext';
 import { useAuth } from '../context/AuthContext';
@@ -19,6 +19,7 @@ const companyConfig = {
 
 export function ReviewOrder() {
   const navigate = useNavigate();
+  const { siteId } = useParams();
   const { selectedGift, quantity, shippingAddress } = useOrder();
   const { userIdentifier } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,7 +30,7 @@ export function ReviewOrder() {
 
   useEffect(() => {
     if (!selectedGift || !shippingAddress) {
-      navigate('/gift-selection');
+      navigate('../gift-selection');
     }
   }, [selectedGift, shippingAddress, navigate]);
 
@@ -49,7 +50,7 @@ export function ReviewOrder() {
       
       if (!sessionToken) {
         toast.error('Session expired. Please log in again.');
-        navigate('/access');
+        navigate('../access');
         return;
       }
       
@@ -137,7 +138,7 @@ export function ReviewOrder() {
                 {t('review.selectedGift')}
               </h2>
               <button
-                onClick={() => navigate('/gift-selection')}
+                onClick={() => navigate('../gift-selection')}
                 className="flex items-center gap-2 text-[#D91C81] hover:text-[#B71569] font-medium text-sm"
               >
                 <Edit className="w-4 h-4" />
@@ -178,7 +179,7 @@ export function ReviewOrder() {
                 {t('review.shippingInformation')}
               </h2>
               <button
-                onClick={() => navigate('/shipping')}
+                onClick={() => navigate('../shipping-information')}
                 className="flex items-center gap-2 text-[#D91C81] hover:text-[#B71569] font-medium text-sm"
               >
                 <Edit className="w-4 h-4" />

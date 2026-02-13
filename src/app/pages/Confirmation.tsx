@@ -42,7 +42,7 @@ const companyConfig = {
 };
 
 export function Confirmation() {
-  const { orderId } = useParams();
+  const { orderId, siteId } = useParams();
   const navigate = useNavigate();
   const { clearOrder } = useOrder();
   const { t } = useLanguage();
@@ -56,7 +56,7 @@ export function Confirmation() {
   useEffect(() => {
     const loadOrder = async () => {
       if (!orderId) {
-        navigate('/gift-selection');
+        navigate('../gift-selection');
         return;
       }
       
@@ -69,7 +69,7 @@ export function Confirmation() {
         
         if (!sessionToken) {
           toast.error('Session expired. Please log in again.');
-          navigate('/access');
+          navigate('../access');
           return;
         }
         
@@ -134,7 +134,7 @@ export function Confirmation() {
         <div className="text-center">
           <p className="text-red-500 text-lg font-bold mb-4">{error || 'Order not found'}</p>
           <button
-            onClick={() => navigate('/gift-selection')}
+            onClick={() => navigate('../gift-selection')}
             className="text-[#D91C81] hover:text-[#B71569] font-medium"
           >
             Return to Gift Selection

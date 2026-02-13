@@ -34,7 +34,7 @@ export function ShippingInformation() {
 
   useEffect(() => {
     if (!selectedGift) {
-      navigate('/gift-selection');
+      navigate('../gift-selection');
     }
   }, [selectedGift, navigate]);
 
@@ -53,7 +53,7 @@ export function ShippingInformation() {
       setShippingAddress(formData);
     }
     
-    navigate('/review');
+    navigate('../review');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

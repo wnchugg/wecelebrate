@@ -3610,6 +3610,45 @@ app.put("/make-server-6fcaeea3/sites/:siteId/gift-config", verifyAdmin, async (c
   }
 });
 
+// Update site
+app.put("/make-server-6fcaeea3/sites/:siteId", verifyAdmin, async (c) => {
+  const environmentId = c.get('environmentId') || 'development';
+  
+  try {
+    const siteId = c.req.param('siteId');
+    const updates = await c.req.json();
+    
+    console.log('[Update Site] Site ID:', siteId);
+    console.log('[Update Site] Environment:', environmentId);
+    console.log('[Update Site] Updates:', JSON.stringify(updates, null, 2));
+    
+    // Get existing site
+    const existingSite = await kv.get(`site:${environmentId}:${siteId}`, environmentId);
+    
+    if (!existingSite) {
+      return c.json({ error: 'Site not found' }, 404);
+    }
+    
+    // Merge updates with existing site
+    const updatedSite = {
+      ...existingSite,
+      ...updates,
+      id: siteId, // Ensure ID doesn't change
+      updatedAt: new Date().toISOString(),
+    };
+    
+    // Save updated site
+    await kv.set(`site:${environmentId}:${siteId}`, updatedSite, environmentId);
+    
+    console.log('[Update Site] ✅ Successfully updated site');
+    
+    return c.json({ site: updatedSite });
+  } catch (error: any) {
+    console.error('[Update Site] ❌ Error:', error);
+    return c.json({ error: error.message }, 500);
+  }
+});
+
 // Get gifts available for a specific site
 app.get("/make-server-6fcaeea3/sites/:siteId/gifts", async (c) => {
   const environmentId = c.req.header('X-Environment-ID') || 'development';
@@ -6515,6 +6554,8 @@ app.get("/make-server-6fcaeea3/public/sites/:siteId/gifts", async (c) => {
     // Get all site-gift assignments for this site
     const assignments = await kv.getByPrefix(`site-gift-assignment:${siteId}:`, environmentId);
     
+    console.log(`[Public Gifts] Found ${assignments?.length || 0} gift assignments for site ${siteId}`);
+    
     if (!assignments || assignments.length === 0) {
       return c.json({ gifts: [], site: { name: site.name, description: site.description } });
     }
@@ -6522,23 +6563,35 @@ app.get("/make-server-6fcaeea3/public/sites/:siteId/gifts", async (c) => {
     // Fetch full gift details for each assignment
     const giftsWithDetails = await Promise.all(
       assignments.map(async (assignment) => {
-        const gift = await kv.get(`gift:${environmentId}:${assignment.giftId}`, environmentId);
+        const giftKey = `gift:${environmentId}:${assignment.giftId}`;
+        const gift = await kv.get(giftKey, environmentId);
         
-        if (!gift || gift.status !== 'active') {
+        console.log(`[Public Gifts] Fetching gift with key: ${giftKey}`);
+        
+        if (!gift) {
+          console.warn(`[Public Gifts] Gift not found for assignment: ${assignment.giftId}`);
           return null;
         }
+        
+        if (gift.status !== 'active') {
+          console.log(`[Public Gifts] Gift ${gift.id} is not active (status: ${gift.status})`);
+          return null;
+        }
+        
+        // Debug logging for image field - log all relevant fields
+        console.log(`[Public Gifts] Gift ${gift.id} - name: "${gift.name}", image: "${gift.image || 'MISSING'}", imageUrl: "${gift.imageUrl || 'MISSING'}", category: "${gift.category}"`);
         
         // Check inventory
         const inventoryAvailable = gift.inventoryTracking 
           ? (gift.inventoryQuantity || 0) > 0 
           : true;
         
-        return {
+        const mappedGift = {
           ...gift,
           // Map image to imageUrl for frontend compatibility
-          imageUrl: gift.imageUrl || gift.image,
-          // Map price to value for frontend compatibility
-          value: gift.value || gift.price,
+          imageUrl: gift.imageUrl || gift.image || '',
+          // Map price to value for frontend compatibility  
+          value: gift.value || gift.price || 0,
           // Include site-specific assignment details
           priority: assignment.priority || 0,
           quantityLimit: assignment.quantityLimit,
@@ -6547,6 +6600,10 @@ app.get("/make-server-6fcaeea3/public/sites/:siteId/gifts", async (c) => {
             ? `${gift.inventoryQuantity || 0} available`
             : 'In Stock'
         };
+        
+        console.log(`[Public Gifts] Mapped gift ${gift.id} - final imageUrl: "${mappedGift.imageUrl}"`);
+        
+        return mappedGift;
       })
     );
     
@@ -6554,6 +6611,8 @@ app.get("/make-server-6fcaeea3/public/sites/:siteId/gifts", async (c) => {
     const availableGifts = giftsWithDetails
       .filter(gift => gift !== null)
       .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+    
+    console.log(`[Public Gifts] Returning ${availableGifts.length} available gifts`);
     
     return c.json({ 
       gifts: availableGifts,
@@ -6576,15 +6635,20 @@ app.get("/make-server-6fcaeea3/public/sites/:siteId/gifts", async (c) => {
 app.get("/make-server-6fcaeea3/public/gifts/:giftId", async (c) => {
   const environmentId = c.req.header('X-Environment-ID') || 'development';
   const giftId = c.req.param('giftId');
-  const sessionToken = c.req.header('Authorization')?.replace('Bearer ', '');
+  const sessionToken = c.req.header('X-Session-Token'); // Changed from Authorization header
   
   try {
-    // Verify session token
+    // SECURITY: Session token verification
+    // For demo/preview purposes, we allow access without session but log it
+    // In production, consider making this mandatory by removing the conditional
     if (sessionToken) {
       const session = await kv.get(`session:${sessionToken}`, environmentId);
       if (!session) {
-        return c.json({ error: 'Invalid session' }, 403);
+        return c.json({ error: 'Invalid or expired session. Please validate your access again.' }, 403);
       }
+    } else {
+      // No session provided - log for security audit
+      console.log(`[SECURITY WARNING] Accessing gift ${giftId} without session in environment: ${environmentId}`);
     }
     
     const gift = await kv.get(`gift:${environmentId}:${giftId}`, environmentId);

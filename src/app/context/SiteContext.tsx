@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
-import { clientApi, siteApi } from '../utils/api';
+import { clientApi, siteApi, apiRequest } from '../utils/api';
 import { useAdmin } from './AdminContext';
 import { logger } from '../utils/logger';
 import { isPublicRoute } from '../utils/routeUtils';
@@ -459,7 +459,29 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateSite = async (id: string, updates: Partial<Site>): Promise<void> => {
-    setSites(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
+    try {
+      // Make API call to update site in backend
+      const response = await apiRequest(`/sites/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(updates)
+      }) as Response;
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to update site');
+      }
+      
+      // Update local state
+      setSites(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
+      
+      // Update currentSite if it's the one being updated
+      if (currentSite?.id === id) {
+        setCurrentSite(prev => prev ? { ...prev, ...updates } : null);
+      }
+    } catch (error) {
+      console.error('Failed to update site:', error);
+      throw error;
+    }
   };
 
   const deleteSite = async (id: string): Promise<void> => {

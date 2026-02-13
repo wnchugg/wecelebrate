@@ -670,6 +670,82 @@ app.post("/make-server-6fcaeea3/public/cleanup-all-sites", async (c) => {
   }
 });
 
+// Seed test employees for a site (public - for testing)
+app.post("/make-server-6fcaeea3/public/seed-test-employees", async (c) => {
+  const environmentId = c.req.header('X-Environment-ID') || 'development';
+  
+  try {
+    const { siteId } = await c.req.json();
+    
+    if (!siteId) {
+      return c.json({
+        success: false,
+        message: 'siteId is required',
+        timestamp: new Date().toISOString()
+      }, 400);
+    }
+    
+    // Create test employees
+    const testEmployees = [
+      {
+        id: 'emp-001',
+        siteId: siteId,
+        name: 'John Doe',
+        email: 'john.doe@company.com',
+        employeeId: 'EMP001',
+        serialCard: 'CARD-001',
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'emp-002',
+        siteId: siteId,
+        name: 'Nicholus Chugg',
+        email: 'nchugg@halo.com',
+        employeeId: 'EMP002',
+        serialCard: 'CARD-002',
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'emp-003',
+        siteId: siteId,
+        name: 'Jane Smith',
+        email: 'jane.smith@company.com',
+        employeeId: 'EMP003',
+        serialCard: 'CARD-003',
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    ];
+    
+    // Save employees to KV store
+    for (const employee of testEmployees) {
+      const key = `employee:${siteId}:${employee.id}`;
+      await kv.set(key, employee, environmentId);
+      console.log(`[Seed] Created employee: ${key}`);
+    }
+    
+    return c.json({
+      success: true,
+      message: `Seeded ${testEmployees.length} test employees for site ${siteId}`,
+      employees: testEmployees.map(e => ({ id: e.id, name: e.name, email: e.email })),
+      environment: environmentId,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error: any) {
+    console.error('Seed test employees error:', error);
+    return c.json({
+      success: false,
+      message: error.message || 'Failed to seed test employees',
+      timestamp: new Date().toISOString()
+    }, 500);
+  }
+});
+
 // Database connection test endpoint (public - no auth required)
 app.get("/make-server-6fcaeea3/test-db", async (c) => {
   const environmentId = c.req.header('X-Environment-ID') || 'development';

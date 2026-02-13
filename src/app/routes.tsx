@@ -228,15 +228,15 @@ export const router = createBrowserRouter([
         errorElement: <ErrorBoundary />,
         HydrateFallback: LoadingFallback,
         children: [
-          { index: true, Component: Welcome, HydrateFallback: LoadingFallback },
-          { path: "home", Component: Landing, HydrateFallback: LoadingFallback }, // Site home/landing page - route renamed from "landing" to "home" for clarity
-          { path: "access", Component: AccessValidation, HydrateFallback: LoadingFallback },
+          { index: true, Component: Landing, HydrateFallback: LoadingFallback }, // Landing page is the entry point
+          { path: "access", Component: AccessValidation, HydrateFallback: LoadingFallback }, // Step 2: Access validation
+          { path: "welcome", Component: Welcome, HydrateFallback: LoadingFallback }, // Step 3: Welcome page after authentication
+          { path: "gift-selection", Component: GiftSelection, HydrateFallback: LoadingFallback }, // Step 4: Gift selection
           { path: "celebration", Component: Celebration, HydrateFallback: LoadingFallback },
           { path: "magic-link", Component: MagicLinkRequest, HydrateFallback: LoadingFallback },
           { path: "magic-link/validate", Component: MagicLinkValidation, HydrateFallback: LoadingFallback },
           { path: "sso/validate", Component: SSOValidation, HydrateFallback: LoadingFallback },
           { path: "privacy", Component: PrivacyPolicy, HydrateFallback: LoadingFallback },
-          { path: "gift-selection", Component: GiftSelection, HydrateFallback: LoadingFallback },
           { path: "gift-detail", Component: GiftDetail, HydrateFallback: LoadingFallback },
           { path: "shipping-information", Component: ShippingInformation, HydrateFallback: LoadingFallback },
           { path: "select-shipping", Component: SelectShipping, HydrateFallback: LoadingFallback },

@@ -170,7 +170,12 @@ export function AccessValidation() {
         });
         
         authenticate(sanitizedInput);
-        navigate('/gift-selection');
+        
+        // Check if welcome page is enabled (default to true for backward compatibility)
+        const enableWelcomePage = currentSite?.settings?.enableWelcomePage !== false;
+        
+        // Navigate to welcome page if enabled, otherwise go directly to gift selection
+        navigate(enableWelcomePage ? 'welcome' : 'gift-selection');
       } else {
         // Validation failed
         setError(data.error || t('validation.error.invalid'));

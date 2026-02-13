@@ -317,7 +317,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [currentSite, setCurrentSite] = useState<Site | null>(null);
   const [currentClient, setCurrentClient] = useState<Client | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { isAdminAuthenticated, adminLoading } = useAdmin();
+  const { isAdminAuthenticated, isLoading: adminLoading } = useAdmin();
   const hasLoadedRef = useRef(false);
 
   // Load sites and clients from API when admin is authenticated

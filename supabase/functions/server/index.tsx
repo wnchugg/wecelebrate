@@ -5824,6 +5824,83 @@ app.get("/make-server-6fcaeea3/sites/:siteId/employees", verifyAdmin, async (c) 
   }
 });
 
+// Create single employee
+app.post("/make-server-6fcaeea3/sites/:siteId/employees", verifyAdmin, async (c) => {
+  const environmentId = c.get('environmentId') || 'development';
+  const userId = c.get('userId');
+  const siteId = c.req.param('siteId');
+  
+  try {
+    const data = await c.req.json();
+    
+    // Validate required fields based on validation method
+    if (!data.email && !data.employeeId && !data.serialCard) {
+      return c.json({ error: 'At least one identifier (email, employeeId, or serialCard) is required' }, 400);
+    }
+    
+    // Validate site exists
+    const site = await kv.get(`site:${siteId}`, environmentId);
+    if (!site) {
+      return c.json({ error: 'Site not found' }, 404);
+    }
+    
+    const employee = {
+      id: crypto.randomUUID(),
+      siteId,
+      email: data.email?.toLowerCase().trim() || '',
+      employeeId: data.employeeId?.trim() || '',
+      serialCard: data.serialCard?.trim() || '',
+      name: data.name?.trim() || '',
+      department: data.department?.trim() || '',
+      status: 'active',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    await kv.set(`employee:${siteId}:${employee.id}`, employee, environmentId);
+    
+    // Trigger employee_added email automation if employee has email
+    if (employee.email && employee.serialCard) {
+      try {
+        const client = await kv.get(`client:${site.clientId}`, environmentId);
+        await emailEventHelper.notifyEmployeeAdded(
+          siteId,
+          {
+            email: employee.email,
+            name: employee.name,
+            serialCode: employee.serialCard,
+          },
+          {
+            name: site.name || 'Your Site',
+          },
+          {
+            name: client?.name || 'Your Company',
+          },
+          environmentId
+        );
+        console.log(`[Employee Create] Triggered employee_added email for ${employee.email}`);
+      } catch (emailError: any) {
+        console.error(`[Employee Create] Failed to send email for ${employee.email}:`, emailError);
+        // Don't fail the creation if email fails
+      }
+    }
+    
+    await auditLog({
+      action: 'employee_created',
+      userId,
+      status: 'success',
+      ip: c.req.header('x-forwarded-for') || c.req.header('x-real-ip'),
+      userAgent: c.req.header('user-agent'),
+      details: { employeeId: employee.id, siteId }
+    });
+    
+    return c.json({ employee });
+  } catch (error: any) {
+    console.error('Create employee error:', error);
+    return c.json({ error: error.message }, 500);
+  }
+});
+
 // Get single employee
 app.get("/make-server-6fcaeea3/employees/:id", verifyAdmin, async (c) => {
   const environmentId = c.get('environmentId') || 'development';
@@ -5948,6 +6025,12 @@ app.post("/make-server-6fcaeea3/public/validate/employee", async (c) => {
       return c.json({ error: 'siteId, method, and value are required' }, 400);
     }
     
+    // Get site to check allowed domains
+    const site = await kv.get(`site:${siteId}`, environmentId);
+    if (!site) {
+      return c.json({ error: 'Site not found' }, 404);
+    }
+    
     // Get all employees for the site
     console.log(`[Employee Validation] Looking for employees with prefix: employee:${siteId}:`);
     const employees = await kv.getByPrefix(`employee:${siteId}:`, environmentId);
@@ -5965,6 +6048,22 @@ app.post("/make-server-6fcaeea3/public/validate/employee", async (c) => {
       validEmployee = employees.find(emp => 
         emp.email === normalizedValue && emp.status === 'active'
       );
+      
+      // If no specific employee found, check allowed domains
+      if (!validEmployee && site.settings?.allowedDomains && site.settings.allowedDomains.length > 0) {
+        const emailDomain = normalizedValue.split('@')[1];
+        if (emailDomain && site.settings.allowedDomains.includes(emailDomain)) {
+          console.log(`[Employee Validation] Email domain ${emailDomain} is in allowed domains list`);
+          // Create a temporary employee record for domain-based access
+          validEmployee = {
+            id: `domain-${crypto.randomUUID()}`,
+            email: normalizedValue,
+            name: normalizedValue.split('@')[0],
+            siteId,
+            status: 'active'
+          };
+        }
+      }
     } else if (method === 'employeeId') {
       validEmployee = employees.find(emp => 
         emp.employeeId === value.trim() && emp.status === 'active'

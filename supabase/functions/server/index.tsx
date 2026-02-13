@@ -594,6 +594,36 @@ app.get("/make-server-6fcaeea3/public/debug-sites", async (c) => {
   }
 });
 
+// Test endpoint to verify /sites CRUD endpoint (requires admin auth)
+app.get("/make-server-6fcaeea3/public/test-sites-endpoint", verifyAdmin, async (c) => {
+  const environmentId = c.get('environmentId') || 'development';
+  
+  try {
+    // This mimics what the CRUD factory does
+    const prefix = `site:${environmentId}:`;
+    const allSites = await kv.getByPrefix(prefix);
+    
+    return c.json({
+      success: true,
+      message: 'Sites endpoint test successful',
+      data: allSites,
+      meta: {
+        total: allSites?.length || 0,
+        prefix: prefix,
+        environmentId: environmentId
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error: any) {
+    console.error('Test sites endpoint error:', error);
+    return c.json({
+      success: false,
+      message: error.message || 'Failed to test sites endpoint',
+      timestamp: new Date().toISOString()
+    }, 500);
+  }
+});
+
 // Cleanup endpoint to delete ALL sites and reseed (public - for cleanup)
 app.post("/make-server-6fcaeea3/public/cleanup-all-sites", async (c) => {
   const environmentId = c.req.header('X-Environment-ID') || 'development';

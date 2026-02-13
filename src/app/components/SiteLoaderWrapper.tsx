@@ -23,14 +23,14 @@ function SiteRouteFallback() {
  */
 export function SiteLoaderWrapper() {
   const { siteId } = useParams<{ siteId: string }>();
-  const { loadSite, site, isLoading, error } = usePublicSite();
+  const { setSiteById, site, isLoading, error } = usePublicSite();
 
   useEffect(() => {
     if (siteId) {
       logger.info('[SiteLoaderWrapper] Loading site', { siteId });
-      loadSite(siteId);
+      setSiteById(siteId);
     }
-  }, [siteId, loadSite]);
+  }, [siteId, setSiteById]);
 
   // Show loading state while site is being loaded
   if (isLoading) {

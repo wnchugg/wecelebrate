@@ -73,6 +73,7 @@ export function SiteConfiguration() {
   const [allowQuantitySelection, setAllowQuantitySelection] = useState(currentSite?.settings.allowQuantitySelection ?? false);
   const [showPricing, setShowPricing] = useState(currentSite?.settings.showPricing ?? true);
   const [skipLandingPage, setSkipLandingPage] = useState(currentSite?.settings.skipLandingPage ?? false);
+  const [enableLandingPage, setEnableLandingPage] = useState(currentSite?.settings.skipLandingPage === false);
   const [giftsPerUser, setGiftsPerUser] = useState(currentSite?.settings.giftsPerUser || 1);
   const [validationMethod, setValidationMethod] = useState<'email' | 'employeeId' | 'serialCard' | 'magic_link' | 'sso'>(
     currentSite?.settings.validationMethod || 'email'
@@ -163,6 +164,7 @@ export function SiteConfiguration() {
       setAllowQuantitySelection(currentSite.settings?.allowQuantitySelection ?? false);
       setShowPricing(currentSite.settings?.showPricing ?? true);
       setSkipLandingPage(currentSite.settings?.skipLandingPage ?? false);
+      setEnableLandingPage(currentSite.settings?.skipLandingPage === false);
       setGiftsPerUser(currentSite.settings?.giftsPerUser || 1);
       setValidationMethod(currentSite.settings?.validationMethod || 'email');
       setDefaultLanguage(currentSite.settings?.defaultLanguage || 'en');
@@ -288,7 +290,7 @@ export function SiteConfiguration() {
           ...currentSite.settings,
           allowQuantitySelection,
           showPricing,
-          skipLandingPage,
+          skipLandingPage: !enableLandingPage, // Invert for backend
           giftsPerUser,
           validationMethod,
           defaultLanguage,
@@ -455,7 +457,7 @@ export function SiteConfiguration() {
           ...currentSite.settings,
           allowQuantitySelection,
           showPricing,
-          skipLandingPage,
+          skipLandingPage: !enableLandingPage, // Invert for backend
           giftsPerUser,
           validationMethod,
           defaultLanguage,
@@ -1075,26 +1077,6 @@ export function SiteConfiguration() {
                     checked={showPricing}
                     onChange={(e) => {
                       setShowPricing(e.target.checked);
-                      setHasChanges(true);
-                    }}
-                    disabled={configMode === 'live'}
-                    className="sr-only peer" 
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-semibold text-gray-900">Skip Home Page</p>
-                  <p className="text-sm text-gray-600">Redirect users directly to authentication page</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox"
-                    checked={skipLandingPage}
-                    onChange={(e) => {
-                      setSkipLandingPage(e.target.checked);
                       setHasChanges(true);
                     }}
                     disabled={configMode === 'live'}
@@ -3113,9 +3095,46 @@ export function SiteConfiguration() {
               </div>
             </div>
           </div>
-          <Suspense fallback={<LoadingSpinner />}>
-            <LandingPageEditor />
-          </Suspense>
+
+          {/* Landing Page Enable/Disable */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Layout className="w-5 h-5 text-blue-600" />
+                Landing Page Configuration
+              </CardTitle>
+              <CardDescription>
+                Configure landing page visibility (optional)
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-semibold text-gray-900">Enable Landing Page</p>
+                  <p className="text-sm text-gray-600">Show landing page before authentication</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    checked={enableLandingPage}
+                    onChange={(e) => {
+                      setEnableLandingPage(e.target.checked);
+                      setHasChanges(true);
+                    }}
+                    disabled={configMode === 'live'}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                </label>
+              </div>
+            </CardContent>
+          </Card>
+
+          {enableLandingPage && (
+            <Suspense fallback={<LoadingSpinner />}>
+              <LandingPageEditor />
+            </Suspense>
+          )}
         </TabsContent>
 
         {/* Welcome Page Tab */}

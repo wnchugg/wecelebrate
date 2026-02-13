@@ -94,8 +94,9 @@ export function Welcome() {
           from: window.location.pathname,
           to: siteId ? '../gift-selection' : '/gift-selection'
         });
-        // Navigate to gift-selection (sibling route)
+        // Navigate to gift-selection (sibling route) immediately
         navigate(siteId ? '../gift-selection' : '/gift-selection', { replace: true });
+        return; // Exit early to prevent rendering
       }
     }
   }, [currentSite, navigate, siteId]);
@@ -173,6 +174,18 @@ As a token of our appreciation for your continued service, we invite you to sele
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#D91C81] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600 font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Early return if welcome page is disabled - prevents flash of content before redirect
+  if (currentSite.settings.enableWelcomePage === false) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#D91C81] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">Redirecting...</p>
         </div>
       </div>
     );

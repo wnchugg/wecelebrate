@@ -6535,6 +6535,10 @@ app.get("/make-server-6fcaeea3/public/sites/:siteId/gifts", async (c) => {
         
         return {
           ...gift,
+          // Map image to imageUrl for frontend compatibility
+          imageUrl: gift.imageUrl || gift.image,
+          // Map price to value for frontend compatibility
+          value: gift.value || gift.price,
           // Include site-specific assignment details
           priority: assignment.priority || 0,
           quantityLimit: assignment.quantityLimit,
@@ -6583,7 +6587,7 @@ app.get("/make-server-6fcaeea3/public/gifts/:giftId", async (c) => {
       }
     }
     
-    const gift = await kv.get(`gift:${giftId}`, environmentId);
+    const gift = await kv.get(`gift:${environmentId}:${giftId}`, environmentId);
     
     if (!gift) {
       return c.json({ error: 'Gift not found' }, 404);
@@ -6601,6 +6605,10 @@ app.get("/make-server-6fcaeea3/public/gifts/:giftId", async (c) => {
     return c.json({ 
       gift: {
         ...gift,
+        // Map image to imageUrl for frontend compatibility
+        imageUrl: gift.imageUrl || gift.image,
+        // Map price to value for frontend compatibility
+        value: gift.value || gift.price,
         available: inventoryAvailable,
         inventoryStatus: gift.inventoryTracking 
           ? `${gift.inventoryQuantity || 0} available`

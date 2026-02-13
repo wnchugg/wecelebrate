@@ -1,6 +1,6 @@
-import { Link, useLocation, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { ChevronRight, Menu, X, Search, User, LogOut, Settings } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useSite } from '../../context/SiteContext';
 import { LanguageSelector } from '../LanguageSelector';
@@ -27,9 +27,59 @@ export function ConfigurableHeader({ config, siteName, clientName }: Configurabl
   const { currentSite, sites } = useSite();
   const location = useLocation();
   const navigate = useNavigate();
+  const { siteId } = useParams();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Check if welcome page is enabled
+  const isWelcomePageEnabled = currentSite?.settings?.enableWelcomePage !== false;
+
+  // Dynamic step map based on welcome page setting
+  const stepMap: Record<string, { label: string; step: number }> = useMemo(() => {
+    if (isWelcomePageEnabled) {
+      // With welcome page: Welcome (0) → Select Gift (1) → Shipping (2) → Review (3) → Confirmation (4)
+      return {
+        '/welcome': { label: 'Welcome', step: 0 },
+        '/gift-selection': { label: 'Select Gift', step: 1 },
+        '/gift-detail': { label: 'Gift Details', step: 1 },
+        '/select-shipping': { label: 'Shipping', step: 2 },
+        '/shipping-information': { label: 'Shipping', step: 2 },
+        '/review-order': { label: 'Review Order', step: 3 },
+        '/confirmation': { label: 'Confirmation', step: 4 },
+      };
+    } else {
+      // Without welcome page: Select Gift (1) → Shipping (2) → Review (3) → Confirmation (4)
+      return {
+        '/gift-selection': { label: 'Select Gift', step: 1 },
+        '/gift-detail': { label: 'Gift Details', step: 1 },
+        '/select-shipping': { label: 'Shipping', step: 2 },
+        '/shipping-information': { label: 'Shipping', step: 2 },
+        '/review-order': { label: 'Review Order', step: 3 },
+        '/confirmation': { label: 'Confirmation', step: 4 },
+      };
+    }
+  }, [isWelcomePageEnabled]);
+
+  // Determine home link based on landing page setting and current route
+  const homeLink = useMemo(() => {
+    // If we're in a site-specific route (/site/:siteId/...)
+    if (siteId) {
+      // Check if landing page is enabled for this site
+      const isLandingPageEnabled = !currentSite?.settings?.skipLandingPage;
+      
+      if (isLandingPageEnabled) {
+        // Landing page enabled: go to /site/:siteId (landing page)
+        return `/site/${siteId}`;
+      } else {
+        // Landing page disabled: go to /site/:siteId/access
+        return `/site/${siteId}/access`;
+      }
+    }
+    
+    // Default: use configured link or root
+    return config?.logo?.link || '/';
+  }, [siteId, currentSite?.settings?.skipLandingPage, config?.logo?.link]);
 
   // Merge with default configuration
   const headerConfig = {
@@ -39,7 +89,7 @@ export function ConfigurableHeader({ config, siteName, clientName }: Configurabl
       url: '',
       alt: 'Logo',
       height: 40,
-      link: '/',
+      link: homeLink, // Use dynamic home link
     },
     navigation: config?.navigation ?? { enabled: false, items: [] },
     progressBar: config?.progressBar ?? { enabled: true, style: 'steps' as const, showLabels: true },
@@ -142,18 +192,43 @@ export function ConfigurableHeader({ config, siteName, clientName }: Configurabl
             {/* Progress Bar */}
             {isAuthenticated && headerConfig.progressBar.enabled && currentStep && (
               <nav aria-label="Progress steps" className="flex items-center gap-2 text-sm">
+                {/* Welcome Step (only if enabled) */}
+                {isWelcomePageEnabled && (
+                  <>
+                    <Link
+                      to={siteId ? `/site/${siteId}/welcome` : '/welcome'}
+                      className={`px-3 py-1 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[#D91C81] ${
+                        currentStep.step === 0
+                          ? 'bg-pink-100 text-[#D91C81] font-semibold'
+                          : currentStep.step > 0
+                          ? 'text-gray-600 hover:text-[#D91C81]'
+                          : 'text-gray-400'
+                      }`}
+                      aria-current={currentStep.step === 0 ? 'step' : undefined}
+                    >
+                      {headerConfig.progressBar.showLabels ? '0. Welcome' : '0'}
+                    </Link>
+                    <ChevronRight className="w-4 h-4 text-gray-400" aria-hidden="true" />
+                  </>
+                )}
+                
+                {/* Select Gift Step */}
                 <Link
-                  to="/gift-selection"
+                  to={siteId ? `/site/${siteId}/gift-selection` : '/gift-selection'}
                   className={`px-3 py-1 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[#D91C81] ${
                     currentStep.step === 1
                       ? 'bg-pink-100 text-[#D91C81] font-semibold'
-                      : 'text-gray-600 hover:text-[#D91C81]'
+                      : currentStep.step > 1
+                      ? 'text-gray-600 hover:text-[#D91C81]'
+                      : 'text-gray-400'
                   }`}
                   aria-current={currentStep.step === 1 ? 'step' : undefined}
                 >
                   {headerConfig.progressBar.showLabels ? '1. Select Gift' : '1'}
                 </Link>
                 <ChevronRight className="w-4 h-4 text-gray-400" aria-hidden="true" />
+                
+                {/* Shipping Step */}
                 <span
                   className={`px-3 py-1 rounded-lg transition-colors ${
                     currentStep.step === 2
@@ -167,6 +242,8 @@ export function ConfigurableHeader({ config, siteName, clientName }: Configurabl
                   {headerConfig.progressBar.showLabels ? '2. Shipping' : '2'}
                 </span>
                 <ChevronRight className="w-4 h-4 text-gray-400" aria-hidden="true" />
+                
+                {/* Review Step */}
                 <span
                   className={`px-3 py-1 rounded-lg transition-colors ${
                     currentStep.step === 3
@@ -180,6 +257,8 @@ export function ConfigurableHeader({ config, siteName, clientName }: Configurabl
                   {headerConfig.progressBar.showLabels ? '3. Review' : '3'}
                 </span>
                 <ChevronRight className="w-4 h-4 text-gray-400" aria-hidden="true" />
+                
+                {/* Confirmation Step */}
                 <span
                   className={`px-3 py-1 rounded-lg transition-colors ${
                     currentStep.step === 4

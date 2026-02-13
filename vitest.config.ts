@@ -2,8 +2,26 @@ import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
+// Simplified Figma Asset Plugin for tests
+function figmaAssetPlugin() {
+  return {
+    name: 'figma-asset-plugin',
+    resolveId(id: string) {
+      if (id.startsWith('figma:asset/')) {
+        return '\0' + id;
+      }
+    },
+    load(id: string) {
+      if (id.startsWith('\0figma:asset/')) {
+        const hash = id.slice('\0figma:asset/'.length);
+        return `export default "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/${hash}"`;
+      }
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), figmaAssetPlugin()],
   test: {
     globals: true,
     environment: 'jsdom',

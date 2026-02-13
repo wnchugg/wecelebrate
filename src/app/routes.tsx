@@ -237,7 +237,7 @@ export const router = createBrowserRouter([
           { path: "magic-link/validate", Component: MagicLinkValidation, HydrateFallback: LoadingFallback },
           { path: "sso/validate", Component: SSOValidation, HydrateFallback: LoadingFallback },
           { path: "privacy", Component: PrivacyPolicy, HydrateFallback: LoadingFallback },
-          { path: "gift-detail", Component: GiftDetail, HydrateFallback: LoadingFallback },
+          { path: "gift-detail/:giftId", Component: GiftDetail, HydrateFallback: LoadingFallback },
           { path: "shipping-information", Component: ShippingInformation, HydrateFallback: LoadingFallback },
           { path: "select-shipping", Component: SelectShipping, HydrateFallback: LoadingFallback },
           { path: "review-order", Component: ReviewOrder, HydrateFallback: LoadingFallback },

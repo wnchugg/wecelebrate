@@ -173,7 +173,8 @@ export function GiftSelection() {
   }, [gifts, searchQuery, selectedCategory, sortBy]);
 
   const handleSelectGift = (giftId: string) => {
-    navigate(`/gift-detail/${giftId}`);
+    // Use relative path to navigate to sibling route
+    navigate(siteId ? `../gift-detail/${giftId}` : `/gift-detail/${giftId}`);
   };
 
   const clearFilters = () => {

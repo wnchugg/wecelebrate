@@ -311,6 +311,8 @@ export interface SiteContextType {
 export const SiteContext = createContext<SiteContextType | undefined>(undefined);
 
 export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  console.log('[SiteProvider] Component rendering');
+  
   const [clients, setClients] = useState<Client[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [sites, setSites] = useState<Site[]>([]);
@@ -319,6 +321,14 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
   const { isAdminAuthenticated, isLoading: adminLoading } = useAdmin();
   const hasLoadedRef = useRef(false);
+
+  console.log('[SiteProvider] State:', {
+    isAdminAuthenticated,
+    adminLoading,
+    hasLoadedRef: hasLoadedRef.current,
+    sitesCount: sites.length,
+    isLoading
+  });
 
   // Reset hasLoadedRef when authentication state changes
   useEffect(() => {

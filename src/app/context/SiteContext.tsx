@@ -350,16 +350,20 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
           clientApi.getAll()
         ]);
 
-        logger.info('[SiteContext] Loaded data', {
-          sitesCount: sitesResponse.data?.length || 0,
-          clientsCount: clientsResponse.data?.length || 0
+        logger.info('[SiteContext] API responses received', {
+          sitesResponse: sitesResponse,
+          clientsResponse: clientsResponse,
+          sitesSuccess: sitesResponse?.success,
+          sitesDataLength: sitesResponse?.data?.length,
+          clientsSuccess: clientsResponse?.success,
+          clientsDataLength: clientsResponse?.data?.length
         });
 
         setSites(sitesResponse.data || []);
         setClients(clientsResponse.data || []);
 
         // Auto-select first active site if none selected
-        if (!currentSite && sitesResponse.data && sitesResponse.data.length > 0) {
+        if (sitesResponse.data && sitesResponse.data.length > 0) {
           const firstActiveSite = sitesResponse.data.find((s: Site) => s.status === 'active') || sitesResponse.data[0];
           setCurrentSite(firstActiveSite);
 
@@ -374,14 +378,18 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         hasLoadedRef.current = true;
       } catch (error) {
-        logger.error('[SiteContext] Failed to load data', { error });
+        logger.error('[SiteContext] Failed to load data', { 
+          error,
+          errorMessage: error instanceof Error ? error.message : String(error),
+          errorStack: error instanceof Error ? error.stack : undefined
+        });
       } finally {
         setIsLoading(false);
       }
     };
 
     loadData();
-  }, [isAdminAuthenticated, adminLoading, currentSite]);
+  }, [isAdminAuthenticated, adminLoading]); // Removed currentSite from dependencies
 
   const addClient = async (client: Partial<Client>): Promise<Client> => {
     const newClient = { ...client, id: Date.now().toString() } as Client;

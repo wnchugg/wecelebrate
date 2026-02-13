@@ -280,7 +280,8 @@ initializeStorageBuckets().catch(err => {
 // This prevents 544 deployment errors by ensuring cache exists before first request
 console.log('⚡ Pre-initializing cache with empty arrays (prevents cold start timeouts)');
 setCachedData('environments:list', []);
-setCachedData('sites:list:development', []);
+// NOTE: Removed sites cache pre-initialization to allow proper data loading
+// setCachedData('sites:list:development', []);
 console.log('✅ Cache pre-initialized - first requests will be fast');
 
 // DISABLED: Warmup function was causing deployment timeouts (544 errors)
@@ -475,6 +476,40 @@ app.get("/make-server-6fcaeea3/health", async (c) => {
   }
 });
 
+// Public health check endpoint with database status (for frontend initialization check)
+app.get("/make-server-6fcaeea3/public/health-check", async (c) => {
+  const environmentId = c.req.header('X-Environment-ID') || 'development';
+  
+  try {
+    // Check if sites exist
+    const sites = await kv.getByPrefix('site:', environmentId);
+    const siteCount = sites?.length || 0;
+    
+    // Check if admin users exist
+    const admins = await kv.getByPrefix('admin_users:', environmentId);
+    const adminCount = admins?.length || 0;
+    
+    return c.json({
+      success: true,
+      status: 'ok',
+      sites: siteCount,
+      admins: adminCount,
+      environment: environmentId,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error: any) {
+    console.error('Public health check error:', error);
+    return c.json({
+      success: false,
+      status: 'error',
+      message: error.message || 'Health check failed',
+      sites: 0,
+      admins: 0,
+      timestamp: new Date().toISOString()
+    }, 500);
+  }
+});
+
 // Security Fix 1.9: Debug endpoint gated behind admin auth
 app.get("/make-server-6fcaeea3/debug-headers", verifyAdmin, async (c) => {
   const headers: any = {};
@@ -489,6 +524,120 @@ app.get("/make-server-6fcaeea3/debug-headers", verifyAdmin, async (c) => {
     method: c.req.method,
     timestamp: new Date().toISOString()
   });
+});
+
+// Public cache clearing endpoint (for debugging deployment issues)
+app.post("/make-server-6fcaeea3/public/clear-cache", async (c) => {
+  const environmentId = c.req.header('X-Environment-ID') || 'development';
+  
+  try {
+    // Clear all caches
+    clearCache();
+    
+    // Force reload sites into cache
+    const sites = await kv.getByPrefix('site:', environmentId);
+    setCachedData(`sites:list:${environmentId}`, sites || []);
+    
+    return c.json({
+      success: true,
+      message: 'Cache cleared and reloaded',
+      sitesLoaded: sites?.length || 0,
+      environment: environmentId,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error: any) {
+    console.error('Cache clear error:', error);
+    return c.json({
+      success: false,
+      message: error.message || 'Failed to clear cache',
+      timestamp: new Date().toISOString()
+    }, 500);
+  }
+});
+
+// Debug endpoint to check site statuses (public - for troubleshooting)
+app.get("/make-server-6fcaeea3/public/debug-sites", async (c) => {
+  const environmentId = c.req.header('X-Environment-ID') || 'development';
+  
+  try {
+    const sites = await kv.getByPrefix('site:', environmentId);
+    const siteInfo = sites?.map((s: any) => ({
+      id: s.id,
+      name: s.name,
+      status: s.status,
+      clientId: s.clientId,
+      hasStatus: s && typeof s === 'object' && 'status' in s,
+      statusType: typeof s.status
+    })) || [];
+    
+    const statusCounts = siteInfo.reduce((acc: any, site: any) => {
+      const status = site.status || 'undefined';
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    }, {});
+    
+    return c.json({
+      success: true,
+      totalSites: sites?.length || 0,
+      statusCounts,
+      sites: siteInfo,
+      environment: environmentId,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error: any) {
+    console.error('Debug sites error:', error);
+    return c.json({
+      success: false,
+      message: error.message || 'Failed to get site info',
+      timestamp: new Date().toISOString()
+    }, 500);
+  }
+});
+
+// Cleanup endpoint to delete ALL sites and reseed (public - for cleanup)
+app.post("/make-server-6fcaeea3/public/cleanup-all-sites", async (c) => {
+  const environmentId = c.req.header('X-Environment-ID') || 'development';
+  
+  try {
+    // Get all site keys directly from database
+    const supabaseClient = getSupabaseClient(environmentId);
+    const { data, error } = await supabaseClient
+      .from("kv_store_6fcaeea3")
+      .select("key")
+      .like("key", "site:%");
+    
+    if (error) {
+      throw new Error(error.message);
+    }
+    
+    const siteKeys = data?.map((d: any) => d.key) || [];
+    console.log(`[Cleanup] Found ${siteKeys.length} site keys to delete`);
+    
+    // Delete all site keys
+    for (const key of siteKeys) {
+      await kv.del(key, environmentId);
+      console.log(`[Cleanup] Deleted key: ${key}`);
+    }
+    
+    // Clear cache to force reload
+    clearCache();
+    
+    return c.json({
+      success: true,
+      message: 'All sites deleted successfully',
+      deletedCount: siteKeys.length,
+      deletedKeys: siteKeys,
+      environment: environmentId,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error: any) {
+    console.error('Cleanup all sites error:', error);
+    return c.json({
+      success: false,
+      message: error.message || 'Failed to cleanup all sites',
+      timestamp: new Date().toISOString()
+    }, 500);
+  }
 });
 
 // Database connection test endpoint (public - no auth required)

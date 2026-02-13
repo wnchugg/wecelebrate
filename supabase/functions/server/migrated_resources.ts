@@ -257,13 +257,14 @@ function setupSiteRoutes(app: Hono, verifyAdminMiddleware?: any): void {
       if (cached) {
         console.log('[Cache Hit] Returning cached sites');
         const activeSites = cached
-          .filter((site: Site) => site.status === 'active')
+          // Include sites with status 'active' OR undefined (for backward compatibility)
+          .filter((site: Site) => !site.status || site.status === 'active')
           .map((site: Site) => ({
             id: site.id,
             name: site.name,
             clientId: site.clientId,
             domain: site.domain,
-            status: site.status,
+            status: site.status || 'active', // Default to 'active' if undefined
             branding: site.branding,
             settings: site.settings,
             createdAt: site.createdAt,
@@ -295,13 +296,14 @@ function setupSiteRoutes(app: Hono, verifyAdminMiddleware?: any): void {
         }
         
         const activeSites = allSites
-          .filter((site: Site) => site.status === 'active')
+          // Include sites with status 'active' OR undefined (for backward compatibility)
+          .filter((site: Site) => !site.status || site.status === 'active')
           .map((site: Site) => ({
             id: site.id,
             name: site.name,
             clientId: site.clientId,
             domain: site.domain,
-            status: site.status,
+            status: site.status || 'active', // Default to 'active' if undefined
             branding: site.branding,
             settings: site.settings,
             createdAt: site.createdAt,

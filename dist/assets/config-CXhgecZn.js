@@ -1,0 +1,1 @@
+const o={defaultSiteId:"",allowedDomains:["company.com","example.com"],employeeList:["john.doe@company.com","jane.smith@company.com","demo@company.com"],shippingMethod:"employee",allowedCountries:[],defaultCountry:"US"};export{o as c};

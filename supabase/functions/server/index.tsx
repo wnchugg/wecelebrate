@@ -6025,10 +6025,12 @@ app.post("/make-server-6fcaeea3/public/validate/employee", async (c) => {
       return c.json({ error: 'siteId, method, and value are required' }, 400);
     }
     
-    // Get site to check allowed domains
-    const site = await kv.get(`site:${siteId}`, environmentId);
-    if (!site) {
-      return c.json({ error: 'Site not found' }, 404);
+    // Get site to check allowed domains (optional - validation works without it)
+    let site = null;
+    try {
+      site = await kv.get(`site:${siteId}`, environmentId);
+    } catch (error) {
+      console.log(`[Employee Validation] Could not load site ${siteId}, continuing without allowed domains check`);
     }
     
     // Get all employees for the site
@@ -6049,8 +6051,8 @@ app.post("/make-server-6fcaeea3/public/validate/employee", async (c) => {
         emp.email === normalizedValue && emp.status === 'active'
       );
       
-      // If no specific employee found, check allowed domains
-      if (!validEmployee && site.settings?.allowedDomains && site.settings.allowedDomains.length > 0) {
+      // If no specific employee found, check allowed domains (if site was loaded)
+      if (!validEmployee && site && site.settings?.allowedDomains && site.settings.allowedDomains.length > 0) {
         const emailDomain = normalizedValue.split('@')[1];
         if (emailDomain && site.settings.allowedDomains.includes(emailDomain)) {
           console.log(`[Employee Validation] Email domain ${emailDomain} is in allowed domains list`);

@@ -56,7 +56,7 @@ export function SiteConfiguration() {
   // Handle tab query parameter
   useEffect(() => {
     const tab = searchParams.get('tab');
-    if (tab && ['general', 'header-footer', 'branding', 'gift-selection', 'landing', 'welcome', 'products', 'shipping', 'access'].includes(tab)) {
+    if (tab && ['general', 'header-footer', 'branding', 'products', 'landing', 'welcome', 'shipping', 'access'].includes(tab)) {
       setActiveTab(tab);
     }
   }, [searchParams]);
@@ -939,13 +939,6 @@ export function SiteConfiguration() {
               <span>Branding</span>
             </TabsTrigger>
             <TabsTrigger 
-              value="gift-selection" 
-              className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap data-[state=active]:bg-[#D91C81] data-[state=active]:text-white data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:bg-gray-100"
-            >
-              <Gift className="w-4 h-4 flex-shrink-0" />
-              <span>Gift Selection</span>
-            </TabsTrigger>
-            <TabsTrigger 
               value="landing" 
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap data-[state=active]:bg-[#D91C81] data-[state=active]:text-white data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:bg-gray-100"
             >
@@ -964,7 +957,7 @@ export function SiteConfiguration() {
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap data-[state=active]:bg-[#D91C81] data-[state=active]:text-white data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:bg-gray-100"
             >
               <Package className="w-4 h-4 flex-shrink-0" />
-              <span>Products</span>
+              <span>Products & Gifts</span>
             </TabsTrigger>
             <TabsTrigger 
               value="shipping" 
@@ -3044,8 +3037,8 @@ export function SiteConfiguration() {
           </Card>
         </TabsContent>
 
-        {/* Gift Selection Configuration Tab */}
-        <TabsContent value="gift-selection" className="space-y-6">
+        {/* Products & Gifts Configuration Tab - Combined */}
+        <TabsContent value="products" className="space-y-6">
           <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-100">
             <div className="flex items-start gap-3">
               <Gift className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />

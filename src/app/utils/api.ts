@@ -387,6 +387,7 @@ const requestCounts = new Map<string, { count: number; resetAt: number }>();
 // Endpoints that should be exempt from rate limiting
 const RATE_LIMIT_EXEMPT_ENDPOINTS = [
   '/auth/session',  // Session checks happen frequently and are read-only
+  '/public/sites',  // Public site loading - needed for initial page load
 ];
 
 function checkClientRateLimit(endpoint: string): boolean {

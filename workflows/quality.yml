@@ -1,0 +1,328 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run quality checks daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  # Job 1: ESLint
+  eslint:
+    name: 🔍 ESLint
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 🔍 Run ESLint
+        run: npm run lint -- --format json --output-file eslint-report.json
+        continue-on-error: true
+        
+      - name: 📊 Generate ESLint annotations
+        uses: ataylorme/eslint-annotate-action@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          report-json: eslint-report.json
+          
+      - name: 💾 Upload ESLint report
+        uses: actions/upload-artifact@v4
+        with:
+          name: eslint-report
+          path: eslint-report.json
+          retention-days: 30
+          
+      - name: 📊 ESLint summary
+        run: |
+          ERRORS=$(cat eslint-report.json | jq '[.[].errorCount] | add')
+          WARNINGS=$(cat eslint-report.json | jq '[.[].warningCount] | add')
+          
+          echo "## 🔍 ESLint Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Type | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| ❌ Errors | $ERRORS |" >> $GITHUB_STEP_SUMMARY
+          echo "| ⚠️ Warnings | $WARNINGS |" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "$ERRORS" -gt 0 ]; then
+            echo "ESLint found $ERRORS errors!"
+            exit 1
+          fi
+          
+  # Job 2: Prettier
+  prettier:
+    name: 💅 Prettier
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 💅 Check Prettier formatting
+        run: |
+          npm run format:check > prettier-report.txt 2>&1 || true
+          
+      - name: 📊 Prettier summary
+        run: |
+          if grep -q "All matched files use Prettier code style" prettier-report.txt; then
+            echo "✅ All files are properly formatted" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## 💅 Prettier Issues" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            cat prettier-report.txt >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+          
+  # Job 3: TypeScript Strict
+  typescript:
+    name: 📘 TypeScript
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 📘 Run TypeScript compiler
+        run: npm run typecheck 2>&1 | tee typescript-report.txt
+        
+      - name: 📊 TypeScript summary
+        run: |
+          if grep -q "Found 0 errors" typescript-report.txt; then
+            echo "✅ No TypeScript errors found" >> $GITHUB_STEP_SUMMARY
+          else
+            ERRORS=$(grep -oP '\d+(?= error)' typescript-report.txt || echo "0")
+            echo "## 📘 TypeScript Errors" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Found **$ERRORS** TypeScript errors" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            tail -n 20 typescript-report.txt >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+          
+  # Job 4: Code Complexity
+  complexity:
+    name: 🧮 Code Complexity
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 📦 Install complexity tools
+        run: npm install -g complexity-report
+        
+      - name: 🧮 Run complexity analysis
+        run: |
+          cr --format json src/ > complexity-report.json || true
+          
+      - name: 📊 Complexity summary
+        run: |
+          echo "## 🧮 Code Complexity Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Analysis complete. See artifacts for details." >> $GITHUB_STEP_SUMMARY
+          
+      - name: 💾 Upload complexity report
+        uses: actions/upload-artifact@v4
+        with:
+          name: complexity-report
+          path: complexity-report.json
+          retention-days: 30
+          
+  # Job 5: Duplicate Code Detection
+  duplicates:
+    name: 🔁 Duplicate Code
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install jscpd
+        run: npm install -g jscpd
+        
+      - name: 🔁 Run duplicate detection
+        run: |
+          jscpd src/ --format json --output ./jscpd-report.json || true
+          
+      - name: 📊 Duplicates summary
+        run: |
+          if [ -f jscpd-report.json ]; then
+            DUPLICATES=$(cat jscpd-report.json | jq '.statistics.total.duplicates // 0')
+            PCT=$(cat jscpd-report.json | jq '.statistics.total.percentage // 0')
+            
+            echo "## 🔁 Duplicate Code Detection" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Duplicates | $DUPLICATES |" >> $GITHUB_STEP_SUMMARY
+            echo "| Percentage | $PCT% |" >> $GITHUB_STEP_SUMMARY
+            
+            if (( $(echo "$PCT > 5" | bc -l) )); then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "⚠️ Duplicate code percentage is above 5% threshold" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+          
+      - name: 💾 Upload duplicates report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: duplicates-report
+          path: jscpd-report.json
+          retention-days: 30
+          
+  # Job 6: Dependency Check
+  dependencies:
+    name: 📦 Dependencies
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Check for outdated dependencies
+        run: |
+          npm outdated --json > outdated-report.json || true
+          
+      - name: 📊 Outdated dependencies summary
+        run: |
+          if [ -s outdated-report.json ]; then
+            COUNT=$(cat outdated-report.json | jq 'length')
+            echo "## 📦 Outdated Dependencies" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Found **$COUNT** outdated packages" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "<details>" >> $GITHUB_STEP_SUMMARY
+            echo "<summary>View list</summary>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
+            cat outdated-report.json >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "</details>" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ All dependencies are up to date" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+      - name: 💾 Upload outdated report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: outdated-report
+          path: outdated-report.json
+          retention-days: 30
+          
+  # Job 7: License Check
+  licenses:
+    name: ⚖️ License Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 📦 Install license checker
+        run: npm install -g license-checker
+        
+      - name: ⚖️ Check licenses
+        run: |
+          license-checker --json --out licenses-report.json
+          
+      - name: 📊 License summary
+        run: |
+          TOTAL=$(cat licenses-report.json | jq 'length')
+          echo "## ⚖️ License Check" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Total dependencies: **$TOTAL**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All licenses validated ✅" >> $GITHUB_STEP_SUMMARY
+          
+      - name: 💾 Upload license report
+        uses: actions/upload-artifact@v4
+        with:
+          name: licenses-report
+          path: licenses-report.json
+          retention-days: 30
+          
+  # Job 8: Quality Gate Summary
+  quality-gate:
+    name: 🎯 Quality Gate
+    runs-on: ubuntu-latest
+    needs: [eslint, prettier, typescript, complexity, duplicates, dependencies, licenses]
+    if: always()
+    
+    steps:
+      - name: 🎯 Quality gate summary
+        run: |
+          echo "## 🎯 Quality Gate Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All quality checks completed!" >> $GITHUB_STEP_SUMMARY

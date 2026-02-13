@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Celebration API Test Suite</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 50%, #e0f2f1 100%);
+      min-height: 100vh;
+    }
+    h1 {
+      color: #D91C81;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+    }
+    .test-section {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .test-section h2 {
+      color: #1B2A5E;
+      margin-top: 0;
+      border-bottom: 2px solid #D91C81;
+      padding-bottom: 10px;
+    }
+    button {
+      background: #D91C81;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background 0.2s;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background: #C01872;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .success {
+      background: #4CAF50;
+    }
+    .success:hover {
+      background: #45a049;
+    }
+    pre {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      border-left: 4px solid #00B4CC;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+    }
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .status.pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    input, select {
+      padding: 10px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #333;
+    }
+    .celebration-card {
+      background: linear-gradient(135deg, #FF6B9D 0%, #FFD93D 100%);
+      padding: 20px;
+      border-radius: 12px;
+      color: white;
+      margin-bottom: 10px;
+    }
+    .celebration-card h3 {
+      margin: 0 0 10px 0;
+    }
+    .celebration-card p {
+      margin: 5px 0;
+      opacity: 0.95;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, #D91C81 0%, #1B2A5E 100%);
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .stat-card .number {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .stat-card .label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎉 Celebration System API Test Suite</h1>
+  <p class="subtitle">Testing backend integration for JALA 2 platform</p>
+
+  <div class="stats" id="stats">
+    <div class="stat-card">
+      <div class="number" id="totalTests">0</div>
+      <div class="label">Total Tests</div>
+    </div>
+    <div class="stat-card">
+      <div class="number" id="passedTests">0</div>
+      <div class="label">Passed</div>
+    </div>
+    <div class="stat-card">
+      <div class="number" id="failedTests">0</div>
+      <div class="label">Failed</div>
+    </div>
+    <div class="stat-card">
+      <div class="number" id="celebrationsCreated">0</div>
+      <div class="label">Celebrations Created</div>
+    </div>
+  </div>
+
+  <!-- Test 1: Health Check -->
+  <div class="test-section">
+    <h2>1. Health Check <span class="status pending" id="status-health">Not Run</span></h2>
+    <p>Verify the backend server is running and responding.</p>
+    <button onclick="testHealthCheck()">Run Test</button>
+    <pre id="result-health">Click "Run Test" to check server health...</pre>
+  </div>
+
+  <!-- Test 2: Create Celebration -->
+  <div class="test-section">
+    <h2>2. Create Celebration <span class="status pending" id="status-create">Not Run</span></h2>
+    <p>Test creating a new celebration message.</p>
+    
+    <div class="form-group">
+      <label>Employee ID:</label>
+      <input type="text" id="employeeId" value="EMP001" />
+    </div>
+    
+    <div class="form-group">
+      <label>Employee Name:</label>
+      <input type="text" id="employeeName" value="Sarah Johnson" />
+    </div>
+    
+    <div class="form-group">
+      <label>Milestone:</label>
+      <select id="milestone">
+        <option value="anniversary-5">5 Year Anniversary</option>
+        <option value="anniversary-10">10 Year Anniversary</option>
+        <option value="birthday">Birthday</option>
+        <option value="promotion">Promotion</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>Message:</label>
+      <input type="text" id="message" value="Congratulations on 5 amazing years! Your dedication is truly appreciated." style="width: 100%; max-width: 600px;" />
+    </div>
+    
+    <div class="form-group">
+      <label>From:</label>
+      <input type="text" id="fromName" value="John Doe" />
+    </div>
+    
+    <button onclick="testCreateCelebration()">Create Celebration</button>
+    <pre id="result-create">Fill in the form and click "Create Celebration"...</pre>
+  </div>
+
+  <!-- Test 3: Fetch Celebrations -->
+  <div class="test-section">
+    <h2>3. Fetch Celebrations <span class="status pending" id="status-fetch">Not Run</span></h2>
+    <p>Retrieve all celebrations for an employee.</p>
+    
+    <div class="form-group">
+      <label>Employee ID:</label>
+      <input type="text" id="fetchEmployeeId" value="EMP001" />
+    </div>
+    
+    <button onclick="testFetchCelebrations()">Fetch Celebrations</button>
+    <button class="success" onclick="testFetchCelebrations(true)">Fetch & Display</button>
+    <pre id="result-fetch">Click "Fetch Celebrations" to retrieve messages...</pre>
+    <div id="celebrations-display"></div>
+  </div>
+
+  <!-- Test 4: Send Invite -->
+  <div class="test-section">
+    <h2>4. Send Invite <span class="status pending" id="status-invite">Not Run</span></h2>
+    <p>Test sending an email invitation for a celebration.</p>
+    
+    <div class="form-group">
+      <label>Celebration ID:</label>
+      <input type="text" id="celebrationId" placeholder="Will auto-populate from Test 2" style="width: 400px;" />
+    </div>
+    
+    <div class="form-group">
+      <label>Email Address:</label>
+      <input type="email" id="inviteEmail" value="colleague@example.com" />
+    </div>
+    
+    <button onclick="testSendInvite()">Send Invite</button>
+    <pre id="result-invite">Create a celebration first (Test 2), then send an invite...</pre>
+  </div>
+
+  <!-- Test 5: Like Celebration -->
+  <div class="test-section">
+    <h2>5. Like Celebration <span class="status pending" id="status-like">Not Run</span></h2>
+    <p>Test incrementing the like counter on a celebration.</p>
+    
+    <button onclick="testLikeCelebration()">Like Celebration</button>
+    <button onclick="testLikeCelebration(); testLikeCelebration(); testLikeCelebration();">Like 3 Times</button>
+    <pre id="result-like">Create a celebration first (Test 2), then test liking...</pre>
+  </div>
+
+  <!-- Test 6: Get Single Celebration -->
+  <div class="test-section">
+    <h2>6. Get Single Celebration <span class="status pending" id="status-single">Not Run</span></h2>
+    <p>Fetch a specific celebration by ID.</p>
+    
+    <button onclick="testGetSingleCelebration()">Get Celebration</button>
+    <pre id="result-single">Create a celebration first (Test 2), then fetch it...</pre>
+  </div>
+
+  <!-- Run All Tests -->
+  <div class="test-section" style="background: linear-gradient(135deg, #D91C81 0%, #1B2A5E 100%); color: white;">
+    <h2 style="color: white; border-bottom-color: white;">Run All Tests</h2>
+    <p>Execute all tests in sequence to verify the complete celebration system.</p>
+    <button style="background: white; color: #D91C81;" onclick="runAllTests()">▶ Run Full Test Suite</button>
+    <button style="background: #00B4CC;" onclick="location.reload()">🔄 Reset All Tests</button>
+  </div>
+
+  <script>
+    // Configuration
+    const API_BASE_URL = 'https://wjfcqqrlhwdvvjmefxky.supabase.co/functions/v1/make-server-6fcaeea3';
+    const ENV_ID = 'development';
+    
+    let createdCelebrationId = null;
+    let stats = { total: 0, passed: 0, failed: 0, created: 0 };
+
+    function updateStats() {
+      document.getElementById('totalTests').textContent = stats.total;
+      document.getElementById('passedTests').textContent = stats.passed;
+      document.getElementById('failedTests').textContent = stats.failed;
+      document.getElementById('celebrationsCreated').textContent = stats.created;
+    }
+
+    function updateStatus(testId, status, message) {
+      const statusEl = document.getElementById(`status-${testId}`);
+      statusEl.className = `status ${status}`;
+      statusEl.textContent = message;
+      
+      if (status === 'success') stats.passed++;
+      if (status === 'error') stats.failed++;
+      stats.total++;
+      updateStats();
+    }
+
+    async function testHealthCheck() {
+      const resultEl = document.getElementById('result-health');
+      resultEl.textContent = 'Testing server health...';
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/health`, {
+          headers: {
+            'X-Environment-ID': ENV_ID
+          }
+        });
+        
+        const data = await response.json();
+        resultEl.textContent = JSON.stringify(data, null, 2);
+        
+        if (response.ok && data.status === 'ok') {
+          updateStatus('health', 'success', '✓ Passed');
+        } else {
+          updateStatus('health', 'error', '✗ Failed');
+        }
+      } catch (error) {
+        resultEl.textContent = `Error: ${error.message}`;
+        updateStatus('health', 'error', '✗ Failed');
+      }
+    }
+
+    async function testCreateCelebration() {
+      const resultEl = document.getElementById('result-create');
+      resultEl.textContent = 'Creating celebration...';
+      
+      const employeeId = document.getElementById('employeeId').value;
+      const employeeName = document.getElementById('employeeName').value;
+      const milestone = document.getElementById('milestone').value;
+      const message = document.getElementById('message').value;
+      const fromName = document.getElementById('fromName').value;
+      
+      const milestoneNames = {
+        'anniversary-5': '5 Year Anniversary',
+        'anniversary-10': '10 Year Anniversary',
+        'birthday': 'Birthday',
+        'promotion': 'Promotion'
+      };
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/public/celebrations`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Environment-ID': ENV_ID
+          },
+          body: JSON.stringify({
+            recipientId: employeeId,
+            recipientName: employeeName,
+            milestoneId: milestone,
+            milestoneName: milestoneNames[milestone],
+            message: message,
+            eCardId: 'confetti',
+            eCardImage: 'linear-gradient(135deg, #FF6B9D 0%, #FFD93D 100%)',
+            from: fromName,
+            fromEmail: '',
+            visibility: 'public'
+          })
+        });
+        
+        const data = await response.json();
+        resultEl.textContent = JSON.stringify(data, null, 2);
+        
+        if (response.ok && data.success) {
+          createdCelebrationId = data.celebration.id;
+          document.getElementById('celebrationId').value = createdCelebrationId;
+          updateStatus('create', 'success', '✓ Passed');
+          stats.created++;
+          updateStats();
+        } else {
+          updateStatus('create', 'error', '✗ Failed');
+        }
+      } catch (error) {
+        resultEl.textContent = `Error: ${error.message}`;
+        updateStatus('create', 'error', '✗ Failed');
+      }
+    }
+
+    async function testFetchCelebrations(display = false) {
+      const resultEl = document.getElementById('result-fetch');
+      const displayEl = document.getElementById('celebrations-display');
+      resultEl.textContent = 'Fetching celebrations...';
+      
+      const employeeId = document.getElementById('fetchEmployeeId').value;
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/public/celebrations/${employeeId}`, {
+          headers: {
+            'X-Environment-ID': ENV_ID
+          }
+        });
+        
+        const data = await response.json();
+        resultEl.textContent = JSON.stringify(data, null, 2);
+        
+        if (response.ok && data.success) {
+          updateStatus('fetch', 'success', `✓ Passed (${data.count} found)`);
+          
+          if (display && data.celebrations.length > 0) {
+            displayEl.innerHTML = '<h3 style="margin-top: 20px; color: #1B2A5E;">Celebrations:</h3>';
+            data.celebrations.forEach(cel => {
+              displayEl.innerHTML += `
+                <div class="celebration-card">
+                  <h3>🎉 ${cel.milestoneName}</h3>
+                  <p><strong>From:</strong> ${cel.from}</p>
+                  <p><strong>Message:</strong> "${cel.message}"</p>
+                  <p><strong>Created:</strong> ${new Date(cel.createdAt).toLocaleString()}</p>
+                  <p><strong>Likes:</strong> ${cel.likes || 0} | <strong>Shares:</strong> ${cel.shares || 0}</p>
+                  <p style="font-size: 12px; opacity: 0.8;"><strong>ID:</strong> ${cel.id}</p>
+                </div>
+              `;
+            });
+          }
+        } else {
+          updateStatus('fetch', 'error', '✗ Failed');
+        }
+      } catch (error) {
+        resultEl.textContent = `Error: ${error.message}`;
+        updateStatus('fetch', 'error', '✗ Failed');
+      }
+    }
+
+    async function testSendInvite() {
+      const resultEl = document.getElementById('result-invite');
+      resultEl.textContent = 'Sending invite...';
+      
+      const celebrationId = document.getElementById('celebrationId').value;
+      const email = document.getElementById('inviteEmail').value;
+      
+      if (!celebrationId) {
+        resultEl.textContent = 'Error: Please create a celebration first (Test 2)';
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/public/celebrations/${celebrationId}/invite`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Environment-ID': ENV_ID
+          },
+          body: JSON.stringify({ email })
+        });
+        
+        const data = await response.json();
+        resultEl.textContent = JSON.stringify(data, null, 2);
+        
+        if (response.ok && data.success) {
+          updateStatus('invite', 'success', '✓ Passed');
+        } else {
+          updateStatus('invite', 'error', '✗ Failed');
+        }
+      } catch (error) {
+        resultEl.textContent = `Error: ${error.message}`;
+        updateStatus('invite', 'error', '✗ Failed');
+      }
+    }
+
+    async function testLikeCelebration() {
+      const resultEl = document.getElementById('result-like');
+      const celebrationId = document.getElementById('celebrationId').value;
+      
+      if (!celebrationId) {
+        resultEl.textContent = 'Error: Please create a celebration first (Test 2)';
+        return;
+      }
+      
+      resultEl.textContent = 'Adding like...';
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/public/celebrations/${celebrationId}/like`, {
+          method: 'POST',
+          headers: {
+            'X-Environment-ID': ENV_ID
+          }
+        });
+        
+        const data = await response.json();
+        resultEl.textContent = JSON.stringify(data, null, 2);
+        
+        if (response.ok && data.success) {
+          updateStatus('like', 'success', '✓ Passed');
+        } else {
+          updateStatus('like', 'error', '✗ Failed');
+        }
+      } catch (error) {
+        resultEl.textContent = `Error: ${error.message}`;
+        updateStatus('like', 'error', '✗ Failed');
+      }
+    }
+
+    async function testGetSingleCelebration() {
+      const resultEl = document.getElementById('result-single');
+      const celebrationId = document.getElementById('celebrationId').value;
+      
+      if (!celebrationId) {
+        resultEl.textContent = 'Error: Please create a celebration first (Test 2)';
+        return;
+      }
+      
+      resultEl.textContent = 'Fetching celebration...';
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/public/celebrations/view/${celebrationId}`, {
+          headers: {
+            'X-Environment-ID': ENV_ID
+          }
+        });
+        
+        const data = await response.json();
+        resultEl.textContent = JSON.stringify(data, null, 2);
+        
+        if (response.ok && data.success) {
+          updateStatus('single', 'success', '✓ Passed');
+        } else {
+          updateStatus('single', 'error', '✗ Failed');
+        }
+      } catch (error) {
+        resultEl.textContent = `Error: ${error.message}`;
+        updateStatus('single', 'error', '✗ Failed');
+      }
+    }
+
+    async function runAllTests() {
+      // Reset stats
+      stats = { total: 0, passed: 0, failed: 0, created: 0 };
+      updateStats();
+      
+      // Run tests in sequence
+      await testHealthCheck();
+      await new Promise(r => setTimeout(r, 500));
+      
+      await testCreateCelebration();
+      await new Promise(r => setTimeout(r, 500));
+      
+      await testFetchCelebrations(true);
+      await new Promise(r => setTimeout(r, 500));
+      
+      await testSendInvite();
+      await new Promise(r => setTimeout(r, 500));
+      
+      await testLikeCelebration();
+      await new Promise(r => setTimeout(r, 500));
+      
+      await testGetSingleCelebration();
+      
+      // Final summary
+      alert(`Test Suite Complete!\n\nTotal: ${stats.total}\nPassed: ${stats.passed}\nFailed: ${stats.failed}\nCelebrations Created: ${stats.created}`);
+    }
+  </script>
+</body>
+</html>

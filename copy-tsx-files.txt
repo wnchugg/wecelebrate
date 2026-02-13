@@ -1,0 +1,10 @@
+Files to copy from .tsx to .ts:
+
+1. /supabase/functions/server/index.tsx → /supabase/functions/server/index.ts
+2. /supabase/functions/server/seed.tsx → /supabase/functions/server/seed.ts  
+3. /supabase/functions/server/security.tsx → /supabase/functions/server/security.ts
+4. /supabase/functions/server/kv_env.tsx → /supabase/functions/server/kv_env.ts (DONE)
+5. /supabase/functions/server/erp_integration.tsx → /supabase/functions/server/erp_integration.ts
+6. /supabase/functions/server/erp_scheduler.tsx → /supabase/functions/server/erp_scheduler.ts
+
+Note: kv_store.tsx is protected and should not be modified

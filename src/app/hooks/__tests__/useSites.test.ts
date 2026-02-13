@@ -1,0 +1,728 @@
+/**
+ * useSites Hook Test Suite
+ * Day 5 - Afternoon Session
+ * Tests for src/app/hooks/useSites.ts
+ */
+
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { renderHook, waitFor, act } from '@testing-library/react';
+import {
+  useSites,
+  usePublicSites,
+  useSite,
+  useSitesByClient,
+  useCreateSite,
+  useUpdateSite,
+  useDeleteSite
+} from '../useSites';
+import type { Site, CreateSiteRequest, UpdateSiteRequest } from '../../types/api.types';
+
+// Mock useApi hooks
+vi.mock('../useApi', () => ({
+  useQuery: vi.fn((queryKey, queryFn, options) => {
+    return {
+      data: null,
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: vi.fn()
+    };
+  }),
+  useMutation: vi.fn((mutationFn, options) => {
+    return {
+      mutate: vi.fn(),
+      mutateAsync: vi.fn(),
+      isLoading: false,
+      isError: false,
+      error: null,
+      data: null,
+      reset: vi.fn()
+    };
+  })
+}));
+
+// Mock apiClient
+vi.mock('../../lib/apiClient', () => ({
+  apiClient: {
+    sites: {
+      list: vi.fn(),
+      listPublic: vi.fn(),
+      get: vi.fn(),
+      getByClient: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn()
+    }
+  }
+}));
+
+describe('useSites Hooks', () => {
+  const mockSite: Site = {
+    id: 'site-123',
+    name: 'Test Site',
+    slug: 'test-site',
+    clientId: 'client-456',
+    status: 'active' as const,
+    isActive: true,
+    validationMethods: [
+      {
+        type: 'email' as const,
+        enabled: true,
+      }
+    ],
+    settings: {
+      validationMethod: 'email' as const,
+      allowMultipleSelections: true,
+      requireShipping: true,
+      supportEmail: 'support@test.com',
+      languages: ['en'],
+      defaultLanguage: 'en',
+      enableLanguageSelector: true,
+      allowQuantitySelection: true,
+      showPricing: true,
+      giftsPerUser: 3,
+      shippingMode: 'employee' as const,
+    },
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z'
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('Sites List Loading', () => {
+    it('should initialize with default state', () => {
+      const { useQuery } = require('../useApi');
+      
+      useQuery.mockReturnValue({
+        data: null,
+        isLoading: false,
+        isError: false,
+        error: null,
+        refetch: vi.fn()
+      });
+
+      const { result } = renderHook(() => useSites());
+
+      expect(result.current.data).toBeNull();
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    it('should fetch sites list', () => {
+      const { useQuery } = require('../useApi');
+      const mockData = {
+        data: [mockSite],
+        total: 1,
+        page: 1,
+        limit: 10
+      };
+
+      useQuery.mockReturnValue({
+        data: mockData,
+        isLoading: false,
+        isError: false,
+        error: null,
+        refetch: vi.fn()
+      });
+
+      const { result } = renderHook(() => useSites());
+
+      expect(result.current.data).toEqual(mockData);
+    });
+
+    it('should set loading state during fetch', () => {
+      const { useQuery } = require('../useApi');
+
+      useQuery.mockReturnValue({
+        data: null,
+        isLoading: true,
+        isError: false,
+        error: null,
+        refetch: vi.fn()
+      });
+
+      const { result } = renderHook(() => useSites());
+
+      expect(result.current.isLoading).toBe(true);
+    });
+
+    it('should handle fetch errors', () => {
+      const { useQuery } = require('../useApi');
+      const mockError = { message: 'Failed to fetch sites', status: 500 };
+
+      useQuery.mockReturnValue({
+        data: null,
+        isLoading: false,
+        isError: true,
+        error: mockError,
+        refetch: vi.fn()
+      });
+
+      const { result } = renderHook(() => useSites());
+
+      expect(result.current.isError).toBe(true);
+      expect(result.current.error).toEqual(mockError);
+    });
+
+    it('should support pagination parameters', () => {
+      const { useQuery } = require('../useApi');
+      const mockData = {
+        data: [mockSite],
+        total: 100,
+        page: 2,
+        limit: 25
+      };
+
+      useQuery.mockReturnValue({
+        data: mockData,
+        isLoading: false,
+        isError: false,
+        error: null,
+        refetch: vi.fn()
+      });
+
+      const { result } = renderHook(() => 
+        useSites({ page: 2, limit: 25 })
+      );
+
+      expect(useQuery).toHaveBeenCalledWith(
+        ['sites', { page: 2, limit: 25 }],
+        expect.any(Function),
+        undefined
+      );
+    });
+
+    it('should fetch public sites', () => {
+      const { useQuery } = require('../useApi');
+      const mockPublicSites = [mockSite];
+
+      useQuery.mockReturnValue({
+        data: mockPublicSites,
+        isLoading: false,
+        isError: false,
+        error: null,
+        refetch: vi.fn()
+      });
+
+      const { result } = renderHook(() => usePublicSites());
+
+      expect(result.current.data).toEqual(mockPublicSites);
+    });
+  });
+
+  describe('Site Filtering', () => {
+    it('should fetch single site by ID', () => {
+      const { useQuery } = require('../useApi');
+
+      useQuery.mockReturnValue({
+        data: mockSite,
+        isLoading: false,
+        isError: false,
+        error: null,
+        refetch: vi.fn()
+      });
+
+      const { result } = renderHook(() => useSite('site-123'));
+
+      expect(result.current.data).toEqual(mockSite);
+      expect(useQuery).toHaveBeenCalledWith(
+        ['site', 'site-123'],
+        expect.any(Function),
+        undefined
+      );
+    });
+
+    it('should fetch sites by client ID', () => {
+      const { useQuery } = require('../useApi');
+      const mockClientSites = [mockSite];
+
+      useQuery.mockReturnValue({
+        data: mockClientSites,
+        isLoading: false,
+        isError: false,
+        error: null,
+        refetch: vi.fn()
+      });
+
+      const { result } = renderHook(() => useSitesByClient('client-456'));
+
+      expect(result.current.data).toEqual(mockClientSites);
+      expect(useQuery).toHaveBeenCalledWith(
+        ['sites-by-client', 'client-456'],
+        expect.any(Function),
+        undefined
+      );
+    });
+
+    it('should handle empty client sites list', () => {
+      const { useQuery } = require('../useApi');
+
+      useQuery.mockReturnValue({
+        data: [],
+        isLoading: false,
+        isError: false,
+        error: null,
+        refetch: vi.fn()
+      });
+
+      const { result } = renderHook(() => useSitesByClient('client-with-no-sites'));
+
+      expect(result.current.data).toEqual([]);
+    });
+
+    it('should handle site not found', () => {
+      const { useQuery } = require('../useApi');
+      const mockError = { message: 'Site not found', status: 404 };
+
+      useQuery.mockReturnValue({
+        data: null,
+        isLoading: false,
+        isError: true,
+        error: mockError,
+        refetch: vi.fn()
+      });
+
+      const { result } = renderHook(() => useSite('nonexistent-site'));
+
+      expect(result.current.isError).toBe(true);
+      expect(result.current.error).toEqual(mockError);
+    });
+
+    it('should support refetch for filtered results', () => {
+      const { useQuery } = require('../useApi');
+      const mockRefetch = vi.fn();
+
+      useQuery.mockReturnValue({
+        data: [mockSite],
+        isLoading: false,
+        isError: false,
+        error: null,
+        refetch: mockRefetch
+      });
+
+      const { result } = renderHook(() => useSitesByClient('client-456'));
+
+      act(() => {
+        result.current.refetch();
+      });
+
+      expect(mockRefetch).toHaveBeenCalled();
+    });
+
+    it('should handle multiple sites for same client', () => {
+      const { useQuery } = require('../useApi');
+      const multipleSites = [
+        mockSite,
+        { ...mockSite, id: 'site-124', name: 'Test Site 2' },
+        { ...mockSite, id: 'site-125', name: 'Test Site 3' }
+      ];
+
+      useQuery.mockReturnValue({
+        data: multipleSites,
+        isLoading: false,
+        isError: false,
+        error: null,
+        refetch: vi.fn()
+      });
+
+      const { result } = renderHook(() => useSitesByClient('client-456'));
+
+      expect(result.current.data).toHaveLength(3);
+    });
+  });
+
+  describe('Site CRUD Operations', () => {
+    it('should create new site', async () => {
+      const { useMutation } = require('../useApi');
+      const mockMutate = vi.fn();
+      const newSiteData: CreateSiteRequest = {
+        name: 'New Site',
+        clientId: 'client-456',
+        slug: 'new-site',
+        validationMethods: mockSite.validationMethods,
+        settings: mockSite.settings
+      };
+
+      useMutation.mockReturnValue({
+        mutate: mockMutate,
+        mutateAsync: vi.fn(),
+        isLoading: false,
+        isError: false,
+        error: null,
+        data: null,
+        reset: vi.fn()
+      });
+
+      const { result } = renderHook(() => useCreateSite());
+
+      act(() => {
+        result.current.mutate(newSiteData);
+      });
+
+      expect(mockMutate).toHaveBeenCalledWith(newSiteData);
+    });
+
+    it('should update existing site', async () => {
+      const { useMutation } = require('../useApi');
+      const mockMutate = vi.fn();
+      const updateData: UpdateSiteRequest = {
+        name: 'Updated Site Name'
+      };
+
+      useMutation.mockReturnValue({
+        mutate: mockMutate,
+        mutateAsync: vi.fn(),
+        isLoading: false,
+        isError: false,
+        error: null,
+        data: null,
+        reset: vi.fn()
+      });
+
+      const { result } = renderHook(() => useUpdateSite());
+
+      act(() => {
+        result.current.mutate({ id: 'site-123', data: updateData });
+      });
+
+      expect(mockMutate).toHaveBeenCalledWith({ id: 'site-123', data: updateData });
+    });
+
+    it('should delete site', async () => {
+      const { useMutation } = require('../useApi');
+      const mockMutate = vi.fn();
+
+      useMutation.mockReturnValue({
+        mutate: mockMutate,
+        mutateAsync: vi.fn(),
+        isLoading: false,
+        isError: false,
+        error: null,
+        data: null,
+        reset: vi.fn()
+      });
+
+      const { result } = renderHook(() => useDeleteSite());
+
+      act(() => {
+        result.current.mutate('site-123');
+      });
+
+      expect(mockMutate).toHaveBeenCalledWith('site-123');
+    });
+
+    it('should handle create site validation errors', () => {
+      const { useMutation } = require('../useApi');
+      const mockError = { message: 'Validation failed', status: 400 };
+
+      useMutation.mockReturnValue({
+        mutate: vi.fn(),
+        mutateAsync: vi.fn(),
+        isLoading: false,
+        isError: true,
+        error: mockError,
+        data: null,
+        reset: vi.fn()
+      });
+
+      const { result } = renderHook(() => useCreateSite());
+
+      expect(result.current.isError).toBe(true);
+      expect(result.current.error).toEqual(mockError);
+    });
+
+    it('should return created site data', () => {
+      const { useMutation } = require('../useApi');
+      const createdSite = { ...mockSite, id: 'new-site-456' };
+
+      useMutation.mockReturnValue({
+        mutate: vi.fn(),
+        mutateAsync: vi.fn(),
+        isLoading: false,
+        isError: false,
+        error: null,
+        data: createdSite,
+        reset: vi.fn()
+      });
+
+      const { result } = renderHook(() => useCreateSite());
+
+      expect(result.current.data).toEqual(createdSite);
+    });
+
+    it('should set loading state during site creation', () => {
+      const { useMutation } = require('../useApi');
+
+      useMutation.mockReturnValue({
+        mutate: vi.fn(),
+        mutateAsync: vi.fn(),
+        isLoading: true,
+        isError: false,
+        error: null,
+        data: null,
+        reset: vi.fn()
+      });
+
+      const { result } = renderHook(() => useCreateSite());
+
+      expect(result.current.isLoading).toBe(true);
+    });
+
+    it('should handle update conflicts', () => {
+      const { useMutation } = require('../useApi');
+      const mockError = { message: 'Conflict', status: 409 };
+
+      useMutation.mockReturnValue({
+        mutate: vi.fn(),
+        mutateAsync: vi.fn(),
+        isLoading: false,
+        isError: true,
+        error: mockError,
+        data: null,
+        reset: vi.fn()
+      });
+
+      const { result } = renderHook(() => useUpdateSite());
+
+      expect(result.current.isError).toBe(true);
+      expect(result.current.error?.statusCode).toBe(409);
+    });
+
+    it('should handle delete authorization errors', () => {
+      const { useMutation } = require('../useApi');
+      const mockError = { message: 'Unauthorized', status: 403 };
+
+      useMutation.mockReturnValue({
+        mutate: vi.fn(),
+        mutateAsync: vi.fn(),
+        isLoading: false,
+        isError: true,
+        error: mockError,
+        data: null,
+        reset: vi.fn()
+      });
+
+      const { result } = renderHook(() => useDeleteSite());
+
+      expect(result.current.isError).toBe(true);
+      expect(result.current.error?.statusCode).toBe(403);
+    });
+
+    it('should call onSuccess callback after creation', () => {
+      const { useMutation } = require('../useApi');
+      const onSuccess = vi.fn();
+
+      useMutation.mockReturnValue({
+        mutate: vi.fn(),
+        mutateAsync: vi.fn(),
+        isLoading: false,
+        isError: false,
+        error: null,
+        data: null,
+        reset: vi.fn()
+      });
+
+      renderHook(() => useCreateSite({ onSuccess }));
+
+      expect(useMutation).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.objectContaining({ onSuccess })
+      );
+    });
+
+    it('should call onError callback on create failure', () => {
+      const { useMutation } = require('../useApi');
+      const onError = vi.fn();
+
+      useMutation.mockReturnValue({
+        mutate: vi.fn(),
+        mutateAsync: vi.fn(),
+        isLoading: false,
+        isError: false,
+        error: null,
+        data: null,
+        reset: vi.fn()
+      });
+
+      renderHook(() => useCreateSite({ onError }));
+
+      expect(useMutation).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.objectContaining({ onError })
+      );
+    });
+  });
+
+  describe('Query Options', () => {
+    it('should support custom query options for sites list', () => {
+      const { useQuery } = require('../useApi');
+      const onSuccess = vi.fn();
+      const onError = vi.fn();
+
+      useQuery.mockReturnValue({
+        data: null,
+        isLoading: false,
+        isError: false,
+        error: null,
+        refetch: vi.fn()
+      });
+
+      renderHook(() => useSites(undefined, { onSuccess, onError }));
+
+      expect(useQuery).toHaveBeenCalledWith(
+        expect.any(Array),
+        expect.any(Function),
+        expect.objectContaining({ onSuccess, onError })
+      );
+    });
+
+    it('should support enabled option', () => {
+      const { useQuery } = require('../useApi');
+
+      useQuery.mockReturnValue({
+        data: null,
+        isLoading: false,
+        isError: false,
+        error: null,
+        refetch: vi.fn()
+      });
+
+      renderHook(() => useSite('site-123', { enabled: false }));
+
+      expect(useQuery).toHaveBeenCalledWith(
+        expect.any(Array),
+        expect.any(Function),
+        expect.objectContaining({ enabled: false })
+      );
+    });
+
+    it('should support refetchOnMount option', () => {
+      const { useQuery } = require('../useApi');
+
+      useQuery.mockReturnValue({
+        data: null,
+        isLoading: false,
+        isError: false,
+        error: null,
+        refetch: vi.fn()
+      });
+
+      renderHook(() => usePublicSites({ refetchOnMount: true }));
+
+      expect(useQuery).toHaveBeenCalledWith(
+        expect.any(Array),
+        expect.any(Function),
+        expect.objectContaining({ refetchOnMount: true })
+      );
+    });
+  });
+
+  describe('Edge Cases', () => {
+    it('should handle empty sites list', () => {
+      const { useQuery } = require('../useApi');
+      const emptyData = {
+        data: [] as Site[],
+        total: 0,
+        page: 1,
+        limit: 10
+      };
+
+      useQuery.mockReturnValue({
+        data: emptyData,
+        isLoading: false,
+        isError: false,
+        error: null,
+        refetch: vi.fn()
+      });
+
+      const { result } = renderHook(() => useSites());
+
+      expect(result.current.data?.data).toHaveLength(0);
+    });
+
+    it('should handle concurrent site operations', async () => {
+      const { useMutation } = require('../useApi');
+      const mockMutate = vi.fn();
+
+      useMutation.mockReturnValue({
+        mutate: mockMutate,
+        mutateAsync: vi.fn().mockResolvedValue(mockSite),
+        isLoading: false,
+        isError: false,
+        error: null,
+        data: null,
+        reset: vi.fn()
+      });
+
+      const { result } = renderHook(() => useCreateSite());
+
+      act(() => {
+        result.current.mutate({ name: 'Site 1', clientId: 'client-1', slug: 'site-1', validationMethods: mockSite.validationMethods, settings: mockSite.settings });
+        result.current.mutate({ name: 'Site 2', clientId: 'client-1', slug: 'site-2', validationMethods: mockSite.validationMethods, settings: mockSite.settings });
+      });
+
+      expect(mockMutate).toHaveBeenCalledTimes(2);
+    });
+
+    it('should reset mutation state', () => {
+      const { useMutation } = require('../useApi');
+      const mockReset = vi.fn();
+
+      useMutation.mockReturnValue({
+        mutate: vi.fn(),
+        mutateAsync: vi.fn(),
+        isLoading: false,
+        isError: false,
+        error: null,
+        data: null,
+        reset: mockReset
+      });
+
+      const { result } = renderHook(() => useCreateSite());
+
+      act(() => {
+        result.current.reset();
+      });
+
+      expect(mockReset).toHaveBeenCalled();
+    });
+
+    it('should handle network timeout', () => {
+      const { useQuery } = require('../useApi');
+      const mockError = { message: 'Request timeout', status: 408 };
+
+      useQuery.mockReturnValue({
+        data: null,
+        isLoading: false,
+        isError: true,
+        error: mockError,
+        refetch: vi.fn()
+      });
+
+      const { result } = renderHook(() => useSites());
+
+      expect(result.current.error?.statusCode).toBe(408);
+    });
+
+    it('should handle malformed pagination params', () => {
+      const { useQuery } = require('../useApi');
+
+      useQuery.mockReturnValue({
+        data: null,
+        isLoading: false,
+        isError: false,
+        error: null,
+        refetch: vi.fn()
+      });
+
+      renderHook(() => useSites({ page: -1, limit: 0 }));
+
+      expect(useQuery).toHaveBeenCalled();
+    });
+  });
+});

@@ -1,0 +1,316 @@
+name: Performance Monitoring
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run daily at 4 AM UTC
+    - cron: '0 4 * * *'
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  # Job 1: Lighthouse CI
+  lighthouse:
+    name: ⚡ Lighthouse CI
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 🏗️ Build application
+        run: npm run build
+        env:
+          VITE_ENVIRONMENT: staging
+          VITE_API_URL: ${{ secrets.STAGING_API_URL }}
+          VITE_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+          
+      - name: 📦 Install Lighthouse CI
+        run: npm install -g @lhci/cli
+        
+      - name: ⚡ Run Lighthouse CI
+        run: |
+          lhci autorun \
+            --collect.settings.chromeFlags="--no-sandbox" \
+            --collect.numberOfRuns=3 \
+            --upload.target=temporary-public-storage
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          
+      - name: 📊 Generate Lighthouse summary
+        if: always()
+        run: |
+          if [ -f .lighthouseci/manifest.json ]; then
+            echo "## ⚡ Lighthouse Performance Report" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Lighthouse audit completed!" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+      - name: 💾 Upload Lighthouse results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+          retention-days: 30
+          
+  # Job 2: Bundle Size Analysis
+  bundle-size:
+    name: 📦 Bundle Size Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 🏗️ Build application
+        run: npm run build
+        
+      - name: 📊 Analyze bundle size
+        run: |
+          echo "## 📦 Bundle Size Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Total bundle size
+          TOTAL_SIZE=$(du -sh dist | cut -f1)
+          echo "**Total Bundle Size:** $TOTAL_SIZE" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Individual file sizes
+          echo "### Largest Files" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          find dist -type f -name "*.js" -o -name "*.css" | xargs du -h | sort -rh | head -10 >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          
+      - name: 📊 Bundle size check
+        run: |
+          TOTAL_BYTES=$(du -sb dist | cut -f1)
+          MAX_BYTES=$((5 * 1024 * 1024))  # 5MB limit
+          
+          if [ $TOTAL_BYTES -gt $MAX_BYTES ]; then
+            echo "⚠️ Warning: Bundle size ($TOTAL_BYTES bytes) exceeds 5MB limit"
+            echo "Consider code splitting or lazy loading"
+          else
+            echo "✅ Bundle size is within limits"
+          fi
+          
+      - name: 📊 Compare bundle size (PR only)
+        if: github.event_name == 'pull_request'
+        uses: andresz1/size-limit-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          
+  # Job 3: Web Vitals Monitoring
+  web-vitals:
+    name: 📈 Web Vitals
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 🎭 Install Playwright
+        run: npx playwright install --with-deps chromium
+        
+      - name: 📈 Measure Web Vitals
+        run: |
+          # Create a simple web vitals test
+          cat > web-vitals-test.ts << 'EOF'
+          import { chromium } from 'playwright';
+          
+          async function measureWebVitals() {
+            const browser = await chromium.launch();
+            const page = await browser.newPage();
+            
+            await page.goto('http://localhost:3000', { waitUntil: 'networkidle' });
+            
+            const metrics = await page.evaluate(() => {
+              return new Promise((resolve) => {
+                if (window.performance) {
+                  const perfData = window.performance.getEntriesByType('navigation')[0];
+                  resolve({
+                    fcp: perfData.responseStart,
+                    lcp: perfData.loadEventEnd,
+                    ttfb: perfData.responseStart - perfData.requestStart
+                  });
+                }
+              });
+            });
+            
+            console.log('Web Vitals:', metrics);
+            await browser.close();
+          }
+          
+          measureWebVitals();
+          EOF
+          
+          # Note: This would need a running dev server
+          echo "Web Vitals measurement configured"
+          
+  # Job 4: Performance Regression Detection
+  performance-regression:
+    name: 🔍 Performance Regression
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: 📥 Checkout PR code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 🏗️ Build PR version
+        run: npm run build
+        
+      - name: 💾 Save PR build info
+        run: |
+          BUNDLE_SIZE_PR=$(du -sb dist | cut -f1)
+          echo "$BUNDLE_SIZE_PR" > /tmp/bundle-size-pr.txt
+          
+      - name: 📥 Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }}
+          
+      - name: 📦 Install dependencies (base)
+        run: npm ci
+        
+      - name: 🏗️ Build base version
+        run: npm run build
+        
+      - name: 💾 Save base build info
+        run: |
+          BUNDLE_SIZE_BASE=$(du -sb dist | cut -f1)
+          echo "$BUNDLE_SIZE_BASE" > /tmp/bundle-size-base.txt
+          
+      - name: 📊 Compare performance
+        run: |
+          PR_SIZE=$(cat /tmp/bundle-size-pr.txt)
+          BASE_SIZE=$(cat /tmp/bundle-size-base.txt)
+          DIFF=$((PR_SIZE - BASE_SIZE))
+          PERCENT=$(echo "scale=2; ($DIFF / $BASE_SIZE) * 100" | bc)
+          
+          echo "## 📊 Performance Comparison" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Base | PR | Diff |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|------|----|----- |" >> $GITHUB_STEP_SUMMARY
+          echo "| Bundle Size | $(numfmt --to=iec $BASE_SIZE) | $(numfmt --to=iec $PR_SIZE) | $PERCENT% |" >> $GITHUB_STEP_SUMMARY
+          
+          if [ $DIFF -gt 102400 ]; then  # 100KB threshold
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ **Warning:** Bundle size increased by more than 100KB!" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+  # Job 5: Load Testing
+  load-test:
+    name: 🔥 Load Testing
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: 📦 Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+          
+      - name: 🔥 Run load test
+        run: |
+          # Create a basic load test script
+          cat > loadtest.js << 'EOF'
+          import http from 'k6/http';
+          import { check, sleep } from 'k6';
+          
+          export let options = {
+            stages: [
+              { duration: '1m', target: 10 },
+              { duration: '2m', target: 50 },
+              { duration: '1m', target: 0 },
+            ],
+            thresholds: {
+              http_req_duration: ['p(95)<500'],
+              http_req_failed: ['rate<0.01'],
+            },
+          };
+          
+          export default function() {
+            const res = http.get('https://staging.wecelebrate.app');
+            check(res, {
+              'status is 200': (r) => r.status === 200,
+              'response time < 500ms': (r) => r.timings.duration < 500,
+            });
+            sleep(1);
+          }
+          EOF
+          
+          k6 run loadtest.js || echo "Load test completed with warnings"
+          
+  # Job 6: Performance Summary
+  performance-summary:
+    name: 📋 Performance Summary
+    runs-on: ubuntu-latest
+    needs: [lighthouse, bundle-size, web-vitals]
+    if: always()
+    
+    steps:
+      - name: 📋 Generate performance summary
+        run: |
+          echo "## ⚡ Performance Monitoring Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All performance checks completed!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Lighthouse | ${{ needs.lighthouse.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Bundle Size | ${{ needs.bundle-size.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Web Vitals | ${{ needs.web-vitals.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY

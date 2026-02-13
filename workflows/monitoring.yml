@@ -1,0 +1,311 @@
+name: Application Monitoring
+
+on:
+  push:
+    branches: [main, develop]
+  schedule:
+    # Run every 15 minutes
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  # Job 1: Health Check Monitoring
+  health-check:
+    name: 🏥 Health Check
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        environment: [staging, production]
+        
+    steps:
+      - name: 🏥 Check application health
+        id: health
+        run: |
+          if [ "${{ matrix.environment }}" == "production" ]; then
+            APP_URL="https://wecelebrate.app"
+            API_URL="${{ secrets.PRODUCTION_SUPABASE_URL }}/functions/v1/make-server-6fcaeea3"
+            API_KEY="${{ secrets.PRODUCTION_SUPABASE_ANON_KEY }}"
+          else
+            APP_URL="https://staging.wecelebrate.app"
+            API_URL="${{ secrets.STAGING_SUPABASE_URL }}/functions/v1/make-server-6fcaeea3"
+            API_KEY="${{ secrets.STAGING_SUPABASE_ANON_KEY }}"
+          fi
+          
+          echo "Checking ${{ matrix.environment }} health..."
+          
+          # Check frontend
+          FRONTEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $APP_URL/health || echo "000")
+          
+          # Check API
+          API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer $API_KEY" \
+            $API_URL/health || echo "000")
+          
+          # Check response time
+          RESPONSE_TIME=$(curl -s -o /dev/null -w "%{time_total}" $APP_URL || echo "999")
+          
+          echo "frontend_status=$FRONTEND_STATUS" >> $GITHUB_OUTPUT
+          echo "api_status=$API_STATUS" >> $GITHUB_OUTPUT
+          echo "response_time=$RESPONSE_TIME" >> $GITHUB_OUTPUT
+          
+          # Report status
+          echo "## 🏥 Health Check: ${{ matrix.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Endpoint | Status | Response Time |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|---------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend | $FRONTEND_STATUS | ${RESPONSE_TIME}s |" >> $GITHUB_STEP_SUMMARY
+          echo "| API | $API_STATUS | - |" >> $GITHUB_STEP_SUMMARY
+          
+          # Alert if unhealthy
+          if [ "$FRONTEND_STATUS" != "200" ] || [ "$API_STATUS" != "200" ]; then
+            echo "::error::${{ matrix.environment }} health check failed!"
+            exit 1
+          fi
+          
+      - name: 🔔 Alert on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 Health Check Failed: ${{ matrix.environment }}',
+              body: `Health check failed for **${{ matrix.environment }}**
+              
+              **Frontend Status:** ${{ steps.health.outputs.frontend_status }}
+              **API Status:** ${{ steps.health.outputs.api_status }}
+              **Response Time:** ${{ steps.health.outputs.response_time }}s
+              
+              **Workflow:** ${context.payload.repository.html_url}/actions/runs/${context.runId}
+              **Time:** ${new Date().toISOString()}`,
+              labels: ['incident', 'health-check', '${{ matrix.environment }}']
+            });
+            
+  # Job 2: Uptime Monitoring
+  uptime-check:
+    name: ⏰ Uptime Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: ⏰ Check uptime
+        run: |
+          # Production uptime check
+          PROD_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://wecelebrate.app || echo "000")
+          
+          # Staging uptime check
+          STAGING_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://staging.wecelebrate.app || echo "000")
+          
+          echo "## ⏰ Uptime Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Environment | Status | Uptime |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------------|--------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Production | $PROD_STATUS | ${PROD_STATUS == '200' && '✅ Up' || '❌ Down'} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Staging | $STAGING_STATUS | ${STAGING_STATUS == '200' && '✅ Up' || '❌ Down'} |" >> $GITHUB_STEP_SUMMARY
+          
+  # Job 3: Performance Metrics
+  performance-metrics:
+    name: 📊 Performance Metrics
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📊 Collect performance metrics
+        run: |
+          PROD_URL="https://wecelebrate.app"
+          
+          # Measure response time
+          RESPONSE_TIME=$(curl -s -o /dev/null -w "%{time_total}" $PROD_URL)
+          TTFB=$(curl -s -o /dev/null -w "%{time_starttransfer}" $PROD_URL)
+          
+          echo "## 📊 Performance Metrics" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Response Time | ${RESPONSE_TIME}s | $(awk 'BEGIN {print ('$RESPONSE_TIME' < 2.0) ? "✅" : "⚠️"}') |" >> $GITHUB_STEP_SUMMARY
+          echo "| TTFB | ${TTFB}s | $(awk 'BEGIN {print ('$TTFB' < 0.6) ? "✅" : "⚠️"}') |" >> $GITHUB_STEP_SUMMARY
+          
+  # Job 4: Database Health
+  database-health:
+    name: 🗄️ Database Health
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🗄️ Check database connection
+        run: |
+          # Check Supabase API health
+          SUPABASE_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            ${{ secrets.PRODUCTION_SUPABASE_URL }}/rest/v1/ \
+            -H "apikey: ${{ secrets.PRODUCTION_SUPABASE_ANON_KEY }}" || echo "000")
+          
+          echo "## 🗄️ Database Health" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Supabase Status:** $SUPABASE_STATUS" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "$SUPABASE_STATUS" != "200" ]; then
+            echo "::warning::Database health check returned status $SUPABASE_STATUS"
+          fi
+          
+  # Job 5: API Endpoint Monitoring
+  api-monitoring:
+    name: 🔌 API Monitoring
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🔌 Test API endpoints
+        run: |
+          API_URL="${{ secrets.PRODUCTION_SUPABASE_URL }}/functions/v1/make-server-6fcaeea3"
+          API_KEY="${{ secrets.PRODUCTION_SUPABASE_ANON_KEY }}"
+          
+          echo "## 🔌 API Endpoint Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Endpoint | Status | Response Time |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|---------------|" >> $GITHUB_STEP_SUMMARY
+          
+          # Health endpoint
+          HEALTH_START=$(date +%s%N)
+          HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer $API_KEY" \
+            $API_URL/health || echo "000")
+          HEALTH_TIME=$(echo "scale=3; ($(date +%s%N) - $HEALTH_START) / 1000000000" | bc)
+          
+          echo "| /health | $HEALTH_STATUS | ${HEALTH_TIME}s |" >> $GITHUB_STEP_SUMMARY
+          
+  # Job 6: SSL Certificate Check
+  ssl-check:
+    name: 🔒 SSL Certificate Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🔒 Check SSL certificates
+        run: |
+          echo "## 🔒 SSL Certificate Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Check production SSL
+          EXPIRY=$(echo | openssl s_client -servername wecelebrate.app -connect wecelebrate.app:443 2>/dev/null | \
+            openssl x509 -noout -enddate | cut -d= -f2)
+          
+          echo "**Production Certificate Expiry:** $EXPIRY" >> $GITHUB_STEP_SUMMARY
+          
+          # Calculate days until expiry
+          EXPIRY_EPOCH=$(date -d "$EXPIRY" +%s)
+          NOW_EPOCH=$(date +%s)
+          DAYS_LEFT=$(( ($EXPIRY_EPOCH - $NOW_EPOCH) / 86400 ))
+          
+          echo "**Days Until Expiry:** $DAYS_LEFT days" >> $GITHUB_STEP_SUMMARY
+          
+          if [ $DAYS_LEFT -lt 30 ]; then
+            echo "::warning::SSL certificate expires in less than 30 days!"
+          fi
+          
+  # Job 7: Dependency Health
+  dependency-health:
+    name: 📦 Dependency Health
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Check for outdated packages
+        run: |
+          npm outdated --json > outdated.json || true
+          
+          echo "## 📦 Dependency Health" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          OUTDATED_COUNT=$(cat outdated.json | jq 'length')
+          echo "**Outdated Packages:** $OUTDATED_COUNT" >> $GITHUB_STEP_SUMMARY
+          
+          if [ $OUTDATED_COUNT -gt 20 ]; then
+            echo "::warning::More than 20 packages are outdated"
+          fi
+          
+  # Job 8: Monitoring Summary
+  monitoring-summary:
+    name: 📋 Monitoring Summary
+    runs-on: ubuntu-latest
+    needs: [health-check, uptime-check, performance-metrics, database-health, api-monitoring, ssl-check, dependency-health]
+    if: always()
+    
+    steps:
+      - name: 📋 Generate monitoring summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const needs = ${{ toJson(needs) }};
+            const allPassed = Object.values(needs).every(job => job.result === 'success');
+            
+            let summary = `## 📊 Monitoring Summary\n\n`;
+            summary += `**Time:** ${new Date().toISOString()}\n\n`;
+            summary += `| Check | Status |\n`;
+            summary += `|-------|--------|\n`;
+            summary += `| Health Check | ${needs['health-check'].result === 'success' ? '✅' : '❌'} |\n`;
+            summary += `| Uptime | ${needs['uptime-check'].result === 'success' ? '✅' : '❌'} |\n`;
+            summary += `| Performance | ${needs['performance-metrics'].result === 'success' ? '✅' : '❌'} |\n`;
+            summary += `| Database | ${needs['database-health'].result === 'success' ? '✅' : '❌'} |\n`;
+            summary += `| API | ${needs['api-monitoring'].result === 'success' ? '✅' : '❌'} |\n`;
+            summary += `| SSL | ${needs['ssl-check'].result === 'success' ? '✅' : '❌'} |\n`;
+            summary += `| Dependencies | ${needs['dependency-health'].result === 'success' ? '✅' : '❌'} |\n\n`;
+            
+            if (allPassed) {
+              summary += `✅ **All monitoring checks passed!**\n`;
+            } else {
+              summary += `⚠️ **Some monitoring checks failed. Review details above.**\n`;
+            }
+            
+            await core.summary.addRaw(summary).write();
+            
+      - name: 📢 Send Slack notification
+        if: failure()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "⚠️ Monitoring Alert: Some checks failed",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "⚠️ Monitoring Alert"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Some monitoring checks have failed. Please investigate."
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Details"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

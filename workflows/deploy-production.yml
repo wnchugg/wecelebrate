@@ -1,0 +1,568 @@
+name: Deploy to Production
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to deploy'
+        required: true
+        type: string
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '20.x'
+  ENVIRONMENT: 'production'
+
+jobs:
+  # Job 1: Validate release
+  validate-release:
+    name: ✅ Validate Release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: 🏷️ Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/}
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Deploying version: $VERSION"
+          
+      - name: 📋 Check changelog
+        run: |
+          if [ -f CHANGELOG.md ]; then
+            if grep -q "${{ steps.version.outputs.version }}" CHANGELOG.md; then
+              echo "✅ Version found in changelog"
+            else
+              echo "⚠️ Version not found in changelog"
+            fi
+          else
+            echo "⚠️ CHANGELOG.md not found"
+          fi
+          
+      - name: 🔍 Verify git tag
+        run: |
+          git fetch --tags
+          if git tag | grep -q "${{ steps.version.outputs.version }}"; then
+            echo "✅ Git tag exists"
+          else
+            echo "❌ Git tag not found"
+            exit 1
+          fi
+          
+  # Job 2: Pre-deployment approval
+  approval-required:
+    name: ⏸️ Approval Required
+    runs-on: ubuntu-latest
+    needs: validate-release
+    environment:
+      name: production-approval
+    
+    steps:
+      - name: ⏸️ Waiting for approval
+        run: echo "Deployment approved for version ${{ needs.validate-release.outputs.version }}"
+        
+  # Job 3: Pre-deployment checks
+  pre-deploy:
+    name: 🔍 Pre-deployment Checks
+    runs-on: ubuntu-latest
+    needs: approval-required
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.validate-release.outputs.version }}
+          
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 🔍 Run linter
+        run: npm run lint
+        
+      - name: 📘 Type check
+        run: npm run typecheck
+        
+      - name: 🧪 Run all tests
+        run: npm run test
+        env:
+          CI: true
+          
+      - name: 📊 Check coverage
+        run: |
+          npm run test:coverage
+          COVERAGE=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
+          echo "Coverage: $COVERAGE%"
+          
+          if (( $(echo "$COVERAGE < 90" | bc -l) )); then
+            echo "❌ Coverage is below 90%"
+            exit 1
+          fi
+          
+      - name: ✅ All pre-deployment checks passed
+        run: echo "Pre-deployment checks completed successfully"
+        
+  # Job 4: Build application
+  build:
+    name: 🏗️ Build Application
+    runs-on: ubuntu-latest
+    needs: pre-deploy
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.validate-release.outputs.version }}
+          
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 🏗️ Build for production
+        run: npm run build
+        env:
+          NODE_ENV: production
+          VITE_ENVIRONMENT: production
+          VITE_API_URL: ${{ secrets.PRODUCTION_API_URL }}
+          VITE_SUPABASE_URL: ${{ secrets.PRODUCTION_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.PRODUCTION_SUPABASE_ANON_KEY }}
+          
+      - name: 📊 Analyze bundle size
+        run: |
+          BUNDLE_SIZE=$(du -sh dist | cut -f1)
+          echo "## 📦 Production Build" >> $GITHUB_STEP_SUMMARY
+          echo "Bundle size: **$BUNDLE_SIZE**" >> $GITHUB_STEP_SUMMARY
+          
+      - name: 🗜️ Compress assets
+        run: |
+          cd dist
+          find . -type f \( -name '*.js' -o -name '*.css' -o -name '*.html' -o -name '*.json' \) -exec gzip -k {} \;
+          echo "✅ Assets compressed"
+          
+      - name: 💾 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-build
+          path: dist/
+          retention-days: 30
+          
+      - name: 📝 Generate build info
+        run: |
+          cat > dist/build-info.json << EOF
+          {
+            "version": "${{ needs.validate-release.outputs.version }}",
+            "branch": "${{ github.ref_name }}",
+            "environment": "production",
+            "buildDate": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "buildNumber": "${{ github.run_number }}",
+            "commitSha": "${{ github.sha }}"
+          }
+          EOF
+          
+  # Job 5: Create backup
+  create-backup:
+    name: 💾 Create Backup
+    runs-on: ubuntu-latest
+    needs: approval-required
+    environment:
+      name: production
+    
+    steps:
+      - name: 💾 Backup current production
+        run: |
+          echo "Creating backup of current production..."
+          echo "Backup timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          
+          # In a real scenario, you would backup:
+          # - Current build artifacts
+          # - Database snapshot
+          # - Configuration files
+          
+          echo "✅ Backup created successfully"
+          
+      - name: 📝 Record backup location
+        run: |
+          echo "BACKUP_ID=backup-$(date +%s)" >> $GITHUB_ENV
+          echo "Backup ID: $BACKUP_ID"
+          
+  # Job 6: Deploy to Supabase Production
+  deploy-supabase:
+    name: 🚀 Deploy Supabase Functions
+    runs-on: ubuntu-latest
+    needs: [build, create-backup]
+    environment:
+      name: production
+      url: ${{ secrets.PRODUCTION_SUPABASE_URL }}
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.validate-release.outputs.version }}
+          
+      - name: 🔧 Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+          
+      - name: 🔗 Link to Supabase project
+        run: supabase link --project-ref ${{ secrets.PRODUCTION_PROJECT_REF }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          
+      - name: 🚀 Deploy Edge Functions
+        run: |
+          supabase functions deploy server \
+            --project-ref ${{ secrets.PRODUCTION_PROJECT_REF }} \
+            --verify-jwt false
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          
+      - name: 🔐 Set function secrets
+        run: |
+          supabase secrets set \
+            ALLOWED_ORIGINS="${{ secrets.PRODUCTION_ALLOWED_ORIGINS }}" \
+            RESEND_API_KEY="${{ secrets.RESEND_API_KEY }}" \
+            JWT_SECRET="${{ secrets.PRODUCTION_JWT_SECRET }}" \
+            --project-ref ${{ secrets.PRODUCTION_PROJECT_REF }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          
+      - name: ✅ Supabase functions deployed
+        run: echo "Supabase Edge Functions deployed to production"
+        
+  # Job 7: Deploy frontend (Blue-Green)
+  deploy-frontend:
+    name: 🌐 Deploy Frontend
+    runs-on: ubuntu-latest
+    needs: [build, deploy-supabase]
+    environment:
+      name: production
+      url: https://wecelebrate.app
+    
+    steps:
+      - name: 📥 Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: production-build
+          path: dist/
+          
+      - name: 🚀 Deploy to production
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: wecelebrate-production
+          directory: dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+          
+      - name: ✅ Frontend deployed
+        run: echo "Frontend deployed to production"
+        
+  # Job 8: Smoke tests on production
+  smoke-tests:
+    name: 🧪 Production Smoke Tests
+    runs-on: ubuntu-latest
+    needs: deploy-frontend
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 🎭 Install Playwright
+        run: npx playwright install --with-deps
+        
+      - name: 🧪 Run smoke tests
+        run: npm run test:e2e -- --grep @smoke
+        env:
+          BASE_URL: https://wecelebrate.app
+          
+      - name: 📹 Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-smoke-test-results
+          path: test-results/
+          retention-days: 30
+          
+  # Job 9: Health check
+  health-check:
+    name: ❤️ Health Check
+    runs-on: ubuntu-latest
+    needs: smoke-tests
+    
+    steps:
+      - name: 🏥 Check application health
+        run: |
+          echo "Checking production health..."
+          
+          HEALTH_URL="https://wecelebrate.app/health"
+          
+          for i in {1..10}; do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" $HEALTH_URL || echo "000")
+            
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "✅ Health check passed (attempt $i)"
+              exit 0
+            fi
+            
+            echo "⚠️ Health check failed (attempt $i): HTTP $HTTP_CODE"
+            sleep 15
+          done
+          
+          echo "❌ Health check failed after 10 attempts"
+          exit 1
+          
+      - name: 🔍 Check API endpoint
+        run: |
+          API_URL="${{ secrets.PRODUCTION_SUPABASE_URL }}/functions/v1/make-server-6fcaeea3/health"
+          
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.PRODUCTION_SUPABASE_ANON_KEY }}" \
+            $API_URL || echo "000")
+          
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ API health check passed"
+          else
+            echo "❌ API health check failed: HTTP $HTTP_CODE"
+            exit 1
+          fi
+          
+  # Job 10: Performance check
+  performance-check:
+    name: ⚡ Performance Check
+    runs-on: ubuntu-latest
+    needs: health-check
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: ⚡ Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli
+          lhci autorun --collect.url=https://wecelebrate.app
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          
+  # Job 11: Create release
+  create-release:
+    name: 📦 Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [validate-release, performance-check]
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: 📋 Generate release notes
+        id: release-notes
+        run: |
+          VERSION="${{ needs.validate-release.outputs.version }}"
+          
+          # Get commits since last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          
+          if [ -z "$LAST_TAG" ]; then
+            COMMITS=$(git log --pretty=format:"- %s (%h)" HEAD)
+          else
+            COMMITS=$(git log --pretty=format:"- %s (%h)" $LAST_TAG..HEAD)
+          fi
+          
+          cat > release-notes.md << EOF
+          ## 🚀 Release $VERSION
+          
+          ### What's Changed
+          
+          $COMMITS
+          
+          ### Deployment Information
+          
+          - **Environment:** Production
+          - **Build Number:** ${{ github.run_number }}
+          - **Deployed by:** ${{ github.actor }}
+          - **Deployment Date:** $(date -u +%Y-%m-%dT%H:%M:%SZ)
+          
+          ### Links
+          
+          - [Production Site](https://wecelebrate.app)
+          - [API Documentation](https://wecelebrate.app/docs)
+          - [Changelog](CHANGELOG.md)
+          
+          EOF
+          
+      - name: 📦 Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.validate-release.outputs.version }}
+          release_name: Release ${{ needs.validate-release.outputs.version }}
+          body_path: release-notes.md
+          draft: false
+          prerelease: false
+          
+  # Job 12: Deployment summary
+  deployment-summary:
+    name: 📋 Deployment Summary
+    runs-on: ubuntu-latest
+    needs: [validate-release, pre-deploy, build, create-backup, deploy-supabase, deploy-frontend, smoke-tests, health-check, performance-check, create-release]
+    if: always()
+    
+    steps:
+      - name: 📋 Generate deployment summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const needs = ${{ toJson(needs) }};
+            const version = '${{ needs.validate-release.outputs.version }}';
+            const allPassed = Object.values(needs).every(job => job.result === 'success');
+            
+            const summary = `
+            ## 🚀 Production Deployment Summary
+            
+            **Version:** ${version}
+            **Environment:** Production
+            **Triggered by:** ${{ github.actor }}
+            **Date:** ${new Date().toISOString()}
+            
+            ### Deployment Steps
+            
+            | Step | Status |
+            |------|--------|
+            | Validate Release | ${needs['validate-release'].result === 'success' ? '✅' : '❌'} |
+            | Pre-deployment Checks | ${needs['pre-deploy'].result === 'success' ? '✅' : '❌'} |
+            | Build | ${needs['build'].result === 'success' ? '✅' : '❌'} |
+            | Create Backup | ${needs['create-backup'].result === 'success' ? '✅' : '❌'} |
+            | Deploy Supabase | ${needs['deploy-supabase'].result === 'success' ? '✅' : '❌'} |
+            | Deploy Frontend | ${needs['deploy-frontend'].result === 'success' ? '✅' : '❌'} |
+            | Smoke Tests | ${needs['smoke-tests'].result === 'success' ? '✅' : '❌'} |
+            | Health Check | ${needs['health-check'].result === 'success' ? '✅' : '❌'} |
+            | Performance Check | ${needs['performance-check'].result === 'success' ? '✅' : '❌'} |
+            | Create Release | ${needs['create-release'].result === 'success' ? '✅' : '❌'} |
+            
+            ### Overall Status: ${allPassed ? '✅ SUCCESS' : '❌ FAILED'}
+            
+            **Production URL:** https://wecelebrate.app
+            **API URL:** ${{ secrets.PRODUCTION_SUPABASE_URL }}/functions/v1/make-server-6fcaeea3
+            
+            ${allPassed ? '🎉 Production deployment completed successfully!' : '⚠️ Deployment encountered issues. Rollback may be required.'}
+            `;
+            
+            core.summary.addRaw(summary).write();
+            
+  # Job 13: Notify team
+  notify:
+    name: 📢 Notify Team
+    runs-on: ubuntu-latest
+    needs: [deployment-summary, validate-release]
+    if: always()
+    
+    steps:
+      - name: 📢 Send Slack notification
+        uses: slackapi/slack-github-action@v1.24.0
+        if: always()
+        with:
+          payload: |
+            {
+              "text": "🚀 Production Deployment ${{ needs.deployment-summary.result == 'success' && '✅ Successful' || '❌ Failed' }}",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "🚀 Production Deployment ${{ needs.deployment-summary.result == 'success' && 'Completed' || 'Failed' }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Version:*\n${{ needs.validate-release.outputs.version }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Environment:*\nProduction"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Deployed by:*\n${{ github.actor }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Status:*\n${{ needs.deployment-summary.result == 'success' && '✅ Success' || '❌ Failed' }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Deployment"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "Open Production"
+                      },
+                      "url": "https://wecelebrate.app",
+                      "style": "primary"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

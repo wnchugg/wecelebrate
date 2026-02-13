@@ -1,0 +1,226 @@
+        {/* Header/Footer Configuration Tab */}
+        <TabsContent value="header-footer" className="space-y-6">
+          <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-4 border border-purple-100">
+            <div className="flex items-start gap-3">
+              <Layout className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-1">Header & Footer Configuration</h3>
+                <p className="text-sm text-gray-700">
+                  Customize your site's header navigation, logo, and footer content
+                </p>
+                <div className="mt-2">
+                  <Link
+                    to="/admin/header-footer-configuration"
+                    className="inline-flex items-center gap-2 text-sm text-purple-600 hover:text-purple-700 font-medium"
+                  >
+                    Open Full Editor
+                    <ExternalLink className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Layout className="w-5 h-5 text-[#D91C81]" />
+                Header & Footer Quick Settings
+              </CardTitle>
+              <CardDescription>Preview and quick access to header/footer configuration</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h4 className="font-medium text-gray-900 mb-2">Configuration Options</h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span><strong>Header:</strong> Logo, navigation links, language selector, user menu</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span><strong>Footer:</strong> Company info, quick links, contact details, social media</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span><strong>Layouts:</strong> Multiple preset layouts for different use cases</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span><strong>Inheritance:</strong> Configure at client or site level</span>
+                  </li>
+                </ul>
+                {currentSite?.headerFooterConfig && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="flex items-center gap-2 text-sm text-green-700">
+                      <CheckCircle className="w-4 h-4" />
+                      <span>Header/Footer configuration is active for this site</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-end">
+                <Link
+                  to="/admin/header-footer-configuration"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all shadow-md hover:shadow-lg"
+                >
+                  <Layout className="w-5 h-5" />
+                  Configure Header & Footer
+                  <ExternalLink className="w-4 h-4" />
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Branding Configuration Tab */}
+        <TabsContent value="branding" className="space-y-6">
+          <div className="bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl p-4 border border-pink-100">
+            <div className="flex items-start gap-3">
+              <Palette className="w-5 h-5 text-pink-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-1">Branding Configuration</h3>
+                <p className="text-sm text-gray-700">
+                  Customize logos, colors, typography, and brand assets
+                </p>
+                <div className="mt-2">
+                  <Link
+                    to="/admin/branding-configuration"
+                    className="inline-flex items-center gap-2 text-sm text-pink-600 hover:text-pink-700 font-medium"
+                  >
+                    Open Full Editor
+                    <ExternalLink className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="w-5 h-5 text-[#D91C81]" />
+                Branding Quick Settings
+              </CardTitle>
+              <CardDescription>Preview and quick access to branding configuration</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h4 className="font-medium text-gray-900 mb-2">Branding Options</h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span><strong>Logos:</strong> Primary, secondary, and favicon uploads</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span><strong>Colors:</strong> Primary, secondary, accent color schemes</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span><strong>Typography:</strong> Heading and body font customization</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span><strong>Consistency:</strong> Brand guidelines applied site-wide</span>
+                  </li>
+                </ul>
+                {currentSite?.brandingConfig && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="flex items-center gap-2 text-sm text-green-700">
+                      <CheckCircle className="w-4 h-4" />
+                      <span>Custom branding is active for this site</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-end">
+                <Link
+                  to="/admin/branding-configuration"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg font-semibold hover:from-pink-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
+                >
+                  <Palette className="w-5 h-5" />
+                  Configure Branding
+                  <ExternalLink className="w-4 h-4" />
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Gift Selection Configuration Tab */}
+        <TabsContent value="gift-selection" className="space-y-6">
+          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-100">
+            <div className="flex items-start gap-3">
+              <Gift className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-1">Gift Selection UX Configuration</h3>
+                <p className="text-sm text-gray-700">
+                  Customize the gift browsing and selection experience
+                </p>
+                <div className="mt-2">
+                  <Link
+                    to="/admin/gift-selection-configuration"
+                    className="inline-flex items-center gap-2 text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                  >
+                    Open Full Editor
+                    <ExternalLink className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Gift className="w-5 h-5 text-[#D91C81]" />
+                Gift Selection Quick Settings
+              </CardTitle>
+              <CardDescription>Preview and quick access to gift selection configuration</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h4 className="font-medium text-gray-900 mb-2">UX Configuration Options</h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span><strong>Search:</strong> Enable/disable gift search functionality</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span><strong>Filters:</strong> Category, price range, and custom filters</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span><strong>Layout:</strong> Grid options (2-6 columns), image ratios, hover effects</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span><strong>Display:</strong> Show/hide prices, inventory, descriptions</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span><strong>Sorting:</strong> Multiple sort options (name, price, popularity)</span>
+                  </li>
+                </ul>
+                {currentSite?.giftSelectionConfig && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="flex items-center gap-2 text-sm text-green-700">
+                      <CheckCircle className="w-4 h-4" />
+                      <span>Custom gift selection UX is active for this site</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-end">
+                <Link
+                  to="/admin/gift-selection-configuration"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all shadow-md hover:shadow-lg"
+                >
+                  <Gift className="w-5 h-5" />
+                  Configure Gift Selection
+                  <ExternalLink className="w-4 h-4" />
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+

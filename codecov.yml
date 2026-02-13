@@ -1,0 +1,81 @@
+# Codecov Configuration
+# https://docs.codecov.com/docs/codecov-yaml
+
+# Coverage settings
+coverage:
+  precision: 2
+  round: down
+  range: "70...100"
+  
+  status:
+    # Overall project coverage
+    project:
+      default:
+        target: 90%
+        threshold: 1%
+        if_ci_failed: error
+        
+    # PR coverage
+    patch:
+      default:
+        target: 90%
+        threshold: 1%
+        if_ci_failed: error
+        
+    # Require tests for changes
+    changes:
+      default:
+        target: 90%
+        
+# Comment settings
+comment:
+  layout: "header, diff, flags, components, tree, footer"
+  behavior: default
+  require_changes: false
+  require_base: false
+  require_head: true
+  
+# Ignore paths
+ignore:
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/tests/**"
+  - "**/__tests__/**"
+  - "**/__mocks__/**"
+  - "**/node_modules/**"
+  - "**/dist/**"
+  - "**/build/**"
+  - "**/*.config.*"
+  - "**/*.d.ts"
+  - "**/mockData/**"
+  - "vite.config.ts"
+  - "vitest.config.*.ts"
+  
+# Flags for different test types
+flags:
+  unit:
+    paths:
+      - src/app/components/
+      - src/app/utils/
+    carryforward: true
+    
+  integration:
+    paths:
+      - src/app/
+      - supabase/
+    carryforward: true
+    
+  e2e:
+    paths:
+      - src/app/
+    carryforward: true
+    
+# GitHub checks
+github_checks:
+  annotations: true
+  
+# Pull request comments
+pull_request_behavior:
+  default:
+    target: 90%
+    threshold: 1%

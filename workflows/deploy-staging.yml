@@ -1,0 +1,411 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '20.x'
+  ENVIRONMENT: 'staging'
+
+jobs:
+  # Job 1: Pre-deployment checks
+  pre-deploy:
+    name: 🔍 Pre-deployment Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 🔍 Run linter
+        run: npm run lint
+        
+      - name: 📘 Type check
+        run: npm run typecheck
+        
+      - name: 🧪 Run tests
+        run: npm run test:unit
+        env:
+          CI: true
+          
+      - name: ✅ All pre-deployment checks passed
+        run: echo "Pre-deployment checks completed successfully"
+        
+  # Job 2: Build application
+  build:
+    name: 🏗️ Build Application
+    runs-on: ubuntu-latest
+    needs: pre-deploy
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 🏗️ Build for staging
+        run: npm run build
+        env:
+          VITE_ENVIRONMENT: staging
+          VITE_API_URL: ${{ secrets.STAGING_API_URL }}
+          VITE_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+          
+      - name: 📊 Analyze bundle size
+        run: |
+          du -sh dist
+          echo "Bundle size:" >> $GITHUB_STEP_SUMMARY
+          du -sh dist >> $GITHUB_STEP_SUMMARY
+          
+      - name: 💾 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-build
+          path: dist/
+          retention-days: 7
+          
+      - name: 📝 Generate build info
+        run: |
+          cat > dist/build-info.json << EOF
+          {
+            "version": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}",
+            "environment": "staging",
+            "buildDate": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "buildNumber": "${{ github.run_number }}"
+          }
+          EOF
+          
+  # Job 3: Deploy to Supabase Staging
+  deploy-supabase:
+    name: 🚀 Deploy Supabase Functions
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: staging
+      url: ${{ secrets.STAGING_SUPABASE_URL }}
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+          
+      - name: 🔗 Link to Supabase project
+        run: supabase link --project-ref ${{ secrets.STAGING_PROJECT_REF }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          
+      - name: 🚀 Deploy Edge Functions
+        run: |
+          supabase functions deploy server \
+            --project-ref ${{ secrets.STAGING_PROJECT_REF }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          
+      - name: 🔐 Set function secrets
+        run: |
+          supabase secrets set \
+            ALLOWED_ORIGINS="${{ secrets.STAGING_ALLOWED_ORIGINS }}" \
+            RESEND_API_KEY="${{ secrets.RESEND_API_KEY }}" \
+            JWT_SECRET="${{ secrets.STAGING_JWT_SECRET }}" \
+            --project-ref ${{ secrets.STAGING_PROJECT_REF }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          
+      - name: ✅ Supabase functions deployed
+        run: echo "Supabase Edge Functions deployed to staging"
+        
+  # Job 4: Deploy frontend
+  deploy-frontend:
+    name: 🌐 Deploy Frontend
+    runs-on: ubuntu-latest
+    needs: [build, deploy-supabase]
+    environment:
+      name: staging
+      url: https://staging.wecelebrate.app
+    
+    steps:
+      - name: 📥 Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: staging-build
+          path: dist/
+          
+      - name: 🚀 Deploy to hosting
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: wecelebrate-staging
+          directory: dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: ✅ Frontend deployed
+        run: echo "Frontend deployed to Cloudflare Pages"
+        
+  # Job 5: Database migrations
+  migrate-database:
+    name: 🗄️ Run Database Migrations
+    runs-on: ubuntu-latest
+    needs: deploy-supabase
+    environment:
+      name: staging
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+          
+      - name: 🔗 Link to Supabase project
+        run: supabase link --project-ref ${{ secrets.STAGING_PROJECT_REF }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          
+      - name: 🗄️ Run migrations
+        run: |
+          echo "Checking for pending migrations..."
+          # Note: Migrations are managed through Supabase UI for this project
+          echo "No SQL migrations to run (using KV store)"
+        
+      - name: ✅ Database ready
+        run: echo "Database is ready for staging"
+        
+  # Job 6: Smoke tests
+  smoke-tests:
+    name: 🧪 Smoke Tests
+    runs-on: ubuntu-latest
+    needs: [deploy-frontend, migrate-database]
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 🎭 Install Playwright
+        run: npx playwright install --with-deps
+        
+      - name: 🧪 Run smoke tests
+        run: npm run test:e2e -- --grep @smoke
+        env:
+          BASE_URL: https://staging.wecelebrate.app
+          
+      - name: 📹 Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-results
+          path: test-results/
+          retention-days: 7
+          
+  # Job 7: Health check
+  health-check:
+    name: ❤️ Health Check
+    runs-on: ubuntu-latest
+    needs: smoke-tests
+    
+    steps:
+      - name: 🏥 Check application health
+        run: |
+          echo "Checking staging health endpoint..."
+          
+          HEALTH_URL="https://staging.wecelebrate.app/health"
+          
+          for i in {1..5}; do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" $HEALTH_URL || echo "000")
+            
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "✅ Health check passed (attempt $i)"
+              exit 0
+            fi
+            
+            echo "⚠️ Health check failed (attempt $i): HTTP $HTTP_CODE"
+            sleep 10
+          done
+          
+          echo "❌ Health check failed after 5 attempts"
+          exit 1
+          
+      - name: 🔍 Check API endpoint
+        run: |
+          echo "Checking API endpoint..."
+          API_URL="${{ secrets.STAGING_SUPABASE_URL }}/functions/v1/make-server-6fcaeea3/health"
+          
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.STAGING_SUPABASE_ANON_KEY }}" \
+            $API_URL || echo "000")
+          
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ API health check passed"
+          else
+            echo "❌ API health check failed: HTTP $HTTP_CODE"
+            exit 1
+          fi
+          
+  # Job 8: Deployment summary
+  deployment-summary:
+    name: 📋 Deployment Summary
+    runs-on: ubuntu-latest
+    needs: [pre-deploy, build, deploy-supabase, deploy-frontend, migrate-database, smoke-tests, health-check]
+    if: always()
+    
+    steps:
+      - name: 📋 Generate deployment summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const needs = ${{ toJson(needs) }};
+            const allPassed = Object.values(needs).every(job => job.result === 'success');
+            
+            const summary = `
+            ## 🚀 Staging Deployment Summary
+            
+            **Environment:** Staging
+            **Branch:** ${{ github.ref_name }}
+            **Commit:** ${{ github.sha }}
+            **Triggered by:** ${{ github.actor }}
+            
+            ### Deployment Steps
+            
+            | Step | Status |
+            |------|--------|
+            | Pre-deployment Checks | ${needs['pre-deploy'].result === 'success' ? '✅' : '❌'} |
+            | Build | ${needs['build'].result === 'success' ? '✅' : '❌'} |
+            | Deploy Supabase | ${needs['deploy-supabase'].result === 'success' ? '✅' : '❌'} |
+            | Deploy Frontend | ${needs['deploy-frontend'].result === 'success' ? '✅' : '❌'} |
+            | Database Migrations | ${needs['migrate-database'].result === 'success' ? '✅' : '❌'} |
+            | Smoke Tests | ${needs['smoke-tests'].result === 'success' ? '✅' : '❌'} |
+            | Health Check | ${needs['health-check'].result === 'success' ? '✅' : '❌'} |
+            
+            ### Overall Status: ${allPassed ? '✅ SUCCESS' : '❌ FAILED'}
+            
+            **Staging URL:** https://staging.wecelebrate.app
+            **API URL:** ${{ secrets.STAGING_SUPABASE_URL }}/functions/v1/make-server-6fcaeea3
+            
+            ${allPassed ? '🎉 Deployment completed successfully!' : '⚠️ Deployment encountered issues. Check logs for details.'}
+            `;
+            
+            await github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+              body: summary
+            });
+            
+            core.summary.addRaw(summary).write();
+            
+  # Job 9: Notify team
+  notify:
+    name: 📢 Notify Team
+    runs-on: ubuntu-latest
+    needs: deployment-summary
+    if: always()
+    
+    steps:
+      - name: 📢 Send Slack notification
+        uses: slackapi/slack-github-action@v1.24.0
+        if: always()
+        with:
+          payload: |
+            {
+              "text": "Staging Deployment ${{ needs.deployment-summary.result == 'success' && '✅ Successful' || '❌ Failed' }}",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "🚀 Staging Deployment ${{ needs.deployment-summary.result == 'success' && 'Completed' || 'Failed' }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Environment:*\nStaging"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch:*\n${{ github.ref_name }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Triggered by:*\n${{ github.actor }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Status:*\n${{ needs.deployment-summary.result == 'success' && '✅ Success' || '❌ Failed' }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Deployment"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "Open Staging"
+                      },
+                      "url": "https://staging.wecelebrate.app"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

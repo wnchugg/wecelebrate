@@ -1,0 +1,56 @@
+name: Update README Badges
+
+on:
+  push:
+    branches: [main]
+  workflow_run:
+    workflows: ["CI - Continuous Integration", "Code Coverage", "Code Quality"]
+    types:
+      - completed
+
+jobs:
+  update-badges:
+    name: 🏅 Update Badges
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: 🏅 Update README with badges
+        run: |
+          # Create badges section if it doesn't exist
+          if ! grep -q "## Badges" README.md; then
+            cat >> README.md << 'EOF'
+          
+          ## Badges
+          
+          [![CI Status](https://github.com/${{ github.repository }}/workflows/CI%20-%20Continuous%20Integration/badge.svg)](https://github.com/${{ github.repository }}/actions/workflows/ci.yml)
+          [![Coverage](https://codecov.io/gh/${{ github.repository }}/branch/main/graph/badge.svg)](https://codecov.io/gh/${{ github.repository }})
+          [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=wecelebrate&metric=alert_status)](https://sonarcloud.io/dashboard?id=wecelebrate)
+          [![Code Grade](https://api.codeclimate.com/v1/badges/YOUR_BADGE_ID/maintainability)](https://codeclimate.com/github/${{ github.repository }}/maintainability)
+          [![License](https://img.shields.io/github/license/${{ github.repository }})](LICENSE)
+          [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+          
+          ### Test Coverage
+          
+          ![Lines](https://img.shields.io/badge/Coverage-Lines-brightgreen?style=flat-square)
+          ![Functions](https://img.shields.io/badge/Coverage-Functions-brightgreen?style=flat-square)
+          ![Branches](https://img.shields.io/badge/Coverage-Branches-brightgreen?style=flat-square)
+          
+          ### Code Quality
+          
+          ![ESLint](https://img.shields.io/badge/ESLint-passing-brightgreen?style=flat-square)
+          ![Prettier](https://img.shields.io/badge/Prettier-formatted-brightgreen?style=flat-square)
+          ![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?style=flat-square)
+          
+          EOF
+          fi
+          
+      - name: 💾 Commit badge updates
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs: Update README badges [skip ci]"
+          file_pattern: README.md

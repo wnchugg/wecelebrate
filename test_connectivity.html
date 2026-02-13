@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JALA 2 - Route Testing Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .subtitle {
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .config {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .config h2 {
+            color: #2d3748;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        .config-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .config-item label {
+            font-weight: 600;
+            color: #4a5568;
+            min-width: 120px;
+        }
+        
+        .config-item input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #38a169;
+        }
+        
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 8px;
+            color: white;
+        }
+        
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .results {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .test-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 4px solid #cbd5e0;
+            transition: all 0.2s;
+        }
+        
+        .test-item.success {
+            border-left-color: #48bb78;
+        }
+        
+        .test-item.error {
+            border-left-color: #f56565;
+        }
+        
+        .test-item.pending {
+            border-left-color: #ed8936;
+        }
+        
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .test-method {
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        .test-status {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .status-error {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        .status-pending {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+        
+        .test-path {
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .test-desc {
+            color: #4a5568;
+            font-size: 13px;
+        }
+        
+        .test-response {
+            margin-top: 10px;
+            padding: 10px;
+            background: #edf2f7;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 JALA 2 API - Route Testing Dashboard</h1>
+        <p class="subtitle">Test all 55 migrated CRUD routes in development environment</p>
+        
+        <div class="config">
+            <h2>⚙️ Configuration</h2>
+            <div class="config-item">
+                <label>Base URL:</label>
+                <input type="text" id="apiBase" value="https://wjfcqqrlhwdvvjmefxky.supabase.co/functions/v1/make-server-6fcaeea3">
+            </div>
+            <div class="config-item">
+                <label>Environment:</label>
+                <input type="text" id="envId" value="development">
+            </div>
+            <div class="config-item">
+                <label>Auth Token:</label>
+                <input type="password" id="authToken" placeholder="Enter your admin token here">
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-primary" onclick="testPublicRoutes()">Test Public Routes (No Auth)</button>
+            <button class="btn-secondary" onclick="testAllRoutes()">Test All Routes</button>
+            <button class="btn-danger" onclick="clearResults()">Clear Results</button>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalTests">0</div>
+                <div class="stat-label">Total Tests</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">
+                <div class="stat-value" id="passedTests">0</div>
+                <div class="stat-label">Passed ✅</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);">
+                <div class="stat-value" id="failedTests">0</div>
+                <div class="stat-label">Failed ❌</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);">
+                <div class="stat-value" id="successRate">0%</div>
+                <div class="stat-label">Success Rate</div>
+            </div>
+        </div>
+        
+        <div class="results" id="results">
+            <p style="color: #718096; text-align: center;">Click a button above to start testing...</p>
+        </div>
+    </div>
+    
+    <script>
+        const PUBLIC_TESTS = [
+            { method: 'GET', path: '/public/sites', desc: 'Get active sites' },
+        ];
+        
+        const ALL_TESTS = [
+            // Clients (7 routes)
+            { method: 'GET', path: '/clients', auth: true, desc: 'List all clients' },
+            { method: 'GET', path: '/clients?page=1&pageSize=10', auth: true, desc: 'List clients with pagination' },
+            
+            // Sites (7 routes)
+            { method: 'GET', path: '/sites', auth: true, desc: 'List all sites' },
+            { method: 'GET', path: '/public/sites', auth: false, desc: 'Get active sites (public)' },
+            
+            // Gifts (6 routes)
+            { method: 'GET', path: '/admin/gifts', auth: true, desc: 'List all gifts' },
+            { method: 'GET', path: '/admin/gifts?page=1&pageSize=10', auth: true, desc: 'List gifts with pagination' },
+            
+            // Orders (6 routes)
+            { method: 'GET', path: '/orders', auth: true, desc: 'List all orders' },
+            { method: 'GET', path: '/orders?page=1&pageSize=10', auth: true, desc: 'List orders with pagination' },
+            
+            // Employees (5 routes)
+            { method: 'GET', path: '/employees', auth: true, desc: 'List all employees' },
+            { method: 'GET', path: '/employees?page=1&pageSize=10', auth: true, desc: 'List employees with pagination' },
+            
+            // Admin Users (5 routes)
+            { method: 'GET', path: '/admin/users', auth: true, desc: 'List all admin users' },
+            { method: 'GET', path: '/admin/users?page=1&pageSize=10', auth: true, desc: 'List admin users with pagination' },
+            
+            // Roles (5 routes)
+            { method: 'GET', path: '/roles', auth: true, desc: 'List all roles' },
+            { method: 'GET', path: '/roles?page=1&pageSize=10', auth: true, desc: 'List roles with pagination' },
+            
+            // Access Groups (5 routes)
+            { method: 'GET', path: '/access-groups', auth: true, desc: 'List all access groups' },
+            { method: 'GET', path: '/access-groups?page=1&pageSize=10', auth: true, desc: 'List access groups with pagination' },
+            
+            // Celebrations (5 routes)
+            { method: 'GET', path: '/celebrations', auth: true, desc: 'List all celebrations' },
+            { method: 'GET', path: '/celebrations?page=1&pageSize=10', auth: true, desc: 'List celebrations with pagination' },
+            
+            // Email Templates (5 routes)
+            { method: 'GET', path: '/email-templates', auth: true, desc: 'List all email templates' },
+            { method: 'GET', path: '/email-templates?page=1&pageSize=10', auth: true, desc: 'List email templates with pagination' },
+        ];
+        
+        let stats = { total: 0, passed: 0, failed: 0 };
+        
+        async function testRoute(test) {
+            const apiBase = document.getElementById('apiBase').value;
+            const envId = document.getElementById('envId').value;
+            const authToken = document.getElementById('authToken').value;
+            
+            const headers = {
+                'X-Environment-Id': envId,
+                'Content-Type': 'application/json',
+            };
+            
+            if (test.auth && authToken) {
+                headers['Authorization'] = `Bearer ${authToken}`;
+            }
+            
+            try {
+                const response = await fetch(`${apiBase}${test.path}`, {
+                    method: test.method,
+                    headers,
+                });
+                
+                const status = response.status;
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    data = await response.text();
+                }
+                
+                return {
+                    passed: status >= 200 && status < 400,
+                    status,
+                    desc: test.desc,
+                    path: test.path,
+                    method: test.method,
+                    data,
+                };
+            } catch (error) {
+                return {
+                    passed: false,
+                    status: 'ERROR',
+                    desc: test.desc,
+                    path: test.path,
+                    method: test.method,
+                    error: error.message,
+                };
+            }
+        }
+        
+        function renderTest(result, index, total) {
+            const resultsDiv = document.getElementById('results');
+            
+            const testDiv = document.createElement('div');
+            testDiv.className = `test-item ${result.passed ? 'success' : 'error'}`;
+            
+            const statusClass = result.passed ? 'status-success' : 'status-error';
+            const statusText = result.passed ? `✅ ${result.status}` : `❌ ${result.status}`;
+            
+            testDiv.innerHTML = `
+                <div class="test-header">
+                    <span class="test-method">${result.method}</span>
+                    <span class="test-status ${statusClass}">${statusText}</span>
+                </div>
+                <div class="test-path">${result.path}</div>
+                <div class="test-desc">${result.desc}</div>
+                ${result.data ? `<div class="test-response">${JSON.stringify(result.data, null, 2)}</div>` : ''}
+                ${result.error ? `<div class="test-response" style="color: red;">${result.error}</div>` : ''}
+            `;
+            
+            resultsDiv.appendChild(testDiv);
+            
+            // Update progress
+            const progress = ((index + 1) / total) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+        
+        function updateStats() {
+            document.getElementById('totalTests').textContent = stats.total;
+            document.getElementById('passedTests').textContent = stats.passed;
+            document.getElementById('failedTests').textContent = stats.failed;
+            const rate = stats.total > 0 ? Math.round((stats.passed / stats.total) * 100) : 0;
+            document.getElementById('successRate').textContent = `${rate}%`;
+        }
+        
+        async function runTests(tests) {
+            stats = { total: 0, passed: 0, failed: 0 };
+            clearResults();
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="loading"></div><p style="text-align: center; margin-top: 10px; color: #718096;">Testing in progress...</p>';
+            
+            for (let i = 0; i < tests.length; i++) {
+                const test = tests[i];
+                stats.total++;
+                
+                const result = await testRoute(test);
+                
+                if (result.passed) {
+                    stats.passed++;
+                } else {
+                    stats.failed++;
+                }
+                
+                if (i === 0) resultsDiv.innerHTML = '';
+                renderTest(result, i, tests.length);
+                updateStats();
+                
+                // Small delay between requests
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            // Reset progress after completion
+            setTimeout(() => {
+                document.getElementById('progress').style.width = '0%';
+            }, 2000);
+        }
+        
+        function testPublicRoutes() {
+            runTests(PUBLIC_TESTS);
+        }
+        
+        function testAllRoutes() {
+            const authToken = document.getElementById('authToken').value;
+            if (!authToken) {
+                alert('⚠️ Please enter an auth token to test authenticated routes.');
+                return;
+            }
+            runTests(ALL_TESTS);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '<p style="color: #718096; text-align: center;">Click a button above to start testing...</p>';
+            document.getElementById('progress').style.width = '0%';
+            stats = { total: 0, passed: 0, failed: 0 };
+            updateStats();
+        }
+    </script>
+</body>
+</html>

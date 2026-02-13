@@ -1,0 +1,361 @@
+# Documentation Index
+
+**Last Updated:** February 12, 2026  
+**Version:** 2.0 - Organized Structure
+
+Welcome to the wecelebrate platform documentation. This index provides organized access to all documentation by feature area and topic.
+
+---
+
+## 📚 Quick Navigation
+
+- [🚀 Getting Started](#getting-started)
+- [🏗️ Architecture](#architecture)
+- [✨ Features](#features)
+- [🐛 Debugging & Troubleshooting](#debugging--troubleshooting)
+- [🧪 Testing](#testing)
+- [🚢 Deployment](#deployment)
+- [🔒 Security](#security)
+- [📊 Analytics & Reporting](#analytics--reporting)
+- [🔄 CI/CD](#cicd)
+- [📝 Project History](#project-history)
+
+---
+
+## 🚀 Getting Started
+
+### Essential Guides
+- [README.md](../README.md) - Main project README
+- [QUICK_START.md](../QUICK_START.md) - Quick start guide
+- [DEVELOPER_GUIDE.md](../DEVELOPER_GUIDE.md) - Developer setup
+- [CONTRIBUTING.md](../CONTRIBUTING.md) - Contribution guidelines
+
+### Setup Guides
+- [Environment Setup](../ENVIRONMENT_SETUP_COMPLETE.md)
+  - [ENVIRONMENT_SETUP_INSTRUCTIONS.md](../ENVIRONMENT_SETUP_INSTRUCTIONS.md)
+  - [SIMPLE_ENVIRONMENT_SETUP.md](../SIMPLE_ENVIRONMENT_SETUP.md)
+  - [QUICK_SETUP_2_ENVIRONMENTS.md](../QUICK_SETUP_2_ENVIRONMENTS.md)
+
+- [Database Setup](../DATABASE_INITIALIZATION_GUIDE.md)
+  - [STORAGE_SETUP.md](../STORAGE_SETUP.md)
+
+- [Admin Setup](../ADMIN_SETUP.md)
+  - [ADMIN_LOGIN_CREDENTIALS.md](../ADMIN_LOGIN_CREDENTIALS.md)
+  - [BOOTSTRAP_FIX_SUMMARY.md](../BOOTSTRAP_FIX_SUMMARY.md)
+
+---
+
+## 🏗️ Architecture
+
+### System Architecture
+- [ARCHITECTURE.md](../ARCHITECTURE.md) - Overall system architecture
+- [MULTI_SITE_IMPLEMENTATION.md](../MULTI_SITE_IMPLEMENTATION.md) - Multi-site architecture
+- [CLIENT_SITE_ARCHITECTURE.md](../CLIENT_SITE_ARCHITECTURE.md) - Client/site hierarchy
+- [ACCESS_MANAGEMENT_ARCHITECTURE.md](../ACCESS_MANAGEMENT_ARCHITECTURE.md) - Access control
+
+### Multi-Catalog System
+- [Multi-Catalog Architecture](../MULTI_CATALOG_ARCHITECTURE_PROPOSAL.md)
+  - [MULTI_CATALOG_IMPLEMENTATION_PLAN.md](../MULTI_CATALOG_IMPLEMENTATION_PLAN.md)
+  - [MULTI_CATALOG_COMPLETE.md](../MULTI_CATALOG_COMPLETE.md)
+  - [MULTI_CATALOG_ROADMAP.md](../MULTI_CATALOG_ROADMAP.md)
+  - [MULTI_CATALOG_CHECKLIST.md](../MULTI_CATALOG_CHECKLIST.md)
+
+### Backend Architecture
+- [BACKEND_API_README.md](../BACKEND_API_README.md)
+- [API_DOCUMENTATION.md](../supabase/functions/server/API_DOCUMENTATION.md)
+- [DASHBOARD_API_DOCUMENTATION.md](../supabase/functions/server/DASHBOARD_API_DOCUMENTATION.md)
+
+---
+
+## ✨ Features
+
+### Dashboard
+- [Dashboard Production Readiness](../PROJECT_COMPLETE.md)
+  - [PROJECT_COMPLETE.md](../PROJECT_COMPLETE.md) - **Complete project summary**
+  - [DASHBOARD_PRODUCTION_READINESS_EVALUATION.md](../DASHBOARD_PRODUCTION_READINESS_EVALUATION.md)
+  - **Phase Documentation:**
+    - [PHASE_1_COMPLETE.md](../PHASE_1_COMPLETE.md) - Backend APIs
+    - [PHASE_1_SUMMARY.md](../PHASE_1_SUMMARY.md)
+    - [PHASE_2_COMPLETE.md](../PHASE_2_COMPLETE.md) - Service Layer
+    - [PHASE_2_SUMMARY.md](../PHASE_2_SUMMARY.md)
+    - [PHASE_3_COMPLETE.md](../PHASE_3_COMPLETE.md) - Dashboard UI
+    - [PHASE_3_SUMMARY.md](../PHASE_3_SUMMARY.md)
+    - [PHASE_4_COMPLETE.md](../PHASE_4_COMPLETE.md) - Integration & Polish
+    - [PHASE_4_SUMMARY.md](../PHASE_4_SUMMARY.md)
+
+### Catalog Management
+- [GIFT_CATALOG_INTEGRATION_COMPLETE.md](../GIFT_CATALOG_INTEGRATION_COMPLETE.md)
+- [GIFT_MANAGEMENT_COMPLETE.md](../GIFT_MANAGEMENT_COMPLETE.md)
+
+### Order Management
+- [ORDER_CREATION_COMPLETE.md](../ORDER_CREATION_COMPLETE.md)
+- [ORDER_MANAGEMENT_COMPLETE.md](../ORDER_MANAGEMENT_COMPLETE.md)
+- [ORDER_TRACKING_COMPLETE.md](../ORDER_TRACKING_COMPLETE.md)
+
+### Employee Management
+- [EMPLOYEE_MANAGEMENT_COMPLETE.md](../EMPLOYEE_MANAGEMENT_COMPLETE.md)
+- [EMPLOYEE_DATA_IMPORT.md](../EMPLOYEE_DATA_IMPORT.md)
+
+### Brand Management
+- [BRAND_MANAGEMENT_COMPLETE.md](../BRAND_MANAGEMENT_COMPLETE.md)
+
+### Site Management
+- [SITE_MANAGEMENT_COMPLETE.md](../SITE_MANAGEMENT_COMPLETE.md)
+- [SITE_GIFT_ASSIGNMENT_COMPLETE.md](../SITE_GIFT_ASSIGNMENT_COMPLETE.md)
+
+### Celebration System
+- [CELEBRATION_SYSTEM_COMPLETE.md](../CELEBRATION_SYSTEM_COMPLETE.md)
+- [CELEBRATION_SYSTEM_SUMMARY.md](../CELEBRATION_SYSTEM_SUMMARY.md)
+- [CELEBRATION_TESTING_GUIDE.md](../CELEBRATION_TESTING_GUIDE.md)
+
+### Email System
+- [Email Integration](../EMAIL_INTEGRATION_SUMMARY.md)
+  - [EMAIL_INTEGRATION_SETUP.md](../EMAIL_INTEGRATION_SETUP.md)
+  - [EMAIL_TEMPLATES_COMPLETE.md](../EMAIL_TEMPLATES_COMPLETE.md)
+  - [SHIPPING_EMAILS_COMPLETE.md](../SHIPPING_EMAILS_COMPLETE.md)
+
+### ERP Integration
+- [ERP System Documentation](../ERP_BACKEND_IMPLEMENTATION_COMPLETE.md)
+  - [ERP_INTEGRATION_SYSTEM_SUMMARY.md](../ERP_INTEGRATION_SYSTEM_SUMMARY.md)
+  - [ERP_IMPLEMENTATION_ROADMAP.md](../ERP_IMPLEMENTATION_ROADMAP.md)
+  - [ERP_GETTING_STARTED_SAP.md](../ERP_GETTING_STARTED_SAP.md)
+  - [ERP_QUICK_REFERENCE.md](../ERP_QUICK_REFERENCE.md)
+
+### Language Support
+- [LANGUAGE_EXPANSION_COMPLETE.md](../LANGUAGE_EXPANSION_COMPLETE.md)
+- [TRANSLATION_COMPLETION_SUMMARY.md](../TRANSLATION_COMPLETION_SUMMARY.md)
+- [TRANSLATION_COVERAGE_COMPLETE.md](../TRANSLATION_COVERAGE_COMPLETE.md)
+
+---
+
+## 🐛 Debugging & Troubleshooting
+
+### Authentication Issues
+- [Authentication Debugging](../ADMIN_AUTH_DEBUG_GUIDE.md)
+  - [AUTHENTICATION_FIX_GUIDE.md](../AUTHENTICATION_FIX_GUIDE.md)
+  - [INVALID_LOGIN_TROUBLESHOOTING.md](../INVALID_LOGIN_TROUBLESHOOTING.md)
+  - [TOKEN_FIX_V2.md](../TOKEN_FIX_V2.md)
+  - [AUTHENTICATION_ERRORS_FIXED.md](../AUTHENTICATION_ERRORS_FIXED.md)
+
+### JWT Errors
+- [JWT Error Fixes](../JWT_FIX_COMPLETE.md)
+  - [JWT_ERROR_COMPLETE_FIX.md](../JWT_ERROR_COMPLETE_FIX.md)
+  - [JWT_FIX_QUICK_CARD.md](../JWT_FIX_QUICK_CARD.md)
+  - [FIX_INVALID_JWT_NOW.md](../FIX_INVALID_JWT_NOW.md)
+  - [401_JWT_ERRORS_FIXED.md](../401_JWT_ERRORS_FIXED.md)
+
+### 401 Errors
+- [401 Error Fixes](../COMPLETE_401_FIX.md)
+  - [401_ERROR_FIX_COMPLETE.md](../401_ERROR_FIX_COMPLETE.md)
+  - [SIMPLE_FIX_401_ERROR.md](../SIMPLE_FIX_401_ERROR.md)
+  - [QUICK_FIX_401_ERRORS.md](../QUICK_FIX_401_ERRORS.md)
+  - [FIX_401_ERROR.md](../FIX_401_ERROR.md)
+
+### Backend Connection Issues
+- [Backend Connection Debugging](../BACKEND_CONNECTION_TROUBLESHOOTING.md)
+  - [BACKEND_CONNECTION_FIX.md](../BACKEND_CONNECTION_FIX.md)
+  - [FAILED_TO_FETCH_FIX.md](../FAILED_TO_FETCH_FIX.md)
+  - [FAILED_TO_FETCH_FIX_SUMMARY.md](../FAILED_TO_FETCH_FIX_SUMMARY.md)
+  - [FIGMA_MAKE_FAILED_TO_FETCH_FIX.md](../FIGMA_MAKE_FAILED_TO_FETCH_FIX.md)
+
+### Deployment Issues
+- [Deployment Debugging](../DEPLOYMENT_TROUBLESHOOTING.md)
+  - [FIGMA_MAKE_TROUBLESHOOTING.md](../FIGMA_MAKE_TROUBLESHOOTING.md)
+  - [FIGMA_MAKE_PUBLISH_TROUBLESHOOTING.md](../FIGMA_MAKE_PUBLISH_TROUBLESHOOTING.md)
+
+### Error Summaries
+- [ALL_ERRORS_FIXED_SUMMARY.md](../ALL_ERRORS_FIXED_SUMMARY.md)
+- [ERROR_FIXES_SUMMARY.md](../ERROR_FIXES_SUMMARY.md)
+- [COMPLETE_FIX_SUMMARY.md](../COMPLETE_FIX_SUMMARY.md)
+- [TROUBLESHOOTING.md](../TROUBLESHOOTING.md)
+
+---
+
+## 🧪 Testing
+
+### Test Automation
+- [Testing Documentation](../TESTING.md)
+  - [TESTING_QUICK_REFERENCE.md](../TESTING_QUICK_REFERENCE.md)
+  - [TESTING_INSTRUCTIONS.md](../TESTING_INSTRUCTIONS.md)
+  - [TESTING_IN_FIGMA_MAKE.md](../TESTING_IN_FIGMA_MAKE.md)
+
+### Test Automation Progress
+- [Test Automation Journey](../TEST_AUTOMATION_QUICKSTART.md)
+  - [COMPREHENSIVE_TESTING_PLAN.md](../COMPREHENSIVE_TESTING_PLAN.md)
+  - **Daily Progress (Days 1-30):** Available in root directory
+
+### Test Setup
+- [SETUP_TESTS_GUIDE.md](../SETUP_TESTS_GUIDE.md)
+- [SETUP_TESTS_SUMMARY.md](../SETUP_TESTS_SUMMARY.md)
+- [TEST_SETUP_COMPLETE.md](../TEST_SETUP_COMPLETE.md)
+
+### Testing Executive Summary
+- [TESTING_EXECUTIVE_SUMMARY.md](../TESTING_EXECUTIVE_SUMMARY.md)
+- [COMPLETE_TESTING_PROGRESS_FEB_12_2026.md](../COMPLETE_TESTING_PROGRESS_FEB_12_2026.md)
+
+---
+
+## 🚢 Deployment
+
+### Deployment Guides
+- [Deployment Documentation](../DEPLOYMENT_GUIDE.md)
+  - [FULL_DEPLOYMENT_GUIDE.md](../FULL_DEPLOYMENT_GUIDE.md)
+  - [DEPLOYMENT_QUICK_START.md](../DEPLOYMENT_QUICK_START.md)
+  - [READY_TO_DEPLOY_NOW.md](../READY_TO_DEPLOY_NOW.md)
+
+### Deployment Checklists
+- [DEPLOYMENT_CHECKLIST.md](../DEPLOYMENT_CHECKLIST.md)
+- [DEPLOYMENT_CHECKLIST_DETAILED.md](../DEPLOYMENT_CHECKLIST_DETAILED.md)
+- [PRE_DEPLOYMENT_CHECKLIST.md](../PRE_DEPLOYMENT_CHECKLIST.md)
+
+### Environment-Specific Deployment
+- [DEV_DEPLOYMENT_GUIDE.md](../DEV_DEPLOYMENT_GUIDE.md)
+- [DEPLOYMENT_SCRIPTS_README.md](../DEPLOYMENT_SCRIPTS_README.md)
+
+### Figma Make Deployment
+- [DEPLOY_FROM_FIGMA_MAKE.md](../DEPLOY_FROM_FIGMA_MAKE.md)
+- [HOW_TO_PUBLISH_FIGMA_MAKE.md](../HOW_TO_PUBLISH_FIGMA_MAKE.md)
+- [FIGMA_MAKE_DEPLOYMENT_FIX.md](../FIGMA_MAKE_DEPLOYMENT_FIX.md)
+
+### Deployment Status
+- [DEPLOYMENT_SUCCESS.md](../DEPLOYMENT_SUCCESS.md)
+- [DEPLOYMENT_COMPLETE.md](../DEPLOYMENT_COMPLETE.md)
+- [DEPLOYMENT_READY_FINAL_SUMMARY.md](../DEPLOYMENT_READY_FINAL_SUMMARY.md)
+
+---
+
+## 🔒 Security
+
+### Security Documentation
+- [SECURITY.md](../SECURITY.md) - Security overview
+- [SECURITY_POLICY.md](../SECURITY_POLICY.md) - Security policy
+- [OWASP_COMPLIANCE.md](../OWASP_COMPLIANCE.md) - OWASP compliance
+
+### Security Implementation
+- [SECURITY_IMPLEMENTATION_COMPLETE.md](../SECURITY_IMPLEMENTATION_COMPLETE.md)
+- [SECURITY_IMPLEMENTATION_SUMMARY.md](../SECURITY_IMPLEMENTATION_SUMMARY.md)
+- [SECURITY_HARDENING.md](../SECURITY_HARDENING.md)
+
+### Security Audits
+- [SECURITY_AUDIT_SUMMARY.md](../SECURITY_AUDIT_SUMMARY.md)
+- [SECURITY_HARDENING_REPORT.md](../SECURITY_HARDENING_REPORT.md)
+- [FRONTEND_SECURITY_REPORT.md](../FRONTEND_SECURITY_REPORT.md)
+
+### Production Hardening
+- [Production Hardening](../PRODUCTION_HARDENING_PLAN.md)
+  - [PRODUCTION_HARDENING_CHECKLIST.md](../PRODUCTION_HARDENING_CHECKLIST.md)
+  - [PRODUCTION_HARDENING_FINAL_REPORT.md](../PRODUCTION_HARDENING_FINAL_REPORT.md)
+  - [HARDENING_COMPLETE_SUMMARY.md](../HARDENING_COMPLETE_SUMMARY.md)
+
+### Production Readiness
+- [PRODUCTION_READINESS_AUDIT.md](../PRODUCTION_READINESS_AUDIT.md)
+- [PRODUCTION_READINESS_REPORT.md](../PRODUCTION_READINESS_REPORT.md)
+
+---
+
+## 📊 Analytics & Reporting
+
+### Analytics System
+- [Analytics Documentation](../DAY26_ANALYTICS_DASHBOARD_COMPLETE.md)
+  - [DAY27_CATALOG_ANALYTICS_COMPLETE.md](../DAY27_CATALOG_ANALYTICS_COMPLETE.md)
+  - [DAY28_ORDER_GIFTING_ANALYTICS_COMPLETE.md](../DAY28_ORDER_GIFTING_ANALYTICS_COMPLETE.md)
+  - [DAY29_EMPLOYEE_RECOGNITION_ANALYTICS_COMPLETE.md](../DAY29_EMPLOYEE_RECOGNITION_ANALYTICS_COMPLETE.md)
+  - [DAY30_EXPORT_REPORTING_SYSTEM_COMPLETE.md](../DAY30_EXPORT_REPORTING_SYSTEM_COMPLETE.md)
+
+### Reports
+- [REPORTS_ANALYTICS_COMPLETE.md](../REPORTS_ANALYTICS_COMPLETE.md)
+
+---
+
+## 🔄 CI/CD
+
+### CI/CD Documentation
+- [CI/CD System](../CI_CD_COMPLETE_SUMMARY.md)
+  - [CI_CD_FINAL_SUMMARY.md](../CI_CD_FINAL_SUMMARY.md)
+  - [CI_CD_SETUP_GUIDE.md](../CI_CD_SETUP_GUIDE.md)
+  - [CI_CD_SETUP_CHECKLIST.md](../CI_CD_SETUP_CHECKLIST.md)
+  - [CI_CD_QUICKSTART_5MIN.md](../CI_CD_QUICKSTART_5MIN.md)
+
+### CI/CD Reference
+- [CI_CD_QUICK_REFERENCE.md](../CI_CD_QUICK_REFERENCE.md)
+- [CI_CD_FIGMA_MAKE_GUIDE.md](../CI_CD_FIGMA_MAKE_GUIDE.md)
+- [CI_CD_DOCUMENTATION_INDEX.md](../CI_CD_DOCUMENTATION_INDEX.md)
+
+### CI/CD Diagrams
+- [CI_CD_PIPELINE_DIAGRAM.md](../CI_CD_PIPELINE_DIAGRAM.md)
+
+---
+
+## 📝 Project History
+
+### Weekly Progress
+- Week 1: [WEEK1_COMPLETE.md](../WEEK1_COMPLETE.md)
+- Week 2: [WEEK2_QUICK_REFERENCE.md](../WEEK2_QUICK_REFERENCE.md)
+- Week 3: [WEEK3_COMPLETE.md](../WEEK3_COMPLETE.md)
+- Week 4: [WEEK4_COMPLETE_SUMMARY.md](../WEEK4_COMPLETE_SUMMARY.md)
+- Week 5: [WEEK5_CICD_COMPLETE.md](../WEEK5_CICD_COMPLETE.md)
+
+### Refactoring History
+- [Refactoring Journey](../REFACTORING_PLAN.md)
+  - [REFACTORING_PROGRESS.md](../REFACTORING_PROGRESS.md)
+  - [REFACTORING_COMPLETION_REPORT.md](../REFACTORING_COMPLETION_REPORT.md)
+  - [REFACTORING_INDEX.md](../REFACTORING_INDEX.md)
+
+### Status Reports
+- [STATUS.md](../STATUS.md) - Current status
+- [APPLICATION_STATUS.md](../APPLICATION_STATUS.md)
+- [PLATFORM_STATUS_DASHBOARD.md](../PLATFORM_STATUS_DASHBOARD.md)
+- [PROGRESS_TRACKER.md](../PROGRESS_TRACKER.md)
+
+---
+
+## 🔧 Quick Reference Cards
+
+### Quick Start Cards
+- [QUICK_START.md](../QUICK_START.md)
+- [QUICK_REFERENCE.md](../QUICK_REFERENCE.md)
+- [QUICK_REFERENCE_CARD.md](../QUICK_REFERENCE_CARD.md)
+- [DEVELOPER_QUICK_REFERENCE.md](../DEVELOPER_QUICK_REFERENCE.md)
+
+### Feature-Specific Quick Refs
+- [EMAIL_QUICK_REFERENCE.md](../EMAIL_QUICK_REFERENCE.md)
+- [ERP_QUICK_REFERENCE.md](../ERP_QUICK_REFERENCE.md)
+- [ENVIRONMENT_QUICK_REFERENCE.md](../ENVIRONMENT_QUICK_REFERENCE.md)
+- [TESTING_QUICK_REFERENCE.md](../TESTING_QUICK_REFERENCE.md)
+- [SECURITY_QUICK_REFERENCE.md](../SECURITY_QUICK_REFERENCE.md)
+
+---
+
+## 📖 Additional Resources
+
+### Development Process
+- **[Development Workflow Guide](../docs/process/DEVELOPMENT_WORKFLOW.md)** ⭐ NEW!
+  - Complete workflow with epics, stories, tasks
+  - Definition of Ready (40+ criteria)
+  - Definition of Done (80+ criteria)
+  - Templates and examples
+  - **[Quick Reference](../docs/process/WORKFLOW_QUICK_REFERENCE.md)** - Quick guide
+  - **[Epic Example](../docs/process/EPIC_EXAMPLE_DASHBOARD.md)** - Real Dashboard epic
+  - **[Story Example](../docs/process/USER_STORY_EXAMPLE_STATS_API.md)** - Detailed story
+  - **[System Complete](../WORKFLOW_SYSTEM_COMPLETE.md)** - Overview & summary
+
+### Configuration
+- [CONFIGURATION_MANAGEMENT.md](../CONFIGURATION_MANAGEMENT.md)
+- [CONFIGURATION_QUICK_REFERENCE.md](../CONFIGURATION_QUICK_REFERENCE.md)
+- [ENVIRONMENT_SYSTEM_GUIDE.md](../ENVIRONMENT_SYSTEM_GUIDE.md)
+
+### Accessibility
+- [ACCESSIBILITY.md](../ACCESSIBILITY.md)
+- [ACCESSIBILITY_AUDIT_SUMMARY.md](../ACCESSIBILITY_AUDIT_SUMMARY.md)
+
+### Performance
+- [PERFORMANCE_OPTIMIZATION.md](../PERFORMANCE_OPTIMIZATION.md)
+
+### Compliance
+- [COMPLIANCE_SUMMARY.md](../COMPLIANCE_SUMMARY.md)
+
+---
+
+**Last Updated:** February 12, 2026  
+**Maintained by:** wecelebrate Development Team  
+**Version:** 2.0 - Organized Structure

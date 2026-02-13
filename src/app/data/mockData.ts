@@ -1,0 +1,419 @@
+export interface Event {
+  id: string;
+  title: string;
+  type: "wedding" | "birthday" | "baby-shower" | "anniversary" | "graduation" | "other";
+  date: string;
+  hosts: string[];
+  description: string;
+  image: string;
+  giftCount: number;
+  fundedAmount: number;
+  goalAmount: number;
+}
+
+export interface Gift {
+  id: string;
+  eventId: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  funded: number;
+  contributors: number;
+  category: string;
+  status?: 'active' | 'inactive';
+  availableQuantity?: number;
+  inStock?: boolean; // Added for ProductCard compatibility
+}
+
+export const mockEvents: Event[] = [
+  {
+    id: "1",
+    title: "Sarah & John's Wedding",
+    type: "wedding",
+    date: "2026-06-15",
+    hosts: ["Sarah Mitchell", "John Anderson"],
+    description: "Join us in celebrating our special day! Your presence is the greatest gift, but if you wish to contribute, we've selected items for our new home together.",
+    image: "wedding couple celebration",
+    giftCount: 24,
+    fundedAmount: 8500,
+    goalAmount: 12000,
+  },
+  {
+    id: "2",
+    title: "Emma's 30th Birthday Bash",
+    type: "birthday",
+    date: "2026-04-20",
+    hosts: ["Emma Rodriguez"],
+    description: "Turning 30 and ready to party! Help me celebrate with gifts that support my travel dreams and home upgrade.",
+    image: "birthday party celebration",
+    giftCount: 15,
+    fundedAmount: 2300,
+    goalAmount: 5000,
+  },
+  {
+    id: "3",
+    title: "Baby Shower for the Johnsons",
+    type: "baby-shower",
+    date: "2026-05-10",
+    hosts: ["Rachel Johnson", "Michael Johnson"],
+    description: "We're expecting a little one! Help us prepare for our bundle of joy with essentials for the nursery.",
+    image: "baby shower cute",
+    giftCount: 32,
+    fundedAmount: 4200,
+    goalAmount: 6000,
+  },
+  {
+    id: "4",
+    title: "James & Lisa's 25th Anniversary",
+    type: "anniversary",
+    date: "2026-07-08",
+    hosts: ["James Parker", "Lisa Parker"],
+    description: "Celebrating 25 years of love! We're planning a dream vacation and would love your support.",
+    image: "anniversary couple celebration",
+    giftCount: 18,
+    fundedAmount: 6800,
+    goalAmount: 10000,
+  },
+  {
+    id: "5",
+    title: "Alex's Graduation Party",
+    type: "graduation",
+    date: "2026-05-28",
+    hosts: ["Alex Chen"],
+    description: "I did it! Graduated with honors and ready for the next chapter. Help me set up my first apartment!",
+    image: "graduation student celebration",
+    giftCount: 20,
+    fundedAmount: 3100,
+    goalAmount: 4500,
+  },
+  {
+    id: "6",
+    title: "Housewarming for the Smiths",
+    type: "other",
+    date: "2026-03-15",
+    hosts: ["David Smith", "Jennifer Smith"],
+    description: "New house, new memories! Join us for a housewarming and help us make this house a home.",
+    image: "new house home interior",
+    giftCount: 28,
+    fundedAmount: 5600,
+    goalAmount: 8000,
+  },
+];
+
+export const mockGifts: Gift[] = [
+  // Wedding gifts
+  {
+    id: "g1",
+    eventId: "1",
+    name: "Kitchen Aid Stand Mixer",
+    description: "Professional 5-quart stand mixer in empire red",
+    price: 449.99,
+    image: "kitchen stand mixer red",
+    funded: 320,
+    contributors: 8,
+    category: "Kitchen",
+  },
+  {
+    id: "g2",
+    eventId: "1",
+    name: "Luxury Bedding Set",
+    description: "Egyptian cotton 800-thread count king size bedding",
+    price: 299.99,
+    image: "luxury bedding white",
+    funded: 299.99,
+    contributors: 3,
+    category: "Bedroom",
+  },
+  {
+    id: "g3",
+    eventId: "1",
+    name: "Honeymoon Fund",
+    description: "Contribute to Sarah & John's dream honeymoon in Bali",
+    price: 5000,
+    image: "bali beach resort tropical",
+    funded: 2800,
+    contributors: 24,
+    category: "Experience",
+  },
+  {
+    id: "g4",
+    eventId: "1",
+    name: "Dining Table Set",
+    description: "Modern 6-seater dining table with chairs",
+    price: 1299.99,
+    image: "modern dining table wood",
+    funded: 450,
+    contributors: 6,
+    category: "Furniture",
+  },
+  {
+    id: "g5",
+    eventId: "1",
+    name: "Espresso Machine",
+    description: "Professional-grade espresso machine with milk frother",
+    price: 699.99,
+    image: "espresso machine stainless",
+    funded: 560,
+    contributors: 9,
+    category: "Kitchen",
+  },
+  {
+    id: "g6",
+    eventId: "1",
+    name: "Smart TV 65\"",
+    description: "4K Ultra HD Smart TV with HDR",
+    price: 899.99,
+    image: "smart tv modern living room",
+    funded: 720,
+    contributors: 12,
+    category: "Electronics",
+  },
+  // Birthday gifts
+  {
+    id: "g7",
+    eventId: "2",
+    name: "Travel Backpack",
+    description: "Professional travel backpack with laptop compartment",
+    price: 189.99,
+    image: "travel backpack adventure",
+    funded: 189.99,
+    contributors: 4,
+    category: "Travel",
+  },
+  {
+    id: "g8",
+    eventId: "2",
+    name: "Europe Trip Fund",
+    description: "Help Emma explore Europe this summer",
+    price: 3000,
+    image: "europe eiffel tower paris",
+    funded: 1200,
+    contributors: 15,
+    category: "Experience",
+  },
+  {
+    id: "g9",
+    eventId: "2",
+    name: "Designer Watch",
+    description: "Elegant timepiece for special occasions",
+    price: 449.99,
+    image: "luxury watch elegant",
+    funded: 340,
+    contributors: 7,
+    category: "Fashion",
+  },
+  {
+    id: "g10",
+    eventId: "2",
+    name: "Photography Camera",
+    description: "Mirrorless camera perfect for travel photography",
+    price: 1299.99,
+    image: "mirrorless camera professional",
+    funded: 570,
+    contributors: 9,
+    category: "Electronics",
+  },
+  // Baby shower gifts
+  {
+    id: "g11",
+    eventId: "3",
+    name: "Convertible Crib",
+    description: "3-in-1 convertible crib in white",
+    price: 399.99,
+    image: "baby crib white nursery",
+    funded: 399.99,
+    contributors: 8,
+    category: "Furniture",
+  },
+  {
+    id: "g12",
+    eventId: "3",
+    name: "Baby Monitor System",
+    description: "Smart baby monitor with camera and app",
+    price: 249.99,
+    image: "baby monitor camera modern",
+    funded: 249.99,
+    contributors: 5,
+    category: "Electronics",
+  },
+  {
+    id: "g13",
+    eventId: "3",
+    name: "Stroller & Car Seat Combo",
+    description: "Complete travel system for newborn to toddler",
+    price: 549.99,
+    image: "baby stroller modern gray",
+    funded: 380,
+    contributors: 11,
+    category: "Travel",
+  },
+  {
+    id: "g14",
+    eventId: "3",
+    name: "Nursery Essentials Bundle",
+    description: "Complete set of changing table, rocker, and storage",
+    price: 799.99,
+    image: "nursery furniture set white",
+    funded: 560,
+    contributors: 14,
+    category: "Furniture",
+  },
+  {
+    id: "g15",
+    eventId: "3",
+    name: "Baby Clothes Collection",
+    description: "0-12 months organic cotton clothing set",
+    price: 199.99,
+    image: "baby clothes colorful cute",
+    funded: 199.99,
+    contributors: 6,
+    category: "Clothing",
+  },
+  // Anniversary gifts
+  {
+    id: "g16",
+    eventId: "4",
+    name: "Caribbean Cruise",
+    description: "7-day Caribbean cruise for two",
+    price: 4500,
+    image: "cruise ship caribbean ocean",
+    funded: 3200,
+    contributors: 28,
+    category: "Experience",
+  },
+  {
+    id: "g17",
+    eventId: "4",
+    name: "Couples Spa Day",
+    description: "Full day spa package for two",
+    price: 599.99,
+    image: "spa luxury relaxation",
+    funded: 599.99,
+    contributors: 8,
+    category: "Experience",
+  },
+  {
+    id: "g18",
+    eventId: "4",
+    name: "Fine Dining Experience",
+    description: "Michelin-star restaurant gift certificate",
+    price: 500,
+    image: "fine dining elegant restaurant",
+    funded: 500,
+    contributors: 10,
+    category: "Experience",
+  },
+  // Graduation gifts
+  {
+    id: "g19",
+    eventId: "5",
+    name: "Laptop Computer",
+    description: "High-performance laptop for work and study",
+    price: 1299.99,
+    image: "laptop computer modern silver",
+    funded: 890,
+    contributors: 12,
+    category: "Electronics",
+  },
+  {
+    id: "g20",
+    eventId: "5",
+    name: "Professional Wardrobe Fund",
+    description: "Help Alex build a professional wardrobe",
+    price: 800,
+    image: "business professional attire",
+    funded: 640,
+    contributors: 11,
+    category: "Fashion",
+  },
+  {
+    id: "g21",
+    eventId: "5",
+    name: "Office Desk Setup",
+    description: "Ergonomic desk, chair, and accessories",
+    price: 699.99,
+    image: "home office desk modern",
+    funded: 490,
+    contributors: 8,
+    category: "Furniture",
+  },
+  {
+    id: "g22",
+    eventId: "5",
+    name: "Professional Development Fund",
+    description: "Online courses and certifications",
+    price: 500,
+    image: "online learning education",
+    funded: 380,
+    contributors: 9,
+    category: "Education",
+  },
+  // Housewarming gifts
+  {
+    id: "g23",
+    eventId: "6",
+    name: "Sectional Sofa",
+    description: "Modern L-shaped sectional in charcoal gray",
+    price: 1899.99,
+    image: "sectional sofa modern gray",
+    funded: 1520,
+    contributors: 18,
+    category: "Furniture",
+  },
+  {
+    id: "g24",
+    eventId: "6",
+    name: "Smart Home System",
+    description: "Complete smart home hub with lights and thermostat",
+    price: 599.99,
+    image: "smart home technology modern",
+    funded: 599.99,
+    contributors: 9,
+    category: "Electronics",
+  },
+  {
+    id: "g25",
+    eventId: "6",
+    name: "Outdoor Grill & Patio Set",
+    description: "Gas grill with patio furniture for 6",
+    price: 1299.99,
+    image: "outdoor grill patio furniture",
+    funded: 910,
+    contributors: 14,
+    category: "Outdoor",
+  },
+  {
+    id: "g26",
+    eventId: "6",
+    name: "Kitchen Appliance Package",
+    description: "Blender, toaster, coffee maker set",
+    price: 449.99,
+    image: "kitchen appliances modern stainless",
+    funded: 449.99,
+    contributors: 11,
+    category: "Kitchen",
+  },
+];
+
+export interface CartItem {
+  giftId: string;
+  amount: number;
+}
+
+export interface UserEvent {
+  event: Event;
+  gifts: Gift[];
+}
+
+export const getEventById = (id: string): Event | undefined => {
+  return mockEvents.find((event) => event.id === id);
+};
+
+export const getGiftsByEventId = (eventId: string): Gift[] => {
+  return mockGifts.filter((gift) => gift.eventId === eventId);
+};
+
+export const getGiftById = (id: string): Gift | undefined => {
+  return mockGifts.find((gift) => gift.id === id);
+};

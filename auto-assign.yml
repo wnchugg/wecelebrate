@@ -1,0 +1,43 @@
+# Auto-assign configuration for pull requests
+
+# Reviewers to assign
+addReviewers:
+  reviewers:
+    - team-lead
+    - senior-dev
+    
+  numberOfReviewers: 2
+  
+# Assignees
+addAssignees: author
+
+# File matching for specialized reviewers
+reviewGroups:
+  backend:
+    - "**/*.api.ts"
+    - "**/supabase/**"
+    reviewers:
+      - backend-team
+      
+  frontend:
+    - "**/components/**"
+    - "**/pages/**"
+    reviewers:
+      - frontend-team
+      
+  tests:
+    - "**/*.test.ts"
+    - "**/*.test.tsx"
+    - "**/__tests__/**"
+    reviewers:
+      - qa-team
+      
+  devops:
+    - ".github/workflows/**"
+    - "Dockerfile"
+    - "docker-compose.yml"
+    reviewers:
+      - devops-team
+
+# Skip draft PRs
+skipDraftPR: true

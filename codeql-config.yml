@@ -1,0 +1,21 @@
+name: "CodeQL Security Configuration"
+
+queries:
+  - name: Security extended queries
+    uses: security-extended
+  - name: Security and quality queries
+    uses: security-and-quality
+
+paths-ignore:
+  - '**/node_modules/**'
+  - '**/dist/**'
+  - '**/build/**'
+  - '**/coverage/**'
+  - '**/*.test.ts'
+  - '**/*.test.tsx'
+  - '**/__tests__/**'
+  - '**/__mocks__/**'
+
+paths:
+  - 'src/**'
+  - 'supabase/**'

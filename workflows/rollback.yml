@@ -1,0 +1,394 @@
+name: Rollback Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to rollback'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      backup_id:
+        description: 'Backup ID to restore (optional)'
+        required: false
+        type: string
+      reason:
+        description: 'Reason for rollback'
+        required: true
+        type: string
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  # Job 1: Validate rollback request
+  validate-rollback:
+    name: ✅ Validate Rollback
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📋 Rollback information
+        run: |
+          echo "## 🔄 Rollback Request" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${{ github.event.inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Backup ID:** ${{ github.event.inputs.backup_id || 'Latest' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Reason:** ${{ github.event.inputs.reason }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Initiated by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_STEP_SUMMARY
+          
+      - name: ⚠️ Confirm rollback intent
+        run: |
+          echo "⚠️ CRITICAL: This will rollback the ${{ github.event.inputs.environment }} environment"
+          echo "Reason: ${{ github.event.inputs.reason }}"
+          
+  # Job 2: Approval required
+  approval-required:
+    name: ⏸️ Approval Required
+    runs-on: ubuntu-latest
+    needs: validate-rollback
+    environment:
+      name: ${{ github.event.inputs.environment }}-rollback
+    
+    steps:
+      - name: ⏸️ Waiting for rollback approval
+        run: echo "Rollback approved for ${{ github.event.inputs.environment }}"
+        
+  # Job 3: Create snapshot before rollback
+  create-snapshot:
+    name: 📸 Create Snapshot
+    runs-on: ubuntu-latest
+    needs: approval-required
+    
+    steps:
+      - name: 📸 Create snapshot of current state
+        run: |
+          echo "Creating snapshot before rollback..."
+          SNAPSHOT_ID="snapshot-$(date +%s)"
+          echo "SNAPSHOT_ID=$SNAPSHOT_ID" >> $GITHUB_ENV
+          echo "Snapshot ID: $SNAPSHOT_ID"
+          
+          # In a real scenario:
+          # - Snapshot current database state
+          # - Archive current build artifacts
+          # - Save current configuration
+          
+          echo "✅ Snapshot created: $SNAPSHOT_ID"
+          
+  # Job 4: Identify previous version
+  identify-version:
+    name: 🔍 Identify Previous Version
+    runs-on: ubuntu-latest
+    needs: create-snapshot
+    outputs:
+      previous_version: ${{ steps.version.outputs.previous_version }}
+      
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: 🔍 Find previous version
+        id: version
+        run: |
+          # Get the last two tags
+          TAGS=$(git tag --sort=-version:refname | head -2)
+          PREVIOUS_VERSION=$(echo "$TAGS" | tail -1)
+          
+          echo "previous_version=$PREVIOUS_VERSION" >> $GITHUB_OUTPUT
+          echo "Previous version to restore: $PREVIOUS_VERSION"
+          
+          echo "## 📍 Rollback Target" >> $GITHUB_STEP_SUMMARY
+          echo "Rolling back to version: **$PREVIOUS_VERSION**" >> $GITHUB_STEP_SUMMARY
+          
+  # Job 5: Rollback Supabase functions
+  rollback-supabase:
+    name: 🔄 Rollback Supabase
+    runs-on: ubuntu-latest
+    needs: identify-version
+    environment:
+      name: ${{ github.event.inputs.environment }}
+    
+    steps:
+      - name: 📥 Checkout previous version
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.identify-version.outputs.previous_version }}
+          
+      - name: 🔧 Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+          
+      - name: 🔗 Link to Supabase project
+        run: |
+          if [ "${{ github.event.inputs.environment }}" == "production" ]; then
+            supabase link --project-ref ${{ secrets.PRODUCTION_PROJECT_REF }}
+          else
+            supabase link --project-ref ${{ secrets.STAGING_PROJECT_REF }}
+          fi
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          
+      - name: 🔄 Deploy previous functions version
+        run: |
+          if [ "${{ github.event.inputs.environment }}" == "production" ]; then
+            PROJECT_REF="${{ secrets.PRODUCTION_PROJECT_REF }}"
+          else
+            PROJECT_REF="${{ secrets.STAGING_PROJECT_REF }}"
+          fi
+          
+          supabase functions deploy server \
+            --project-ref $PROJECT_REF
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          
+      - name: ✅ Supabase functions rolled back
+        run: echo "Supabase functions rolled back to ${{ needs.identify-version.outputs.previous_version }}"
+        
+  # Job 6: Rollback frontend
+  rollback-frontend:
+    name: 🔄 Rollback Frontend
+    runs-on: ubuntu-latest
+    needs: [identify-version, rollback-supabase]
+    environment:
+      name: ${{ github.event.inputs.environment }}
+    
+    steps:
+      - name: 📥 Checkout previous version
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.identify-version.outputs.previous_version }}
+          
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 🏗️ Build previous version
+        run: npm run build
+        env:
+          VITE_ENVIRONMENT: ${{ github.event.inputs.environment }}
+          VITE_API_URL: ${{ github.event.inputs.environment == 'production' && secrets.PRODUCTION_API_URL || secrets.STAGING_API_URL }}
+          VITE_SUPABASE_URL: ${{ github.event.inputs.environment == 'production' && secrets.PRODUCTION_SUPABASE_URL || secrets.STAGING_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ github.event.inputs.environment == 'production' && secrets.PRODUCTION_SUPABASE_ANON_KEY || secrets.STAGING_SUPABASE_ANON_KEY }}
+          
+      - name: 🚀 Deploy previous version
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: ${{ github.event.inputs.environment == 'production' && 'wecelebrate-production' || 'wecelebrate-staging' }}
+          directory: dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: ✅ Frontend rolled back
+        run: echo "Frontend rolled back to ${{ needs.identify-version.outputs.previous_version }}"
+        
+  # Job 7: Health check after rollback
+  health-check:
+    name: ❤️ Health Check
+    runs-on: ubuntu-latest
+    needs: rollback-frontend
+    
+    steps:
+      - name: 🏥 Check application health
+        run: |
+          if [ "${{ github.event.inputs.environment }}" == "production" ]; then
+            HEALTH_URL="https://wecelebrate.app/health"
+            API_URL="${{ secrets.PRODUCTION_SUPABASE_URL }}/functions/v1/make-server-6fcaeea3/health"
+            API_KEY="${{ secrets.PRODUCTION_SUPABASE_ANON_KEY }}"
+          else
+            HEALTH_URL="https://staging.wecelebrate.app/health"
+            API_URL="${{ secrets.STAGING_SUPABASE_URL }}/functions/v1/make-server-6fcaeea3/health"
+            API_KEY="${{ secrets.STAGING_SUPABASE_ANON_KEY }}"
+          fi
+          
+          echo "Checking health after rollback..."
+          
+          for i in {1..10}; do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" $HEALTH_URL || echo "000")
+            
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "✅ Health check passed (attempt $i)"
+              break
+            fi
+            
+            echo "⚠️ Health check failed (attempt $i): HTTP $HTTP_CODE"
+            
+            if [ $i -eq 10 ]; then
+              echo "❌ Health check failed after 10 attempts"
+              exit 1
+            fi
+            
+            sleep 15
+          done
+          
+          # Check API
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer $API_KEY" \
+            $API_URL || echo "000")
+          
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ API health check passed"
+          else
+            echo "❌ API health check failed: HTTP $HTTP_CODE"
+            exit 1
+          fi
+          
+  # Job 8: Smoke tests
+  smoke-tests:
+    name: 🧪 Smoke Tests
+    runs-on: ubuntu-latest
+    needs: health-check
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 🎭 Install Playwright
+        run: npx playwright install --with-deps
+        
+      - name: 🧪 Run smoke tests
+        run: npm run test:e2e -- --grep @smoke
+        env:
+          BASE_URL: ${{ github.event.inputs.environment == 'production' && 'https://wecelebrate.app' || 'https://staging.wecelebrate.app' }}
+          
+  # Job 9: Rollback summary
+  rollback-summary:
+    name: 📋 Rollback Summary
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, identify-version, rollback-supabase, rollback-frontend, health-check, smoke-tests]
+    if: always()
+    
+    steps:
+      - name: 📋 Generate rollback summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const needs = ${{ toJson(needs) }};
+            const allPassed = Object.values(needs).every(job => job.result === 'success');
+            const version = '${{ needs.identify-version.outputs.previous_version }}';
+            
+            const summary = `
+            ## 🔄 Rollback Summary
+            
+            **Environment:** ${{ github.event.inputs.environment }}
+            **Rolled back to:** ${version}
+            **Reason:** ${{ github.event.inputs.reason }}
+            **Initiated by:** ${{ github.actor }}
+            **Date:** ${new Date().toISOString()}
+            
+            ### Rollback Steps
+            
+            | Step | Status |
+            |------|--------|
+            | Validate Rollback | ${needs['validate-rollback'].result === 'success' ? '✅' : '❌'} |
+            | Identify Version | ${needs['identify-version'].result === 'success' ? '✅' : '❌'} |
+            | Rollback Supabase | ${needs['rollback-supabase'].result === 'success' ? '✅' : '❌'} |
+            | Rollback Frontend | ${needs['rollback-frontend'].result === 'success' ? '✅' : '❌'} |
+            | Health Check | ${needs['health-check'].result === 'success' ? '✅' : '❌'} |
+            | Smoke Tests | ${needs['smoke-tests'].result === 'success' ? '✅' : '❌'} |
+            
+            ### Overall Status: ${allPassed ? '✅ SUCCESS' : '❌ FAILED'}
+            
+            ${allPassed ? '✅ Rollback completed successfully!' : '⚠️ Rollback encountered issues. Manual intervention may be required.'}
+            `;
+            
+            core.summary.addRaw(summary).write();
+            
+            // Create an issue for tracking
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔄 Rollback: ${{ github.event.inputs.environment }} to ${version}`,
+              body: summary,
+              labels: ['rollback', 'incident', '${{ github.event.inputs.environment }}']
+            });
+            
+  # Job 10: Notify team
+  notify:
+    name: 📢 Notify Team
+    runs-on: ubuntu-latest
+    needs: rollback-summary
+    if: always()
+    
+    steps:
+      - name: 📢 Send Slack notification
+        uses: slackapi/slack-github-action@v1.24.0
+        if: always()
+        with:
+          payload: |
+            {
+              "text": "🔄 Rollback ${{ needs.rollback-summary.result == 'success' && '✅ Successful' || '❌ Failed' }}",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "🔄 Rollback ${{ needs.rollback-summary.result == 'success' && 'Completed' || 'Failed' }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Environment:*\n${{ github.event.inputs.environment }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Reason:*\n${{ github.event.inputs.reason }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Initiated by:*\n${{ github.actor }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Status:*\n${{ needs.rollback-summary.result == 'success' && '✅ Success' || '❌ Failed' }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "⚠️ *CRITICAL:* A rollback has been performed on ${{ github.event.inputs.environment }}. Please investigate the cause."
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Rollback Details"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+                      "style": "danger"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

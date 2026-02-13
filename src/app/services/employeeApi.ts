@@ -38,7 +38,8 @@ export interface UpdateEmployeeData {
  * Get all employees for a site
  */
 export async function getEmployees(siteId: string): Promise<Employee[]> {
-  const response = await apiClient.get(`/sites/${siteId}/employees`);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const response = await (apiClient as any).get(`/sites/${siteId}/employees`);
   const data = (await response.json()) as { employees: Employee[] };
   return data.employees;
 }
@@ -47,7 +48,8 @@ export async function getEmployees(siteId: string): Promise<Employee[]> {
  * Get a single employee
  */
 export async function getEmployee(employeeId: string, siteId: string): Promise<Employee> {
-  const response = await apiClient.get(`/employees/${employeeId}?siteId=${siteId}`);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const response = await (apiClient as any).get(`/employees/${employeeId}?siteId=${siteId}`);
   const data = (await response.json()) as { employee: Employee };
   return data.employee;
 }
@@ -56,7 +58,8 @@ export async function getEmployee(employeeId: string, siteId: string): Promise<E
  * Create a new employee
  */
 export async function createEmployee(siteId: string, data: CreateEmployeeData): Promise<Employee> {
-  const response = await apiClient.post(`/sites/${siteId}/employees`, data);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const response = await (apiClient as any).post(`/sites/${siteId}/employees`, data);
   const result = (await response.json()) as { employee: Employee };
   return result.employee;
 }
@@ -69,7 +72,8 @@ export async function updateEmployee(
   siteId: string,
   data: UpdateEmployeeData
 ): Promise<Employee> {
-  const response = await apiClient.put(`/employees/${employeeId}`, {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const response = await (apiClient as any).put(`/employees/${employeeId}`, {
     siteId,
     ...data,
   });
@@ -81,7 +85,8 @@ export async function updateEmployee(
  * Delete (deactivate) an employee
  */
 export async function deleteEmployee(employeeId: string, siteId: string): Promise<void> {
-  await apiClient.delete(`/employees/${employeeId}?siteId=${siteId}`);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (apiClient as any).delete(`/employees/${employeeId}?siteId=${siteId}`);
 }
 
 /**
@@ -91,7 +96,8 @@ export async function importEmployees(
   siteId: string,
   employees: CreateEmployeeData[]
 ): Promise<{ imported: number; errors?: Array<{ row: number; error: string }>; employees: Employee[] }> {
-  const response = await apiClient.post('/employees/import', {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const response = await (apiClient as any).post('/employees/import', {
     siteId,
     employees,
   });

@@ -493,43 +493,37 @@ export function WelcomePageEditor() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome Page Editor</h1>
-          <p className="text-gray-600 mt-1">Customize your site's welcome page with visual editor, block builder, or custom code</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handleReset}
-            className="flex items-center gap-2 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <RotateCcw className="w-4 h-4" />
-            Reset
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={!hasChanges || saveStatus === 'saving'}
-            className="flex items-center gap-2 px-6 py-2 bg-[#D91C81] text-white rounded-lg hover:bg-[#B01669] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {saveStatus === 'saving' ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Saving...
-              </>
-            ) : saveStatus === 'saved' ? (
-              <>
-                <Check className="w-4 h-4" />
-                Saved!
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4" />
-                Save Changes
-              </>
-            )}
-          </button>
-        </div>
+      {/* Action Buttons */}
+      <div className="flex items-center justify-end gap-3">
+        <button
+          onClick={handleReset}
+          className="flex items-center gap-2 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          <RotateCcw className="w-4 h-4" />
+          Reset
+        </button>
+        <button
+          onClick={handleSave}
+          disabled={!hasChanges || saveStatus === 'saving'}
+          className="flex items-center gap-2 px-6 py-2 bg-[#D91C81] text-white rounded-lg hover:bg-[#B01669] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {saveStatus === 'saving' ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Saving...
+            </>
+          ) : saveStatus === 'saved' ? (
+            <>
+              <Check className="w-4 h-4" />
+              Saved!
+            </>
+          ) : (
+            <>
+              <Save className="w-4 h-4" />
+              Save Changes
+            </>
+          )}
+        </button>
       </div>
 
       {hasChanges && saveStatus === 'idle' && (

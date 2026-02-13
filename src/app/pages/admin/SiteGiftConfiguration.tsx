@@ -376,79 +376,70 @@ export function SiteGiftConfiguration() {
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="space-y-6">
-        {/* Live/Draft Mode Toggle */}
-        <Card className={configMode === 'draft' ? 'border-2 border-amber-400' : 'border-2 border-green-600'}>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div className="flex items-center gap-4">
-                <div className="flex gap-2 bg-gray-100 rounded-lg p-1">
-                  <button
-                    onClick={() => setConfigMode('live')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-md font-semibold transition-all ${
-                      configMode === 'live'
-                        ? 'bg-green-600 text-white shadow-md'
-                        : 'text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    <Eye className="w-4 h-4" />
-                    Live Site
-                  </button>
-                  <button
-                    onClick={() => setConfigMode('draft')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-md font-semibold transition-all ${
-                      configMode === 'draft'
-                        ? 'bg-amber-500 text-white shadow-md'
-                        : 'text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    <FileEdit className="w-4 h-4" />
-                    Draft Mode
-                  </button>
-                </div>
-                {configMode === 'live' && (
-                  <Badge className="bg-green-100 text-green-800 border-green-300">
-                    <Eye className="w-3 h-3 mr-1" />
-                    Viewing Live Configuration
-                  </Badge>
-                )}
-                {configMode === 'draft' && (
-                  <Badge className="bg-amber-100 text-amber-800 border-amber-300">
-                    <FileEdit className="w-3 h-3 mr-1" />
-                    Editing Draft
-                  </Badge>
-                )}
+        {/* Mode Status Banner */}
+        {configMode === 'live' && (
+          <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Eye className="w-5 h-5 text-blue-600 flex-shrink-0" />
+              <div className="text-sm text-blue-900">
+                <p className="font-semibold">🔒 Read-Only Mode</p>
+                <p>Viewing live configuration. Click "Edit" to make changes.</p>
               </div>
-              {configMode === 'draft' && (
-                <Button
-                  onClick={handlePublish}
-                  className="bg-green-600 hover:bg-green-700 text-white"
-                  disabled={isPublishing}
-                >
-                  {isPublishing ? (
-                    <>
-                      <div className="animate-spin mr-2">
-                        <Rocket className="w-4 h-4" />
-                      </div>
-                      Publishing...
-                    </>
-                  ) : (
-                    <>
-                      <Rocket className="w-4 h-4 mr-2" />
-                      Publish to Live
-                    </>
-                  )}
-                </Button>
-              )}
             </div>
-            <div className="mt-3 text-sm text-gray-600">
-              {configMode === 'live' ? (
-                <p>👁️ You are viewing the <strong>live configuration</strong> that is currently active on the site. Switch to Draft Mode to make changes.</p>
-              ) : (
-                <p>✏️ You are editing the <strong>draft configuration</strong>. Changes are auto-saved but won't affect the live site until you publish.</p>
-              )}
+            <Button
+              onClick={() => setConfigMode('draft')}
+              variant="outline"
+              size="sm"
+              className="border-blue-300 hover:bg-blue-100"
+            >
+              <FileEdit className="w-3.5 h-3.5 mr-1.5" />
+              Edit Draft
+            </Button>
+          </div>
+        )}
+        
+        {configMode === 'draft' && (
+          <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <FileEdit className="w-5 h-5 text-amber-600 flex-shrink-0" />
+              <div className="text-sm text-amber-900">
+                <p className="font-semibold">✏️ Editing Draft</p>
+                <p>Changes are auto-saved but won't affect the live site until you publish.</p>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={() => setConfigMode('live')}
+                variant="outline"
+                size="sm"
+                className="border-amber-300 hover:bg-amber-100"
+              >
+                <Eye className="w-3.5 h-3.5 mr-1.5" />
+                View Live
+              </Button>
+              <Button
+                onClick={handlePublish}
+                className="bg-green-600 hover:bg-green-700 text-white"
+                disabled={isPublishing}
+                size="sm"
+              >
+                {isPublishing ? (
+                  <>
+                    <div className="animate-spin mr-1.5">
+                      <Rocket className="w-3.5 h-3.5" />
+                    </div>
+                    Publishing...
+                  </>
+                ) : (
+                  <>
+                    <Rocket className="w-3.5 h-3.5 mr-1.5" />
+                    Publish
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Info Card */}
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3">

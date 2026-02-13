@@ -771,6 +771,35 @@ export function SiteConfiguration() {
               </div>
             )}
             
+            {/* Live/Draft Mode Toggle - Moved to header for easy access */}
+            <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setConfigMode('live')}
+                disabled={currentSite.status === 'draft'}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-semibold transition-all ${
+                  configMode === 'live'
+                    ? 'bg-green-600 text-white shadow-sm'
+                    : 'text-gray-600 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed'
+                }`}
+                title={currentSite.status === 'draft' ? 'Publish site first to view live mode' : 'View live configuration (read-only)'}
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Live</span>
+              </button>
+              <button
+                onClick={() => setConfigMode('draft')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-semibold transition-all ${
+                  configMode === 'draft'
+                    ? 'bg-amber-500 text-white shadow-sm'
+                    : 'text-gray-600 hover:bg-gray-200'
+                }`}
+                title="Edit configuration in draft mode"
+              >
+                <Edit3 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Edit</span>
+              </button>
+            </div>
+            
             {/* View Live Site */}
             {currentSite.status === 'active' && (
               <a
@@ -811,95 +840,50 @@ export function SiteConfiguration() {
         </div>
       </div>
 
-      {/* Live/Draft Mode Toggle */}
-      <Card className={configMode === 'draft' ? 'border-2 border-amber-400' : 'border-2 border-green-600'}>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-4">
-              <div className="flex gap-2 bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setConfigMode('live')}
-                  disabled={currentSite.status === 'draft'}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md font-semibold transition-all ${
-                    configMode === 'live'
-                      ? 'bg-green-600 text-white shadow-md'
-                      : 'text-gray-600 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed'
-                  }`}
-                >
-                  <Eye className="w-4 h-4" />
-                  Live Site
-                </button>
-                <button
-                  onClick={() => setConfigMode('draft')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md font-semibold transition-all ${
-                    configMode === 'draft'
-                      ? 'bg-amber-500 text-white shadow-md'
-                      : 'text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  <FileEdit className="w-4 h-4" />
-                  Draft Mode
-                </button>
-              </div>
-              {configMode === 'live' && currentSite.status === 'active' && (
-                <Badge className="bg-green-100 text-green-800 border-green-300">
-                  <Eye className="w-3 h-3 mr-1" />
-                  Viewing Live Configuration
-                </Badge>
-              )}
-              {configMode === 'draft' && (
-                <Badge className="bg-amber-100 text-amber-800 border-amber-300">
-                  <FileEdit className="w-3 h-3 mr-1" />
-                  {currentSite.status === 'draft' ? 'Site Not Published' : 'Editing Draft'}
-                </Badge>
-              )}
-            </div>
-            {configMode === 'draft' && currentSite.status === 'draft' && (
-              <Button
-                onClick={handlePublish}
-                className="bg-green-600 hover:bg-green-700 text-white"
-                disabled={isPublishing}
-              >
-                {isPublishing ? (
-                  <>
-                    <div className="animate-spin mr-2">
-                      <Rocket className="w-4 h-4" />
-                    </div>
-                    Publishing...
-                  </>
-                ) : (
-                  <>
-                    <Rocket className="w-4 h-4 mr-2" />
-                    Publish Site
-                  </>
-                )}
-              </Button>
-            )}
-          </div>
-          <div className="mt-3 text-sm text-gray-600">
-            {configMode === 'live' ? (
-              currentSite.status === 'active' ? (
-                <p>👁️ You are viewing the <strong>live configuration</strong> that is currently active on the site. Switch to Draft Mode to make changes.</p>
-              ) : (
-                <p>ℹ️ This site has not been published yet. Publish the site to view the live configuration.</p>
-              )
-            ) : (
-              currentSite.status === 'draft' ? (
-                <p>✏️ This site is in <strong>draft mode</strong> and not visible to users yet. Configure your settings below, then click \"Publish Site\" when ready.</p>
-              ) : (
-                <p>✏️ You are editing the <strong>draft configuration</strong>. Changes won't affect the live site until you publish them.</p>
-              )
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Live Mode Warning Banner */}
+      {/* Mode Status Banner */}
       {configMode === 'live' && currentSite.status === 'active' && (
         <Alert className="border-blue-200 bg-blue-50">
           <Eye className="w-4 h-4 text-blue-600" />
           <AlertDescription className="text-blue-800">
-            <strong>🔒 Read-Only Mode:</strong> You are viewing the live configuration. All inputs are disabled. Switch to Draft Mode to make changes.
+            <strong>🔒 Read-Only Mode:</strong> You are viewing the live configuration. Click "Edit" in the header to make changes.
+          </AlertDescription>
+        </Alert>
+      )}
+      
+      {configMode === 'draft' && currentSite.status === 'draft' && (
+        <Alert className="border-amber-200 bg-amber-50">
+          <AlertCircle className="w-4 h-4 text-amber-600" />
+          <AlertDescription className="text-amber-800 flex items-center justify-between">
+            <div>
+              <strong>✏️ Draft Mode:</strong> This site is not published yet. Configure your settings below, then publish when ready.
+            </div>
+            <Button
+              onClick={handlePublish}
+              className="bg-green-600 hover:bg-green-700 text-white ml-4"
+              disabled={isPublishing}
+              size="sm"
+            >
+              {isPublishing ? (
+                <>
+                  <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
+                  Publishing...
+                </>
+              ) : (
+                <>
+                  <Rocket className="w-3 h-3 mr-1.5" />
+                  Publish Site
+                </>
+              )}
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+      
+      {configMode === 'draft' && currentSite.status === 'active' && (
+        <Alert className="border-amber-200 bg-amber-50">
+          <AlertCircle className="w-4 h-4 text-amber-600" />
+          <AlertDescription className="text-amber-800">
+            <strong>✏️ Editing Draft:</strong> Changes won't affect the live site until you save and publish them.
           </AlertDescription>
         </Alert>
       )}
@@ -2167,141 +2151,6 @@ export function SiteConfiguration() {
             </CardContent>
           </Card>
 
-          {/* ========== WELCOME PAGE CONFIGURATION (NEW) ========== */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                Welcome Page Configuration
-              </CardTitle>
-              <CardDescription>
-                Configure post-authentication welcome page (optional)
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-semibold text-gray-900">Enable Welcome Page</p>
-                  <p className="text-sm text-gray-600">Show welcome page after authentication</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox"
-                    checked={enableWelcomePage}
-                    onChange={(e) => {
-                      setEnableWelcomePage(e.target.checked);
-                      setHasChanges(true);
-                    }}
-                    disabled={configMode === 'live'}
-                    className="sr-only peer" 
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
-                </label>
-              </div>
-
-              {enableWelcomePage && (
-                <>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Welcome Message <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                    </label>
-                    <Input
-                      value={welcomeMessage}
-                      onChange={(e) => {
-                        setWelcomeMessage(e.target.value);
-                        setHasChanges(true);
-                      }}
-                      disabled={configMode === 'live'}
-                      placeholder="Welcome to our gift selection program!"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Short welcome message</p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Page Title <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                      </label>
-                      <Input
-                        value={welcomePageTitle}
-                        onChange={(e) => {
-                          setWelcomePageTitle(e.target.value);
-                          setHasChanges(true);
-                        }}
-                        disabled={configMode === 'live'}
-                        placeholder="Welcome!"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Image URL <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                      </label>
-                      <Input
-                        value={welcomePageImageUrl}
-                        onChange={(e) => {
-                          setWelcomePageImageUrl(e.target.value);
-                          setHasChanges(true);
-                        }}
-                        disabled={configMode === 'live'}
-                        placeholder="https://..."
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Detailed Message <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                    </label>
-                    <textarea
-                      value={welcomePageMessage}
-                      onChange={(e) => {
-                        setWelcomePageMessage(e.target.value);
-                        setHasChanges(true);
-                      }}
-                      disabled={configMode === 'live'}
-                      rows={3}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
-                      placeholder="Thank you for your dedication and hard work..."
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Author Name <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                      </label>
-                      <Input
-                        value={welcomePageAuthorName}
-                        onChange={(e) => {
-                          setWelcomePageAuthorName(e.target.value);
-                          setHasChanges(true);
-                        }}
-                        disabled={configMode === 'live'}
-                        placeholder="CEO John Smith"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Author Title <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                      </label>
-                      <Input
-                        value={welcomePageAuthorTitle}
-                        onChange={(e) => {
-                          setWelcomePageAuthorTitle(e.target.value);
-                          setHasChanges(true);
-                        }}
-                        disabled={configMode === 'live'}
-                        placeholder="Chief Executive Officer"
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
-
           {/* ========== INTERNATIONAL SETTINGS (NEW) ========== */}
           <Card>
             <CardHeader>
@@ -3271,11 +3120,147 @@ export function SiteConfiguration() {
 
         {/* Welcome Page Tab */}
         <TabsContent value="welcome" className="space-y-6">
+          {/* Welcome Page Configuration */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                Welcome Page Configuration
+              </CardTitle>
+              <CardDescription>
+                Configure post-authentication welcome page (optional)
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-semibold text-gray-900">Enable Welcome Page</p>
+                  <p className="text-sm text-gray-600">Show welcome page after authentication</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    checked={enableWelcomePage}
+                    onChange={(e) => {
+                      setEnableWelcomePage(e.target.checked);
+                      setHasChanges(true);
+                    }}
+                    disabled={configMode === 'live'}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                </label>
+              </div>
+
+              {enableWelcomePage && (
+                <>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Welcome Message <span className="text-gray-400 font-normal ml-1">(Optional)</span>
+                    </label>
+                    <Input
+                      value={welcomeMessage}
+                      onChange={(e) => {
+                        setWelcomeMessage(e.target.value);
+                        setHasChanges(true);
+                      }}
+                      disabled={configMode === 'live'}
+                      placeholder="Welcome to our gift selection program!"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Short welcome message</p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Page Title <span className="text-gray-400 font-normal ml-1">(Optional)</span>
+                      </label>
+                      <Input
+                        value={welcomePageTitle}
+                        onChange={(e) => {
+                          setWelcomePageTitle(e.target.value);
+                          setHasChanges(true);
+                        }}
+                        disabled={configMode === 'live'}
+                        placeholder="Welcome!"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Image URL <span className="text-gray-400 font-normal ml-1">(Optional)</span>
+                      </label>
+                      <Input
+                        value={welcomePageImageUrl}
+                        onChange={(e) => {
+                          setWelcomePageImageUrl(e.target.value);
+                          setHasChanges(true);
+                        }}
+                        disabled={configMode === 'live'}
+                        placeholder="https://..."
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Detailed Message <span className="text-gray-400 font-normal ml-1">(Optional)</span>
+                    </label>
+                    <textarea
+                      value={welcomePageMessage}
+                      onChange={(e) => {
+                        setWelcomePageMessage(e.target.value);
+                        setHasChanges(true);
+                      }}
+                      disabled={configMode === 'live'}
+                      rows={3}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+                      placeholder="Thank you for your dedication and hard work..."
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Author Name <span className="text-gray-400 font-normal ml-1">(Optional)</span>
+                      </label>
+                      <Input
+                        value={welcomePageAuthorName}
+                        onChange={(e) => {
+                          setWelcomePageAuthorName(e.target.value);
+                          setHasChanges(true);
+                        }}
+                        disabled={configMode === 'live'}
+                        placeholder="CEO John Smith"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Author Title <span className="text-gray-400 font-normal ml-1">(Optional)</span>
+                      </label>
+                      <Input
+                        value={welcomePageAuthorTitle}
+                        onChange={(e) => {
+                          setWelcomePageAuthorTitle(e.target.value);
+                          setHasChanges(true);
+                        }}
+                        disabled={configMode === 'live'}
+                        placeholder="Chief Executive Officer"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Visual Editor */}
           <div className="bg-gradient-to-r from-pink-50 to-blue-50 rounded-xl p-4 border border-pink-100">
             <div className="flex items-start gap-3">
               <Layout className="w-5 h-5 text-[#D91C81] mt-0.5 flex-shrink-0" />
               <div>
-                <h3 className="font-semibold text-gray-900 mb-1">Welcome Page Configuration</h3>
+                <h3 className="font-semibold text-gray-900 mb-1">Visual Editor</h3>
                 <p className="text-sm text-gray-700">
                   Customize your site's welcome page with visual editor or custom HTML/CSS/JS
                 </p>

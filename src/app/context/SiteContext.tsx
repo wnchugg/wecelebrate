@@ -406,19 +406,19 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
           clientsDataLength: clientsResponse?.data?.length
         });
 
-        setSites(sitesResponse.data || []);
-        setClients(clientsResponse.data || []);
+        setSites((sitesResponse.data || []) as Site[]);
+        setClients((clientsResponse.data || []) as Client[]);
 
         // Auto-select first active site if none selected
         if (sitesResponse.data && sitesResponse.data.length > 0) {
           const firstActiveSite = sitesResponse.data.find((s: Site) => s.status === 'active') || sitesResponse.data[0];
-          setCurrentSite(firstActiveSite);
+          setCurrentSite(firstActiveSite as Site);
 
           // Set corresponding client
           if (firstActiveSite && clientsResponse.data) {
             const siteClient = clientsResponse.data.find((c: Client) => c.id === firstActiveSite.clientId);
             if (siteClient) {
-              setCurrentClient(siteClient);
+              setCurrentClient(siteClient as Client);
             }
           }
         }

@@ -557,7 +557,7 @@ export const defaultHeaderFooterConfig: HeaderFooterConfig = {
     footer: false,
   },
   display: {
-    hideOnRoutes: ['/landing'],
+    hideOnRoutes: [],
     authenticatedOnly: false,
     unauthenticatedOnly: false,
   },

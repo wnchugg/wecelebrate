@@ -122,7 +122,8 @@ export function InitialSeed() {
       }
     } catch (error: unknown) {
       console.error('Debug token error:', error);
-      alert(`❌ Network error: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      alert(`❌ Network error: ${errorMessage}`);
     }
   };
 

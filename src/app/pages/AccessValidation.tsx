@@ -171,11 +171,19 @@ export function AccessValidation() {
         
         authenticate(sanitizedInput);
         
-        // Check if welcome page is enabled (default to true for backward compatibility)
-        const enableWelcomePage = currentSite?.settings?.enableWelcomePage !== false;
+        // Check if welcome page is enabled
+        // If explicitly set to false, skip welcome page
+        // If not set or set to true, show welcome page
+        const enableWelcomePage = currentSite?.settings?.enableWelcomePage;
+        
+        logger.log('[AccessValidation] Welcome page setting:', {
+          enableWelcomePage,
+          rawSetting: currentSite?.settings?.enableWelcomePage,
+          willNavigateTo: enableWelcomePage === false ? 'gift-selection' : 'welcome'
+        });
         
         // Navigate to welcome page if enabled, otherwise go directly to gift selection
-        navigate(enableWelcomePage ? 'welcome' : 'gift-selection');
+        navigate(enableWelcomePage === false ? 'gift-selection' : 'welcome');
       } else {
         // Validation failed
         setError(data.error || t('validation.error.invalid'));

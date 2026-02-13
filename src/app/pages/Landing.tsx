@@ -5,9 +5,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { usePublicSite } from '../context/PublicSiteContext';
 import { useLanguage } from '../context/LanguageContext';
-import { LanguageSelector } from '../components/LanguageSelector';
 import { CatalogInitializer } from '../components/CatalogInitializer';
-import Logo from '../../imports/Logo';
 
 export function Landing() {
   const { t } = useLanguage();
@@ -60,18 +58,6 @@ function DefaultLandingPage() {
           <div>Status: {t('landing.debug.siteStatus')}</div>
         </div>
       )}
-      
-      {/* Header */}
-      <header className="px-4 sm:px-6 lg:px-8 py-6 relative z-[100]" role="banner">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center h-10 w-[100px]" style={{ filter: 'brightness(0) invert(1)' }}>
-            <Logo />
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg">
-            <LanguageSelector />
-          </div>
-        </div>
-      </header>
 
       {/* Hero Section */}
       <div className="px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 relative z-10">

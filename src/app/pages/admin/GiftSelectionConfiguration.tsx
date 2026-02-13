@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, Eye, RefreshCw, Search, Filter, ArrowUpDown } from 'lucide-react';
+import { Save, RefreshCw, Search, Filter, ArrowUpDown } from 'lucide-react';
 import { useSite } from '../../context/SiteContext';
 import { GiftSelectionConfig } from '../../types/siteCustomization';
 import { toast } from 'sonner';
@@ -66,7 +66,6 @@ export function GiftSelectionConfiguration() {
   const { currentSite, updateSite } = useSite();
   const [config, setConfig] = useState<GiftSelectionConfig>(defaultConfig);
   const [isSaving, setIsSaving] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     // Load existing configuration
@@ -172,34 +171,55 @@ export function GiftSelectionConfiguration() {
             </div>
 
             {/* Pagination */}
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">Show Pagination</label>
-              <input
-                type="checkbox"
-                checked={config.layout.showPagination}
-                onChange={(e) =>
-                  setConfig(prev => ({
-                    ...prev,
-                    layout: { ...prev.layout, showPagination: e.target.checked },
-                  }))
-                }
-                className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300 rounded"
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">Show Load More Button</label>
-              <input
-                type="checkbox"
-                checked={config.layout.showLoadMore}
-                onChange={(e) =>
-                  setConfig(prev => ({
-                    ...prev,
-                    layout: { ...prev.layout, showLoadMore: e.target.checked },
-                  }))
-                }
-                className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300 rounded"
-              />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Pagination Options</label>
+              <div className="space-y-2">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="pagination"
+                    checked={config.layout.showPagination && !config.layout.showLoadMore}
+                    onChange={() =>
+                      setConfig(prev => ({
+                        ...prev,
+                        layout: { ...prev.layout, showPagination: true, showLoadMore: false },
+                      }))
+                    }
+                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700">Show Pagination</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="pagination"
+                    checked={!config.layout.showPagination && config.layout.showLoadMore}
+                    onChange={() =>
+                      setConfig(prev => ({
+                        ...prev,
+                        layout: { ...prev.layout, showPagination: false, showLoadMore: true },
+                      }))
+                    }
+                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700">Show Load More Button</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="pagination"
+                    checked={!config.layout.showPagination && !config.layout.showLoadMore}
+                    onChange={() =>
+                      setConfig(prev => ({
+                        ...prev,
+                        layout: { ...prev.layout, showPagination: false, showLoadMore: false },
+                      }))
+                    }
+                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700">No Pagination</span>
+                </label>
+              </div>
             </div>
           </div>
         </div>
@@ -213,19 +233,40 @@ export function GiftSelectionConfiguration() {
 
           <div className="space-y-6">
             {/* Enable Search */}
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">Enable Search</label>
-              <input
-                type="checkbox"
-                checked={config.search.enabled}
-                onChange={(e) =>
-                  setConfig(prev => ({
-                    ...prev,
-                    search: { ...prev.search, enabled: e.target.checked },
-                  }))
-                }
-                className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300 rounded"
-              />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Search Functionality</label>
+              <div className="space-y-2">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="searchEnabled"
+                    checked={config.search.enabled}
+                    onChange={() =>
+                      setConfig(prev => ({
+                        ...prev,
+                        search: { ...prev.search, enabled: true },
+                      }))
+                    }
+                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700">Enable Search</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="searchEnabled"
+                    checked={!config.search.enabled}
+                    onChange={() =>
+                      setConfig(prev => ({
+                        ...prev,
+                        search: { ...prev.search, enabled: false },
+                      }))
+                    }
+                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700">Disable Search</span>
+                </label>
+              </div>
             </div>
 
             {config.search.enabled && (
@@ -263,33 +304,75 @@ export function GiftSelectionConfiguration() {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700">Show Search Button</label>
-                  <input
-                    type="checkbox"
-                    checked={config.search.showSearchButton}
-                    onChange={(e) =>
-                      setConfig(prev => ({
-                        ...prev,
-                        search: { ...prev.search, showSearchButton: e.target.checked },
-                      }))
-                    }
-                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300 rounded"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-3">Search Button</label>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="searchButton"
+                        checked={config.search.showSearchButton}
+                        onChange={() =>
+                          setConfig(prev => ({
+                            ...prev,
+                            search: { ...prev.search, showSearchButton: true },
+                          }))
+                        }
+                        className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                      />
+                      <span className="text-sm text-gray-700">Show Search Button</span>
+                    </label>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="searchButton"
+                        checked={!config.search.showSearchButton}
+                        onChange={() =>
+                          setConfig(prev => ({
+                            ...prev,
+                            search: { ...prev.search, showSearchButton: false },
+                          }))
+                        }
+                        className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                      />
+                      <span className="text-sm text-gray-700">Hide Search Button</span>
+                    </label>
+                  </div>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700">Live Search (Search as you type)</label>
-                  <input
-                    type="checkbox"
-                    checked={config.search.liveSearch}
-                    onChange={(e) =>
-                      setConfig(prev => ({
-                        ...prev,
-                        search: { ...prev.search, liveSearch: e.target.checked },
-                      }))
-                    }
-                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300 rounded"
-                  />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">Search Type</label>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="liveSearch"
+                        checked={config.search.liveSearch}
+                        onChange={() =>
+                          setConfig(prev => ({
+                            ...prev,
+                            search: { ...prev.search, liveSearch: true },
+                          }))
+                        }
+                        className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                      />
+                      <span className="text-sm text-gray-700">Live Search (Search as you type)</span>
+                    </label>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="liveSearch"
+                        checked={!config.search.liveSearch}
+                        onChange={() =>
+                          setConfig(prev => ({
+                            ...prev,
+                            search: { ...prev.search, liveSearch: false },
+                          }))
+                        }
+                        className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                      />
+                      <span className="text-sm text-gray-700">Manual Search (Requires button click)</span>
+                    </label>
+                  </div>
                 </div>
               </>
             )}
@@ -305,19 +388,40 @@ export function GiftSelectionConfiguration() {
 
           <div className="space-y-6">
             {/* Enable Filters */}
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">Enable Filters</label>
-              <input
-                type="checkbox"
-                checked={config.filters.enabled}
-                onChange={(e) =>
-                  setConfig(prev => ({
-                    ...prev,
-                    filters: { ...prev.filters, enabled: e.target.checked },
-                  }))
-                }
-                className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300 rounded"
-              />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Filter Functionality</label>
+              <div className="space-y-2">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="filtersEnabled"
+                    checked={config.filters.enabled}
+                    onChange={() =>
+                      setConfig(prev => ({
+                        ...prev,
+                        filters: { ...prev.filters, enabled: true },
+                      }))
+                    }
+                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700">Enable Filters</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="filtersEnabled"
+                    checked={!config.filters.enabled}
+                    onChange={() =>
+                      setConfig(prev => ({
+                        ...prev,
+                        filters: { ...prev.filters, enabled: false },
+                      }))
+                    }
+                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700">Disable Filters</span>
+                </label>
+              </div>
             </div>
 
             {config.filters.enabled && (
@@ -340,40 +444,85 @@ export function GiftSelectionConfiguration() {
                   </select>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700">Collapsible Filters</label>
-                  <input
-                    type="checkbox"
-                    checked={config.filters.collapsible}
-                    onChange={(e) =>
-                      setConfig(prev => ({
-                        ...prev,
-                        filters: { ...prev.filters, collapsible: e.target.checked },
-                      }))
-                    }
-                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300 rounded"
-                  />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">Filter Behavior</label>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="collapsible"
+                        checked={config.filters.collapsible}
+                        onChange={() =>
+                          setConfig(prev => ({
+                            ...prev,
+                            filters: { ...prev.filters, collapsible: true },
+                          }))
+                        }
+                        className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                      />
+                      <span className="text-sm text-gray-700">Collapsible Filters</span>
+                    </label>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="collapsible"
+                        checked={!config.filters.collapsible}
+                        onChange={() =>
+                          setConfig(prev => ({
+                            ...prev,
+                            filters: { ...prev.filters, collapsible: false },
+                          }))
+                        }
+                        className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                      />
+                      <span className="text-sm text-gray-700">Always Expanded</span>
+                    </label>
+                  </div>
                 </div>
 
                 <div className="border-t pt-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-4">Category Filter</h3>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <label className="text-sm font-medium text-gray-700">Enable Category Filter</label>
-                      <input
-                        type="checkbox"
-                        checked={config.filters.categories.enabled}
-                        onChange={(e) =>
-                          setConfig(prev => ({
-                            ...prev,
-                            filters: {
-                              ...prev.filters,
-                              categories: { ...prev.filters.categories, enabled: e.target.checked },
-                            },
-                          }))
-                        }
-                        className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300 rounded"
-                      />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-3">Category Filter Status</label>
+                      <div className="space-y-2">
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="categoryFilter"
+                            checked={config.filters.categories.enabled}
+                            onChange={() =>
+                              setConfig(prev => ({
+                                ...prev,
+                                filters: {
+                                  ...prev.filters,
+                                  categories: { ...prev.filters.categories, enabled: true },
+                                },
+                              }))
+                            }
+                            className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                          />
+                          <span className="text-sm text-gray-700">Enable Category Filter</span>
+                        </label>
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="categoryFilter"
+                            checked={!config.filters.categories.enabled}
+                            onChange={() =>
+                              setConfig(prev => ({
+                                ...prev,
+                                filters: {
+                                  ...prev.filters,
+                                  categories: { ...prev.filters.categories, enabled: false },
+                                },
+                              }))
+                            }
+                            className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                          />
+                          <span className="text-sm text-gray-700">Disable Category Filter</span>
+                        </label>
+                      </div>
                     </div>
                     {config.filters.categories.enabled && (
                       <div>
@@ -400,22 +549,46 @@ export function GiftSelectionConfiguration() {
                 <div className="border-t pt-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-4">Price Range Filter</h3>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <label className="text-sm font-medium text-gray-700">Enable Price Range Filter</label>
-                      <input
-                        type="checkbox"
-                        checked={config.filters.priceRange.enabled}
-                        onChange={(e) =>
-                          setConfig(prev => ({
-                            ...prev,
-                            filters: {
-                              ...prev.filters,
-                              priceRange: { ...prev.filters.priceRange, enabled: e.target.checked },
-                            },
-                          }))
-                        }
-                        className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300 rounded"
-                      />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-3">Price Range Filter Status</label>
+                      <div className="space-y-2">
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="priceRangeFilter"
+                            checked={config.filters.priceRange.enabled}
+                            onChange={() =>
+                              setConfig(prev => ({
+                                ...prev,
+                                filters: {
+                                  ...prev.filters,
+                                  priceRange: { ...prev.filters.priceRange, enabled: true },
+                                },
+                              }))
+                            }
+                            className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                          />
+                          <span className="text-sm text-gray-700">Enable Price Range Filter</span>
+                        </label>
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="priceRangeFilter"
+                            checked={!config.filters.priceRange.enabled}
+                            onChange={() =>
+                              setConfig(prev => ({
+                                ...prev,
+                                filters: {
+                                  ...prev.filters,
+                                  priceRange: { ...prev.filters.priceRange, enabled: false },
+                                },
+                              }))
+                            }
+                            className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                          />
+                          <span className="text-sm text-gray-700">Disable Price Range Filter</span>
+                        </label>
+                      </div>
                     </div>
                     {config.filters.priceRange.enabled && (
                       <div>
@@ -452,19 +625,40 @@ export function GiftSelectionConfiguration() {
 
           <div className="space-y-6">
             {/* Enable Sorting */}
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">Enable Sorting</label>
-              <input
-                type="checkbox"
-                checked={config.sorting.enabled}
-                onChange={(e) =>
-                  setConfig(prev => ({
-                    ...prev,
-                    sorting: { ...prev.sorting, enabled: e.target.checked },
-                  }))
-                }
-                className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300 rounded"
-              />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Sorting Functionality</label>
+              <div className="space-y-2">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="sortingEnabled"
+                    checked={config.sorting.enabled}
+                    onChange={() =>
+                      setConfig(prev => ({
+                        ...prev,
+                        sorting: { ...prev.sorting, enabled: true },
+                      }))
+                    }
+                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700">Enable Sorting</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="sortingEnabled"
+                    checked={!config.sorting.enabled}
+                    onChange={() =>
+                      setConfig(prev => ({
+                        ...prev,
+                        sorting: { ...prev.sorting, enabled: false },
+                      }))
+                    }
+                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700">Disable Sorting</span>
+                </label>
+              </div>
             </div>
 
             {config.sorting.enabled && (
@@ -514,65 +708,149 @@ export function GiftSelectionConfiguration() {
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Display Options</h2>
 
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">Show Prices</label>
-              <input
-                type="checkbox"
-                checked={config.display.showPrices}
-                onChange={(e) =>
-                  setConfig(prev => ({
-                    ...prev,
-                    display: { ...prev.display, showPrices: e.target.checked },
-                  }))
-                }
-                className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300 rounded"
-              />
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Show Prices</label>
+              <div className="space-y-2">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="showPrices"
+                    checked={config.display.showPrices}
+                    onChange={() =>
+                      setConfig(prev => ({
+                        ...prev,
+                        display: { ...prev.display, showPrices: true },
+                      }))
+                    }
+                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700">Show Prices</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="showPrices"
+                    checked={!config.display.showPrices}
+                    onChange={() =>
+                      setConfig(prev => ({
+                        ...prev,
+                        display: { ...prev.display, showPrices: false },
+                      }))
+                    }
+                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700">Hide Prices</span>
+                </label>
+              </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">Show Inventory Status</label>
-              <input
-                type="checkbox"
-                checked={config.display.showInventory}
-                onChange={(e) =>
-                  setConfig(prev => ({
-                    ...prev,
-                    display: { ...prev.display, showInventory: e.target.checked },
-                  }))
-                }
-                className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300 rounded"
-              />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Show Inventory Status</label>
+              <div className="space-y-2">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="showInventory"
+                    checked={config.display.showInventory}
+                    onChange={() =>
+                      setConfig(prev => ({
+                        ...prev,
+                        display: { ...prev.display, showInventory: true },
+                      }))
+                    }
+                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700">Show Inventory</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="showInventory"
+                    checked={!config.display.showInventory}
+                    onChange={() =>
+                      setConfig(prev => ({
+                        ...prev,
+                        display: { ...prev.display, showInventory: false },
+                      }))
+                    }
+                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700">Hide Inventory</span>
+                </label>
+              </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">Show Ratings</label>
-              <input
-                type="checkbox"
-                checked={config.display.showRatings}
-                onChange={(e) =>
-                  setConfig(prev => ({
-                    ...prev,
-                    display: { ...prev.display, showRatings: e.target.checked },
-                  }))
-                }
-                className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300 rounded"
-              />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Show Ratings</label>
+              <div className="space-y-2">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="showRatings"
+                    checked={config.display.showRatings}
+                    onChange={() =>
+                      setConfig(prev => ({
+                        ...prev,
+                        display: { ...prev.display, showRatings: true },
+                      }))
+                    }
+                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700">Show Ratings</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="showRatings"
+                    checked={!config.display.showRatings}
+                    onChange={() =>
+                      setConfig(prev => ({
+                        ...prev,
+                        display: { ...prev.display, showRatings: false },
+                      }))
+                    }
+                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700">Hide Ratings</span>
+                </label>
+              </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">Show Quick View</label>
-              <input
-                type="checkbox"
-                checked={config.display.showQuickView}
-                onChange={(e) =>
-                  setConfig(prev => ({
-                    ...prev,
-                    display: { ...prev.display, showQuickView: e.target.checked },
-                  }))
-                }
-                className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300 rounded"
-              />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Show Quick View</label>
+              <div className="space-y-2">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="showQuickView"
+                    checked={config.display.showQuickView}
+                    onChange={() =>
+                      setConfig(prev => ({
+                        ...prev,
+                        display: { ...prev.display, showQuickView: true },
+                      }))
+                    }
+                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700">Show Quick View</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="showQuickView"
+                    checked={!config.display.showQuickView}
+                    onChange={() =>
+                      setConfig(prev => ({
+                        ...prev,
+                        display: { ...prev.display, showQuickView: false },
+                      }))
+                    }
+                    className="h-4 w-4 text-[#D91C81] focus:ring-[#D91C81] border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700">Hide Quick View</span>
+                </label>
+              </div>
             </div>
 
             <div>
@@ -666,15 +944,7 @@ export function GiftSelectionConfiguration() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between bg-white rounded-lg shadow-sm p-6">
-          <button
-            onClick={() => setShowPreview(!showPreview)}
-            className="flex items-center gap-2 px-4 py-2 text-[#D91C81] border border-[#D91C81] rounded-md hover:bg-pink-50 transition-colors"
-          >
-            <Eye className="w-4 h-4" />
-            {showPreview ? 'Hide' : 'Show'} Preview
-          </button>
-
+        <div className="flex items-center justify-end bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setConfig(defaultConfig)}

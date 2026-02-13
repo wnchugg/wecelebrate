@@ -9,6 +9,7 @@ import { ECard } from '../components/ECard';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';
 import { publicAnonKey } from '../../../utils/supabase/info';
 import { toast } from 'sonner';
+import { logger } from '../utils/logger';
 
 export function Welcome() {
   const navigate = useNavigate();
@@ -76,12 +77,20 @@ export function Welcome() {
   useEffect(() => {
     if (currentSite) {
       // Check if welcome page is explicitly disabled
-      // Default to enabled if not specified (backward compatibility)
-      const enableWelcomePage = currentSite.settings.enableWelcomePage !== false;
+      // If not set or set to true, show welcome page (backward compatibility)
+      const enableWelcomePage = currentSite.settings.enableWelcomePage;
       
-      if (!enableWelcomePage) {
+      logger.log('[Welcome] Welcome page setting:', {
+        enableWelcomePage,
+        rawSetting: currentSite.settings.enableWelcomePage,
+        willRedirect: enableWelcomePage === false,
+        siteId
+      });
+      
+      if (enableWelcomePage === false) {
+        logger.log('[Welcome] Redirecting to gift-selection because welcome page is disabled');
         // Use relative path to preserve site context if in /site/:siteId route
-        navigate(siteId ? 'gift-selection' : '/gift-selection');
+        navigate(siteId ? 'gift-selection' : '/gift-selection', { replace: true });
       }
     }
   }, [currentSite, navigate, siteId]);

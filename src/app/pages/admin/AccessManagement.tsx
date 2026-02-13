@@ -45,8 +45,8 @@ export function AccessManagement() {
   useEffect(() => {
     if (currentSite?.id) {
       void loadEmployees();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const domains = currentSite.settings.allowedDomains;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+      const domains = (currentSite.settings as any).allowedDomains;
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       setAllowedDomains(domains ? domains.join(', ') : '');
     }
@@ -157,11 +157,12 @@ export function AccessManagement() {
         .map(d => d.trim())
         .filter(d => d.length > 0);
       
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await updateSite(currentSite.id, {
         settings: {
           ...currentSite.settings,
           allowedDomains: domains,
-        },
+        } as any,
       });
       
       toast.success('Allowed domains saved successfully');
@@ -267,20 +268,6 @@ export function AccessManagement() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <div className="flex items-center gap-3 mb-2">
-          <div 
-            className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold"
-            style={{ backgroundColor: currentSite.branding.primaryColor }}
-          >
-            {currentClient.name.substring(0, 2).toUpperCase()}
-          </div>
-        </div>
-        <h1 className="text-2xl font-bold text-gray-900">Access Management</h1>
-        <p className="text-gray-600 mt-1">Manage user access and validation methods for {currentClient.name}</p>
-      </div>
-
       {/* Validation Method Selector */}
       <div className="bg-white rounded-xl p-6 border border-gray-200">
         <h2 className="text-lg font-bold text-gray-900 mb-4">Validation Method</h2>

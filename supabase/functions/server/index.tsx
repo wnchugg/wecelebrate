@@ -3518,6 +3518,89 @@ app.put("/make-server-6fcaeea3/sites/:siteId/gift-config", verifyAdmin, async (c
     
     console.log('[Save Gift Config] ✅ Successfully saved config to key:', `site_configs:${siteId}`);
     
+    // IMPORTANT: Also create site-gift-assignment keys for the public endpoint
+    // First, delete all existing assignments for this site
+    const existingAssignments = await kv.getByPrefix(`site-gift-assignment:${siteId}:`, environmentId);
+    for (const assignment of existingAssignments) {
+      await kv.del(`site-gift-assignment:${siteId}:${assignment.giftId}`, environmentId);
+    }
+    console.log('[Save Gift Config] Deleted', existingAssignments.length, 'existing assignments');
+    
+    // Create new assignments based on the strategy
+    if (config.assignmentStrategy === 'explicit' && config.includedGiftIds) {
+      // For explicit strategy, create assignments for each included gift
+      for (const giftId of config.includedGiftIds) {
+        const assignmentKey = `site-gift-assignment:${siteId}:${giftId}`;
+        const assignment = {
+          siteId,
+          giftId,
+          priority: 0,
+          quantityLimit: null,
+          createdAt: new Date().toISOString(),
+        };
+        await kv.set(assignmentKey, assignment, environmentId);
+      }
+      console.log('[Save Gift Config] Created', config.includedGiftIds.length, 'explicit gift assignments');
+    } else if (config.assignmentStrategy === 'all') {
+      // For 'all' strategy, create assignments for all active gifts
+      const allGifts = await kv.getByPrefix('gifts:', environmentId);
+      const activeGifts = allGifts.filter((g: any) => g.status === 'active');
+      for (const gift of activeGifts) {
+        const assignmentKey = `site-gift-assignment:${siteId}:${gift.id}`;
+        const assignment = {
+          siteId,
+          giftId: gift.id,
+          priority: 0,
+          quantityLimit: null,
+          createdAt: new Date().toISOString(),
+        };
+        await kv.set(assignmentKey, assignment, environmentId);
+      }
+      console.log('[Save Gift Config] Created', activeGifts.length, 'assignments for all active gifts');
+    } else if (config.assignmentStrategy === 'price_levels' && config.selectedLevelId && config.priceLevels) {
+      // For price levels, create assignments for gifts in the selected level
+      const level = config.priceLevels.find((l: any) => l.id === config.selectedLevelId);
+      if (level) {
+        const allGifts = await kv.getByPrefix('gifts:', environmentId);
+        const levelGifts = allGifts.filter((g: any) => 
+          g.status === 'active' && g.price >= level.minPrice && g.price < level.maxPrice
+        );
+        for (const gift of levelGifts) {
+          const assignmentKey = `site-gift-assignment:${siteId}:${gift.id}`;
+          const assignment = {
+            siteId,
+            giftId: gift.id,
+            priority: 0,
+            quantityLimit: null,
+            createdAt: new Date().toISOString(),
+          };
+          await kv.set(assignmentKey, assignment, environmentId);
+        }
+        console.log('[Save Gift Config] Created', levelGifts.length, 'assignments for price level');
+      }
+    } else if (config.assignmentStrategy === 'exclusions') {
+      // For exclusions, create assignments for all gifts except excluded ones
+      const allGifts = await kv.getByPrefix('gifts:', environmentId);
+      const includedGifts = allGifts.filter((g: any) => {
+        if (g.status !== 'active') return false;
+        if (config.excludedSkus?.includes(g.sku)) return false;
+        if (config.excludedCategories?.includes(g.category)) return false;
+        return true;
+      });
+      for (const gift of includedGifts) {
+        const assignmentKey = `site-gift-assignment:${siteId}:${gift.id}`;
+        const assignment = {
+          siteId,
+          giftId: gift.id,
+          priority: 0,
+          quantityLimit: null,
+          createdAt: new Date().toISOString(),
+        };
+        await kv.set(assignmentKey, assignment, environmentId);
+      }
+      console.log('[Save Gift Config] Created', includedGifts.length, 'assignments with exclusions');
+    }
+    
     return c.json({ config: configData });
   } catch (error: any) {
     console.error('[Save Gift Config] ❌ Error:', error);

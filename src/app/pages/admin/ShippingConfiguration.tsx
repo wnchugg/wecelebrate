@@ -393,14 +393,6 @@ export function ShippingConfiguration() {
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Shipping Configuration</h1>
-            <p className="text-gray-600 mt-1">Configure shipping options for {currentSite.name}</p>
-          </div>
-        </div>
-
         {/* Info Banner */}
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
           <div className="flex items-start gap-3">

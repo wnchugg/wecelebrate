@@ -119,7 +119,10 @@ export function GiftSelection() {
         setSiteInfo(data.site);
         
         if (data.gifts.length === 0) {
-          setError(config.messages.noResults);
+          // More helpful error message for admins
+          const adminMessage = 'No gifts have been assigned to this site yet. Please go to Admin → Site Gifts to assign gifts.';
+          setError(adminMessage);
+          logger.warn('[GiftSelection] No gifts assigned to site:', effectiveSiteId);
         }
       } catch (error: unknown) {
         logger.error('Failed to load gifts:', error);
@@ -281,19 +284,21 @@ export function GiftSelection() {
           )}
 
           {/* Empty State */}
-          {filteredGifts.length === 0 && (
+          {filteredGifts.length === 0 && !isLoading && (
             <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
               <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <h2 className="text-2xl font-bold text-gray-900 mb-2">No Gifts Found</h2>
               <p className="text-gray-600 mb-6">
-                {config.messages.noResults}
+                {error || config.messages.noResults}
               </p>
-              <button
-                onClick={clearFilters}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-[#D91C81] to-[#B71569] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
-              >
-                Clear All Filters
-              </button>
+              {!error && (
+                <button
+                  onClick={clearFilters}
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-[#D91C81] to-[#B71569] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
+                >
+                  Clear All Filters
+                </button>
+              )}
             </div>
           )}
 

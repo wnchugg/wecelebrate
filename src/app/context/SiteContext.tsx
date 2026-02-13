@@ -320,22 +320,59 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { isAdminAuthenticated, isLoading: adminLoading } = useAdmin();
   const hasLoadedRef = useRef(false);
 
+  // Reset hasLoadedRef when authentication state changes
+  useEffect(() => {
+    if (!isAdminAuthenticated) {
+      hasLoadedRef.current = false;
+    }
+  }, [isAdminAuthenticated]);
+
+  // Listen for admin login success event to trigger data load
+  useEffect(() => {
+    const handleLoginSuccess = () => {
+      logger.info('[SiteContext] Admin login success event received, resetting hasLoadedRef');
+      hasLoadedRef.current = false;
+    };
+
+    window.addEventListener('admin-login-success', handleLoginSuccess);
+    return () => {
+      window.removeEventListener('admin-login-success', handleLoginSuccess);
+    };
+  }, []);
+
   // Load sites and clients from API when admin is authenticated
   useEffect(() => {
     const loadData = async () => {
+      logger.info('[SiteContext] useEffect triggered', {
+        isAdminAuthenticated,
+        adminLoading,
+        hasLoadedRef: hasLoadedRef.current,
+        currentPath: window.location.pathname,
+        isPublic: isPublicRoute(window.location.pathname)
+      });
+
       // Skip if on public route
       if (isPublicRoute(window.location.pathname)) {
+        logger.info('[SiteContext] Skipping - on public route');
         setIsLoading(false);
         return;
       }
 
       // Wait for admin authentication to complete
       if (adminLoading) {
+        logger.info('[SiteContext] Waiting for admin authentication to complete');
         return;
       }
 
       // Only load if authenticated and haven't loaded yet
-      if (!isAdminAuthenticated || hasLoadedRef.current) {
+      if (!isAdminAuthenticated) {
+        logger.info('[SiteContext] Not authenticated, skipping data load');
+        setIsLoading(false);
+        return;
+      }
+
+      if (hasLoadedRef.current) {
+        logger.info('[SiteContext] Data already loaded, skipping');
         setIsLoading(false);
         return;
       }

@@ -1,6 +1,6 @@
 import * as kv from "./kv_env.ts"; // Use environment-aware KV store
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import * as giftsApi from "./gifts_api.ts";
+import * as giftsApi from "./gifts_api_v2.ts"; // UPDATED: Using database version
 
 // This script seeds the database with demo data
 // It should be called once when the server starts

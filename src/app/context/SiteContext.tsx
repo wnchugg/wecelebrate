@@ -76,6 +76,8 @@ export interface Site extends Omit<GlobalSite, 'settings'> {
       videoUrl?: string; // Optional video instead of image
       ctaText?: string; // Call-to-action button text
     };
+    // Review Order Page Configuration
+    skipReviewPage?: boolean; // If true, skip review page and go directly to confirmation
     // Celebration Module Configuration
     celebrationModule?: {
       enabled: boolean;

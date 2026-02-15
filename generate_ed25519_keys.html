@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ed25519 Key Generator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .output {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .section {
+            margin: 25px 0;
+        }
+        .section-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #28a745;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .copy-btn {
+            background: #2196F3;
+            padding: 8px 16px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        .copy-btn:hover {
+            background: #0b7dda;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔑 Ed25519 Key Generator for JWT</h1>
+        
+        <div class="warning">
+            <strong>⚠️ Security Notice:</strong> This page generates cryptographic keys in your browser. 
+            The private key is sensitive - never share it or commit it to version control.
+        </div>
+
+        <button onclick="generateKeys()">Generate Ed25519 Key Pair</button>
+
+        <div id="results" class="hidden">
+            <div class="success">
+                ✅ Keys generated successfully! Copy the environment variables below.
+            </div>
+
+            <div class="section">
+                <div class="section-title">📋 Environment Variables (Copy to Supabase)</div>
+                <div class="output" id="envVars"></div>
+                <button class="copy-btn" onclick="copyToClipboard('envVars')">Copy to Clipboard</button>
+            </div>
+
+            <div class="section">
+                <div class="section-title">🔓 Public Key (JWK - Can be shared)</div>
+                <div class="output" id="publicKey"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">🔒 Private Key (JWK - Keep secret!)</div>
+                <div class="output" id="privateKey"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">📝 Next Steps</div>
+                <div class="output">1. Copy the environment variables above
+2. Go to Supabase Dashboard → Project Settings → Edge Functions → Secrets
+3. Add JWT_PUBLIC_KEY with the value shown above
+4. Add JWT_PRIVATE_KEY with the value shown above
+5. Deploy your Edge Function
+6. Test login to verify Ed25519 is working</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function generateKeys() {
+            try {
+                console.log('Generating Ed25519 key pair...');
+                
+                // Generate Ed25519 key pair using Web Crypto API
+                const keyPair = await crypto.subtle.generateKey(
+                    {
+                        name: 'Ed25519',
+                    },
+                    true, // extractable
+                    ['sign', 'verify']
+                );
+                
+                // Export keys as JWK
+                const publicJWK = await crypto.subtle.exportKey('jwk', keyPair.publicKey);
+                const privateJWK = await crypto.subtle.exportKey('jwk', keyPair.privateKey);
+                
+                // Convert to base64 for environment variables
+                const publicKeyB64 = btoa(JSON.stringify(publicJWK));
+                const privateKeyB64 = btoa(JSON.stringify(privateJWK));
+                
+                // Display results
+                document.getElementById('publicKey').textContent = JSON.stringify(publicJWK, null, 2);
+                document.getElementById('privateKey').textContent = JSON.stringify(privateJWK, null, 2);
+                document.getElementById('envVars').textContent = 
+                    `JWT_PUBLIC_KEY=${publicKeyB64}\n\nJWT_PRIVATE_KEY=${privateKeyB64}`;
+                
+                document.getElementById('results').classList.remove('hidden');
+                
+                console.log('✅ Keys generated successfully!');
+            } catch (error) {
+                console.error('Error generating keys:', error);
+                alert('Error generating keys: ' + error.message);
+            }
+        }
+
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
+    </script>
+</body>
+</html>

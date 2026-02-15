@@ -1,97 +1,111 @@
 #!/bin/bash
 
-# JALA 2 Backend Deployment Script
-# This script deploys the Supabase Edge Function backend
+# JALA2 Backend Deployment Script
+# Deploys the Edge Function to Development or Production
 
-set -e  # Exit on error
+set -e
 
-echo "🚀 JALA 2 Backend Deployment Script"
-echo "===================================="
-echo ""
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
 
-# Check if Supabase CLI is installed
-if ! command -v supabase &> /dev/null; then
-    echo "❌ Supabase CLI is not installed."
-    echo "📦 Installing Supabase CLI..."
-    npm install -g supabase
-    echo "✅ Supabase CLI installed!"
-    echo ""
-fi
+# Get environment argument
+ENV=${1:-dev}
 
-# Ask which environment to deploy to
-echo "Which environment do you want to deploy to?"
-echo "1) Development (wjfcqqrlhwdvvjmefxky)"
-echo "2) Production (lmffeqwhrnbsbhdztwyv)"
-echo ""
-read -p "Enter choice [1-2]: " env_choice
-
-if [ "$env_choice" = "1" ]; then
+if [ "$ENV" = "dev" ]; then
     PROJECT_REF="wjfcqqrlhwdvvjmefxky"
     ENV_NAME="Development"
-elif [ "$env_choice" = "2" ]; then
+elif [ "$ENV" = "prod" ]; then
     PROJECT_REF="lmffeqwhrnbsbhdztwyv"
     ENV_NAME="Production"
+    
+    # Confirm production deployment
+    echo -e "${RED}⚠️  WARNING: You are about to deploy to PRODUCTION${NC}"
+    read -p "Are you sure? (yes/no): " confirm
+    if [ "$confirm" != "yes" ]; then
+        echo "Deployment cancelled"
+        exit 0
+    fi
 else
-    echo "❌ Invalid choice. Exiting."
+    echo -e "${RED}Error: Invalid environment. Use 'dev' or 'prod'${NC}"
+    echo ""
+    echo "Usage:"
+    echo "  ./deploy-backend.sh dev   # Deploy to development"
+    echo "  ./deploy-backend.sh prod  # Deploy to production"
     exit 1
 fi
 
 echo ""
-echo "📍 Deploying to: $ENV_NAME ($PROJECT_REF)"
+echo -e "${BLUE}════════════════════════════════════════${NC}"
+echo -e "${BLUE}   JALA2 Backend Deployment${NC}"
+echo -e "${BLUE}   Environment: $ENV_NAME${NC}"
+echo -e "${BLUE}════════════════════════════════════════${NC}"
 echo ""
 
-# Login to Supabase
-echo "🔑 Checking Supabase authentication..."
-if ! supabase projects list &> /dev/null; then
-    echo "Please login to Supabase:"
-    supabase login
+# Step 1: Rename directory
+echo -e "${YELLOW}→${NC} Preparing deployment..."
+if [ -d "supabase/functions/server" ]; then
+    mv supabase/functions/server supabase/functions/make-server-6fcaeea3
+    echo -e "${GREEN}✓${NC} Directory renamed"
+elif [ -d "supabase/functions/make-server-6fcaeea3" ]; then
+    echo -e "${GREEN}✓${NC} Directory already prepared"
+else
+    echo -e "${RED}✗${NC} Error: Function directory not found!"
+    exit 1
 fi
-echo "✅ Authenticated!"
-echo ""
 
-# Link project
-echo "🔗 Linking to Supabase project..."
-supabase link --project-ref "$PROJECT_REF"
-echo "✅ Project linked!"
+# Step 2: Deploy
 echo ""
+echo -e "${YELLOW}→${NC} Deploying Edge Function to $ENV_NAME..."
+supabase functions deploy make-server-6fcaeea3 --project-ref $PROJECT_REF --no-verify-jwt
 
-# Deploy Edge Function
-echo "📤 Deploying Edge Function 'make-server-6fcaeea3'..."
-supabase functions deploy make-server-6fcaeea3 --no-verify-jwt
-echo "✅ Edge Function deployed!"
 echo ""
+echo -e "${GREEN}✓${NC} Deployed successfully!"
 
-# Test the deployment
-echo "🧪 Testing deployment..."
+# Step 3: Rename back
+echo ""
+echo -e "${YELLOW}→${NC} Cleaning up..."
+mv supabase/functions/make-server-6fcaeea3 supabase/functions/server
+echo -e "${GREEN}✓${NC} Directory restored"
+
+# Step 4: Test
+echo ""
+echo -e "${YELLOW}→${NC} Testing backend health..."
+sleep 2
+
 HEALTH_URL="https://${PROJECT_REF}.supabase.co/functions/v1/make-server-6fcaeea3/health"
-echo "Testing: $HEALTH_URL"
-echo ""
+RESPONSE=$(curl -s "$HEALTH_URL" || echo "")
 
-if curl -s -f "$HEALTH_URL" > /dev/null; then
-    echo "✅ Backend is responding!"
+if echo "$RESPONSE" | grep -q '"status":"ok"'; then
+    echo -e "${GREEN}✓${NC} Backend is healthy!"
     echo ""
-    echo "Response:"
-    curl -s "$HEALTH_URL" | jq '.' || curl -s "$HEALTH_URL"
+    echo -e "${GREEN}════════════════════════════════════════${NC}"
+    echo -e "${GREEN}   Deployment Complete!${NC}"
+    echo -e "${GREEN}════════════════════════════════════════${NC}"
+    echo ""
+    echo "Backend URL: https://${PROJECT_REF}.supabase.co/functions/v1/make-server-6fcaeea3"
+    echo ""
+    
+    if [ "$ENV" = "dev" ]; then
+        echo "Next steps:"
+        echo "  1. Test login at http://localhost:5173/admin/login"
+        echo "  2. Check browser console for any errors"
+        echo "  3. View logs: supabase functions logs make-server-6fcaeea3"
+    else
+        echo "Production deployment complete!"
+        echo "  View logs: supabase functions logs make-server-6fcaeea3"
+    fi
     echo ""
 else
-    echo "⚠️  Warning: Backend health check failed."
-    echo "The function may still be initializing. Please wait 30-60 seconds and try again."
+    echo -e "${RED}✗${NC} Health check failed"
+    echo "Response: $RESPONSE"
     echo ""
+    echo "Troubleshooting:"
+    echo "  1. Check logs: supabase functions logs make-server-6fcaeea3"
+    echo "  2. Verify JWT keys are set in Supabase Dashboard"
+    echo "  3. Wait 30 seconds and try again (cold start)"
+    exit 1
 fi
-
-# Success message
-echo ""
-echo "=========================================="
-echo "✅ Deployment Complete!"
-echo "=========================================="
-echo ""
-echo "Backend URL: https://${PROJECT_REF}.supabase.co/functions/v1/make-server-6fcaeea3"
-echo "Health Check: $HEALTH_URL"
-echo ""
-echo "Next Steps:"
-echo "1. Go to your admin page and check 'Backend Connection Status'"
-echo "2. Create an admin user at /admin/bootstrap"
-echo "3. Run initial database seed at /admin/initial-seed"
-echo ""
-echo "For more information, see /docs/BACKEND_CONNECTION_FIX.md"
-echo ""

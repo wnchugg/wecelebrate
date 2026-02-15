@@ -5,7 +5,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { 
   Save, Settings, Globe, Mail, Truck, Gift, Lock, 
   Check, AlertCircle, ChevronDown, Building2, ExternalLink,
-  Layout, Package, Users, Clock, Calendar, CheckCircle, Palette, Shield, Loader2, Eye, FileEdit, Rocket, History, Edit3
+  Layout, Package, Users, Clock, Calendar, CheckCircle, Palette, Shield, Loader2, Eye, FileEdit, Rocket, History, Edit3, Zap
 } from 'lucide-react';
 import { useSite } from '../../context/SiteContext';
 import { useGift } from '../../context/GiftContext';
@@ -151,6 +151,7 @@ export function SiteConfiguration() {
   const [allowedCountries, setAllowedCountries] = useState<string[]>(currentSite?.settings.allowedCountries || []);
   const [enableAddressValidation, setEnableAddressValidation] = useState(currentSite?.settings.addressValidation?.enabled ?? false);
   const [addressValidationProvider, setAddressValidationProvider] = useState(currentSite?.settings.addressValidation?.provider || 'none');
+  const [skipReviewPage, setSkipReviewPage] = useState(currentSite?.settings.skipReviewPage ?? false);
 
   // Sync state when currentSite changes
   useEffect(() => {
@@ -237,6 +238,7 @@ export function SiteConfiguration() {
       setAllowedCountries(currentSite.settings.allowedCountries || []);
       setEnableAddressValidation(currentSite.settings.addressValidation?.enabled ?? false);
       setAddressValidationProvider(currentSite.settings.addressValidation?.provider || 'none');
+      setSkipReviewPage(currentSite.settings.skipReviewPage ?? false);
       
       // Set configMode based on site status
       setConfigMode(currentSite.status === 'active' ? 'live' : 'draft');
@@ -291,6 +293,7 @@ export function SiteConfiguration() {
           allowQuantitySelection,
           showPricing,
           skipLandingPage: !enableLandingPage, // Invert for backend
+          skipReviewPage,
           giftsPerUser,
           validationMethod,
           defaultLanguage,
@@ -914,13 +917,6 @@ export function SiteConfiguration() {
               <span>General</span>
             </TabsTrigger>
             <TabsTrigger 
-              value="header-footer" 
-              className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap data-[state=active]:bg-[#D91C81] data-[state=active]:text-white data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:bg-gray-100"
-            >
-              <Layout className="w-4 h-4 flex-shrink-0" />
-              <span>Header/Footer</span>
-            </TabsTrigger>
-            <TabsTrigger 
               value="branding" 
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap data-[state=active]:bg-[#D91C81] data-[state=active]:text-white data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:bg-gray-100"
             >
@@ -928,11 +924,25 @@ export function SiteConfiguration() {
               <span>Branding</span>
             </TabsTrigger>
             <TabsTrigger 
+              value="header-footer" 
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap data-[state=active]:bg-[#D91C81] data-[state=active]:text-white data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:bg-gray-100"
+            >
+              <Layout className="w-4 h-4 flex-shrink-0" />
+              <span>Header/Footer</span>
+            </TabsTrigger>
+            <TabsTrigger 
               value="landing" 
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap data-[state=active]:bg-[#D91C81] data-[state=active]:text-white data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:bg-gray-100"
             >
               <Rocket className="w-4 h-4 flex-shrink-0" />
               <span>Landing</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="access" 
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap data-[state=active]:bg-[#D91C81] data-[state=active]:text-white data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:bg-gray-100"
+            >
+              <Users className="w-4 h-4 flex-shrink-0" />
+              <span>Access</span>
             </TabsTrigger>
             <TabsTrigger 
               value="welcome" 
@@ -956,11 +966,18 @@ export function SiteConfiguration() {
               <span>Shipping</span>
             </TabsTrigger>
             <TabsTrigger 
-              value="access" 
+              value="review" 
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap data-[state=active]:bg-[#D91C81] data-[state=active]:text-white data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:bg-gray-100"
             >
-              <Users className="w-4 h-4 flex-shrink-0" />
-              <span>Access</span>
+              <Eye className="w-4 h-4 flex-shrink-0" />
+              <span>Review Order</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="confirmation" 
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap data-[state=active]:bg-[#D91C81] data-[state=active]:text-white data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:bg-gray-100"
+            >
+              <CheckCircle className="w-4 h-4 flex-shrink-0" />
+              <span>Order Confirmation</span>
             </TabsTrigger>
           </TabsList>
         </div>
@@ -995,18 +1012,47 @@ export function SiteConfiguration() {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Site URL
+                  Site URL Slug
                 </label>
-                <Input
-                  type="text"
-                  value={siteUrl}
-                  onChange={(e) => {
-                    setSiteUrl(e.target.value);
-                    setHasChanges(true);
-                  }}
-                  disabled={configMode === 'live'}
-                  placeholder="Enter site URL"
-                />
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500 whitespace-nowrap">
+                      https://wecelebrate.netlify.app/site/
+                    </span>
+                    <Input
+                      type="text"
+                      value={siteUrl}
+                      onChange={(e) => {
+                        // Only allow lowercase letters, numbers, and hyphens
+                        const slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+                        setSiteUrl(slug);
+                        setHasChanges(true);
+                      }}
+                      disabled={configMode === 'live'}
+                      placeholder="techcorpus"
+                      className="flex-1"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Enter a unique identifier for your site URL (lowercase letters, numbers, and hyphens only)
+                  </p>
+                  {siteUrl && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Globe className="w-4 h-4 text-green-600" />
+                      <span className="text-gray-700">
+                        Your site will be accessible at:{' '}
+                        <a 
+                          href={`https://wecelebrate.netlify.app/site/${siteUrl}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          https://wecelebrate.netlify.app/site/{siteUrl}
+                        </a>
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>
@@ -1038,477 +1084,6 @@ export function SiteConfiguration() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Gift Selection Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Package className="w-5 h-5 text-purple-600" />
-                Gift Selection Settings
-              </CardTitle>
-              <CardDescription>Configure how users interact with gifts</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-semibold text-gray-900">Allow Quantity Selection</p>
-                  <p className="text-sm text-gray-600">Let users select multiple quantities of gifts</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={allowQuantitySelection}
-                    onChange={(e) => {
-                      setAllowQuantitySelection(e.target.checked);
-                      setHasChanges(true);
-                    }}
-                    disabled={configMode === 'live'}
-                    className="sr-only peer" 
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-semibold text-gray-900">Show Gift Prices</p>
-                  <p className="text-sm text-gray-600">Display pricing information to users</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox"
-                    checked={showPricing}
-                    onChange={(e) => {
-                      setShowPricing(e.target.checked);
-                      setHasChanges(true);
-                    }}
-                    disabled={configMode === 'live'}
-                    className="sr-only peer" 
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
-                </label>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Gifts Per User
-                </label>
-                <Input
-                  type="number"
-                  value={giftsPerUser}
-                  onChange={(e) => {
-                    setGiftsPerUser(parseInt(e.target.value));
-                    setHasChanges(true);
-                  }}
-                  disabled={configMode === 'live'}
-                  min="1"
-                  placeholder="1"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Maximum number of gifts each user can select
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Validation & Access */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-[#1B2A5E]" />
-                Validation Method
-              </CardTitle>
-              <CardDescription>Choose how users will access the portal</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Validation Type
-                </label>
-                <select
-                  value={validationMethod}
-                  onChange={(e) => {
-                    setValidationMethod(e.target.value as any);
-                    setHasChanges(true);
-                  }}
-                  disabled={configMode === 'live'}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  <option value="email">Email Address Validation</option>
-                  <option value="employeeId">Employee ID Validation</option>
-                  <option value="serialCard">Serial Card Number</option>
-                  <option value="magic_link">Magic Link (Email)</option>
-                  <option value="sso">Single Sign-On (SSO)</option>
-                </select>
-                <p className="text-xs text-gray-500 mt-1">
-                  {validationMethod === 'email' && 'Users verify their email address to access the portal'}
-                  {validationMethod === 'employeeId' && 'Users enter their employee ID for verification'}
-                  {validationMethod === 'serialCard' && 'Users enter a unique serial card number'}
-                  {validationMethod === 'magic_link' && 'Users request a magic link sent to their email'}
-                  {validationMethod === 'sso' && 'Users authenticate through your organization\'s SSO provider'}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* SSO Configuration - Only shown when SSO is selected */}
-          {validationMethod === 'sso' && (
-            <Card className="border-2 border-[#D91C81]">
-              <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
-                <CardTitle className="flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-[#D91C81]" />
-                  SSO Configuration
-                </CardTitle>
-                <CardDescription>Configure Single Sign-On authentication settings</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6 pt-6">
-                {/* Provider Selection */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    SSO Provider *
-                  </label>
-                  <select
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                    onChange={() => setHasChanges(true)}
-                  >
-                    <option value="">Select a provider...</option>
-                    <option value="azure">Microsoft Azure AD / Entra ID</option>
-                    <option value="okta">Okta</option>
-                    <option value="google">Google Workspace</option>
-                    <option value="saml">Generic SAML 2.0</option>
-                    <option value="oauth2">Generic OAuth 2.0</option>
-                    <option value="openid">OpenID Connect</option>
-                    <option value="custom">Custom Provider</option>
-                  </select>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Select your organization's identity provider
-                  </p>
-                </div>
-
-                {/* OAuth/OpenID Configuration */}
-                <div className="space-y-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 15V17M12 7V13M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    OAuth 2.0 / OpenID Connect Settings
-                  </h4>
-                  
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Client ID *
-                    </label>
-                    <Input
-                      type="text"
-                      placeholder="e.g., abc123xyz789"
-                      onChange={() => setHasChanges(true)}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Client Secret *
-                    </label>
-                    <Input
-                      type="password"
-                      placeholder="Enter client secret"
-                      onChange={() => setHasChanges(true)}
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Keep this secret secure. Never share it publicly.
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Authorization URL *
-                    </label>
-                    <Input
-                      type="url"
-                      placeholder="https://login.provider.com/oauth/authorize"
-                      onChange={() => setHasChanges(true)}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Token URL *
-                    </label>
-                    <Input
-                      type="url"
-                      placeholder="https://login.provider.com/oauth/token"
-                      onChange={() => setHasChanges(true)}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      User Info URL
-                    </label>
-                    <Input
-                      type="url"
-                      placeholder="https://login.provider.com/oauth/userinfo"
-                      onChange={() => setHasChanges(true)}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Scope
-                    </label>
-                    <Input
-                      type="text"
-                      defaultValue="openid profile email"
-                      placeholder="openid profile email"
-                      onChange={() => setHasChanges(true)}
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Space-separated list of OAuth scopes
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Redirect URI (Callback URL) *
-                    </label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="url"
-                        value={`https://${currentSite.domain}/auth/callback`}
-                        readOnly
-                        className="bg-gray-50"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          navigator.clipboard.writeText(`https://${currentSite.domain}/auth/callback`);
-                        }}
-                        className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all text-sm font-medium"
-                      >
-                        Copy
-                      </button>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Add this URL to your provider's allowed redirect URIs
-                    </p>
-                  </div>
-                </div>
-
-                {/* SAML Configuration */}
-                <div className="space-y-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                  <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    SAML 2.0 Settings
-                  </h4>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      IdP Entry Point (SSO URL) *
-                    </label>
-                    <Input
-                      type="url"
-                      placeholder="https://sso.provider.com/saml/sso"
-                      onChange={() => setHasChanges(true)}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Issuer / Entity ID *
-                    </label>
-                    <Input
-                      type="text"
-                      placeholder="urn:your-app:entity-id"
-                      onChange={() => setHasChanges(true)}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      X.509 Certificate *
-                    </label>
-                    <textarea
-                      rows={4}
-                      placeholder="Paste your X.509 certificate here..."
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none font-mono text-xs"
-                      onChange={() => setHasChanges(true)}
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Public certificate from your identity provider
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Assertion Consumer Service URL *
-                    </label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="url"
-                        value={`https://${currentSite.domain}/auth/saml/callback`}
-                        readOnly
-                        className="bg-gray-50"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          navigator.clipboard.writeText(`https://${currentSite.domain}/auth/saml/callback`);
-                        }}
-                        className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all text-sm font-medium"
-                      >
-                        Copy
-                      </button>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Configure this URL in your IdP as the ACS URL
-                    </p>
-                  </div>
-                </div>
-
-                {/* Attribute Mapping */}
-                <div className="space-y-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                  <h4 className="font-semibold text-gray-900">User Attribute Mapping</h4>
-                  <p className="text-sm text-gray-600">
-                    Map attributes from your SSO provider to user fields
-                  </p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Email Attribute
-                      </label>
-                      <Input
-                        type="text"
-                        defaultValue="email"
-                        placeholder="email"
-                        onChange={() => setHasChanges(true)}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        First Name Attribute
-                      </label>
-                      <Input
-                        type="text"
-                        defaultValue="firstName"
-                        placeholder="firstName"
-                        onChange={() => setHasChanges(true)}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Last Name Attribute
-                      </label>
-                      <Input
-                        type="text"
-                        defaultValue="lastName"
-                        placeholder="lastName"
-                        onChange={() => setHasChanges(true)}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Employee ID Attribute
-                      </label>
-                      <Input
-                        type="text"
-                        defaultValue="employeeId"
-                        placeholder="employeeId"
-                        onChange={() => setHasChanges(true)}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Additional Settings */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-semibold text-gray-900">Auto-Provision Users</p>
-                      <p className="text-sm text-gray-600">Automatically create accounts for new users</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox"
-                        defaultChecked
-                        onChange={() => setHasChanges(true)}
-                        disabled={configMode === 'live'}
-                        className="sr-only peer" 
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-semibold text-gray-900">Require Multi-Factor Authentication</p>
-                      <p className="text-sm text-gray-600">Enforce MFA at the provider level</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox"
-                        onChange={() => setHasChanges(true)}
-                        disabled={configMode === 'live'}
-                        className="sr-only peer" 
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
-                    </label>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Allowed Email Domains (Optional)
-                    </label>
-                    <Input
-                      type="text"
-                      placeholder="example.com, company.com"
-                      onChange={() => setHasChanges(true)}
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Comma-separated list of allowed email domains. Leave empty to allow all.
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Session Timeout (minutes)
-                    </label>
-                    <Input
-                      type="number"
-                      defaultValue="60"
-                      min="5"
-                      max="480"
-                      onChange={() => setHasChanges(true)}
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      How long users stay logged in (5-480 minutes)
-                    </p>
-                  </div>
-                </div>
-
-                {/* Test Connection */}
-                <div className="pt-4 border-t border-gray-200">
-                  <button
-                    type="button"
-                    className="w-full py-3 px-4 bg-gradient-to-r from-[#D91C81] to-purple-600 text-white rounded-lg font-semibold hover:from-[#B71569] hover:to-purple-700 transition-all flex items-center justify-center gap-2"
-                  >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    Test SSO Connection
-                  </button>
-                  <p className="text-xs text-center text-gray-500 mt-2">
-                    Verify your SSO configuration is working correctly
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Internationalization */}
           <Card>
@@ -1683,109 +1258,6 @@ export function SiteConfiguration() {
                     </div>
                   </div>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Default Gift Configuration */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Gift className="w-5 h-5 text-[#D91C81]" />
-                Default Gift Configuration
-              </CardTitle>
-              <CardDescription>
-                Configure a default gift to be sent to employees who haven't made a selection after the site closes
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Alert className="border-blue-200 bg-blue-50">
-                <AlertCircle className="w-4 h-4 text-blue-600" />
-                <AlertDescription className="text-blue-800 text-sm">
-                  <strong>How it works:</strong> After the site closes, if an employee hasn't selected a gift, 
-                  the system will automatically send them the default gift after the specified number of days.
-                </AlertDescription>
-              </Alert>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Default Gift
-                </label>
-                <select
-                  value={defaultGiftId}
-                  onChange={(e) => {
-                    setDefaultGiftId(e.target.value);
-                    setHasChanges(true);
-                  }}
-                  disabled={configMode === 'live'}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  <option value="">No default gift (employees must make a selection)</option>
-                  {gifts.map((gift) => (
-                    <option key={gift.id} value={gift.id}>
-                      {gift.name} - ${gift.price.toFixed(2)}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-xs text-gray-500 mt-1">
-                  Select a gift to be automatically sent to employees who don't make a selection
-                </p>
-              </div>
-
-              {defaultGiftId && (
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Days After Site Closes
-                  </label>
-                  <Input
-                    type="number"
-                    min="0"
-                    max="365"
-                    value={defaultGiftDaysAfterClose}
-                    onChange={(e) => {
-                      setDefaultGiftDaysAfterClose(parseInt(e.target.value) || 0);
-                      setHasChanges(true);
-                    }}
-                    disabled={configMode === 'live'}
-                    placeholder="0"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Number of days after the availability end date to send the default gift. Set to 0 to send immediately when the site closes.
-                  </p>
-                </div>
-              )}
-
-              {defaultGiftId && availabilityEndDate && (
-                <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <div className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-green-900">
-                      <p className="font-semibold mb-1">Default Gift Summary</p>
-                      <p>• Gift: {gifts.find(g => g.id === defaultGiftId)?.name || 'Unknown Gift'}</p>
-                      <p>• Site closes: {new Date(availabilityEndDate).toLocaleString()}</p>
-                      <p>• Default gift will be sent: {(() => {
-                        const closeDate = new Date(availabilityEndDate);
-                        closeDate.setDate(closeDate.getDate() + defaultGiftDaysAfterClose);
-                        return closeDate.toLocaleString();
-                      })()}</p>
-                      <p className="mt-2 text-xs">
-                        {defaultGiftDaysAfterClose === 0 
-                          ? 'The default gift will be sent immediately when the site closes.' 
-                          : `The default gift will be sent ${defaultGiftDaysAfterClose} day${defaultGiftDaysAfterClose !== 1 ? 's' : ''} after the site closes.`
-                        }
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {defaultGiftId && !availabilityEndDate && (
-                <Alert className="border-amber-200 bg-amber-50">
-                  <AlertCircle className="w-4 h-4 text-amber-600" />
-                  <AlertDescription className="text-amber-800 text-sm">
-                    <strong>Note:</strong> You must set an availability end date for the default gift to be sent automatically.
-                  </AlertDescription>
-                </Alert>
               )}
             </CardContent>
           </Card>
@@ -2885,6 +2357,181 @@ export function SiteConfiguration() {
             </div>
           </div>
 
+          {/* Gift Selection Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Package className="w-5 h-5 text-purple-600" />
+                Gift Selection Settings
+              </CardTitle>
+              <CardDescription>Configure how users interact with gifts</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-semibold text-gray-900">Allow Quantity Selection</p>
+                  <p className="text-sm text-gray-600">Let users select multiple quantities of gifts</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={allowQuantitySelection}
+                    onChange={(e) => {
+                      setAllowQuantitySelection(e.target.checked);
+                      setHasChanges(true);
+                    }}
+                    disabled={configMode === 'live'}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-semibold text-gray-900">Show Gift Prices</p>
+                  <p className="text-sm text-gray-600">Display pricing information to users</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    checked={showPricing}
+                    onChange={(e) => {
+                      setShowPricing(e.target.checked);
+                      setHasChanges(true);
+                    }}
+                    disabled={configMode === 'live'}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                </label>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Gifts Per User
+                </label>
+                <Input
+                  type="number"
+                  value={giftsPerUser}
+                  onChange={(e) => {
+                    setGiftsPerUser(parseInt(e.target.value));
+                    setHasChanges(true);
+                  }}
+                  disabled={configMode === 'live'}
+                  min="1"
+                  placeholder="1"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Maximum number of gifts each user can select
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Default Gift Configuration */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Gift className="w-5 h-5 text-[#D91C81]" />
+                Default Gift Configuration
+              </CardTitle>
+              <CardDescription>
+                Configure a default gift to be sent to employees who haven't made a selection after the site closes
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Alert className="border-blue-200 bg-blue-50">
+                <AlertCircle className="w-4 h-4 text-blue-600" />
+                <AlertDescription className="text-blue-800 text-sm">
+                  <strong>How it works:</strong> After the site closes, if an employee hasn't selected a gift, 
+                  the system will automatically send them the default gift after the specified number of days.
+                </AlertDescription>
+              </Alert>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Default Gift
+                </label>
+                <select
+                  value={defaultGiftId}
+                  onChange={(e) => {
+                    setDefaultGiftId(e.target.value);
+                    setHasChanges(true);
+                  }}
+                  disabled={configMode === 'live'}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <option value="">No default gift (employees must make a selection)</option>
+                  {gifts.map((gift) => (
+                    <option key={gift.id} value={gift.id}>
+                      {gift.name} - ${gift.price.toFixed(2)}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Select a gift to be automatically sent to employees who don't make a selection
+                </p>
+              </div>
+
+              {defaultGiftId && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Days After Site Closes
+                  </label>
+                  <Input
+                    type="number"
+                    min="0"
+                    max="365"
+                    value={defaultGiftDaysAfterClose}
+                    onChange={(e) => {
+                      setDefaultGiftDaysAfterClose(parseInt(e.target.value) || 0);
+                      setHasChanges(true);
+                    }}
+                    disabled={configMode === 'live'}
+                    placeholder="0"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Number of days after the availability end date to send the default gift. Set to 0 to send immediately when the site closes.
+                  </p>
+                </div>
+              )}
+
+              {defaultGiftId && availabilityEndDate && (
+                <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-green-900">
+                      <p className="font-semibold mb-1">Default Gift Summary</p>
+                      <p>• Gift: {gifts.find(g => g.id === defaultGiftId)?.name || 'Unknown Gift'}</p>
+                      <p>• Site closes: {new Date(availabilityEndDate).toLocaleString()}</p>
+                      <p>• Default gift will be sent: {(() => {
+                        const closeDate = new Date(availabilityEndDate);
+                        closeDate.setDate(closeDate.getDate() + defaultGiftDaysAfterClose);
+                        return closeDate.toLocaleString();
+                      })()}</p>
+                      <p className="mt-2 text-xs">
+                        {defaultGiftDaysAfterClose === 0 
+                          ? 'The default gift will be sent immediately when the site closes.' 
+                          : `The default gift will be sent ${defaultGiftDaysAfterClose} day${defaultGiftDaysAfterClose !== 1 ? 's' : ''} after the site closes.`
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {defaultGiftId && !availabilityEndDate && (
+                <Alert className="border-amber-200 bg-amber-50">
+                  <AlertCircle className="w-4 h-4 text-amber-600" />
+                  <AlertDescription className="text-amber-800 text-sm">
+                    <strong>Note:</strong> You must set an availability end date for the default gift to be sent automatically.
+                  </AlertDescription>
+                </Alert>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Search & Filter Settings */}
           <Card>
             <CardHeader>
@@ -3336,17 +2983,1069 @@ export function SiteConfiguration() {
             <div className="flex items-start gap-3">
               <Users className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
               <div>
-                <h3 className="font-semibold text-gray-900 mb-1">Access Management</h3>
+                <h3 className="font-semibold text-gray-900 mb-1">Access & Authentication</h3>
                 <p className="text-sm text-gray-700">
-                  Manage user access, validation methods, and permissions
+                  Configure how users access your site - from simple validation to enterprise SSO
                 </p>
               </div>
             </div>
           </div>
-          <Suspense fallback={<LoadingSpinner />}>
-            <AccessManagement />
-          </Suspense>
+
+          {/* Authentication Type Selector */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="w-5 h-5 text-[#D91C81]" />
+                Authentication Method
+              </CardTitle>
+              <CardDescription>Choose between simple validation or advanced authentication</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-4">
+                <button
+                  onClick={() => {
+                    // Set to simple auth method if currently SSO
+                    if (validationMethod === 'sso') {
+                      setValidationMethod('email');
+                      setHasChanges(true);
+                    }
+                  }}
+                  className={`p-6 border-2 rounded-lg text-left transition-all ${
+                    validationMethod !== 'sso'
+                      ? 'border-[#D91C81] bg-pink-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <Mail className="w-6 h-6 text-[#D91C81] flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-bold text-gray-900 mb-2">Simple Auth</h4>
+                      <p className="text-sm text-gray-600 mb-3">
+                        For sites without full employee data. Quick validation methods.
+                      </p>
+                      <ul className="text-xs text-gray-600 space-y-1">
+                        <li>• Email validation</li>
+                        <li>• Serial card numbers</li>
+                        <li>• Magic links</li>
+                      </ul>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setValidationMethod('sso');
+                    setHasChanges(true);
+                  }}
+                  className={`p-6 border-2 rounded-lg text-left transition-all ${
+                    validationMethod === 'sso'
+                      ? 'border-[#D91C81] bg-pink-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <Lock className="w-6 h-6 text-[#1B2A5E] flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-bold text-gray-900 mb-2">Advanced Auth</h4>
+                      <p className="text-sm text-gray-600 mb-3">
+                        For sites with employee data. Enterprise-grade security.
+                      </p>
+                      <ul className="text-xs text-gray-600 space-y-1">
+                        <li>• Single Sign-On (SSO)</li>
+                        <li>• User/Password authentication</li>
+                        <li>• Roles & access groups</li>
+                      </ul>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Simple Auth Configuration */}
+          {validationMethod !== 'sso' && (
+            <>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Mail className="w-5 h-5 text-[#D91C81]" />
+                    Simple Authentication Settings
+                  </CardTitle>
+                  <CardDescription>Choose a validation method for user access</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Validation Method
+                    </label>
+                    <select
+                      value={validationMethod}
+                      onChange={(e) => {
+                        setValidationMethod(e.target.value as any);
+                        setHasChanges(true);
+                      }}
+                      disabled={configMode === 'live'}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <option value="email">Email Address Validation</option>
+                      <option value="serialCard">Serial Card Number</option>
+                      <option value="magic_link">Magic Link (Email)</option>
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {validationMethod === 'email' && 'Users verify their email address to access the portal'}
+                      {validationMethod === 'serialCard' && 'Users enter a unique serial card number'}
+                      {validationMethod === 'magic_link' && 'Users request a magic link sent to their email'}
+                    </p>
+                  </div>
+
+                  {/* Email-specific settings */}
+                  {(validationMethod === 'email' || validationMethod === 'magic_link') && (
+                    <div className="space-y-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <h4 className="font-semibold text-gray-900">Email Configuration</h4>
+                      
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Allowed Email Domains
+                        </label>
+                        <Input
+                          type="text"
+                          placeholder="example.com, company.com"
+                          onChange={() => setHasChanges(true)}
+                          disabled={configMode === 'live'}
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Comma-separated list of allowed email domains. Leave empty to allow all domains.
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Email Whitelist (Optional)
+                        </label>
+                        <textarea
+                          rows={4}
+                          placeholder="user1@example.com&#10;user2@example.com&#10;user3@example.com"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 font-mono text-sm"
+                          onChange={() => setHasChanges(true)}
+                          disabled={configMode === 'live'}
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          One email per line. If specified, only these emails will be allowed access.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Serial Card settings */}
+                  {validationMethod === 'serialCard' && (
+                    <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                      <h4 className="font-semibold text-gray-900 mb-2">Serial Card Configuration</h4>
+                      <p className="text-sm text-gray-600 mb-3">
+                        Users will need to enter a unique serial card number to access the site.
+                      </p>
+                      <Alert className="border-amber-200 bg-amber-50">
+                        <AlertCircle className="w-4 h-4 text-amber-600" />
+                        <AlertDescription className="text-amber-800 text-sm">
+                          <strong>Note:</strong> Serial card numbers must be uploaded via the employee management section below.
+                        </AlertDescription>
+                      </Alert>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Employee Management for Simple Auth */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-5 h-5 text-green-600" />
+                    Employee Management
+                  </CardTitle>
+                  <CardDescription>
+                    Manage employee access and validation credentials
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <AccessManagement />
+                  </Suspense>
+                </CardContent>
+              </Card>
+            </>
+          )}
+
+          {/* Advanced Auth Configuration (SSO) */}
+          {validationMethod === 'sso' && (
+            <>
+              <Card className="border-2 border-[#D91C81]">
+                <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-[#D91C81]" />
+                    SSO Configuration
+                  </CardTitle>
+                  <CardDescription>Configure Single Sign-On authentication settings</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6 pt-6">
+                  {/* Provider Selection */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      SSO Provider *
+                    </label>
+                    <select
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
+                      onChange={() => setHasChanges(true)}
+                      disabled={configMode === 'live'}
+                    >
+                      <option value="">Select a provider...</option>
+                      <option value="azure">Microsoft Azure AD / Entra ID</option>
+                      <option value="okta">Okta</option>
+                      <option value="google">Google Workspace</option>
+                      <option value="saml">Generic SAML 2.0</option>
+                      <option value="oauth2">Generic OAuth 2.0</option>
+                      <option value="openid">OpenID Connect</option>
+                      <option value="custom">Custom Provider</option>
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Select your organization's identity provider
+                    </p>
+                  </div>
+
+                  {/* OAuth/OpenID Configuration */}
+                  <div className="space-y-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 15V17M12 7V13M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      OAuth 2.0 / OpenID Connect Settings
+                    </h4>
+                    
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Client ID *
+                      </label>
+                      <Input
+                        type="text"
+                        placeholder="e.g., abc123xyz789"
+                        onChange={() => setHasChanges(true)}
+                        disabled={configMode === 'live'}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Client Secret *
+                      </label>
+                      <Input
+                        type="password"
+                        placeholder="Enter client secret"
+                        onChange={() => setHasChanges(true)}
+                        disabled={configMode === 'live'}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Keep this secret secure. Never share it publicly.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Authorization URL *
+                      </label>
+                      <Input
+                        type="url"
+                        placeholder="https://login.provider.com/oauth/authorize"
+                        onChange={() => setHasChanges(true)}
+                        disabled={configMode === 'live'}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Token URL *
+                      </label>
+                      <Input
+                        type="url"
+                        placeholder="https://login.provider.com/oauth/token"
+                        onChange={() => setHasChanges(true)}
+                        disabled={configMode === 'live'}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        User Info URL
+                      </label>
+                      <Input
+                        type="url"
+                        placeholder="https://login.provider.com/oauth/userinfo"
+                        onChange={() => setHasChanges(true)}
+                        disabled={configMode === 'live'}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Scope
+                      </label>
+                      <Input
+                        type="text"
+                        defaultValue="openid profile email"
+                        placeholder="openid profile email"
+                        onChange={() => setHasChanges(true)}
+                        disabled={configMode === 'live'}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Space-separated list of OAuth scopes
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Redirect URI (Callback URL) *
+                      </label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="url"
+                          value={`https://wecelebrate.netlify.app/site/${currentSite.domain}/auth/callback`}
+                          readOnly
+                          className="bg-gray-50"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(`https://wecelebrate.netlify.app/site/${currentSite.domain}/auth/callback`);
+                            toast.success('Copied to clipboard');
+                          }}
+                          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all text-sm font-medium"
+                        >
+                          Copy
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Add this URL to your provider's allowed redirect URIs
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* SAML Configuration */}
+                  <div className="space-y-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                    <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      SAML 2.0 Settings
+                    </h4>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        IdP Entry Point (SSO URL) *
+                      </label>
+                      <Input
+                        type="url"
+                        placeholder="https://sso.provider.com/saml/sso"
+                        onChange={() => setHasChanges(true)}
+                        disabled={configMode === 'live'}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Issuer / Entity ID *
+                      </label>
+                      <Input
+                        type="text"
+                        placeholder="urn:your-app:entity-id"
+                        onChange={() => setHasChanges(true)}
+                        disabled={configMode === 'live'}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        X.509 Certificate *
+                      </label>
+                      <textarea
+                        rows={4}
+                        placeholder="Paste your X.509 certificate here..."
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none font-mono text-xs disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+                        onChange={() => setHasChanges(true)}
+                        disabled={configMode === 'live'}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Public certificate from your identity provider
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Assertion Consumer Service URL *
+                      </label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="url"
+                          value={`https://wecelebrate.netlify.app/site/${currentSite.domain}/auth/saml/callback`}
+                          readOnly
+                          className="bg-gray-50"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(`https://wecelebrate.netlify.app/site/${currentSite.domain}/auth/saml/callback`);
+                            toast.success('Copied to clipboard');
+                          }}
+                          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all text-sm font-medium"
+                        >
+                          Copy
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Configure this URL in your IdP as the ACS URL
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Attribute Mapping */}
+                  <div className="space-y-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                    <h4 className="font-semibold text-gray-900">User Attribute Mapping</h4>
+                    <p className="text-sm text-gray-600">
+                      Map attributes from your SSO provider to user fields
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Email Attribute
+                        </label>
+                        <Input
+                          type="text"
+                          defaultValue="email"
+                          placeholder="email"
+                          onChange={() => setHasChanges(true)}
+                          disabled={configMode === 'live'}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          First Name Attribute
+                        </label>
+                        <Input
+                          type="text"
+                          defaultValue="firstName"
+                          placeholder="firstName"
+                          onChange={() => setHasChanges(true)}
+                          disabled={configMode === 'live'}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Last Name Attribute
+                        </label>
+                        <Input
+                          type="text"
+                          defaultValue="lastName"
+                          placeholder="lastName"
+                          onChange={() => setHasChanges(true)}
+                          disabled={configMode === 'live'}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Employee ID Attribute
+                        </label>
+                        <Input
+                          type="text"
+                          defaultValue="employeeId"
+                          placeholder="employeeId"
+                          onChange={() => setHasChanges(true)}
+                          disabled={configMode === 'live'}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Additional Settings */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                      <div>
+                        <p className="font-semibold text-gray-900">Auto-Provision Users</p>
+                        <p className="text-sm text-gray-600">Automatically create accounts for new users</p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox"
+                          defaultChecked
+                          onChange={() => setHasChanges(true)}
+                          disabled={configMode === 'live'}
+                          className="sr-only peer" 
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                      </label>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                      <div>
+                        <p className="font-semibold text-gray-900">Require Multi-Factor Authentication</p>
+                        <p className="text-sm text-gray-600">Enforce MFA at the provider level</p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox"
+                          onChange={() => setHasChanges(true)}
+                          disabled={configMode === 'live'}
+                          className="sr-only peer" 
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                      </label>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Session Timeout (minutes)
+                      </label>
+                      <Input
+                        type="number"
+                        defaultValue="60"
+                        min="5"
+                        max="480"
+                        onChange={() => setHasChanges(true)}
+                        disabled={configMode === 'live'}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        How long users stay logged in (5-480 minutes)
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Test Connection */}
+                  <div className="pt-4 border-t border-gray-200">
+                    <button
+                      type="button"
+                      className="w-full py-3 px-4 bg-gradient-to-r from-[#D91C81] to-purple-600 text-white rounded-lg font-semibold hover:from-[#B71569] hover:to-purple-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={configMode === 'live'}
+                    >
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      Test SSO Connection
+                    </button>
+                    <p className="text-xs text-center text-gray-500 mt-2">
+                      Verify your SSO configuration is working correctly
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Employee Management for Advanced Auth */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-5 h-5 text-green-600" />
+                    Employee Management & Access Groups
+                  </CardTitle>
+                  <CardDescription>
+                    Manage employees, roles, and access permissions
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <AccessManagement />
+                  </Suspense>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </TabsContent>
+
+        {/* Review Order Tab */}
+        <TabsContent value="review" className="space-y-6">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
+            <div className="flex items-start gap-3">
+              <Eye className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-1">Review Order Page Configuration</h3>
+                <p className="text-sm text-gray-700">
+                  Customize the order review page where users confirm their selections
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Skip Review Page Toggle */}
+          <Card className="border-2 border-amber-200 bg-amber-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="w-5 h-5 text-amber-600" />
+                Quick Checkout
+              </CardTitle>
+              <CardDescription>Skip the review page for faster checkout</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-amber-200">
+                <div>
+                  <p className="font-semibold text-gray-900">Skip Review Page</p>
+                  <p className="text-sm text-gray-600">
+                    Users go directly to confirmation after entering shipping details
+                  </p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    checked={skipReviewPage}
+                    onChange={(e) => {
+                      setSkipReviewPage(e.target.checked);
+                      setHasChanges(true);
+                    }}
+                    disabled={configMode === 'live'}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                </label>
+              </div>
+              {skipReviewPage && (
+                <Alert className="mt-4 border-amber-200 bg-amber-50">
+                  <AlertCircle className="w-4 h-4 text-amber-600" />
+                  <AlertDescription className="text-amber-800 text-sm">
+                    <strong>Note:</strong> When enabled, users will skip the review page and go directly to the order confirmation after completing shipping information. Make sure your shipping form collects all necessary information.
+                  </AlertDescription>
+                </Alert>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Eye className="w-5 h-5 text-[#D91C81]" />
+                Review Page Settings
+              </CardTitle>
+              <CardDescription>Configure what users see when reviewing their order</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-semibold text-gray-900">Show Gift Images</p>
+                  <p className="text-sm text-gray-600">Display product images in the review summary</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    defaultChecked
+                    onChange={() => setHasChanges(true)}
+                    disabled={configMode === 'live'}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-semibold text-gray-900">Show Gift Prices</p>
+                  <p className="text-sm text-gray-600">Display pricing information in the review</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    defaultChecked
+                    onChange={() => setHasChanges(true)}
+                    disabled={configMode === 'live'}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-semibold text-gray-900">Allow Editing</p>
+                  <p className="text-sm text-gray-600">Let users edit their selections from the review page</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    defaultChecked
+                    onChange={() => setHasChanges(true)}
+                    disabled={configMode === 'live'}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                </label>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Review Page Title
+                </label>
+                <Input
+                  type="text"
+                  defaultValue="Review Your Order"
+                  placeholder="Review Your Order"
+                  onChange={() => setHasChanges(true)}
+                  disabled={configMode === 'live'}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Heading displayed at the top of the review page
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Review Page Description
+                </label>
+                <textarea
+                  rows={3}
+                  defaultValue="Please review your selections before submitting your order."
+                  placeholder="Please review your selections before submitting your order."
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+                  onChange={() => setHasChanges(true)}
+                  disabled={configMode === 'live'}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Instructions or description shown to users
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Submit Button Text
+                </label>
+                <Input
+                  type="text"
+                  defaultValue="Submit Order"
+                  placeholder="Submit Order"
+                  onChange={() => setHasChanges(true)}
+                  disabled={configMode === 'live'}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Text displayed on the submit button
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-amber-600" />
+                Terms & Conditions
+              </CardTitle>
+              <CardDescription>Legal agreements and disclaimers</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-semibold text-gray-900">Require Terms Acceptance</p>
+                  <p className="text-sm text-gray-600">Users must agree to terms before submitting</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    defaultChecked
+                    onChange={() => setHasChanges(true)}
+                    disabled={configMode === 'live'}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                </label>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Terms & Conditions Text
+                </label>
+                <textarea
+                  rows={6}
+                  defaultValue="By submitting this order, you agree to our terms and conditions."
+                  placeholder="Enter your terms and conditions..."
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 font-mono text-sm"
+                  onChange={() => setHasChanges(true)}
+                  disabled={configMode === 'live'}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Legal text that users must agree to
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Terms & Conditions URL (Optional)
+                </label>
+                <Input
+                  type="url"
+                  placeholder="https://example.com/terms"
+                  onChange={() => setHasChanges(true)}
+                  disabled={configMode === 'live'}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Link to full terms and conditions document
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Order Confirmation Tab */}
+        <TabsContent value="confirmation" className="space-y-6">
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100">
+            <div className="flex items-start gap-3">
+              <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-1">Order Confirmation Page Configuration</h3>
+                <p className="text-sm text-gray-700">
+                  Customize the confirmation page users see after submitting their order
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-[#D91C81]" />
+                Confirmation Page Settings
+              </CardTitle>
+              <CardDescription>Configure the success message and next steps</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Confirmation Title
+                </label>
+                <Input
+                  type="text"
+                  defaultValue="Order Confirmed!"
+                  placeholder="Order Confirmed!"
+                  onChange={() => setHasChanges(true)}
+                  disabled={configMode === 'live'}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Main heading on the confirmation page
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Confirmation Message
+                </label>
+                <textarea
+                  rows={4}
+                  defaultValue="Thank you for your order! We've received your selection and will process it shortly. You'll receive a confirmation email with tracking information once your order ships."
+                  placeholder="Enter confirmation message..."
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+                  onChange={() => setHasChanges(true)}
+                  disabled={configMode === 'live'}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Message displayed to users after successful order submission
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-semibold text-gray-900">Show Order Number</p>
+                  <p className="text-sm text-gray-600">Display the order confirmation number</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    defaultChecked
+                    onChange={() => setHasChanges(true)}
+                    disabled={configMode === 'live'}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-semibold text-gray-900">Show Order Summary</p>
+                  <p className="text-sm text-gray-600">Display a summary of selected items</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    defaultChecked
+                    onChange={() => setHasChanges(true)}
+                    disabled={configMode === 'live'}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-semibold text-gray-900">Show Estimated Delivery</p>
+                  <p className="text-sm text-gray-600">Display estimated delivery timeframe</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    defaultChecked
+                    onChange={() => setHasChanges(true)}
+                    disabled={configMode === 'live'}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                </label>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Estimated Delivery Text
+                </label>
+                <Input
+                  type="text"
+                  defaultValue="Your order will arrive within 5-7 business days"
+                  placeholder="Your order will arrive within 5-7 business days"
+                  onChange={() => setHasChanges(true)}
+                  disabled={configMode === 'live'}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Delivery timeframe message
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Mail className="w-5 h-5 text-blue-600" />
+                Email Notifications
+              </CardTitle>
+              <CardDescription>Configure confirmation email settings</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-semibold text-gray-900">Send Confirmation Email</p>
+                  <p className="text-sm text-gray-600">Automatically email order confirmation to users</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    defaultChecked
+                    onChange={() => setHasChanges(true)}
+                    disabled={configMode === 'live'}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                </label>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Email Subject Line
+                </label>
+                <Input
+                  type="text"
+                  defaultValue="Your Order Confirmation"
+                  placeholder="Your Order Confirmation"
+                  onChange={() => setHasChanges(true)}
+                  disabled={configMode === 'live'}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Subject line for confirmation emails
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Reply-To Email Address
+                </label>
+                <Input
+                  type="email"
+                  placeholder="support@example.com"
+                  onChange={() => setHasChanges(true)}
+                  disabled={configMode === 'live'}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Email address for customer replies
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="w-5 h-5 text-purple-600" />
+                Next Steps & Actions
+              </CardTitle>
+              <CardDescription>Configure what users can do after confirmation</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-semibold text-gray-900">Show Track Order Button</p>
+                  <p className="text-sm text-gray-600">Allow users to track their order status</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    defaultChecked
+                    onChange={() => setHasChanges(true)}
+                    disabled={configMode === 'live'}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-semibold text-gray-900">Show Print Receipt Button</p>
+                  <p className="text-sm text-gray-600">Let users print their order confirmation</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    defaultChecked
+                    onChange={() => setHasChanges(true)}
+                    disabled={configMode === 'live'}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                </label>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Custom Action Button Text (Optional)
+                </label>
+                <Input
+                  type="text"
+                  placeholder="e.g., Return to Dashboard"
+                  onChange={() => setHasChanges(true)}
+                  disabled={configMode === 'live'}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Add a custom button with your own text
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Custom Action Button URL (Optional)
+                </label>
+                <Input
+                  type="url"
+                  placeholder="https://example.com/dashboard"
+                  onChange={() => setHasChanges(true)}
+                  disabled={configMode === 'live'}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  URL for the custom action button
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
       </Tabs>
     </div>
   );

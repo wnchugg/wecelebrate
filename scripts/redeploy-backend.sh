@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Quick Backend Redeployment Script
-# Renames, deploys, then renames back
+# JALA2 Backend Deployment Script
+# Deploys the Edge Function to Development or Production
 
 set -e
 
@@ -21,32 +21,45 @@ if [ "$ENV" = "dev" ]; then
 elif [ "$ENV" = "prod" ]; then
     PROJECT_REF="lmffeqwhrnbsbhdztwyv"
     ENV_NAME="Production"
+    
+    # Confirm production deployment
+    echo -e "${RED}⚠️  WARNING: You are about to deploy to PRODUCTION${NC}"
+    read -p "Are you sure? (yes/no): " confirm
+    if [ "$confirm" != "yes" ]; then
+        echo "Deployment cancelled"
+        exit 0
+    fi
 else
     echo -e "${RED}Error: Invalid environment. Use 'dev' or 'prod'${NC}"
+    echo ""
+    echo "Usage:"
+    echo "  ./deploy-backend.sh dev   # Deploy to development"
+    echo "  ./deploy-backend.sh prod  # Deploy to production"
     exit 1
 fi
 
 echo ""
 echo -e "${BLUE}════════════════════════════════════════${NC}"
-echo -e "${BLUE}   Quick Backend Redeploy ($ENV_NAME)${NC}"
+echo -e "${BLUE}   JALA2 Backend Deployment${NC}"
+echo -e "${BLUE}   Environment: $ENV_NAME${NC}"
 echo -e "${BLUE}════════════════════════════════════════${NC}"
 echo ""
 
 # Step 1: Rename directory
-echo -e "${YELLOW}→${NC} Renaming server → make-server-6fcaeea3..."
+echo -e "${YELLOW}→${NC} Preparing deployment..."
 if [ -d "supabase/functions/server" ]; then
     mv supabase/functions/server supabase/functions/make-server-6fcaeea3
-    echo -e "${GREEN}✓${NC} Renamed"
+    echo -e "${GREEN}✓${NC} Directory renamed"
 elif [ -d "supabase/functions/make-server-6fcaeea3" ]; then
-    echo -e "${GREEN}✓${NC} Already named correctly"
+    echo -e "${GREEN}✓${NC} Directory already prepared"
 else
-    echo -e "${RED}✗${NC} Error: Neither 'server' nor 'make-server-6fcaeea3' directory found!"
+    echo -e "${RED}✗${NC} Error: Function directory not found!"
     exit 1
 fi
 
 # Step 2: Deploy
 echo ""
-echo -e "${YELLOW}→${NC} Deploying Edge Function..."
+echo -e "${YELLOW}→${NC} Deploying Edge Function to $ENV_NAME..."
 supabase functions deploy make-server-6fcaeea3 --project-ref $PROJECT_REF --no-verify-jwt
 
 echo ""
@@ -54,9 +67,9 @@ echo -e "${GREEN}✓${NC} Deployed successfully!"
 
 # Step 3: Rename back
 echo ""
-echo -e "${YELLOW}→${NC} Renaming back to 'server' for easier editing..."
+echo -e "${YELLOW}→${NC} Cleaning up..."
 mv supabase/functions/make-server-6fcaeea3 supabase/functions/server
-echo -e "${GREEN}✓${NC} Renamed back"
+echo -e "${GREEN}✓${NC} Directory restored"
 
 # Step 4: Test
 echo ""
@@ -64,7 +77,7 @@ echo -e "${YELLOW}→${NC} Testing backend health..."
 sleep 2
 
 HEALTH_URL="https://${PROJECT_REF}.supabase.co/functions/v1/make-server-6fcaeea3/health"
-RESPONSE=$(curl -s "$HEALTH_URL")
+RESPONSE=$(curl -s "$HEALTH_URL" || echo "")
 
 if echo "$RESPONSE" | grep -q '"status":"ok"'; then
     echo -e "${GREEN}✓${NC} Backend is healthy!"
@@ -75,12 +88,24 @@ if echo "$RESPONSE" | grep -q '"status":"ok"'; then
     echo ""
     echo "Backend URL: https://${PROJECT_REF}.supabase.co/functions/v1/make-server-6fcaeea3"
     echo ""
-    echo "Next steps:"
-    echo "  1. Test login at http://localhost:5173/admin/login"
-    echo "  2. Check browser console for any errors"
+    
+    if [ "$ENV" = "dev" ]; then
+        echo "Next steps:"
+        echo "  1. Test login at http://localhost:5173/admin/login"
+        echo "  2. Check browser console for any errors"
+        echo "  3. View logs: supabase functions logs make-server-6fcaeea3"
+    else
+        echo "Production deployment complete!"
+        echo "  View logs: supabase functions logs make-server-6fcaeea3"
+    fi
     echo ""
 else
     echo -e "${RED}✗${NC} Health check failed"
     echo "Response: $RESPONSE"
+    echo ""
+    echo "Troubleshooting:"
+    echo "  1. Check logs: supabase functions logs make-server-6fcaeea3"
+    echo "  2. Verify JWT keys are set in Supabase Dashboard"
+    echo "  3. Wait 30 seconds and try again (cold start)"
     exit 1
 fi

@@ -4,6 +4,7 @@ import { Building2, ArrowRight, ArrowLeft, MapPin, Package, Globe } from 'lucide
 import { companyConfig } from '../data/config';
 import { toast } from 'sonner';
 import { useOrder } from '../context/OrderContext';
+import { usePublicSite } from '../context/PublicSiteContext';
 import { countries, getCountryByCode, Country } from '../utils/countries';
 import { useLanguage } from '../context/LanguageContext';
 import { LanguageSelector } from '../components/LanguageSelector';
@@ -12,6 +13,7 @@ import Logo from '../../imports/Logo';
 export function ShippingInformation() {
   const navigate = useNavigate();
   const { selectedGift, setShippingAddress } = useOrder();
+  const { currentSite } = usePublicSite();
   const { t } = useLanguage();
   
   const [formData, setFormData] = useState({
@@ -53,7 +55,16 @@ export function ShippingInformation() {
       setShippingAddress(formData);
     }
     
-    navigate('../review');
+    // Check if review page should be skipped
+    const skipReview = currentSite?.settings?.skipReviewPage ?? false;
+    
+    if (skipReview) {
+      // Skip review page and go directly to confirmation
+      navigate('../confirmation');
+    } else {
+      // Go to review page
+      navigate('../review');
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

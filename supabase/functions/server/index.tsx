@@ -26,7 +26,7 @@ import * as kv from "./kv_env.ts"; // Use environment-aware KV store
 import * as erp from "./erp_integration.ts";
 import * as erpEnhanced from "./erp_integration_enhanced.ts";
 import * as scheduler from "./erp_scheduler.ts";
-import * as giftsApi from "./gifts_api.ts";
+import * as giftsApi from "./gifts_api_v2.ts"; // UPDATED: Using database version
 import * as emailService from "./email_service.tsx";
 import * as emailAutomation from "./email_automation.tsx";
 import * as emailEventHelper from "./email_event_helper.tsx";
@@ -39,57 +39,92 @@ import * as adminUsers from "./admin_users.ts";
 import { setupTestCrudRoutes, verifyCrudFactorySetup } from './crud_factory_test.ts';
 // Phase 3.2: Migrated CRUD resources using factory pattern (consolidated file)
 import { setupMigratedResources } from './migrated_resources.ts';
-// Phase 2: Multi-Catalog Architecture APIs
-import catalogsApi from './catalogs_api.ts';
-import siteCatalogConfigApi from './site-catalog-config_api.ts';
+// Phase 2: Multi-Catalog Architecture APIs (UPDATED: Using V2 database versions)
+import catalogsApi from './catalogs_api_v2.ts';  // UPDATED: V2 with database
+import siteCatalogConfigApi from './site-catalog-config_api_v2.ts';  // UPDATED: V2 with database
 import migrationApi from './migration_api.ts';
 // Database cleanup utilities
 import { setupCleanupRoutes } from './database_cleanup.ts';
+// Phase 4: Security Middleware (Production Readiness)
+import { authMiddleware, optionalAuthMiddleware } from './middleware/auth.ts';
+import { tenantIsolationMiddleware } from './middleware/tenant.ts';
+import { errorHandler } from './middleware/errorHandler.ts';
+import { ipRateLimit, userRateLimit } from './middleware/rateLimit.ts';
 
 const app = new Hono();
 
-// ==================== CUSTOM JWT CONFIGURATION ====================
-// JWT Secret for custom HS256 tokens
-// CRITICAL: Must be deterministic (same on every restart) or tokens will become invalid!
-// Deployment trigger: 2026-02-11
+// ==================== ED25519 JWT CONFIGURATION ====================
+// JWT using Ed25519 asymmetric keys (best practice)
+// Migration date: 2026-02-15
+// Security: HS256 fallback REMOVED on 2026-02-15 to close security vulnerability
+// All tokens must now use Ed25519 - no exceptions
 
-// Get JWT secret (priority order):
-// 1. JWT_SECRET env var (if set via Supabase secrets)
-// 2. Derive from SUPABASE_URL (project ID - this NEVER changes)
-// 3. Fallback to hardcoded dev secret
-let JWT_SECRET = Deno.env.get('JWT_SECRET');
+import { importJWK } from "npm:jose@5.2.0";
 
-if (!JWT_SECRET) {
-  const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-  const projectIdMatch = supabaseUrl.match(/https:\/\/([^.]+)\.supabase\.co/);
-  const projectId = projectIdMatch ? projectIdMatch[1] : '';
-  
-  if (projectId) {
-    JWT_SECRET = `jala2-jwt-secret-stable-${projectId}-do-not-change-this-string-or-tokens-become-invalid`;
-  } else {
-    JWT_SECRET = 'jala2-dev-local-secret-change-in-production';
+// Load Ed25519 keys from environment variables
+const JWT_PRIVATE_KEY_B64 = Deno.env.get('JWT_PRIVATE_KEY');
+const JWT_PUBLIC_KEY_B64 = Deno.env.get('JWT_PUBLIC_KEY');
+
+let privateKey: any = null;
+let publicKey: any = null;
+
+// Initialize Ed25519 keys
+async function initializeJWTKeys() {
+  try {
+    if (!JWT_PRIVATE_KEY_B64) {
+      throw new Error('JWT_PRIVATE_KEY environment variable is required');
+    }
+    
+    if (!JWT_PUBLIC_KEY_B64) {
+      throw new Error('JWT_PUBLIC_KEY environment variable is required');
+    }
+    
+    const privateJWK = JSON.parse(atob(JWT_PRIVATE_KEY_B64));
+    privateKey = await importJWK(privateJWK, 'EdDSA');
+    console.log('✅ JWT Ed25519 private key loaded');
+    
+    const publicJWK = JSON.parse(atob(JWT_PUBLIC_KEY_B64));
+    publicKey = await importJWK(publicJWK, 'EdDSA');
+    console.log('✅ JWT Ed25519 public key loaded');
+    
+    console.log('🔒 Security: Ed25519-only mode (HS256 fallback removed)');
+  } catch (error) {
+    console.error('❌ CRITICAL: Failed to initialize Ed25519 JWT keys:', error);
+    console.error('❌ Backend cannot start without Ed25519 keys');
+    throw error; // Fail fast - don't start without proper keys
   }
 }
 
-// Helper to generate custom HS256 JWT
+// Initialize keys on startup
+await initializeJWTKeys();
+
+// Helper to generate JWT (Ed25519 only - no fallback)
 async function generateCustomJWT(payload: any): Promise<string> {
+  if (!privateKey) {
+    throw new Error('Ed25519 private key not initialized');
+  }
+  
   const jwt = await new SignJWT(payload)
-    .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
+    .setProtectedHeader({ alg: 'EdDSA', typ: 'JWT' })
     .setIssuedAt()
     .setExpirationTime('24h')
-    .sign(new TextEncoder().encode(JWT_SECRET));
+    .sign(privateKey);
   
   return jwt;
 }
 
-// Helper to verify custom HS256 JWT
+// Helper to verify JWT (Ed25519 only - no fallback)
 async function verifyCustomJWT(token: string): Promise<any> {
+  if (!publicKey) {
+    throw new Error('Ed25519 public key not initialized');
+  }
+  
   try {
-    const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
+    const { payload } = await jwtVerify(token, publicKey);
     return payload;
   } catch (error: any) {
     if (isDevelopment) {
-      console.error('[JWT] Verification failed:', error.message);
+      console.error('[JWT] Ed25519 verification failed:', error.message);
     }
     throw new Error('Invalid or expired token');
   }
@@ -389,6 +424,12 @@ app.use(
   }),
 );
 
+// ==================== PHASE 4: SECURITY MIDDLEWARE ====================
+// Rate limiting to prevent abuse and DoS attacks
+console.log('🔒 Applying rate limiting middleware...');
+app.use('*', ipRateLimit);
+console.log('✅ Rate limiting active: 100 requests per 15 minutes per IP');
+
 // Global error handler
 app.onError((err, c) => {
   console.error('Global error handler:', err);
@@ -423,6 +464,23 @@ async function verifyAdmin(c: any, next: any) {
     c.set('userRole', payload.role);
     c.set('environmentId', environmentId);
     
+    // Phase 4: Add tenant context for multi-tenant isolation
+    c.set('tenantContext', {
+      client_id: payload.clientId,
+      site_id: payload.siteId,
+      enforce_isolation: payload.role !== 'super_admin', // Super admins can access all tenants
+    });
+    
+    // Phase 4: Log tenant access for audit
+    console.log('[Tenant] Access:', {
+      user_id: payload.userId,
+      user_email: payload.email,
+      client_id: payload.clientId,
+      site_id: payload.siteId,
+      path: c.req.path,
+      method: c.req.method,
+    });
+    
     await next();
   } catch (error: any) {
     await auditLog({
@@ -443,6 +501,30 @@ async function verifyAdmin(c: any, next: any) {
       error: 'Unauthorized: Invalid or expired token'
     }, 401);
   }
+}
+
+// Phase 4: Tenant isolation helper function
+// Apply tenant filters to query parameters for automatic multi-tenant isolation
+export function applyTenantFilters(c: any, filters: Record<string, any>): Record<string, any> {
+  const tenantContext = c.get('tenantContext');
+  
+  if (!tenantContext || !tenantContext.enforce_isolation) {
+    return filters;
+  }
+  
+  const tenantFilters = { ...filters };
+  
+  // Add client_id filter if user has client context
+  if (tenantContext.client_id) {
+    tenantFilters.client_id = tenantContext.client_id;
+  }
+  
+  // Add site_id filter if user has site context
+  if (tenantContext.site_id) {
+    tenantFilters.site_id = tenantContext.site_id;
+  }
+  
+  return tenantFilters;
 }
 
 // Health check endpoint (public - no auth required)

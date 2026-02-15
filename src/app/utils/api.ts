@@ -58,6 +58,8 @@ export interface PublicSite {
       videoUrl?: string;
       ctaText?: string;
     };
+    // Checkout Configuration
+    skipReviewPage?: boolean; // If true, skip review page and go straight to confirmation
     // Celebration Module Configuration
     celebrationModule?: {
       enabled: boolean;

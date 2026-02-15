@@ -37,18 +37,12 @@ export function Dashboard() {
 
   // Fetch all dashboard data
   const fetchDashboardData = async (showLoader = true) => {
-    // Wait for sites to load before showing error
-    if (sitesLoading) {
-      console.log('[Dashboard] Waiting for sites to load...');
-      return;
-    }
-    
     if (!currentSite?.id) {
       console.warn('[Dashboard] No current site selected');
       // Only show error if we have sites available but none selected
-      if (sites.length > 0) {
+      if (!sitesLoading && sites.length > 0) {
         setError('No site selected. Please select a site from the dropdown.');
-      } else {
+      } else if (!sitesLoading && sites.length === 0) {
         setError('No sites available. Please create a site first.');
       }
       setLoading(false);
@@ -175,8 +169,12 @@ export function Dashboard() {
 
   const formattedStats = getFormattedStats();
 
-  // Loading state
-  if (loading) {
+  // Show dashboard with loading states for individual sections
+  // This allows users to see the UI and navigate away if needed
+  const showDashboard = !sitesLoading || currentSite !== null;
+
+  // Loading state - show skeleton UI instead of blocking
+  if (!showDashboard) {
     return (
       <div className="space-y-6">
         <DeployedDomainBanner />
@@ -191,7 +189,7 @@ export function Dashboard() {
         <div className="flex items-center justify-center py-32">
           <div className="text-center">
             <Loader2 className="w-12 h-12 text-[#D91C81] animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">Loading dashboard data...</p>
+            <p className="text-gray-600">Loading sites...</p>
           </div>
         </div>
       </div>
@@ -281,9 +279,14 @@ export function Dashboard() {
           return (
             <div
               key={stat.name}
-              className="bg-white rounded-xl p-6 border border-gray-200"
+              className="bg-white rounded-xl p-6 border border-gray-200 relative"
               style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}
             >
+              {loading && (
+                <div className="absolute inset-0 bg-white/50 rounded-xl flex items-center justify-center">
+                  <Loader2 className="w-6 h-6 text-[#D91C81] animate-spin" />
+                </div>
+              )}
               <div className="flex items-center justify-between mb-4">
                 <div className={`w-12 h-12 ${stat.color} rounded-lg flex items-center justify-center`}>
                   <Icon className="w-6 h-6 text-white" />
@@ -311,7 +314,7 @@ export function Dashboard() {
         <PublicSitePreview />
         
         {/* Recent Orders */}
-        <div className="bg-white rounded-xl border border-gray-200" style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
+        <div className="bg-white rounded-xl border border-gray-200 relative" style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold text-gray-900">Recent Orders</h2>
@@ -321,7 +324,12 @@ export function Dashboard() {
             </div>
           </div>
           <div className="divide-y divide-gray-200">
-            {recentOrders.length === 0 ? (
+            {loading ? (
+              <div className="p-8 text-center">
+                <Loader2 className="w-8 h-8 text-[#D91C81] animate-spin mx-auto mb-3" />
+                <p className="text-gray-500 text-sm">Loading orders...</p>
+              </div>
+            ) : recentOrders.length === 0 ? (
               <div className="p-8 text-center">
                 <ShoppingCart className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                 <p className="text-gray-500">No recent orders</p>
@@ -349,7 +357,7 @@ export function Dashboard() {
         </div>
 
         {/* Popular Gifts */}
-        <div className="bg-white rounded-xl border border-gray-200" style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
+        <div className="bg-white rounded-xl border border-gray-200 relative" style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold text-gray-900">Popular Gifts</h2>
@@ -359,7 +367,12 @@ export function Dashboard() {
             </div>
           </div>
           <div className="p-6 space-y-4">
-            {popularGifts.length === 0 ? (
+            {loading ? (
+              <div className="py-8 text-center">
+                <Loader2 className="w-8 h-8 text-[#D91C81] animate-spin mx-auto mb-3" />
+                <p className="text-gray-500 text-sm">Loading gifts...</p>
+              </div>
+            ) : popularGifts.length === 0 ? (
               <div className="py-8 text-center">
                 <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                 <p className="text-gray-500">No popular gifts data</p>

@@ -6,6 +6,8 @@
  * Version: 1.0
  */
 
+import { isValidSlug } from './validationUtils';
+
 export interface ValidationResult {
   valid: boolean;
   errors: string[];
@@ -156,19 +158,22 @@ export function validateSiteConfiguration(data: SiteConfigData): ValidationResul
     fieldErrors.siteName = 'Only letters, numbers, spaces, and basic punctuation allowed';
   }
   
-  // 2. Site URL (REQUIRED)
+  // 2. Site URL Slug (REQUIRED)
   if (!data.siteUrl?.trim()) {
-    errors.push('Site URL is required');
+    errors.push('Site URL slug is required');
     fieldErrors.siteUrl = 'This field is required';
-  } else if (!isValidUrl(data.siteUrl)) {
-    errors.push('Site URL must be a valid URL');
-    fieldErrors.siteUrl = 'Invalid URL format (e.g., https://example.com)';
+  } else if (!isValidSlug(data.siteUrl)) {
+    errors.push('Site URL slug must contain only lowercase letters, numbers, and hyphens');
+    fieldErrors.siteUrl = 'Invalid format (e.g., techcorpus, my-company-2024)';
+  } else if (data.siteUrl.length < 3) {
+    errors.push('Site URL slug must be at least 3 characters');
+    fieldErrors.siteUrl = 'Minimum 3 characters required';
+  } else if (data.siteUrl.length > 50) {
+    errors.push('Site URL slug must not exceed 50 characters');
+    fieldErrors.siteUrl = 'Maximum 50 characters allowed';
   } else if (hasReservedWords(data.siteUrl)) {
-    warnings.push('Site URL contains reserved words which may cause conflicts');
-    // Don't block, just warn
-  } else if (data.siteUrl.length > 255) {
-    errors.push('Site URL must not exceed 255 characters');
-    fieldErrors.siteUrl = 'URL too long';
+    errors.push('Site URL slug contains reserved words which are not allowed');
+    fieldErrors.siteUrl = 'This slug is reserved. Please choose a different one.';
   }
   
   // 3. Date Range Validation
@@ -368,7 +373,9 @@ export function validateField(fieldName: string, value: any): string | null {
       
     case 'siteUrl':
       if (!value?.trim()) return 'Required';
-      if (!isValidUrl(value)) return 'Invalid URL format';
+      if (!isValidSlug(value)) return 'Invalid slug format (lowercase, numbers, hyphens only)';
+      if (value.length < 3) return 'Minimum 3 characters';
+      if (value.length > 50) return 'Maximum 50 characters';
       return null;
       
     case 'primaryColor':

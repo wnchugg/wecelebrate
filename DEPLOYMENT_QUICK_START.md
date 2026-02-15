@@ -1,297 +1,132 @@
-# JALA2 Deployment - Quick Start 🚀
+# Deployment Quick Start
 
-## ✅ Scripts Are Fixed!
+## 🚀 Deploy in 3 Steps
 
-The issue with `SUPABASE_` prefixed environment variables has been resolved. 
+### Step 1: Copy SQL
 
-**Key Insight:** Supabase automatically provides `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` to Edge Functions, so we don't need to set them manually!
+The SQL has been saved to: `deploy_site_catalog_config.sql`
 
----
+Or copy from below:
 
-## 🎯 Run This Now:
+```sql
+-- Table 1: site_catalog_assignments
+CREATE TABLE IF NOT EXISTS site_catalog_assignments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  site_id UUID NOT NULL REFERENCES sites(id) ON DELETE CASCADE,
+  catalog_id UUID NOT NULL REFERENCES catalogs(id) ON DELETE CASCADE,
+  settings JSONB DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  created_by UUID,
+  updated_by UUID,
+  CONSTRAINT site_catalog_assignments_unique UNIQUE (site_id, catalog_id)
+);
 
-```bash
-# Make script executable (if not already done)
-chmod +x scripts/deploy-full-stack.sh
+CREATE INDEX IF NOT EXISTS idx_site_catalog_assignments_site_id ON site_catalog_assignments(site_id);
+CREATE INDEX IF NOT EXISTS idx_site_catalog_assignments_catalog_id ON site_catalog_assignments(catalog_id);
+CREATE INDEX IF NOT EXISTS idx_site_catalog_assignments_settings ON site_catalog_assignments USING gin(settings);
 
-# Deploy to Development
-./scripts/deploy-full-stack.sh dev
+-- Table 2: site_price_overrides
+CREATE TABLE IF NOT EXISTS site_price_overrides (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  site_id UUID NOT NULL REFERENCES sites(id) ON DELETE CASCADE,
+  product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  override_price DECIMAL(10,2) NOT NULL CHECK (override_price >= 0),
+  reason TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  created_by UUID,
+  updated_by UUID,
+  CONSTRAINT site_price_overrides_unique UNIQUE (site_id, product_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_site_price_overrides_site_id ON site_price_overrides(site_id);
+CREATE INDEX IF NOT EXISTS idx_site_price_overrides_product_id ON site_price_overrides(product_id);
+
+-- Table 3: site_category_exclusions
+CREATE TABLE IF NOT EXISTS site_category_exclusions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  site_id UUID NOT NULL REFERENCES sites(id) ON DELETE CASCADE,
+  category VARCHAR(100) NOT NULL,
+  reason TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  created_by UUID,
+  CONSTRAINT site_category_exclusions_unique UNIQUE (site_id, category)
+);
+
+CREATE INDEX IF NOT EXISTS idx_site_category_exclusions_site_id ON site_category_exclusions(site_id);
+CREATE INDEX IF NOT EXISTS idx_site_category_exclusions_category ON site_category_exclusions(category);
+
+-- Triggers
+CREATE OR REPLACE FUNCTION update_site_catalog_assignments_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trigger_update_site_catalog_assignments_updated_at ON site_catalog_assignments;
+
+CREATE TRIGGER trigger_update_site_catalog_assignments_updated_at
+  BEFORE UPDATE ON site_catalog_assignments
+  FOR EACH ROW
+  EXECUTE FUNCTION update_site_catalog_assignments_updated_at();
+
+CREATE OR REPLACE FUNCTION update_site_price_overrides_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trigger_update_site_price_overrides_updated_at ON site_price_overrides;
+
+CREATE TRIGGER trigger_update_site_price_overrides_updated_at
+  BEFORE UPDATE ON site_price_overrides
+  FOR EACH ROW
+  EXECUTE FUNCTION update_site_price_overrides_updated_at();
 ```
 
----
+### Step 2: Execute in Supabase
 
-## 📋 What the Script Does:
+1. Go to: https://supabase.com/dashboard
+2. Select project: `wjfcqqrlhwdvvjmefxky`
+3. Click **SQL Editor** (left sidebar)
+4. Click **New Query**
+5. Paste the SQL above
+6. Click **Run**
 
-### ✅ **Checks Prerequisites**
-- Node.js, npm, Supabase CLI
+### Step 3: Verify
 
-### ✅ **Backend Deployment**
-1. Links to your Supabase project (`wjfcqqrlhwdvvjmefxky` for dev)
-2. Sets custom secrets:
-   - `ALLOWED_ORIGINS="*"`
-   - `SEED_ON_STARTUP="false"`
-3. Deploys Edge Function: `make-server-6fcaeea3`
-4. Tests backend health automatically
+Run this command to verify:
 
-### ✅ **Frontend Build**
-5. Installs dependencies (`npm ci`)
-6. Runs TypeScript type check
-7. Runs tests
-8. Builds frontend (`npm run build`)
-9. Shows deployment options
-
-**Time:** ~10 minutes
-
----
-
-## 🔑 What You'll Need:
-
-When the script asks for credentials, get them from **Supabase Dashboard**:
-
-1. Go to: https://supabase.com/dashboard/project/wjfcqqrlhwdvvjmefxky
-2. Navigate to: **Settings → API**
-3. Copy:
-   - **Project URL**: `https://wjfcqqrlhwdvvjmefxky.supabase.co`
-   - **Anon Key** (public)
-   - **Service Role Key** (secret - keep safe!)
-
----
-
-## ✨ What Changed:
-
-### **Before (Broken):**
 ```bash
-# ❌ This failed because SUPABASE_ prefix is reserved
-supabase secrets set SUPABASE_URL="..." --no-verbose
-supabase secrets set SUPABASE_ANON_KEY="..." --no-verbose
-supabase secrets set SUPABASE_SERVICE_ROLE_KEY="..." --no-verbose
+deno run --allow-net --allow-env --allow-read --allow-write --unsafely-ignore-certificate-errors \
+  supabase/functions/server/database/deploy_site_catalog_config_simple.ts
 ```
 
-### **After (Fixed):**
-```bash
-# ✅ Only set custom secrets (Supabase provides the rest automatically)
-supabase secrets set ALLOWED_ORIGINS="*"
-supabase secrets set SEED_ON_STARTUP="false"
-
-# Note: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
-# are automatically provided by Supabase!
+You should see:
 ```
-
----
-
-## 🎬 Complete Workflow:
-
-### **Step 1: Deploy Backend**
-```bash
-./scripts/deploy-full-stack.sh dev
-```
-
-**Enter when prompted:**
-- Project URL: `https://wjfcqqrlhwdvvjmefxky.supabase.co` (or press Enter for default)
-- Anon Key: [paste from Supabase Dashboard]
-- Service Role Key: [paste from Supabase Dashboard]
-
-### **Step 2: Wait for Deployment**
-The script will:
-- ✅ Link to Supabase project
-- ✅ Set secrets
-- ✅ Deploy backend
-- ✅ Test backend health
-- ✅ Build frontend
-- ✅ Show next steps
-
-### **Step 3: Deploy Frontend** (Choose one)
-
-**Option A: Vercel** (Recommended)
-```bash
-npm install -g vercel
-vercel login
-vercel --prod
-```
-
-**Option B: Netlify**
-```bash
-npm install -g netlify-cli
-netlify login
-netlify deploy --prod --dir=dist
-```
-
-**Option C: Manual**
-- Upload `dist/` folder to your web server
-
----
-
-## 🧪 Test the Deployment:
-
-### **Test Backend:**
-```bash
-curl https://wjfcqqrlhwdvvjmefxky.supabase.co/functions/v1/make-server-6fcaeea3/health \
-  -H "Authorization: Bearer YOUR_ANON_KEY_HERE"
-```
-
-**Expected Response:**
-```json
-{"status":"ok","timestamp":"2026-02-07T..."}
-```
-
-### **Test Frontend:**
-- Visit your deployed frontend URL
-- Open browser console (F12)
-- Should see no errors
-- Backend health check should succeed
-
----
-
-## 📊 Environment Configuration:
-
-### **Development**
-- Project ID: `wjfcqqrlhwdvvjmefxky`
-- Backend URL: `https://wjfcqqrlhwdvvjmefxky.supabase.co`
-- Edge Function: `make-server-6fcaeea3`
-
-### **Production**
-- Project ID: `lmffeqwhrnbsbhdztwyv`
-- Backend URL: `https://lmffeqwhrnbsbhdztwyv.supabase.co`
-- Edge Function: `make-server-6fcaeea3`
-
----
-
-## 🚨 Common Issues:
-
-### **Issue: "unknown flag: --no-verbose"**
-✅ **Fixed!** Updated scripts to remove this flag.
-
-### **Issue: "Env name cannot start with SUPABASE_"**
-✅ **Fixed!** We no longer try to set SUPABASE_* secrets (Supabase provides them automatically).
-
-### **Issue: "Missing authorization header" (401)**
-This is **normal** when testing without the Authorization header. Use:
-```bash
-curl https://wjfcqqrlhwdvvjmefxky.supabase.co/functions/v1/make-server-6fcaeea3/health \
-  -H "Authorization: Bearer YOUR_ANON_KEY"
-```
-
-### **Issue: Backend health check fails**
-```bash
-# Check logs
-supabase functions logs make-server-6fcaeea3 --project-ref wjfcqqrlhwdvvjmefxky
-
-# Redeploy
-./scripts/deploy-backend.sh dev
+✅ site_catalog_assignments: EXISTS
+✅ site_price_overrides: EXISTS
+✅ site_category_exclusions: EXISTS
 ```
 
 ---
 
-## 📚 Available Scripts:
+## ✅ Done!
 
-### **Full Stack** (Recommended)
-```bash
-./scripts/deploy-full-stack.sh dev   # Backend + Frontend build
-./scripts/deploy-full-stack.sh prod
-```
+Your database schema is now deployed. The API is ready to use.
 
-### **Backend Only**
-```bash
-./scripts/deploy-backend.sh dev      # Quick backend updates
-./scripts/deploy-backend.sh prod
-```
-
-### **Frontend Only**
-```bash
-./scripts/deploy-frontend.sh dev     # Just build frontend
-./scripts/deploy-frontend.sh prod
-```
-
-### **Platform Specific**
-```bash
-./scripts/deploy-to-vercel.sh dev    # Build + deploy to Vercel
-./scripts/deploy-to-netlify.sh dev   # Build + deploy to Netlify
-```
+**Next**: Test the API endpoints or proceed to Phase 3!
 
 ---
 
-## ⏱️ Time Estimates:
+## 📚 Full Documentation
 
-| Task | Time |
-|------|------|
-| Backend deployment | 2 min |
-| Frontend build | 3 min |
-| Full stack deployment | 10 min |
-| First-time setup (both envs) | 30 min |
-
----
-
-## 🎯 Next Steps After Deployment:
-
-1. **Create Admin User:**
-   ```bash
-   ./scripts/create-admin-user.sh
-   ```
-
-2. **Configure Environment:**
-   - Visit: `https://your-frontend-url.com/admin/environment-config`
-   - Add Development credentials
-   - Test connection
-
-3. **Test the Platform:**
-   - Login to admin panel
-   - Create a client
-   - Create a site
-   - Assign products
-
----
-
-## 💡 Pro Tips:
-
-### **Tip 1: Quick Backend Updates**
-When you only change backend code:
-```bash
-./scripts/deploy-backend.sh dev  # 2 minutes!
-```
-
-### **Tip 2: Watch Logs**
-Monitor backend in real-time:
-```bash
-supabase functions logs make-server-6fcaeea3 --project-ref wjfcqqrlhwdvvjmefxky
-```
-
-### **Tip 3: Local Development**
-Test locally before deploying:
-```bash
-npm run dev  # Frontend
-# Backend runs on Supabase (can't run locally in this setup)
-```
-
-### **Tip 4: Deployment Logs**
-All deployments are logged to `deployments/` folder:
-```bash
-ls -la deployments/
-cat deployments/dev-fullstack-*.log
-```
-
----
-
-## ✅ You're Ready!
-
-Run this command to deploy:
-
-```bash
-./scripts/deploy-full-stack.sh dev
-```
-
-Then follow the prompts. The script will guide you through the rest!
-
----
-
-## 🆘 Need Help?
-
-- **Scripts Documentation:** [/scripts/README.md](/scripts/README.md)
-- **Full Deployment Guide:** [/DEPLOYMENT_GUIDE.md](/DEPLOYMENT_GUIDE.md)
-- **Troubleshooting:** [/TROUBLESHOOTING.md](/TROUBLESHOOTING.md)
-- **Backend API Docs:** [/supabase/functions/server/API_DOCUMENTATION.md](/supabase/functions/server/API_DOCUMENTATION.md)
-
----
-
-*Last Updated: February 7, 2026*  
-*Scripts Version: 1.1.0 (Fixed)*  
-*Status: Ready to Deploy ✅*
+- **Deployment Guide**: `DEPLOYMENT_GUIDE.md`
+- **API Documentation**: `API_DOCUMENTATION.md`
+- **Architecture Guide**: `ARCHITECTURE_GUIDE.md`
+- **Completion Summary**: `OPTION_2_COMPLETE.md`

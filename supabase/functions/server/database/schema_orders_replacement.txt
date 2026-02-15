@@ -1,0 +1,72 @@
+-- ============================================================================
+-- ORDERS TABLE
+-- Stores customer orders with multi-tenant support
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS orders (
+  -- Primary Key
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  
+  -- Foreign Keys
+  client_id UUID NOT NULL REFERENCES clients(id),
+  site_id UUID NOT NULL REFERENCES sites(id),
+  product_id UUID REFERENCES products(id),  -- Can be NULL if product deleted
+  employee_id UUID REFERENCES employees(id),  -- Can be NULL for guest orders
+  
+  -- Order Identification
+  order_number TEXT NOT NULL UNIQUE,  -- Human-readable order number
+  
+  -- Customer Information
+  customer_name TEXT NOT NULL,
+  customer_email TEXT NOT NULL,
+  customer_employee_id TEXT,  -- For tracking even if employee record deleted
+  
+  -- Order Details
+  status TEXT NOT NULL DEFAULT 'pending',
+  total_amount NUMERIC(10, 2) NOT NULL,
+  currency TEXT NOT NULL DEFAULT 'USD',
+  
+  -- Shipping Information (stored as JSONB)
+  shipping_address JSONB NOT NULL,
+  tracking_number TEXT,
+  
+  -- Order Items (stored as JSONB for flexibility)
+  items JSONB NOT NULL DEFAULT '[]',
+  
+  -- Additional Metadata
+  metadata JSONB DEFAULT '{}',
+  notes TEXT,
+  
+  -- Timestamps
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  confirmed_at TIMESTAMPTZ,
+  shipped_at TIMESTAMPTZ,
+  delivered_at TIMESTAMPTZ,
+  cancelled_at TIMESTAMPTZ,
+  
+  -- Constraints
+  CONSTRAINT orders_status_check CHECK (status IN ('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled')),
+  CONSTRAINT orders_total_check CHECK (total_amount >= 0),
+  CONSTRAINT orders_email_format CHECK (customer_email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
+  CONSTRAINT orders_status_timestamps CHECK (
+    (status != 'confirmed' OR confirmed_at IS NOT NULL) AND
+    (status != 'shipped' OR shipped_at IS NOT NULL) AND
+    (status != 'delivered' OR delivered_at IS NOT NULL) AND
+    (status != 'cancelled' OR cancelled_at IS NOT NULL)
+  )
+);
+
+-- Indexes for fast lookups and reporting
+CREATE INDEX IF NOT EXISTS idx_orders_client_id ON orders(client_id);
+CREATE INDEX IF NOT EXISTS idx_orders_site_id ON orders(site_id);
+CREATE INDEX IF NOT EXISTS idx_orders_product_id ON orders(product_id) WHERE product_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_orders_employee_id ON orders(employee_id) WHERE employee_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_orders_order_number ON orders(order_number);
+CREATE INDEX IF NOT EXISTS idx_orders_customer_email ON orders(customer_email);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
+CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_orders_client_created ON orders(client_id, created_at DESC);  -- For client reports
+CREATE INDEX IF NOT EXISTS idx_orders_site_created ON orders(site_id, created_at DESC);  -- For site reports
+CREATE INDEX IF NOT EXISTS idx_orders_client_status ON orders(client_id, status);
+CREATE INDEX IF NOT EXISTS idx_orders_site_status ON orders(site_id, status);

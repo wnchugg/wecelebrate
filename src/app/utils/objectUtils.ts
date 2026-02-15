@@ -129,12 +129,12 @@ export function get<T = any>(obj: any, path: string, defaultValue?: T): T {
   
   for (const key of keys) {
     if (result == null) {
-      return defaultValue as T;
+      return defaultValue;
     }
     result = result[key];
   }
   
-  return result !== undefined ? result : defaultValue as T;
+  return result !== undefined ? result : defaultValue;
 }
 
 /**
@@ -142,7 +142,7 @@ export function get<T = any>(obj: any, path: string, defaultValue?: T): T {
  */
 export function set<T extends Record<string, any>>(obj: T, path: string, value: any): T {
   const keys = path.split('.');
-  const lastKey = keys.pop()!;
+  const lastKey = keys.pop();
   let current = obj;
   
   for (const key of keys) {

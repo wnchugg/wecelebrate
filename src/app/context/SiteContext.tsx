@@ -466,7 +466,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await apiRequest(`/sites/${id}`, {
         method: 'PUT',
         body: JSON.stringify(updates)
-      }) as Response;
+      });
       
       if (!response.ok) {
         const error = await response.json();

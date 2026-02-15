@@ -47,7 +47,7 @@ export async function retry<T>(
     }
   }
   
-  throw lastError!;
+  throw lastError;
 }
 
 /**
@@ -263,7 +263,7 @@ export async function withFallbacks<T>(
     }
   }
   
-  throw lastError!;
+  throw lastError;
 }
 
 /**
@@ -370,7 +370,7 @@ export function deferred<T>(): Deferred<T> {
     reject = rej;
   });
   
-  return { promise, resolve: resolve!, reject: reject! };
+  return { promise, resolve: resolve, reject: reject };
 }
 
 /**

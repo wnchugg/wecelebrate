@@ -951,7 +951,7 @@ export function WelcomePageEditor() {
                           <div className="flex items-center gap-2">
                             {blockTypeOptions.find(opt => opt.type === block.type)?.icon && (
                               (() => {
-                                const Icon = blockTypeOptions.find(opt => opt.type === block.type)!.icon;
+                                const Icon = blockTypeOptions.find(opt => opt.type === block.type).icon;
                                 return <Icon className="w-4 h-4 text-gray-600" />;
                               })()
                             )}

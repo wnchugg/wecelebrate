@@ -103,7 +103,7 @@ describe('Modal Component', () => {
 
       // Click on backdrop (not the modal content)
       const backdrop = document.querySelector('.bg-black.bg-opacity-50');
-      await user.click(backdrop!);
+      await user.click(backdrop);
 
       expect(handleClose).toHaveBeenCalled();
     });

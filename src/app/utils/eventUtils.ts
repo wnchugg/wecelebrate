@@ -17,7 +17,7 @@ export class EventEmitter<T extends Record<string, any> = Record<string, any>> {
       this.events.set(event, new Set());
     }
     
-    this.events.get(event)!.add(handler);
+    this.events.get(event).add(handler);
     
     // Return unsubscribe function
     return () => this.off(event, handler);

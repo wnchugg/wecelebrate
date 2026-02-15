@@ -484,7 +484,7 @@ export function EnvironmentManagement() {
     try {
       const response = await apiRequest(`/config/environments/${deletingEnv.id}`, {
         method: 'DELETE',
-      }) as { success?: boolean };
+      });
 
       if (response.success) {
         toast.success('Environment deleted successfully');

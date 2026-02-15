@@ -294,7 +294,7 @@ export function ClientSiteERPAssignment() {
                         onChange={(e) => setClientAssignment({
                           ...clientAssignment,
                           settings: {
-                            ...clientAssignment.settings!,
+                            ...clientAssignment.settings,
                             [setting.key]: e.target.checked
                           }
                         })}
@@ -455,7 +455,7 @@ export function ClientSiteERPAssignment() {
                             onChange={(e) => setSiteAssignment({
                               ...siteAssignment,
                               settings: {
-                                ...siteAssignment.settings!,
+                                ...siteAssignment.settings,
                                 [setting.key]: e.target.checked
                               }
                             })}

@@ -432,10 +432,10 @@ describe('Multi-Catalog Architecture', () => {
         .filter(c => c.settings.minSelectableQuantity && c.settings.maxSelectableQuantity);
       
       catalogsWithLimits.forEach(catalog => {
-        expect(catalog.settings.minSelectableQuantity!).toBeLessThanOrEqual(
-          catalog.settings.maxSelectableQuantity!
+        expect(catalog.settings.minSelectableQuantity).toBeLessThanOrEqual(
+          catalog.settings.maxSelectableQuantity
         );
-        expect(catalog.settings.minSelectableQuantity!).toBeGreaterThan(0);
+        expect(catalog.settings.minSelectableQuantity).toBeGreaterThan(0);
       });
     });
   });

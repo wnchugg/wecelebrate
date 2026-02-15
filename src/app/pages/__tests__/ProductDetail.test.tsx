@@ -215,7 +215,7 @@ describe('Product Detail Page Component Suite', () => {
         </TestWrapper>
       );
       
-      const image = screen.getByAltText('Premium Headphones') as HTMLImageElement;
+      const image = screen.getByAltText('Premium Headphones');
       expect(image.src).toContain('headphones.jpg');
     });
 

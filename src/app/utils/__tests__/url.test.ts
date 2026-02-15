@@ -72,7 +72,7 @@ describe('URL Utils', () => {
       const parsed = parseUrl(url);
       
       expect(parsed).toBeDefined();
-      expect(parsed!.protocol).toBe('https:');
+      expect(parsed.protocol).toBe('https:');
     });
   });
 

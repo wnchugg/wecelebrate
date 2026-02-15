@@ -752,7 +752,7 @@ describe('Complex Scenarios E2E Suite', () => {
       await user.click(screen.getByText('Navigate'));
       
       await waitFor(() => {
-        expect(screen.getByTestId('cart-count')).toHaveTextContent(initialCount!);
+        expect(screen.getByTestId('cart-count')).toHaveTextContent(initialCount);
       });
     });
   });

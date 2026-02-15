@@ -221,7 +221,7 @@ export function SiteGiftAssignment() {
 
   // Get preview of assigned gifts based on current config
   const getAssignedGifts = () => {
-    let assignedGifts = gifts.filter(g => g.status === 'active');
+    const assignedGifts = gifts.filter(g => g.status === 'active');
 
     switch (config.assignmentStrategy) {
       case 'all':

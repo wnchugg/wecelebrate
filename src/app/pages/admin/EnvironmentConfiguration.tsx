@@ -181,7 +181,7 @@ export function EnvironmentConfiguration() {
       // For editing existing environments that exist in the backend, use PUT
       // For new environments or local-only defaults, use POST
       let method = 'POST';
-      let endpoint = '/config/environments';
+      const endpoint = '/config/environments';
       
       if (editingEnv) {
         // Check if this environment exists in backend by trying to update it

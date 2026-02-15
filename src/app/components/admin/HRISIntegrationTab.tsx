@@ -254,12 +254,12 @@ export function HRISIntegrationTab({ client, sites, onSyncComplete }: HRISIntegr
     let password = '';
     let clientId = '';
     let clientSecret = '';
-    let tenantId = '';
-    let sftpHost = '';
-    let sftpPort = '22';
-    let sftpUsername = '';
-    let sftpPassword = '';
-    let sftpPath = '';
+    const tenantId = '';
+    const sftpHost = '';
+    const sftpPort = '22';
+    const sftpUsername = '';
+    const sftpPassword = '';
+    const sftpPath = '';
 
     if (creds.type === 'api_key') {
       apiKey = creds.apiKey;

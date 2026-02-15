@@ -236,14 +236,16 @@ export function OrderManagement() {
         case 'today':
           matchesDate = orderDate.toDateString() === today.toDateString();
           break;
-        case 'week':
+        case 'week': {
           const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
           matchesDate = orderDate >= weekAgo;
           break;
-        case 'month':
+        }
+        case 'month': {
           const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
           matchesDate = orderDate >= monthAgo;
           break;
+        }
       }
     }
     
@@ -701,11 +703,12 @@ function OrderDetailModal({ order, onClose, onStatusUpdate }: { order: Order | n
 
 // Status Update Modal Component
 function StatusUpdateModal({ order, onClose, onUpdate }: { order: Order | null, onClose: () => void, onUpdate: (status: Order['status'], tracking?: string, carrier?: string) => void }) {
-  if (!order) return null;
+  // All hooks must be called unconditionally
+  const [status, setStatus] = useState(order?.status || 'pending');
+  const [trackingNumber, setTrackingNumber] = useState(order?.trackingNumber || '');
+  const [carrier, setCarrier] = useState(order?.carrier || '');
 
-  const [status, setStatus] = useState(order.status);
-  const [trackingNumber, setTrackingNumber] = useState(order.trackingNumber || '');
-  const [carrier, setCarrier] = useState(order.carrier || '');
+  if (!order) return null;
 
   return (
     <Dialog open={!!order} onOpenChange={onClose}>

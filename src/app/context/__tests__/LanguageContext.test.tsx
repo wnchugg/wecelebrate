@@ -123,7 +123,7 @@ describe('LanguageContext', () => {
 
     it('should set language by object', () => {
       const { result } = renderHook(() => useLanguage(), { wrapper });
-      const frenchLang = languages.find(l => l.code === 'fr')!;
+      const frenchLang = languages.find(l => l.code === 'fr');
       
       act(() => {
         result.current.setLanguage(frenchLang);

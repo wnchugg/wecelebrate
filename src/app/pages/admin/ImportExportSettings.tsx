@@ -150,7 +150,7 @@ export function ImportExportSettings() {
         if (data.data.sites) {
           data.data.sites.forEach(site => {
             const newClientId = generateNewIds && clientIdMap.has(site.clientId)
-              ? clientIdMap.get(site.clientId)!
+              ? clientIdMap.get(site.clientId)
               : site.clientId;
             const processed = processSiteImport(site, newClientId, generateNewIds);
             addSite(processed);

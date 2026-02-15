@@ -157,7 +157,7 @@ export function AccessManagement() {
         .map(d => d.trim())
         .filter(d => d.length > 0);
       
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       await updateSite(currentSite.id, {
         settings: {
           ...currentSite.settings,

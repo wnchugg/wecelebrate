@@ -58,7 +58,7 @@ export default function ForgotPassword() {
     // Check rate limiting (3 attempts per 15 minutes)
     const rateLimitCheck = checkRateLimit('password_reset', 3, 900000);
     if (!rateLimitCheck.allowed) {
-      const waitMinutes = Math.ceil(rateLimitCheck.retryAfter! / 60000);
+      const waitMinutes = Math.ceil(rateLimitCheck.retryAfter / 60000);
       const errorMsg = `Too many password reset attempts. Please try again in ${waitMinutes} minute${waitMinutes !== 1 ? 's' : ''}.`;
       setError(errorMsg);
       showErrorToast(errorMsg);

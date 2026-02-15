@@ -361,7 +361,7 @@ export function logSecurityEvent(
   } else {
     // Pattern 2: logSecurityEvent({ action: 'event_name', status: 'failure', userId: 'user@example.com', details: {} })
     event = eventOrParams.action;
-    level = (eventOrParams.status === 'failure' ? 'error' : eventOrParams.status === 'warning' ? 'warning' : 'info') as 'info' | 'warning' | 'error';
+    level = (eventOrParams.status === 'failure' ? 'error' : eventOrParams.status === 'warning' ? 'warning' : 'info');
     userId = eventOrParams.userId;
     logDetails = eventOrParams.details || {};
   }

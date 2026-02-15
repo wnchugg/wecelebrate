@@ -396,7 +396,7 @@ beforeAll(() => {
         if (!this.params.has(name)) {
           this.params.set(name, []);
         }
-        this.params.get(name)!.push(value);
+        this.params.get(name).push(value);
       }
       
       delete(name: string) {

@@ -134,7 +134,7 @@ export function validateApiResponse<T>(
     throw new Error('API response data validation failed');
   }
 
-  return successResponse.data as T;
+  return successResponse.data;
 }
 
 /**
@@ -378,7 +378,7 @@ export function transformApiResponse<T, U>(
   const successResponse = response as SuccessResponse<T>;
   return {
     ...successResponse,
-    data: transformer(successResponse.data as T),
+    data: transformer(successResponse.data),
   };
 }
 

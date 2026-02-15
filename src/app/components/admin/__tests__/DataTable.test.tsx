@@ -293,7 +293,7 @@ describe('DataTable Component', () => {
       );
 
       const johnRow = screen.getByText('John Doe').closest('tr');
-      await user.click(johnRow!);
+      await user.click(johnRow);
 
       expect(handleRowClick).toHaveBeenCalledWith(mockData[0]);
     });

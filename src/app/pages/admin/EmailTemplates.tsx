@@ -175,8 +175,8 @@ export function EmailTemplates() {
       if (!response.templates || response.templates.length === 0) {
         const initializedTemplates = DEFAULT_TEMPLATES.map(t => ({
           ...t,
-          htmlContent: getDefaultHtmlContent(t.id!),
-          textContent: getDefaultTextContent(t.id!),
+          htmlContent: getDefaultHtmlContent(t.id),
+          textContent: getDefaultTextContent(t.id),
           lastModified: new Date().toISOString(),
           usageCount: 0
         } as EmailTemplate));
@@ -198,8 +198,8 @@ export function EmailTemplates() {
       // Fallback to defaults
       setTemplates(DEFAULT_TEMPLATES.map(t => ({
         ...t,
-        htmlContent: getDefaultHtmlContent(t.id!),
-        textContent: getDefaultTextContent(t.id!),
+        htmlContent: getDefaultHtmlContent(t.id),
+        textContent: getDefaultTextContent(t.id),
         lastModified: new Date().toISOString(),
         usageCount: 0
       } as EmailTemplate)));

@@ -164,7 +164,7 @@ export function SetupWizard() {
                       <Button 
                         size="sm" 
                         variant="outline"
-                        onClick={() => copyCommand(step.command!)}
+                        onClick={() => copyCommand(step.command)}
                       >
                         Copy
                       </Button>

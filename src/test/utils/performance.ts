@@ -58,7 +58,7 @@ class PerformanceMonitor {
     if (!this.measurements.has(name)) {
       this.measurements.set(name, []);
     }
-    this.measurements.get(name)!.push(duration);
+    this.measurements.get(name).push(duration);
 
     return duration;
   }

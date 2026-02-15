@@ -284,10 +284,10 @@ class SecurityLogger {
         filtered = filtered.filter(e => e.userId === filters.userId);
       }
       if (filters.startTime) {
-        filtered = filtered.filter(e => e.timestamp >= filters.startTime!);
+        filtered = filtered.filter(e => e.timestamp >= filters.startTime);
       }
       if (filters.endTime) {
-        filtered = filtered.filter(e => e.timestamp <= filters.endTime!);
+        filtered = filtered.filter(e => e.timestamp <= filters.endTime);
       }
     }
 

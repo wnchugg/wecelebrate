@@ -268,7 +268,7 @@ describe('Token Manager', () => {
       const token = `eyJhbGciOiJIUzI1NiJ9.${payload}.signature`;
       
       const expiry = getTokenExpiry(token);
-      const timeUntilExpiry = expiry! - Date.now();
+      const timeUntilExpiry = expiry - Date.now();
       
       expect(timeUntilExpiry).toBeGreaterThan(3599000); // Almost 1 hour
       expect(timeUntilExpiry).toBeLessThan(3601000); // Just over 1 hour

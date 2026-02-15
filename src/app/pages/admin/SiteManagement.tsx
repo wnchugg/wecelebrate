@@ -691,7 +691,7 @@ function SiteModal({ open, onClose, site, clients, onSave }: SiteModalProps) {
         setLogoPreview(base64);
         setFormData({
           ...formData,
-          branding: { ...formData.branding!, logo: base64 }
+          branding: { ...formData.branding, logo: base64 }
         });
       };
       reader.readAsDataURL(file);
@@ -700,7 +700,7 @@ function SiteModal({ open, onClose, site, clients, onSave }: SiteModalProps) {
       const uploadRes = await uploadLogo(file, formData.slug || 'temp');
       setFormData({
         ...formData,
-        branding: { ...formData.branding!, logo: uploadRes.url }
+        branding: { ...formData.branding, logo: uploadRes.url }
       });
       
       showSuccessToast('Logo uploaded successfully');
@@ -715,7 +715,7 @@ function SiteModal({ open, onClose, site, clients, onSave }: SiteModalProps) {
     setLogoPreview('');
     setFormData({
       ...formData,
-      branding: { ...formData.branding!, logo: '' }
+      branding: { ...formData.branding, logo: '' }
     });
   };
 
@@ -748,14 +748,14 @@ function SiteModal({ open, onClose, site, clients, onSave }: SiteModalProps) {
 
     // If removing default language, set new default
     let newDefaultLanguage = formData.settings?.defaultLanguage;
-    if (!newLanguages.includes(newDefaultLanguage!)) {
+    if (!newLanguages.includes(newDefaultLanguage)) {
       newDefaultLanguage = newLanguages[0];
     }
 
     setFormData({
       ...formData,
       settings: {
-        ...formData.settings!,
+        ...formData.settings,
         supportedLanguages: newLanguages,
         defaultLanguage: newDefaultLanguage
       }
@@ -981,7 +981,7 @@ function SiteModal({ open, onClose, site, clients, onSave }: SiteModalProps) {
                       value={formData.branding?.primaryColor}
                       onChange={(e) => setFormData({
                         ...formData,
-                        branding: { ...formData.branding!, primaryColor: e.target.value }
+                        branding: { ...formData.branding, primaryColor: e.target.value }
                       })}
                       className="w-16 h-10 cursor-pointer"
                     />
@@ -990,7 +990,7 @@ function SiteModal({ open, onClose, site, clients, onSave }: SiteModalProps) {
                       value={formData.branding?.primaryColor}
                       onChange={(e) => setFormData({
                         ...formData,
-                        branding: { ...formData.branding!, primaryColor: e.target.value }
+                        branding: { ...formData.branding, primaryColor: e.target.value }
                       })}
                       placeholder="#D91C81"
                       className="flex-1 font-mono text-sm"
@@ -1008,7 +1008,7 @@ function SiteModal({ open, onClose, site, clients, onSave }: SiteModalProps) {
                       value={formData.branding?.secondaryColor}
                       onChange={(e) => setFormData({
                         ...formData,
-                        branding: { ...formData.branding!, secondaryColor: e.target.value }
+                        branding: { ...formData.branding, secondaryColor: e.target.value }
                       })}
                       className="w-16 h-10 cursor-pointer"
                     />
@@ -1017,7 +1017,7 @@ function SiteModal({ open, onClose, site, clients, onSave }: SiteModalProps) {
                       value={formData.branding?.secondaryColor}
                       onChange={(e) => setFormData({
                         ...formData,
-                        branding: { ...formData.branding!, secondaryColor: e.target.value }
+                        branding: { ...formData.branding, secondaryColor: e.target.value }
                       })}
                       placeholder="#1B2A5E"
                       className="flex-1 font-mono text-sm"
@@ -1035,7 +1035,7 @@ function SiteModal({ open, onClose, site, clients, onSave }: SiteModalProps) {
                       value={formData.branding?.tertiaryColor}
                       onChange={(e) => setFormData({
                         ...formData,
-                        branding: { ...formData.branding!, tertiaryColor: e.target.value }
+                        branding: { ...formData.branding, tertiaryColor: e.target.value }
                       })}
                       className="w-16 h-10 cursor-pointer"
                     />
@@ -1044,7 +1044,7 @@ function SiteModal({ open, onClose, site, clients, onSave }: SiteModalProps) {
                       value={formData.branding?.tertiaryColor}
                       onChange={(e) => setFormData({
                         ...formData,
-                        branding: { ...formData.branding!, tertiaryColor: e.target.value }
+                        branding: { ...formData.branding, tertiaryColor: e.target.value }
                       })}
                       placeholder="#00B4CC"
                       className="flex-1 font-mono text-sm"
@@ -1111,7 +1111,7 @@ function SiteModal({ open, onClose, site, clients, onSave }: SiteModalProps) {
                   onChange={(e) => setFormData({
                     ...formData,
                     settings: {
-                      ...formData.settings!,
+                      ...formData.settings,
                       validationMethod: e.target.value as any
                     }
                   })}
@@ -1135,7 +1135,7 @@ function SiteModal({ open, onClose, site, clients, onSave }: SiteModalProps) {
                   onChange={(e) => setFormData({
                     ...formData,
                     settings: {
-                      ...formData.settings!,
+                      ...formData.settings,
                       defaultLanguage: e.target.value
                     }
                   })}
@@ -1185,7 +1185,7 @@ function SiteModal({ open, onClose, site, clients, onSave }: SiteModalProps) {
                   checked={formData.settings?.allowGuestAccess}
                   onCheckedChange={(checked) => setFormData({
                     ...formData,
-                    settings: { ...formData.settings!, allowGuestAccess: checked }
+                    settings: { ...formData.settings, allowGuestAccess: checked }
                   })}
                 />
               </div>

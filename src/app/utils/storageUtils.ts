@@ -160,7 +160,7 @@ export function getStorageSize(storage: 'local' | 'session'): number {
     let size = 0;
     
     for (const key in storageObj) {
-      if (storageObj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(storageObj, key)) {
         size += key.length + (storageObj[key]?.length || 0);
       }
     }

@@ -91,7 +91,7 @@ export function ScheduleManager({ erpConnectionId, erpConnectionName, onClose }:
   const loadSchedules = async () => {
     try {
       setLoading(true);
-      const response = await authApi.getSchedulesByConnection(erpConnectionId) as unknown as SchedulesResponse;
+      const response = await authApi.getSchedulesByConnection(erpConnectionId) as SchedulesResponse;
       setSchedules(response.schedules || []);
     } catch (error: unknown) {
       showErrorToast(error, { operation: 'loadSchedules' });
@@ -103,7 +103,7 @@ export function ScheduleManager({ erpConnectionId, erpConnectionName, onClose }:
   const loadExecutionLogs = async (scheduleId: string) => {
     try {
       setLogsLoading(true);
-      const response = await authApi.getScheduleExecutionLogs(scheduleId, 20) as unknown as LogsResponse;
+      const response = await authApi.getScheduleExecutionLogs(scheduleId, 20) as LogsResponse;
       setExecutionLogs((response.logs || []) as unknown as ExecutionLog[]);
     } catch (error: unknown) {
       showErrorToast(error, { operation: 'loadExecutionLogs' });

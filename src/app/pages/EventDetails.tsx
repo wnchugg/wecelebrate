@@ -425,8 +425,8 @@ export function EventDetails() {
               {selectedGift && (
                 <p className="text-sm text-gray-600">
                   ${(
-                    gifts.find((g) => g.id === selectedGift)!.price -
-                    gifts.find((g) => g.id === selectedGift)!.funded
+                    gifts.find((g) => g.id === selectedGift).price -
+                    gifts.find((g) => g.id === selectedGift).funded
                   ).toFixed(2)}{" "}
                   remaining
                 </p>

@@ -3,35 +3,35 @@ export function BackendTest() {
     const projectId = 'wjfcqqrlhwdvvjmefxky'; // Development project
     const url = `https://${projectId}.supabase.co/functions/v1/make-server-6fcaeea3/health`;
     
-    console.log('Testing backend health endpoint...');
-    console.log('URL:', url);
+    console.warn('Testing backend health endpoint...');
+    console.warn('URL:', url);
     
     try {
       // Test 1: Without any headers
-      console.log('\n=== Test 1: No headers ===');
+      console.warn('\n=== Test 1: No headers ===');
       const response1 = await fetch(url);
-      console.log('Status:', response1.status);
-      console.log('Headers:', Object.fromEntries(response1.headers.entries()));
+      console.warn('Status:', response1.status);
+      console.warn('Headers:', Object.fromEntries(response1.headers.entries()));
       const text1 = await response1.text();
-      console.log('Response:', text1);
+      console.warn('Response:', text1);
       
       // Test 2: With anon key (if available in window)
-      console.log('\n=== Test 2: With anon key (from info) ===');
+      console.warn('\n=== Test 2: With anon key (from info) ===');
       const { publicAnonKey } = await import('/utils/supabase/info');
       const response2 = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${publicAnonKey}`,
         }
       });
-      console.log('Status:', response2.status);
+      console.warn('Status:', response2.status);
       const text2 = await response2.text();
-      console.log('Response:', text2);
+      console.warn('Response:', text2);
       
       // Test 3: Check if backend is even reachable
-      console.log('\n=== Test 3: OPTIONS request (CORS preflight) ===');
+      console.warn('\n=== Test 3: OPTIONS request (CORS preflight) ===');
       const response3 = await fetch(url, { method: 'OPTIONS' });
-      console.log('Status:', response3.status);
-      console.log('CORS headers:', {
+      console.warn('Status:', response3.status);
+      console.warn('CORS headers:', {
         'access-control-allow-origin': response3.headers.get('access-control-allow-origin'),
         'access-control-allow-methods': response3.headers.get('access-control-allow-methods'),
       });

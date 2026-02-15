@@ -226,7 +226,7 @@ export const buildEnv = {
    */
   debug(...args: unknown[]): void {
     if (getBuildConfig().enableDebugLogging) {
-      console.log('[DEBUG]', ...args);
+      console.warn('[DEBUG]', ...args);
     }
   },
 

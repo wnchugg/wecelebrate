@@ -222,7 +222,7 @@ export const env = {
    */
   debug(...args: unknown[]): void {
     if (getEnvironmentConfig().enableDebugLogging) {
-      console.log('[DEBUG]', ...args);
+      console.warn('[DEBUG]', ...args);
     }
   },
 

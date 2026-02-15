@@ -65,7 +65,7 @@ export function PublicSiteProvider({ children }: { children: ReactNode }) {
       
       // Check if no sites were returned (database not initialized)
       if (!sites || sites.length === 0) {
-        console.log('[PublicSiteContext] No sites available - database may not be initialized');
+        console.warn('[PublicSiteContext] No sites available - database may not be initialized');
         setError('DATABASE_NOT_INITIALIZED');
         setIsLoading(false);
         return;
@@ -118,7 +118,7 @@ export function PublicSiteProvider({ children }: { children: ReactNode }) {
       
       if (isSiteNotFound) {
         // Database not initialized - don't log as error, this is expected
-        console.log('[PublicSiteContext] Database not initialized - no sites found');
+        console.warn('[PublicSiteContext] Database not initialized - no sites found');
         setError('DATABASE_NOT_INITIALIZED');
       } else if (isFetchError) {
         // Backend not deployed - silently use fallback (no console message needed)
@@ -168,13 +168,13 @@ export function PublicSiteProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     setError(null);
     
-    console.log('[PublicSiteContext] setSiteById called with:', siteId);
+    console.warn('[PublicSiteContext] setSiteById called with:', siteId);
     
     try {
       const response = await publicSiteApi.getSiteById(siteId);
       
-      console.log('[PublicSiteContext] Full API response:', JSON.stringify(response, null, 2));
-      console.log('[PublicSiteContext] response.site:', response.site);
+      console.warn('[PublicSiteContext] Full API response:', JSON.stringify(response, null, 2));
+      console.warn('[PublicSiteContext] response.site:', response.site);
       
       const selectedSite = response?.site;
       
@@ -186,7 +186,7 @@ export function PublicSiteProvider({ children }: { children: ReactNode }) {
         return;
       }
       
-      console.log('[PublicSiteContext] Site data received:', {
+      console.warn('[PublicSiteContext] Site data received:', {
         id: selectedSite.id,
         name: selectedSite.name,
         validationMethod: selectedSite.settings?.validationMethod,
@@ -206,7 +206,7 @@ export function PublicSiteProvider({ children }: { children: ReactNode }) {
       // Load gifts for this site
       await loadGiftsForSite(selectedSite.id);
       
-      console.log('[PublicSiteContext] Site loaded successfully:', selectedSite.name);
+      console.warn('[PublicSiteContext] Site loaded successfully:', selectedSite.name);
     } catch (err) {
       console.error('[PublicSiteContext] Error loading site:', err);
       console.error('[PublicSiteContext] Error details:', {

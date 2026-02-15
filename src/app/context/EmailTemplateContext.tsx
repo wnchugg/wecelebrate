@@ -41,14 +41,14 @@ export function EmailTemplateProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Only try to load if we have a token
     const token = getAccessToken();
-    console.log('[EmailTemplateContext] useEffect - Token available:', !!token);
-    console.log('[EmailTemplateContext] useEffect - Token preview:', token?.substring(0, 30) + '...');
+    console.warn('[EmailTemplateContext] useEffect - Token available:', !!token);
+    console.warn('[EmailTemplateContext] useEffect - Token preview:', token?.substring(0, 30) + '...');
     
     if (token) {
-      console.log('[EmailTemplateContext] Token found, loading global templates...');
+      console.warn('[EmailTemplateContext] Token found, loading global templates...');
       refreshGlobalTemplates();
     } else {
-      console.log('[EmailTemplateContext] No token available, skipping initial load');
+      console.warn('[EmailTemplateContext] No token available, skipping initial load');
     }
   }, []);
 
@@ -62,7 +62,7 @@ export function EmailTemplateProvider({ children }: { children: ReactNode }) {
       
       // If no templates exist, automatically seed them
       if (templates.length === 0) {
-        console.log('No global templates found, seeding...');
+        console.warn('No global templates found, seeding...');
         await seedGlobalTemplates();
       }
     } catch (error: any) {

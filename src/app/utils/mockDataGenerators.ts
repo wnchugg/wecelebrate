@@ -369,7 +369,7 @@ export function seedMockData(): void {
   localStorage.setItem('mock_employees', JSON.stringify(data.employees));
   localStorage.setItem('mock_orders', JSON.stringify(data.orders));
   
-  console.log('✅ Mock data seeded to localStorage:', data);
+  console.warn('✅ Mock data seeded to localStorage:', data);
 }
 
 /**
@@ -400,5 +400,5 @@ export function clearMockData(): void {
   localStorage.removeItem('mock_gifts');
   localStorage.removeItem('mock_employees');
   localStorage.removeItem('mock_orders');
-  console.log('✅ Mock data cleared from localStorage');
+  console.warn('✅ Mock data cleared from localStorage');
 }

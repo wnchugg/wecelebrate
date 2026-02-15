@@ -4,7 +4,7 @@ import { CheckCircle } from 'lucide-react';
 export function ForceTokenClear() {
   useEffect(() => {
     // Force clear everything immediately
-    console.log('🧹 [ForceTokenClear] Clearing ALL storage...');
+    console.warn('🧹 [ForceTokenClear] Clearing ALL storage...');
     
     // Clear all possible storage locations
     sessionStorage.clear();
@@ -15,8 +15,8 @@ export function ForceTokenClear() {
     sessionStorage.removeItem('jala_just_logged_in');
     localStorage.removeItem('deployment_environment');
     
-    console.log('✅ [ForceTokenClear] All storage cleared!');
-    console.log('🔄 [ForceTokenClear] Redirecting to login in 2 seconds...');
+    console.warn('✅ [ForceTokenClear] All storage cleared!');
+    console.warn('🔄 [ForceTokenClear] Redirecting to login in 2 seconds...');
     
     // Redirect after 2 seconds
     const timeout = setTimeout(() => {

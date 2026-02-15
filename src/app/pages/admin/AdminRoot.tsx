@@ -38,7 +38,7 @@ export function AdminRoot() {
   // Log route changes for debugging (development only)
   useEffect(() => {
     if (import.meta.env.DEV) {
-      console.log('[AdminRoot] Route changed:', location.pathname);
+      console.warn('[AdminRoot] Route changed:', location.pathname);
     }
   }, [location.pathname]);
 

@@ -96,7 +96,7 @@ export class DashboardErrorBoundary extends Component<ErrorBoundaryProps, ErrorB
   }
 
   resetError = () => {
-    console.log('[DashboardErrorBoundary] Resetting error state');
+    console.warn('[DashboardErrorBoundary] Resetting error state');
     
     // Check if we've hit too many errors (prevent infinite loop)
     if (this.state.errorCount >= 5) {

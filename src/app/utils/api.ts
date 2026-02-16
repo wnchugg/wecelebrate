@@ -213,6 +213,20 @@ export function setAccessToken(token: string | null): void {
       tokenLength: token.length
     });
     
+    // CRITICAL DEBUG: Decode token header to see what algorithm it uses
+    try {
+      const parts = token.split('.');
+      if (parts.length === 3) {
+        const header = JSON.parse(atob(parts[0]));
+        logger.info('[setAccessToken] Token header decoded', {
+          algorithm: header.alg,
+          type: header.typ
+        });
+      }
+    } catch (e) {
+      logger.error('[setAccessToken] Failed to decode token header', { error: e });
+    }
+    
     // Validate token format before storing
     if (!isValidTokenFormat(token)) {
       logger.error('[Token Validation] Refusing to store invalid token');

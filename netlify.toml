@@ -12,6 +12,32 @@
   [build.environment]
     NODE_VERSION = "20"
 
+# Production branch configuration
+[context.production]
+  command = "npm run build"
+  [context.production.environment]
+    NODE_ENV = "production"
+
+# Main branch (staging) configuration
+[context.main]
+  command = "npm run build"
+  [context.main.environment]
+    NODE_ENV = "staging"
+
+# Development branch configuration
+[context.development]
+  command = "npm run build"
+  [context.development.environment]
+    NODE_ENV = "development"
+
+# Branch deploy configuration
+[context.branch-deploy]
+  command = "npm run build"
+
+# Deploy preview configuration (for PRs)
+[context.deploy-preview]
+  command = "npm run build"
+
 # Redirect all requests to index.html for client-side routing
 # This is critical for SPA routing to work (e.g., /admin/login)
 [[redirects]]

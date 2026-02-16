@@ -109,7 +109,7 @@ export default function SiteCatalogConfiguration() {
         }
       } catch (err) {
         // No config yet, that's okay
-        console.log('No existing site catalog config');
+        console.warn('No existing site catalog config');
       }
     } catch (err: any) {
       console.error('Error loading data:', err);

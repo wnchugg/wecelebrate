@@ -102,7 +102,11 @@ describe('Session Manager', () => {
       vi.mocked(storage.getEncrypted).mockReturnValue(mockSession);
       
       const session = getSession();
-      expect(session).toEqual(mockSession);
+      // getSession normalizes expiresAt to a number
+      expect(session).toEqual({
+        ...mockSession,
+        expiresAt: new Date(mockSession.expiresAt).getTime()
+      });
     });
 
     it('should return null when no session exists', () => {

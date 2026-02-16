@@ -52,7 +52,7 @@ export function assert(condition: boolean, message?: string): asserts condition 
  * Assert unreachable code (for exhaustive checks)
  */
 export function assertUnreachable(value: never, message?: string): never {
-  throw new Error(message || `Unreachable code reached with value: ${value}`);
+  throw new Error(message || `Unreachable code reached with value: ${String(value)}`);
 }
 
 /**
@@ -100,7 +100,7 @@ export function isBoolean(value: unknown): value is boolean {
 /**
  * Check if value is function
  */
-export function isFunction(value: unknown): value is Function {
+export function isFunction(value: unknown): value is (...args: any[]) => any {
   return typeof value === 'function';
 }
 

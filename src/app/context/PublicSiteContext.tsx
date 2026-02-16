@@ -126,7 +126,7 @@ export function PublicSiteProvider({ children }: { children: ReactNode }) {
         setError('BACKEND_NOT_AVAILABLE');
       } else if (import.meta.env.DEV) {
         // Only log in development mode
-        console.info('[PublicSiteContext] Using fallback site configuration');
+        console.warn('[PublicSiteContext] Using fallback site configuration');
       }
       
       // Create a default fallback site
@@ -229,7 +229,7 @@ export function PublicSiteProvider({ children }: { children: ReactNode }) {
         console.error('[PublicSiteContext] Backend fetch failed - backend may not be deployed');
         setError('Backend server not available. Please check deployment.');
       } else if (import.meta.env.DEV) {
-        console.info('[PublicSiteContext] Using fallback site configuration');
+        console.warn('[PublicSiteContext] Using fallback site configuration');
       }
       
       // Create a default fallback site

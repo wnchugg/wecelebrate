@@ -18,7 +18,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
  * Seed catalogs
  */
 async function seedCatalogs() {
-  console.log('🌱 Seeding catalogs...');
+  console.warn('🌱 Seeding catalogs...');
   
   for (const catalog of mockCatalogs) {
     try {
@@ -34,7 +34,7 @@ async function seedCatalogs() {
       });
 
       if (response.ok) {
-        console.log(`  ✓ Created catalog: ${catalog.name}`);
+        console.warn(`  ✓ Created catalog: ${catalog.name}`);
       } else {
         const error = await response.json();
         console.error(`  ✗ Failed to create catalog ${catalog.name}:`, error);
@@ -44,34 +44,34 @@ async function seedCatalogs() {
     }
   }
 
-  console.log(`✅ Seeded ${mockCatalogs.length} catalogs\n`);
+  console.warn(`✅ Seeded ${mockCatalogs.length} catalogs\n`);
 }
 
 /**
  * Seed sites
  */
 async function seedSites() {
-  console.log('🌱 Seeding sites...');
+  console.warn('🌱 Seeding sites...');
   
   for (const site of mockSites) {
     try {
       const key = `site:${site.id}`;
       // In a real scenario, you'd call your site creation API
       // For now, we'll just log it
-      console.log(`  ✓ Would create site: ${site.name}`);
+      console.warn(`  ✓ Would create site: ${site.name}`);
     } catch (error) {
       console.error(`  ✗ Error creating site ${site.name}:`, error);
     }
   }
 
-  console.log(`✅ Would seed ${mockSites.length} sites\n`);
+  console.warn(`✅ Would seed ${mockSites.length} sites\n`);
 }
 
 /**
  * Seed site catalog configurations
  */
 async function seedSiteConfigs() {
-  console.log('🌱 Seeding site catalog configurations...');
+  console.warn('🌱 Seeding site catalog configurations...');
   
   for (const config of mockSiteConfigs) {
     try {
@@ -93,7 +93,7 @@ async function seedSiteConfigs() {
       );
 
       if (response.ok) {
-        console.log(`  ✓ Created config for site: ${config.siteId}`);
+        console.warn(`  ✓ Created config for site: ${config.siteId}`);
       } else {
         const error = await response.json();
         console.error(`  ✗ Failed to create config for ${config.siteId}:`, error);
@@ -103,14 +103,14 @@ async function seedSiteConfigs() {
     }
   }
 
-  console.log(`✅ Seeded ${mockSiteConfigs.length} site configurations\n`);
+  console.warn(`✅ Seeded ${mockSiteConfigs.length} site configurations\n`);
 }
 
 /**
  * Clear all test data
  */
 async function clearTestData() {
-  console.log('🧹 Clearing test data...');
+  console.warn('🧹 Clearing test data...');
   
   try {
     // Clear catalogs
@@ -122,7 +122,7 @@ async function clearTestData() {
         },
       });
     }
-    console.log('  ✓ Cleared catalogs');
+    console.warn('  ✓ Cleared catalogs');
 
     // Clear site configs
     for (const config of mockSiteConfigs) {
@@ -136,9 +136,9 @@ async function clearTestData() {
         }
       );
     }
-    console.log('  ✓ Cleared site configurations');
+    console.warn('  ✓ Cleared site configurations');
 
-    console.log('✅ Test data cleared\n');
+    console.warn('✅ Test data cleared\n');
   } catch (error) {
     console.error('✗ Error clearing test data:', error);
   }
@@ -148,7 +148,7 @@ async function clearTestData() {
  * Main seeding function
  */
 async function seed() {
-  console.log('\n🚀 Starting test data seeding...\n');
+  console.warn('\n🚀 Starting test data seeding...\n');
 
   const args = process.argv.slice(2);
   const shouldClear = args.includes('--clear');
@@ -165,7 +165,7 @@ async function seed() {
       await seedSiteConfigs();
     }
 
-    console.log('🎉 Test data seeding completed successfully!\n');
+    console.warn('🎉 Test data seeding completed successfully!\n');
   } catch (error) {
     console.error('❌ Error during seeding:', error);
     process.exit(1);
@@ -176,21 +176,21 @@ async function seed() {
  * Simple seeding function that just logs the data (for testing)
  */
 function seedSimple() {
-  console.log('\n📊 Test Data Summary:\n');
-  console.log(`Catalogs: ${mockCatalogs.length}`);
-  mockCatalogs.forEach((c) => console.log(`  - ${c.name} (${c.type})`));
+  console.warn('\n📊 Test Data Summary:\n');
+  console.warn(`Catalogs: ${mockCatalogs.length}`);
+  mockCatalogs.forEach((c) => console.warn(`  - ${c.name} (${c.type})`));
   
-  console.log(`\nSites: ${mockSites.length}`);
-  mockSites.forEach((s) => console.log(`  - ${s.name}`));
+  console.warn(`\nSites: ${mockSites.length}`);
+  mockSites.forEach((s) => console.warn(`  - ${s.name}`));
   
-  console.log(`\nSite Configurations: ${mockSiteConfigs.length}`);
+  console.warn(`\nSite Configurations: ${mockSiteConfigs.length}`);
   mockSiteConfigs.forEach((c) => {
     const site = mockSites.find((s) => s.id === c.siteId);
     const catalog = mockCatalogs.find((cat) => cat.id === c.catalogId);
-    console.log(`  - ${site?.name} → ${catalog?.name}`);
+    console.warn(`  - ${site?.name} → ${catalog?.name}`);
   });
   
-  console.log('\n✅ Use this data for manual testing or API testing\n');
+  console.warn('\n✅ Use this data for manual testing or API testing\n');
 }
 
 // Run the appropriate function based on environment

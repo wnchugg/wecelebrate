@@ -113,8 +113,8 @@ export function BrandManagementNew() {
     try {
       const [brandsRes, clientsRes, sitesRes] = await Promise.all([
         apiRequest<{ brands: Brand[] }>('/brands').catch((): { brands: Brand[] } => ({ brands: [] })),
-        apiRequest<{ success: boolean; data: Client[] }>('/clients'),
-        apiRequest<{ success: boolean; data: Array<{ id: string; name: string; brandId?: string; [key: string]: unknown }> }>('/sites')
+        apiRequest<{ success: boolean; data: Client[] }>('/v2/clients'),
+        apiRequest<{ success: boolean; data: Array<{ id: string; name: string; brandId?: string; [key: string]: unknown }> }>('/v2/sites')
       ]);
 
       setBrands(brandsRes.brands || []);

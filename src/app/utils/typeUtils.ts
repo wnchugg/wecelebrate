@@ -245,7 +245,7 @@ export type Primitive = string | number | boolean | null | undefined | symbol | 
 /**
  * Builtin types
  */
-export type Builtin = Primitive | Function | Date | Error | RegExp;
+export type Builtin = Primitive | ((...args: any[]) => any) | Date | Error | RegExp;
 
 /**
  * Deep readonly

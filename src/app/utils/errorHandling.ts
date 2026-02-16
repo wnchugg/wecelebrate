@@ -108,7 +108,12 @@ export function extractErrorMessage(
   fallback = 'An unexpected error occurred'
 ): string {
   try {
-    return getErrorMessage(error) || fallback;
+    const message = getErrorMessage(error);
+    // If getErrorMessage returns its default "An unknown error occurred", use our fallback
+    if (message === 'An unknown error occurred') {
+      return fallback;
+    }
+    return message || fallback;
   } catch {
     return fallback;
   }

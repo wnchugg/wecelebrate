@@ -20,7 +20,7 @@ export function AdminLogout() {
     
     // Redirect to login after a brief delay
     setTimeout(() => {
-      navigate('/admin/login', { replace: true });
+      void navigate('/admin/login', { replace: true });
     }, 500);
   }, [navigate]);
 

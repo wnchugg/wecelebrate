@@ -25,7 +25,7 @@ export function SessionTimeoutWarning() {
     sessionManager.onSessionExpired(() => {
       setIsVisible(false);
       // Redirect to session expired page
-      navigate('/admin/session-expired');
+      void navigate('/admin/session-expired');
     });
 
     // Update countdown every second
@@ -50,7 +50,7 @@ export function SessionTimeoutWarning() {
 
   const handleLogout = () => {
     setIsVisible(false);
-    navigate('/admin/logout');
+    void navigate('/admin/logout');
   };
 
   if (!isVisible) return null;

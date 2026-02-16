@@ -15,10 +15,10 @@ export function Landing() {
   useEffect(() => {
     // Check if landing page should be skipped after site loads
     if (!isLoading && currentSite?.settings?.skipLandingPage) {
-      console.log('[Landing] Landing page is disabled (skipLandingPage: true), redirecting to access page');
+      console.warn('[Landing] Landing page is disabled (skipLandingPage: true), redirecting to access page');
       setShouldRedirect(true);
     } else if (!isLoading && currentSite) {
-      console.log('[Landing] Landing page is enabled (skipLandingPage: false), showing landing page');
+      console.warn('[Landing] Landing page is enabled (skipLandingPage: false), showing landing page');
     }
   }, [currentSite, isLoading]);
 

@@ -12,7 +12,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/access');
+      void navigate('/access');
     }
   }, [isAuthenticated, navigate]);
 

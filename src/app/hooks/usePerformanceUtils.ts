@@ -75,7 +75,7 @@ export function useRenderTime(componentName: string = 'Component') {
     if (startTime.current) {
       const endTime = performance.now();
       const renderTime = endTime - startTime.current;
-      console.log(`${componentName} render time: ${renderTime.toFixed(2)}ms`);
+      console.warn(`${componentName} render time: ${renderTime.toFixed(2)}ms`);
       startTime.current = undefined;
     }
   });
@@ -102,7 +102,7 @@ export function useWhyDidYouUpdate(name: string, props: Record<string, any>) {
       });
       
       if (Object.keys(changedProps).length > 0) {
-        console.log('[why-did-you-update]', name, changedProps);
+        console.warn('[why-did-you-update]', name, changedProps);
       }
     }
     

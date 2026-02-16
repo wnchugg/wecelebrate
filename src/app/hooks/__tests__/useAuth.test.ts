@@ -14,6 +14,7 @@ import {
   useLogout
 } from '../useAuth';
 import type { LoginRequest, LoginResponse } from '../../types/api.types';
+import { useQuery, useMutation } from '../useApi';
 
 // Mock apiClient
 vi.mock('../../lib/apiClient', () => ({
@@ -30,28 +31,8 @@ vi.mock('../../lib/apiClient', () => ({
 
 // Mock useApi hooks
 vi.mock('../useApi', () => ({
-  useQuery: vi.fn((queryKey, queryFn, options) => {
-    // Simple mock implementation
-    return {
-      data: null,
-      isLoading: false,
-      isError: false,
-      error: null,
-      refetch: vi.fn()
-    };
-  }),
-  useMutation: vi.fn((mutationFn, options) => {
-    // Simple mock implementation
-    return {
-      mutate: vi.fn(),
-      mutateAsync: vi.fn(),
-      isLoading: false,
-      isError: false,
-      error: null,
-      data: null,
-      reset: vi.fn()
-    };
-  })
+  useQuery: vi.fn(),
+  useMutation: vi.fn()
 }));
 
 describe('useAuth Hooks', () => {
@@ -65,9 +46,7 @@ describe('useAuth Hooks', () => {
 
   describe('useSession Hook', () => {
     it('should initialize with default state', () => {
-      const { useQuery } = require('../useApi');
-      
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: null,
         isLoading: false,
         isError: false,
@@ -83,10 +62,9 @@ describe('useAuth Hooks', () => {
     });
 
     it('should fetch session on mount', () => {
-      const { useQuery } = require('../useApi');
       const mockRefetch = vi.fn();
       
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: null,
         isLoading: true,
         isError: false,
@@ -106,13 +84,13 @@ describe('useAuth Hooks', () => {
     });
 
     it('should return session data when available', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
       const mockSession = {
         user: { id: '1', email: 'test@example.com' },
         token: 'test-token'
       };
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: mockSession,
         isLoading: false,
         isError: false,
@@ -126,10 +104,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should handle session fetch error', () => {
-      const { useQuery } = require('../useApi');
-      const mockError = { message: 'Unauthorized', status: 401 };
+      // useQuery is mocked
+      const mockError = { message: 'Unauthorized', statusCode: 401, name: 'ApiError' };
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: null,
         isLoading: false,
         isError: true,
@@ -144,11 +122,11 @@ describe('useAuth Hooks', () => {
     });
 
     it('should support custom options', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
       const onSuccess = vi.fn();
       const onError = vi.fn();
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: null,
         isLoading: false,
         isError: false,
@@ -174,10 +152,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should support refetch', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
       const mockRefetch = vi.fn();
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: null,
         isLoading: false,
         isError: false,
@@ -197,9 +175,9 @@ describe('useAuth Hooks', () => {
 
   describe('useLogin Hook - Login Flow', () => {
     it('should initialize login hook', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -216,10 +194,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should call login mutation', async () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const mockMutate = vi.fn();
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: mockMutate,
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -244,9 +222,9 @@ describe('useAuth Hooks', () => {
     });
 
     it('should set loading state during login', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: true,
@@ -262,7 +240,7 @@ describe('useAuth Hooks', () => {
     });
 
     it('should return login response data', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const mockResponse: LoginResponse = {
         success: true,
         accessToken: 'jwt-token',
@@ -270,7 +248,7 @@ describe('useAuth Hooks', () => {
         email: 'test@example.com',
       };
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -286,10 +264,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should handle login failure', () => {
-      const { useMutation } = require('../useApi');
-      const mockError = { message: 'Invalid credentials', status: 401 };
+      // useMutation is mocked
+      const mockError = { message: 'Invalid credentials', statusCode: 401, name: 'ApiError' };
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -306,10 +284,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should call onSuccess callback after successful login', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const onSuccess = vi.fn();
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -328,10 +306,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should call onError callback after failed login', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const onError = vi.fn();
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -350,13 +328,13 @@ describe('useAuth Hooks', () => {
     });
 
     it('should support mutateAsync for promise-based flow', async () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const mockMutateAsync = vi.fn().mockResolvedValue({
         success: true,
         token: 'jwt-token'
       });
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: mockMutateAsync,
         isLoading: false,
@@ -383,9 +361,9 @@ describe('useAuth Hooks', () => {
 
   describe('useLogout Hook - Logout Flow', () => {
     it('should initialize logout hook', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -401,10 +379,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should call logout mutation', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const mockMutate = vi.fn();
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: mockMutate,
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -424,9 +402,9 @@ describe('useAuth Hooks', () => {
     });
 
     it('should set loading state during logout', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: true,
@@ -442,10 +420,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should handle logout error', () => {
-      const { useMutation } = require('../useApi');
-      const mockError = { message: 'Logout failed', status: 500 };
+      // useMutation is mocked
+      const mockError = { message: 'Logout failed', statusCode: 500, name: 'ApiError' };
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -462,10 +440,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should call onSuccess callback after logout', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const onSuccess = vi.fn();
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -486,9 +464,9 @@ describe('useAuth Hooks', () => {
 
   describe('useSignup Hook', () => {
     it('should initialize signup hook', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -505,10 +483,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should call signup mutation', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const mockMutate = vi.fn();
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: mockMutate,
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -534,10 +512,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should handle signup validation error', () => {
-      const { useMutation } = require('../useApi');
-      const mockError = { message: 'Email already exists', status: 400 };
+      // useMutation is mocked
+      const mockError = { message: 'Email already exists', statusCode: 400, name: 'ApiError' };
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -554,14 +532,14 @@ describe('useAuth Hooks', () => {
     });
 
     it('should return signup success response', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const mockResponse = {
         success: true,
         user: { id: '1', email: 'newuser@example.com' },
         token: 'jwt-token'
       };
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -579,9 +557,9 @@ describe('useAuth Hooks', () => {
 
   describe('useBootstrapAdmin Hook', () => {
     it('should initialize bootstrap admin hook', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -597,10 +575,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should call bootstrap admin mutation', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const mockMutate = vi.fn();
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: mockMutate,
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -626,10 +604,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should handle bootstrap error when admin already exists', () => {
-      const { useMutation } = require('../useApi');
-      const mockError = { message: 'Admin already exists', status: 409 };
+      // useMutation is mocked
+      const mockError = { message: 'Admin already exists', statusCode: 409, name: 'ApiError' };
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -648,10 +626,10 @@ describe('useAuth Hooks', () => {
 
   describe('Token Refresh Flow', () => {
     it('should refresh session when token expires', async () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
       const mockRefetch = vi.fn();
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: null,
         isLoading: false,
         isError: false,
@@ -669,10 +647,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should handle token refresh failure', () => {
-      const { useQuery } = require('../useApi');
-      const mockError = { message: 'Token expired', status: 401 };
+      // useQuery is mocked
+      const mockError = { message: 'Token expired', statusCode: 401, name: 'ApiError' };
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: null,
         isLoading: false,
         isError: true,
@@ -687,9 +665,9 @@ describe('useAuth Hooks', () => {
     });
 
     it('should automatically refetch on mount', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: null,
         isLoading: false,
         isError: false,
@@ -709,10 +687,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should support manual token refresh', async () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
       const mockRefetch = vi.fn().mockResolvedValue(undefined);
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: { user: { id: '1' } },
         isLoading: false,
         isError: false,
@@ -730,10 +708,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should clear session data on logout', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const mockReset = vi.fn();
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -753,13 +731,13 @@ describe('useAuth Hooks', () => {
     });
 
     it('should persist auth state across page refreshes', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
       const mockSession = {
         user: { id: '1', email: 'test@example.com' },
         token: 'persisted-token'
       };
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: mockSession,
         isLoading: false,
         isError: false,
@@ -775,13 +753,13 @@ describe('useAuth Hooks', () => {
 
   describe('Auth State Persistence', () => {
     it('should load persisted session on initialization', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
       const persistedSession = {
         user: { id: '1', email: 'test@example.com' },
         token: 'stored-token'
       };
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: persistedSession,
         isLoading: false,
         isError: false,
@@ -795,10 +773,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should clear persisted session on logout', async () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const mockMutate = vi.fn();
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: mockMutate,
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -818,14 +796,14 @@ describe('useAuth Hooks', () => {
     });
 
     it('should update persisted session on login', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const mockResponse = {
         success: true,
         token: 'new-jwt-token',
         user: { id: '1', email: 'test@example.com' }
       };
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -841,10 +819,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should handle concurrent auth operations', async () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const mockMutate = vi.fn();
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: mockMutate,
         mutateAsync: vi.fn().mockResolvedValue({ success: true }),
         isLoading: false,
@@ -868,10 +846,10 @@ describe('useAuth Hooks', () => {
 
   describe('Edge Cases', () => {
     it('should handle network errors during login', () => {
-      const { useMutation } = require('../useApi');
-      const mockError = { message: 'Network error', status: 0 };
+      // useMutation is mocked
+      const mockError = { message: 'Network error', statusCode: 0, name: 'ApiError' };
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -888,9 +866,9 @@ describe('useAuth Hooks', () => {
     });
 
     it('should handle session fetch with disabled option', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: null,
         isLoading: false,
         isError: false,
@@ -910,10 +888,10 @@ describe('useAuth Hooks', () => {
     });
 
     it('should reset mutation state', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const mockReset = vi.fn();
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,

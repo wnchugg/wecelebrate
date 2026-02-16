@@ -83,7 +83,8 @@ describe('CurrencyDisplay Component', () => {
   describe('Site Detection', () => {
     it('should use site-specific currency', () => {
       render(<CurrencyDisplay amount={50} siteId="uk-site" />);
-      expect(screen.getByText('£50.00')).toBeInTheDocument();
+      // 50 USD * 0.8 = 40 GBP (based on mock conversion rate)
+      expect(screen.getByText('£40.00')).toBeInTheDocument();
     });
 
     it('should use default USD when no site specified', () => {

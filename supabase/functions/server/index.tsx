@@ -9197,151 +9197,15 @@ app.put("/make-server-6fcaeea3/orders/:orderId/status", async (c) => {
  * With growth percentages compared to previous period
  */
 app.get("/make-server-6fcaeea3/dashboard/stats/:siteId", verifyAdmin, async (c) => {
-  const environmentId = c.get('environmentId') || 'development';
   const siteId = c.req.param('siteId');
   const timeRange = c.req.query('timeRange') || '30d';
   
   try {
-    console.log(`[Dashboard Stats] Fetching stats for site: ${siteId}, timeRange: ${timeRange}, environment: ${environmentId}`);
+    // Use database-based dashboard stats
+    const { getDashboardStats } = await import('./dashboard_db.ts');
+    const result = await getDashboardStats(siteId, timeRange);
     
-    // Calculate date ranges
-    const now = new Date();
-    let daysBack = 30;
-    
-    switch (timeRange) {
-      case '7d':
-        daysBack = 7;
-        break;
-      case '30d':
-        daysBack = 30;
-        break;
-      case '90d':
-        daysBack = 90;
-        break;
-      case '1y':
-        daysBack = 365;
-        break;
-    }
-    
-    const currentPeriodStart = new Date(now.getTime() - daysBack * 24 * 60 * 60 * 1000);
-    const previousPeriodStart = new Date(currentPeriodStart.getTime() - daysBack * 24 * 60 * 60 * 1000);
-    
-    // Fetch all orders for the site
-    const orderIndexKey = `order_index:by_site:${siteId}`;
-    const orderIds: string[] = await kv.get(orderIndexKey, environmentId) || [];
-    
-    console.log(`[Dashboard Stats] Found ${orderIds.length} total orders for site`);
-    
-    // Fetch order details
-    const orders = await Promise.all(
-      orderIds.map(async (orderId) => {
-        const order = await kv.get(`orders:${orderId}`, environmentId);
-        return order;
-      })
-    ).then(results => results.filter(o => o !== null));
-    
-    // Filter orders by time periods
-    const currentPeriodOrders = orders.filter(o => {
-      const orderDate = new Date(o.createdAt || o.orderDate);
-      return orderDate >= currentPeriodStart && orderDate <= now;
-    });
-    
-    const previousPeriodOrders = orders.filter(o => {
-      const orderDate = new Date(o.createdAt || o.orderDate);
-      return orderDate >= previousPeriodStart && orderDate < currentPeriodStart;
-    });
-    
-    // Calculate order stats
-    const totalOrders = currentPeriodOrders.length;
-    const previousOrders = previousPeriodOrders.length;
-    const orderGrowth = previousOrders > 0 
-      ? Math.round(((totalOrders - previousOrders) / previousOrders) * 1000) / 10
-      : (totalOrders > 0 ? 100 : 0);
-    
-    // Calculate pending shipments (orders with status 'pending' or 'confirmed')
-    const pendingShipments = currentPeriodOrders.filter(o => 
-      o.status === 'pending' || o.status === 'confirmed'
-    ).length;
-    const previousPendingShipments = previousPeriodOrders.filter(o => 
-      o.status === 'pending' || o.status === 'confirmed'
-    ).length;
-    const pendingChange = previousPendingShipments > 0
-      ? Math.round(((pendingShipments - previousPendingShipments) / previousPendingShipments) * 1000) / 10
-      : (pendingShipments > 0 ? 100 : 0);
-    
-    // Fetch employees for the site
-    const employeeIndexKey = `employee_index:by_site:${siteId}`;
-    const employeeIds: string[] = await kv.get(employeeIndexKey, environmentId) || [];
-    
-    console.log(`[Dashboard Stats] Found ${employeeIds.length} employees for site`);
-    
-    // Fetch employee details and count active ones
-    const employees = await Promise.all(
-      employeeIds.map(async (empId) => {
-        const employee = await kv.get(`employees:${empId}`, environmentId);
-        return employee;
-      })
-    ).then(results => results.filter(e => e !== null));
-    
-    const activeEmployees = employees.filter(e => e.status === 'active').length;
-    
-    // For previous period employee count, we'll use a simple comparison
-    // In a real system, you'd track historical employee counts
-    const previousActiveEmployees = activeEmployees; // Simplified for now
-    const employeeGrowth = 0; // No historical data yet
-    
-    // Fetch site's catalog configuration to get available gifts
-    const siteCatalogConfigKey = `site_catalog_config:${siteId}`;
-    const siteCatalogConfig = await kv.get(siteCatalogConfigKey, environmentId);
-    
-    let giftsAvailable = 0;
-    let previousGiftsAvailable = 0;
-    
-    if (siteCatalogConfig?.catalogId) {
-      const catalogGiftsKey = `catalog_gifts:${siteCatalogConfig.catalogId}`;
-      const catalogGiftIds: string[] = await kv.get(catalogGiftsKey, environmentId) || [];
-      
-      console.log(`[Dashboard Stats] Found ${catalogGiftIds.length} gifts in catalog`);
-      
-      // Fetch gift details and count active ones
-      const gifts = await Promise.all(
-        catalogGiftIds.map(async (giftId) => {
-          const gift = await kv.get(`gifts:${giftId}`, environmentId);
-          return gift;
-        })
-      ).then(results => results.filter(g => g !== null));
-      
-      giftsAvailable = gifts.filter(g => g.status === 'active').length;
-      previousGiftsAvailable = giftsAvailable; // Simplified for now
-    }
-    
-    const giftsChange = previousGiftsAvailable > 0
-      ? Math.round(((giftsAvailable - previousGiftsAvailable) / previousGiftsAvailable) * 1000) / 10
-      : (giftsAvailable > 0 ? 100 : 0);
-    
-    const stats = {
-      totalOrders,
-      previousOrders,
-      orderGrowth,
-      activeEmployees,
-      previousActiveEmployees,
-      employeeGrowth,
-      giftsAvailable,
-      previousGiftsAvailable,
-      giftsChange,
-      pendingShipments,
-      previousPendingShipments,
-      pendingChange,
-    };
-    
-    console.log(`[Dashboard Stats] Generated stats:`, stats);
-    
-    return c.json({
-      success: true,
-      stats,
-      timeRange,
-      generatedAt: new Date().toISOString(),
-    });
+    return c.json(result);
   } catch (error: any) {
     console.error('[Dashboard Stats] Error:', error);
     return c.json({
@@ -9356,77 +9220,16 @@ app.get("/make-server-6fcaeea3/dashboard/stats/:siteId", verifyAdmin, async (c) 
  * Get recent orders for a site
  */
 app.get("/make-server-6fcaeea3/dashboard/recent-orders/:siteId", verifyAdmin, async (c) => {
-  const environmentId = c.get('environmentId') || 'development';
   const siteId = c.req.param('siteId');
   const limit = parseInt(c.req.query('limit') || '5');
   const statusFilter = c.req.query('status');
   
   try {
-    console.log(`[Dashboard Recent Orders] Fetching for site: ${siteId}, limit: ${limit}, environment: ${environmentId}`);
+    // Use database-based recent orders
+    const { getRecentOrders } = await import('./dashboard_db.ts');
+    const result = await getRecentOrders(siteId, limit, statusFilter);
     
-    // Fetch all orders for the site
-    const orderIndexKey = `order_index:by_site:${siteId}`;
-    const orderIds: string[] = await kv.get(orderIndexKey, environmentId) || [];
-    
-    console.log(`[Dashboard Recent Orders] Found ${orderIds.length} orders for site`);
-    
-    // Fetch order details with related data
-    const ordersWithDetails = await Promise.all(
-      orderIds.map(async (orderId) => {
-        const order = await kv.get(`orders:${orderId}`, environmentId);
-        if (!order) return null;
-        
-        // Apply status filter if provided
-        if (statusFilter && order.status !== statusFilter) {
-          return null;
-        }
-        
-        // Fetch employee details
-        let employeeEmail = 'N/A';
-        if (order.employeeId) {
-          const employee = await kv.get(`employees:${order.employeeId}`, environmentId);
-          if (employee) {
-            employeeEmail = employee.email || employee.employeeId || 'N/A';
-          }
-        }
-        
-        // Fetch gift details
-        let giftName = 'Unknown Gift';
-        if (order.giftId) {
-          const gift = await kv.get(`gifts:${order.giftId}`, environmentId);
-          if (gift) {
-            giftName = gift.name;
-          }
-        }
-        
-        return {
-          id: order.id,
-          orderNumber: order.orderNumber || order.id,
-          employeeEmail,
-          giftName,
-          status: order.status,
-          orderDate: order.orderDate || order.createdAt,
-        };
-      })
-    ).then(results => results.filter(o => o !== null));
-    
-    // Sort by date (most recent first)
-    ordersWithDetails.sort((a, b) => {
-      const dateA = new Date(a.orderDate).getTime();
-      const dateB = new Date(b.orderDate).getTime();
-      return dateB - dateA;
-    });
-    
-    // Limit results
-    const recentOrders = ordersWithDetails.slice(0, limit);
-    
-    console.log(`[Dashboard Recent Orders] Returning ${recentOrders.length} orders`);
-    
-    return c.json({
-      success: true,
-      orders: recentOrders,
-      total: ordersWithDetails.length,
-    });
+    return c.json(result);
   } catch (error: any) {
     console.error('[Dashboard Recent Orders] Error:', error);
     return c.json({
@@ -9441,103 +9244,16 @@ app.get("/make-server-6fcaeea3/dashboard/recent-orders/:siteId", verifyAdmin, as
  * Get most popular gifts based on order count
  */
 app.get("/make-server-6fcaeea3/dashboard/popular-gifts/:siteId", verifyAdmin, async (c) => {
-  const environmentId = c.get('environmentId') || 'development';
   const siteId = c.req.param('siteId');
   const limit = parseInt(c.req.query('limit') || '5');
   const timeRange = c.req.query('timeRange') || '30d';
   
   try {
-    console.log(`[Dashboard Popular Gifts] Fetching for site: ${siteId}, limit: ${limit}, timeRange: ${timeRange}, environment: ${environmentId}`);
+    // Use database-based popular gifts
+    const { getPopularGifts } = await import('./dashboard_db.ts');
+    const result = await getPopularGifts(siteId, limit, timeRange);
     
-    // Calculate date range
-    const now = new Date();
-    let daysBack = 30;
-    
-    switch (timeRange) {
-      case '7d':
-        daysBack = 7;
-        break;
-      case '30d':
-        daysBack = 30;
-        break;
-      case '90d':
-        daysBack = 90;
-        break;
-      case '1y':
-        daysBack = 365;
-        break;
-    }
-    
-    const periodStart = new Date(now.getTime() - daysBack * 24 * 60 * 60 * 1000);
-    
-    // Fetch all orders for the site
-    const orderIndexKey = `order_index:by_site:${siteId}`;
-    const orderIds: string[] = await kv.get(orderIndexKey, environmentId) || [];
-    
-    console.log(`[Dashboard Popular Gifts] Found ${orderIds.length} total orders for site`);
-    
-    // Fetch orders and filter by time range
-    const orders = await Promise.all(
-      orderIds.map(async (orderId) => {
-        const order = await kv.get(`orders:${orderId}`, environmentId);
-        return order;
-      })
-    ).then(results => results.filter(o => o !== null));
-    
-    // Filter by date range
-    const filteredOrders = orders.filter(o => {
-      const orderDate = new Date(o.createdAt || o.orderDate);
-      return orderDate >= periodStart && orderDate <= now;
-    });
-    
-    console.log(`[Dashboard Popular Gifts] ${filteredOrders.length} orders in time range`);
-    
-    // Count orders by gift ID
-    const giftCounts = new Map<string, number>();
-    
-    for (const order of filteredOrders) {
-      if (order.giftId) {
-        const count = giftCounts.get(order.giftId) || 0;
-        giftCounts.set(order.giftId, count + 1);
-      }
-    }
-    
-    // Get gift details and create result array
-    const giftsWithCounts = await Promise.all(
-      Array.from(giftCounts.entries()).map(async ([giftId, count]) => {
-        const gift = await kv.get(`gifts:${giftId}`, environmentId);
-        
-        return {
-          giftId,
-          giftName: gift?.name || 'Unknown Gift',
-          orderCount: count,
-          percentage: 0, // Will calculate below
-        };
-      })
-    );
-    
-    // Sort by order count (descending)
-    giftsWithCounts.sort((a, b) => b.orderCount - a.orderCount);
-    
-    // Calculate percentages based on total orders
-    const totalOrders = filteredOrders.length;
-    
-    if (totalOrders > 0) {
-      for (const gift of giftsWithCounts) {
-        gift.percentage = Math.round((gift.orderCount / totalOrders) * 100);
-      }
-    }
-    
-    // Limit results
-    const popularGifts = giftsWithCounts.slice(0, limit);
-    
-    console.log(`[Dashboard Popular Gifts] Returning ${popularGifts.length} popular gifts`);
-    
-    return c.json({
-      success: true,
-      gifts: popularGifts,
-      totalOrders,
-    });
+    return c.json(result);
   } catch (error: any) {
     console.error('[Dashboard Popular Gifts] Error:', error);
     return c.json({
@@ -9561,6 +9277,55 @@ app.post("/make-server-6fcaeea3/seed-demo-sites", async (c) => {
     return c.json({ error: error.message }, 500);
   }
 });
+
+// ===== V2 DATABASE-BACKED CRUD ENDPOINTS =====
+// These endpoints use PostgreSQL database instead of KV store
+// Provides better performance, scalability, and query capabilities
+
+import * as v2 from './endpoints_v2.ts';
+
+// CLIENTS
+app.get("/make-server-6fcaeea3/v2/clients", verifyAdmin, v2.getClientsV2);
+app.get("/make-server-6fcaeea3/v2/clients/:id", verifyAdmin, v2.getClientByIdV2);
+app.post("/make-server-6fcaeea3/v2/clients", verifyAdmin, v2.createClientV2);
+app.put("/make-server-6fcaeea3/v2/clients/:id", verifyAdmin, v2.updateClientV2);
+app.delete("/make-server-6fcaeea3/v2/clients/:id", verifyAdmin, v2.deleteClientV2);
+
+// SITES
+app.get("/make-server-6fcaeea3/v2/sites", verifyAdmin, v2.getSitesV2);
+app.get("/make-server-6fcaeea3/v2/sites/:id", verifyAdmin, v2.getSiteByIdV2);
+app.get("/make-server-6fcaeea3/v2/sites/slug/:slug", verifyAdmin, v2.getSiteBySlugV2);
+app.post("/make-server-6fcaeea3/v2/sites", verifyAdmin, v2.createSiteV2);
+app.put("/make-server-6fcaeea3/v2/sites/:id", verifyAdmin, v2.updateSiteV2);
+app.delete("/make-server-6fcaeea3/v2/sites/:id", verifyAdmin, v2.deleteSiteV2);
+
+// PRODUCTS
+app.get("/make-server-6fcaeea3/v2/products", verifyAdmin, v2.getProductsV2);
+app.get("/make-server-6fcaeea3/v2/products/:id", verifyAdmin, v2.getProductByIdV2);
+app.post("/make-server-6fcaeea3/v2/products", verifyAdmin, v2.createProductV2);
+app.put("/make-server-6fcaeea3/v2/products/:id", verifyAdmin, v2.updateProductV2);
+app.delete("/make-server-6fcaeea3/v2/products/:id", verifyAdmin, v2.deleteProductV2);
+
+// EMPLOYEES
+app.get("/make-server-6fcaeea3/v2/employees", verifyAdmin, v2.getEmployeesV2);
+app.get("/make-server-6fcaeea3/v2/employees/:id", verifyAdmin, v2.getEmployeeByIdV2);
+app.post("/make-server-6fcaeea3/v2/employees", verifyAdmin, v2.createEmployeeV2);
+app.put("/make-server-6fcaeea3/v2/employees/:id", verifyAdmin, v2.updateEmployeeV2);
+app.delete("/make-server-6fcaeea3/v2/employees/:id", verifyAdmin, v2.deleteEmployeeV2);
+
+// ORDERS
+app.get("/make-server-6fcaeea3/v2/orders", verifyAdmin, v2.getOrdersV2);
+app.get("/make-server-6fcaeea3/v2/orders/:id", verifyAdmin, v2.getOrderByIdV2);
+app.get("/make-server-6fcaeea3/v2/orders/number/:orderNumber", verifyAdmin, v2.getOrderByNumberV2);
+app.post("/make-server-6fcaeea3/v2/orders", verifyAdmin, v2.createOrderV2);
+app.put("/make-server-6fcaeea3/v2/orders/:id", verifyAdmin, v2.updateOrderV2);
+app.delete("/make-server-6fcaeea3/v2/orders/:id", verifyAdmin, v2.deleteOrderV2);
+
+// UTILITIES
+app.get("/make-server-6fcaeea3/v2/product-categories", verifyAdmin, v2.getProductCategoriesV2);
+app.get("/make-server-6fcaeea3/v2/order-stats", verifyAdmin, v2.getOrderStatsV2);
+
+console.log('✅ V2 Database-backed CRUD endpoints registered (32 endpoints)');
 
 // ===== CELEBRATION SYSTEM =====
 

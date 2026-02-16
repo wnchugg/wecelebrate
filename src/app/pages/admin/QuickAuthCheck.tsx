@@ -17,7 +17,7 @@ export function QuickAuthCheck() {
 
     try {
       // Use the new public endpoint that checks both Auth and KV in one call
-      console.log('[QuickAuthCheck] Fetching auth status...');
+      console.warn('[QuickAuthCheck] Fetching auth status...');
       const response = await fetch(
         `https://${projectId}.supabase.co/functions/v1/make-server-6fcaeea3/public/check-auth-status`,
         {
@@ -28,8 +28,8 @@ export function QuickAuthCheck() {
         }
       );
 
-      console.log('[QuickAuthCheck] Response status:', response.status);
-      console.log('[QuickAuthCheck] Response ok:', response.ok);
+      console.warn('[QuickAuthCheck] Response status:', response.status);
+      console.warn('[QuickAuthCheck] Response ok:', response.ok);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -38,7 +38,7 @@ export function QuickAuthCheck() {
       }
 
       const result = await response.json();
-      console.log('[QuickAuthCheck] Result:', result);
+      console.warn('[QuickAuthCheck] Result:', result);
       
       if (!result.success) {
         throw new Error(result.error || 'Failed to check auth status');

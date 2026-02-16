@@ -164,7 +164,9 @@ class TokenManager {
 
     if (refreshTime > 0) {
       this.refreshTimer = setTimeout(() => {
-        this.performTokenRefresh();
+        void this.performTokenRefresh().catch((error) => {
+          logger.error('[TokenManager] Scheduled token refresh failed:', error);
+        });
       }, refreshTime);
 
       logger.log(`[TokenManager] Token refresh scheduled in ${Math.round(refreshTime / 1000)}s`);

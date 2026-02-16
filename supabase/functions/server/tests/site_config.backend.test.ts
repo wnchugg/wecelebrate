@@ -240,15 +240,20 @@ async function mockSiteApiHandler(method: string, url: string, body?: any, heade
         return context.json({ success: false, error: 'Site not found' }, 404);
       }
       
-      const validation = validateSiteConfig(body);
+      // Merge with existing data before validation
+      const merged = {
+        ...existing,
+        ...body,
+        id: siteId, // Preserve original ID
+      };
+      
+      const validation = validateSiteConfig(merged);
       if (!validation.valid) {
         return context.json({ success: false, errors: validation.errors }, 400);
       }
       
       const updated = {
-        ...existing,
-        ...body,
-        id: siteId,
+        ...merged,
         updatedAt: new Date().toISOString(),
       };
       
@@ -657,8 +662,8 @@ describe('Backend Verification - Site Configuration', () => {
     });
     
     it('should maintain environment isolation', async () => {
-      await mockKv.set('site:site-1', { id: 'site-1', siteName: 'Dev' }, 'development');
-      await mockKv.set('site:site-1', { id: 'site-1', siteName: 'Prod' }, 'production');
+      await mockKv.set('site:site-1', { id: 'site-1', siteName: 'Dev', siteUrl: 'https://dev.com' }, 'development');
+      await mockKv.set('site:site-1', { id: 'site-1', siteName: 'Prod', siteUrl: 'https://prod.com' }, 'production');
       
       const headers = new Map([['X-Environment-ID', 'development']]);
       await mockSiteApiHandler('PUT', '/make-server-6fcaeea3/sites/site-1', { siteName: 'Updated Dev' }, headers);

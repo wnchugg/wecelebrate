@@ -44,27 +44,9 @@ export default function AdminLogin(): JSX.Element {
     identifier?: string;
     password?: string;
   }>({});
-  const [contextError, setContextError] = useState<Error | null>(null);
   
-  // Safely access useAdmin with error handling
-  let adminContext;
-  try {
-    adminContext = useAdmin();
-  } catch (err) {
-    // Store error in state instead of returning early
-    if (!contextError) {
-      logger.error('[AdminLogin] Failed to access AdminContext:', err);
-      setContextError(err as Error);
-    }
-    // Provide default values to satisfy TypeScript
-    adminContext = {
-      adminLogin: async () => ({ success: false, error: 'Context not available' }),
-      isAdminAuthenticated: false,
-      isLoading: false,
-    };
-  }
-  
-  const { adminLogin, isAdminAuthenticated, isLoading: isCheckingAuth } = adminContext;
+  // Call useAdmin unconditionally - hooks must always be called in the same order
+  const { adminLogin, isAdminAuthenticated, isLoading: isCheckingAuth } = useAdmin();
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -188,27 +170,6 @@ export default function AdminLogin(): JSX.Element {
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-white animate-spin mx-auto mb-4" />
           <p className="text-white text-lg">Checking authentication...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show error if context failed to load
-  if (contextError) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1B2A5E] via-[#D91C81] to-[#00B4CC] flex items-center justify-center p-6">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Configuration Error</h1>
-          <p className="text-gray-600 mb-6">
-            The admin system is not properly initialized. Please refresh the page.
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-[#D91C81] text-white rounded-lg hover:bg-[#B71569] transition-colors"
-          >
-            Refresh Page
-          </button>
         </div>
       </div>
     );

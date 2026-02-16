@@ -73,7 +73,7 @@ export default function ClientPortal() {
         // This should be stored in the admin user data or we need to query it
         // For now, we'll fetch all clients and filter (in production, backend should return only their client)
         const clientsResponse = await fetch(
-          `${env.supabaseUrl}/functions/v1/make-server-6fcaeea3/clients`,
+          `${env.supabaseUrl}/functions/v1/make-server-6fcaeea3/v2/clients`,
           {
             headers: {
               'Authorization': `Bearer ${publicAnonKey}`,
@@ -91,7 +91,7 @@ export default function ClientPortal() {
         
         // TODO: In production, the backend should only return the client(s) this user has access to
         // For now, take the first active client
-        const activeClient = clientsData.clients?.find((c: Client) => c.status === 'active') || clientsData.clients?.[0];
+        const activeClient = clientsData.data?.find((c: Client) => c.status === 'active') || clientsData.data?.[0];
         
         if (!activeClient) {
           setError('No client found for your account');
@@ -103,7 +103,7 @@ export default function ClientPortal() {
 
         // Fetch sites for this client
         const sitesResponse = await fetch(
-          `${env.supabaseUrl}/functions/v1/make-server-6fcaeea3/sites?clientId=${activeClient.id}`,
+          `${env.supabaseUrl}/functions/v1/make-server-6fcaeea3/v2/sites?client_id=${activeClient.id}`,
           {
             headers: {
               'Authorization': `Bearer ${publicAnonKey}`,
@@ -118,7 +118,7 @@ export default function ClientPortal() {
         }
 
         const sitesData = await sitesResponse.json();
-        setSites(sitesData.sites || []);
+        setSites(sitesData.data || []);
       } catch (err: any) {
         console.error('Error fetching client data:', err);
         setError(err.message || 'Failed to load client data');

@@ -5,9 +5,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithRouter } from '@/test/helpers';
 import { MemoryRouter, Route, Routes, Link, useNavigate } from 'react-router';
 import { CartProvider } from '../context/CartContext';
 import { AdminProvider } from '../context/AdminContext';
@@ -122,7 +121,7 @@ describe('Navigation Flow Suite', () => {
     it('should navigate from home to products', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -144,7 +143,7 @@ describe('Navigation Flow Suite', () => {
     it('should navigate from home to cart', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -164,7 +163,7 @@ describe('Navigation Flow Suite', () => {
     it('should navigate from products to home', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper initialRoute="/products">
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -186,7 +185,7 @@ describe('Navigation Flow Suite', () => {
     it('should navigate to product detail', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper initialRoute="/products">
           <Routes>
             <Route path="/products" element={<ProductsPage />} />
@@ -208,7 +207,7 @@ describe('Navigation Flow Suite', () => {
     it('should navigate through shopping flow: home -> products -> cart', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -235,7 +234,7 @@ describe('Navigation Flow Suite', () => {
     it('should navigate through checkout flow: cart -> checkout', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper initialRoute="/cart">
           <Routes>
             <Route path="/cart" element={<CartPage />} />
@@ -256,7 +255,7 @@ describe('Navigation Flow Suite', () => {
     it('should navigate back from checkout to cart', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper initialRoute="/checkout">
           <Routes>
             <Route path="/cart" element={<CartPage />} />
@@ -277,7 +276,7 @@ describe('Navigation Flow Suite', () => {
     it('should continue shopping from cart', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper initialRoute="/cart">
           <Routes>
             <Route path="/cart" element={<CartPage />} />
@@ -296,7 +295,7 @@ describe('Navigation Flow Suite', () => {
     it('should add to cart from product detail', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper initialRoute="/products/product-1">
           <Routes>
             <Route path="/products/:productId" element={<ProductDetailPage />} />
@@ -317,7 +316,7 @@ describe('Navigation Flow Suite', () => {
     it('should navigate to admin login', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -336,7 +335,7 @@ describe('Navigation Flow Suite', () => {
     it('should navigate from admin login to dashboard', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper initialRoute="/admin/login">
           <Routes>
             <Route path="/admin/login" element={<AdminLoginPage />} />
@@ -355,7 +354,7 @@ describe('Navigation Flow Suite', () => {
     it('should navigate back from admin to public site', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper initialRoute="/admin/login">
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -376,7 +375,7 @@ describe('Navigation Flow Suite', () => {
     it('should navigate programmatically with useNavigate', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper>
           <Routes>
             <Route path="/" element={<ProgrammaticNavigationTest />} />
@@ -395,7 +394,7 @@ describe('Navigation Flow Suite', () => {
     it('should navigate back programmatically', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <MemoryRouter initialEntries={['/', '/test']}>
           <CartProvider>
             <Routes>
@@ -419,7 +418,7 @@ describe('Navigation Flow Suite', () => {
 
   describe('Not Found Routes', () => {
     it('should render 404 for invalid route', () => {
-      renderWithRouter(
+      render(
         <TestWrapper initialRoute="/invalid-route">
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -434,7 +433,7 @@ describe('Navigation Flow Suite', () => {
     it('should navigate from 404 to home', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper initialRoute="/invalid">
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -453,7 +452,7 @@ describe('Navigation Flow Suite', () => {
 
   describe('URL Parameters', () => {
     it('should navigate with URL parameters', () => {
-      renderWithRouter(
+      render(
         <TestWrapper initialRoute="/products/product-123">
           <Routes>
             <Route path="/products/:productId" element={<ProductDetailPage />} />
@@ -467,7 +466,7 @@ describe('Navigation Flow Suite', () => {
     it('should navigate from product list to product detail with parameter', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper initialRoute="/products">
           <Routes>
             <Route path="/products" element={<ProductsPage />} />
@@ -488,7 +487,7 @@ describe('Navigation Flow Suite', () => {
     it('should handle multiple navigation steps', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -515,7 +514,7 @@ describe('Navigation Flow Suite', () => {
 
   describe('Link Rendering', () => {
     it('should render navigation links', () => {
-      renderWithRouter(
+      render(
         <TestWrapper>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -529,7 +528,7 @@ describe('Navigation Flow Suite', () => {
     });
 
     it('should render correct href attributes', () => {
-      renderWithRouter(
+      render(
         <TestWrapper>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -549,7 +548,7 @@ describe('Navigation Flow Suite', () => {
     it('should maintain cart context across navigation', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -573,7 +572,7 @@ describe('Navigation Flow Suite', () => {
     it('should handle rapid navigation clicks', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -596,7 +595,7 @@ describe('Navigation Flow Suite', () => {
     it('should handle navigation to current route', async () => {
       const user = userEvent.setup();
       
-      renderWithRouter(
+      render(
         <TestWrapper>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -612,7 +611,7 @@ describe('Navigation Flow Suite', () => {
       const user = userEvent.setup();
       
       expect(() => {
-        renderWithRouter(
+        render(
           <TestWrapper>
             <Routes>
               <Route path="/" element={<HomePage />} />

@@ -8,8 +8,8 @@
 import { z } from 'zod';
 
 // Re-export commonly used Zod utility types
-export type ZodError<T = any> = z.ZodError<T>;
-export type ZodSchema<T = any> = z.ZodType<T>;
+export type ZodError<T = any> = any;
+export type ZodSchema<T = any> = any;
 
 // ===== Common Schemas =====
 

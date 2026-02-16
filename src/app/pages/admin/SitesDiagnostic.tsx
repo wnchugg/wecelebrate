@@ -54,9 +54,9 @@ export function SitesDiagnostic() {
       }
 
       // Test API calls
-      console.log('🔍 Testing /sites endpoint...');
+      console.warn('🔍 Testing /sites endpoint...');
       try {
-        const sitesResponse = await apiRequest<{ success: boolean; data: any[] }>('/sites');
+        const sitesResponse = await apiRequest<{ success: boolean; data: any[] }>('/v2/sites');
         diagnostics.apiCalls.sites = {
           success: true,
           responseFormat: sitesResponse,
@@ -73,9 +73,9 @@ export function SitesDiagnostic() {
         diagnostics.errors.push({ endpoint: '/sites', error: err.message });
       }
 
-      console.log('🔍 Testing /clients endpoint...');
+      console.warn('🔍 Testing /clients endpoint...');
       try {
-        const clientsResponse = await apiRequest<{ success: boolean; data: any[] }>('/clients');
+        const clientsResponse = await apiRequest<{ success: boolean; data: any[] }>('/v2/clients');
         diagnostics.apiCalls.clients = {
           success: true,
           responseFormat: clientsResponse,
@@ -93,9 +93,9 @@ export function SitesDiagnostic() {
       }
 
       // Test direct fetch to see raw response
-      console.log('🔍 Testing direct fetch to /sites...');
+      console.warn('🔍 Testing direct fetch to /v2/sites...');
       try {
-        const directUrl = `https://${projectId}.supabase.co/functions/v1/make-server-6fcaeea3/sites`;
+        const directUrl = `https://${projectId}.supabase.co/functions/v1/make-server-6fcaeea3/v2/sites`;
         const headers: HeadersInit = {
           'Content-Type': 'application/json',
           'X-Environment-ID': env.id,
@@ -140,11 +140,11 @@ export function SitesDiagnostic() {
     setLoading(false);
 
     // Log to console for easy copy-paste
-    console.log('='.repeat(80));
-    console.log('SITES DIAGNOSTIC RESULTS');
-    console.log('='.repeat(80));
-    console.log(JSON.stringify(diagnostics, null, 2));
-    console.log('='.repeat(80));
+    console.warn('='.repeat(80));
+    console.warn('SITES DIAGNOSTIC RESULTS');
+    console.warn('='.repeat(80));
+    console.warn(JSON.stringify(diagnostics, null, 2));
+    console.warn('='.repeat(80));
   };
 
   return (

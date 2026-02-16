@@ -206,6 +206,7 @@ export const CURRENCIES: Record<string, CurrencyConfig> = {
  * Get currency configuration by code
  */
 export function getCurrency(code: string): CurrencyConfig {
+  if (!code) return CURRENCIES.USD;
   return CURRENCIES[code.toUpperCase()] || CURRENCIES.USD;
 }
 
@@ -223,8 +224,22 @@ export function formatPrice(
   const currency = getCurrency(currencyCode);
   const { symbol, decimalPlaces, symbolPosition, thousandsSeparator, decimalSeparator } = currency;
   
+  // Handle compact notation for large numbers
+  if (options?.compact && Math.abs(amount) >= 1000000) {
+    const millions = amount / 1000000;
+    const roundedMillions = Math.round(millions * 10) / 10;
+    const formattedPrice = symbolPosition === 'before'
+      ? `${symbol}${roundedMillions}M`
+      : `${roundedMillions}M ${symbol}`;
+    return options.showCode ? `${formattedPrice} ${currency.code}` : formattedPrice;
+  }
+  
+  // Handle negative amounts
+  const isNegative = amount < 0;
+  const absoluteAmount = Math.abs(amount);
+  
   // Round to appropriate decimal places
-  const roundedAmount = Math.round(amount * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);
+  const roundedAmount = Math.round(absoluteAmount * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);
   
   // Split into integer and decimal parts
   const [integerPart, decimalPart] = roundedAmount.toFixed(decimalPlaces).split('.');
@@ -239,9 +254,14 @@ export function formatPrice(
   }
   
   // Add currency symbol
-  const formattedPrice = symbolPosition === 'before' 
+  let formattedPrice = symbolPosition === 'before' 
     ? `${symbol}${formattedNumber}`
     : `${formattedNumber} ${symbol}`;
+  
+  // Add negative sign before everything
+  if (isNegative) {
+    formattedPrice = `-${formattedPrice}`;
+  }
   
   // Optionally add currency code
   if (options?.showCode) {
@@ -271,23 +291,47 @@ export function parsePrice(formattedPrice: string, currencyCode: string): number
     .replace(currency.code, '')
     .trim();
   
-  // Replace thousands separator with nothing
-  cleanedPrice = cleanedPrice.replace(new RegExp(`\\\\${currency.thousandsSeparator}`, 'g'), '');
+  // Replace thousands separator with nothing (escape special regex characters)
+  const escapedSeparator = currency.thousandsSeparator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  cleanedPrice = cleanedPrice.replace(new RegExp(escapedSeparator, 'g'), '');
   
   // Replace decimal separator with standard period
   cleanedPrice = cleanedPrice.replace(currency.decimalSeparator, '.');
   
-  return parseFloat(cleanedPrice) || 0;
+  const parsed = parseFloat(cleanedPrice);
+  return isNaN(parsed) ? NaN : parsed;
 }
 
 // Alias for backward compatibility
 export const parseCurrencyAmount = parsePrice;
 
 /**
- * Convert currency using exchange rates from countries.ts
+ * Convert currency using provided exchange rate
+ * @param amount - Amount to convert
+ * @param fromCurrency - Source currency code
+ * @param toCurrency - Target currency code
+ * @param exchangeRate - Optional exchange rate (if not provided, returns amount unchanged)
  */
-export function convertCurrency(amount: number, fromCurrency: string, toCurrency: string): number {
-  // Import exchange rates from countries.ts
-  const { convertCurrency: convertFromCountries } = require('./countries');
-  return convertFromCountries(amount, fromCurrency, toCurrency);
+export function convertCurrency(
+  amount: number, 
+  fromCurrency: string, 
+  toCurrency: string,
+  exchangeRate?: number
+): number {
+  // If same currency, return as-is
+  if (fromCurrency.toUpperCase() === toCurrency.toUpperCase()) {
+    return amount;
+  }
+  
+  // If no exchange rate provided, return amount unchanged
+  if (exchangeRate === undefined) {
+    return amount;
+  }
+  
+  // Convert using the provided exchange rate
+  const result = amount * exchangeRate;
+  
+  // Round to 2 decimal places for most currencies
+  // (In a real app, you'd use the target currency's decimalPlaces)
+  return Math.round(result * 100) / 100;
 }

@@ -60,10 +60,10 @@ const erpIntegrationService = {
     return { success: true, responseTime: 150, message: 'Connection successful' };
   },
   triggerSync: async (connectionId: string, dataType: ERPDataType) => {
-    console.log('Triggering sync:', connectionId, dataType);
+    console.warn('Triggering sync:', connectionId, dataType);
   },
   deleteERPConnection: async (connectionId: string) => {
-    console.log('Deleting connection:', connectionId);
+    console.warn('Deleting connection:', connectionId);
   },
 };
 

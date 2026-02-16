@@ -18,7 +18,7 @@ export function InitializeDatabase() {
       const env = getCurrentEnvironment();
       const apiUrl = buildApiUrl(env);
 
-      console.log('Calling initial seed endpoint...');
+      console.warn('Calling initial seed endpoint...');
       
       const response = await fetch(`${apiUrl}/dev/initial-seed`, {
         method: 'POST',
@@ -33,7 +33,7 @@ export function InitializeDatabase() {
 
       if (response.ok && data.success) {
         setResult(data);
-        console.log('Database seeded successfully:', data);
+        console.warn('Database seeded successfully:', data);
       } else {
         setError(data.error || 'Failed to seed database');
         console.error('Seed failed:', data);

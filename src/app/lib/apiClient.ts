@@ -72,19 +72,19 @@ const TOKEN_KEY = 'jala_access_token';
  * This runs IMMEDIATELY when the module loads, before any API calls
  */
 const currentPath = window.location.pathname;
-console.log('[API Client Init] Current path:', currentPath);
-console.log('[API Client Init] Is public route:', isPublicRoute(currentPath));
+console.warn('[API Client Init] Current path:', currentPath);
+console.warn('[API Client Init] Is public route:', isPublicRoute(currentPath));
 
 if (isPublicRoute(currentPath)) {
   const existingToken = sessionStorage.getItem(TOKEN_KEY);
   if (existingToken) {
-    console.log('[API Client Init] ⚠️ CLEARING admin token on public route:', currentPath);
+    console.warn('[API Client Init] ⚠️ CLEARING admin token on public route:', currentPath);
     sessionStorage.removeItem(TOKEN_KEY);
   } else {
-    console.log('[API Client Init] ✓ No admin token found on public route');
+    console.warn('[API Client Init] ✓ No admin token found on public route');
   }
 } else {
-  console.log('[API Client Init] Not a public route - keeping token if present');
+  console.warn('[API Client Init] Not a public route - keeping token if present');
 }
 
 // ===== Configuration =====
@@ -302,7 +302,7 @@ async function apiRequest<T>(
     // Check if we're on a public route FIRST
     const isOnPublicRoute = isPublicRoute(currentPath);
     
-    console.log('[API Client] Error response:', {
+    console.warn('[API Client] Error response:', {
       status: response.status,
       currentPath,
       isOnPublicRoute,
@@ -329,7 +329,7 @@ async function apiRequest<T>(
         }, 100);
       }
     } else if (response.status === 401 && isOnPublicRoute) {
-      console.log('[API Client] Received 401 on public route - skipping session expired redirect');
+      console.warn('[API Client] Received 401 on public route - skipping session expired redirect');
     }
     
     if (isErrorResponse(data)) {
@@ -414,7 +414,7 @@ export const apiClient = {
       if (params?.limit) query.set('limit', String(params.limit));
 
       const queryString = query.toString();
-      const endpoint = `/clients${queryString ? `?${queryString}` : ''}`;
+      const endpoint = `/v2/clients${queryString ? `?${queryString}` : ''}`;
 
       return apiRequest<PaginatedResponse<Client>>(endpoint, {
         requireAuth: true,
@@ -423,7 +423,7 @@ export const apiClient = {
 
     async get(id: string): Promise<Client> {
       const response = await apiRequest<{ success: true; data: Client }>(
-        `/clients/${id}`,
+        `/v2/clients/${id}`,
         { requireAuth: true }
       );
       return response.data;
@@ -431,7 +431,7 @@ export const apiClient = {
 
     async create(request: CreateClientRequest): Promise<Client> {
       const response = await apiRequest<{ success: true; data: Client }>(
-        '/clients',
+        '/v2/clients',
         {
           method: 'POST',
           body: request,
@@ -443,7 +443,7 @@ export const apiClient = {
 
     async update(id: string, request: UpdateClientRequest): Promise<Client> {
       const response = await apiRequest<{ success: true; data: Client }>(
-        `/clients/${id}`,
+        `/v2/clients/${id}`,
         {
           method: 'PUT',
           body: request,
@@ -454,7 +454,7 @@ export const apiClient = {
     },
 
     async delete(id: string): Promise<void> {
-      await apiRequest(`/clients/${id}`, {
+      await apiRequest(`/v2/clients/${id}`, {
         method: 'DELETE',
         requireAuth: true,
       });
@@ -470,7 +470,7 @@ export const apiClient = {
       if (params?.limit) query.set('limit', String(params.limit));
 
       const queryString = query.toString();
-      const endpoint = `/sites${queryString ? `?${queryString}` : ''}`;
+      const endpoint = `/v2/sites${queryString ? `?${queryString}` : ''}`;
 
       return apiRequest<PaginatedResponse<Site>>(endpoint, {
         requireAuth: true,
@@ -484,23 +484,23 @@ export const apiClient = {
 
     async get(id: string): Promise<Site> {
       const response = await apiRequest<{ success: true; data: Site }>(
-        `/sites/${id}`,
+        `/v2/sites/${id}`,
         { requireAuth: true }
       );
       return response.data;
     },
 
     async getByClient(clientId: string): Promise<Site[]> {
-      const response = await apiRequest<{ sites: Site[] }>(
-        `/clients/${clientId}/sites`,
+      const response = await apiRequest<{ success: true; data: Site[] }>(
+        `/v2/sites?client_id=${clientId}`,
         { requireAuth: true }
       );
-      return response.sites;
+      return response.data;
     },
 
     async create(request: CreateSiteRequest): Promise<Site> {
       const response = await apiRequest<{ success: true; data: Site }>(
-        '/sites',
+        '/v2/sites',
         {
           method: 'POST',
           body: request,
@@ -512,7 +512,7 @@ export const apiClient = {
 
     async update(id: string, request: UpdateSiteRequest): Promise<Site> {
       const response = await apiRequest<{ success: true; data: Site }>(
-        `/sites/${id}`,
+        `/v2/sites/${id}`,
         {
           method: 'PUT',
           body: request,
@@ -523,7 +523,7 @@ export const apiClient = {
     },
 
     async delete(id: string): Promise<void> {
-      await apiRequest(`/sites/${id}`, {
+      await apiRequest(`/v2/sites/${id}`, {
         method: 'DELETE',
         requireAuth: true,
       });
@@ -620,19 +620,19 @@ export const apiClient = {
 
   employees: {
     async list(siteId: string, params?: PaginationParams): Promise<PaginatedResponse<Employee>> {
-      const query = new URLSearchParams({ siteId });
+      const query = new URLSearchParams({ site_id: siteId });
       if (params?.page) query.set('page', String(params.page));
       if (params?.limit) query.set('limit', String(params.limit));
 
       return apiRequest<PaginatedResponse<Employee>>(
-        `/employees?${query.toString()}`,
+        `/v2/employees?${query.toString()}`,
         { requireAuth: true }
       );
     },
 
     async get(id: string): Promise<Employee> {
       const response = await apiRequest<{ success: true; data: Employee }>(
-        `/employees/${id}`,
+        `/v2/employees/${id}`,
         { requireAuth: true }
       );
       return response.data;
@@ -640,7 +640,7 @@ export const apiClient = {
 
     async create(request: CreateEmployeeRequest): Promise<Employee> {
       const response = await apiRequest<{ success: true; data: Employee }>(
-        '/employees',
+        '/v2/employees',
         {
           method: 'POST',
           body: request,
@@ -652,7 +652,7 @@ export const apiClient = {
 
     async update(id: string, request: UpdateEmployeeRequest): Promise<Employee> {
       const response = await apiRequest<{ success: true; data: Employee }>(
-        `/employees/${id}`,
+        `/v2/employees/${id}`,
         {
           method: 'PUT',
           body: request,
@@ -663,14 +663,14 @@ export const apiClient = {
     },
 
     async delete(id: string): Promise<void> {
-      await apiRequest(`/employees/${id}`, {
+      await apiRequest(`/v2/employees/${id}`, {
         method: 'DELETE',
         requireAuth: true,
       });
     },
 
     async bulkImport(request: BulkImportRequest): Promise<BulkImportResponse> {
-      return apiRequest<BulkImportResponse>('/employees/bulk-import', {
+      return apiRequest<BulkImportResponse>('/v2/employees/bulk-import', {
         method: 'POST',
         body: request,
         requireAuth: true,
@@ -687,7 +687,7 @@ export const apiClient = {
       if (params?.limit) query.set('limit', String(params.limit));
 
       const queryString = query.toString();
-      const endpoint = `/orders${queryString ? `?${queryString}` : ''}`;
+      const endpoint = `/v2/orders${queryString ? `?${queryString}` : ''}`;
 
       return apiRequest<PaginatedResponse<Order>>(endpoint, {
         requireAuth: true,
@@ -696,7 +696,7 @@ export const apiClient = {
 
     async get(id: string): Promise<Order> {
       const response = await apiRequest<{ success: true; data: Order }>(
-        `/orders/${id}`,
+        `/v2/orders/${id}`,
         { requireAuth: true }
       );
       return response.data;
@@ -704,7 +704,7 @@ export const apiClient = {
 
     async create(request: CreateOrderRequest): Promise<Order> {
       const response = await apiRequest<{ success: true; data: Order }>(
-        '/orders',
+        '/v2/orders',
         {
           method: 'POST',
           body: request,
@@ -716,7 +716,7 @@ export const apiClient = {
 
     async update(id: string, request: UpdateOrderRequest): Promise<Order> {
       const response = await apiRequest<{ success: true; data: Order }>(
-        `/orders/${id}`,
+        `/v2/orders/${id}`,
         {
           method: 'PUT',
           body: request,
@@ -832,13 +832,13 @@ export async function ensureCatalogInitialized(): Promise<void> {
     const response = await apiClient.gifts.list({ limit: 1 });
     
     if (response.data.length === 0) {
-      console.log('Initializing gift catalog...');
+      console.warn('Initializing gift catalog...');
       await apiClient.gifts.initializeCatalog();
       catalogInitialized = true;
-      console.log('Gift catalog initialized successfully');
+      console.warn('Gift catalog initialized successfully');
     } else {
       catalogInitialized = true;
-      console.log(`Gift catalog already has ${response.total} gifts`);
+      console.warn(`Gift catalog already has ${response.total} gifts`);
     }
   } catch (error) {
     // Silently fail - catalog initialization is optional

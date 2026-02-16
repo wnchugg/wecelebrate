@@ -86,7 +86,7 @@ export function deepClone<T>(obj: T): T {
   if (obj instanceof Object) {
     const clonedObj = {} as T;
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         clonedObj[key] = deepClone(obj[key]);
       }
     }
@@ -180,7 +180,7 @@ export function flatten(obj: Record<string, any>, prefix: string = ''): Record<s
   const result: Record<string, any> = {};
   
   for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
       const newKey = prefix ? `${prefix}.${key}` : key;
       
       if (isObject(obj[key]) && !Array.isArray(obj[key])) {
@@ -201,7 +201,7 @@ export function unflatten(obj: Record<string, any>): Record<string, any> {
   const result: Record<string, any> = {};
   
   for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
       set(result, key, obj[key]);
     }
   }
@@ -216,7 +216,7 @@ export function deepKeys(obj: Record<string, any>, prefix: string = ''): string[
   const keys: string[] = [];
   
   for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
       const newKey = prefix ? `${prefix}.${key}` : key;
       keys.push(newKey);
       
@@ -246,7 +246,7 @@ export function mapValues<T extends Record<string, any>, R>(
   const result = {} as Record<keyof T, R>;
   
   for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
       result[key] = fn(obj[key], key);
     }
   }
@@ -264,7 +264,7 @@ export function mapKeys<T extends Record<string, any>>(
   const result: Record<string, T[keyof T]> = {};
   
   for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
       result[fn(key)] = obj[key];
     }
   }
@@ -282,7 +282,7 @@ export function filter<T extends Record<string, any>>(
   const result: Partial<T> = {};
   
   for (const key in obj) {
-    if (obj.hasOwnProperty(key) && predicate(obj[key], key)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key) && predicate(obj[key], key)) {
       result[key] = obj[key];
     }
   }
@@ -297,7 +297,7 @@ export function invert<T extends Record<string, string | number>>(obj: T): Recor
   const result: Record<string, string> = {};
   
   for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
       result[String(obj[key])] = key;
     }
   }

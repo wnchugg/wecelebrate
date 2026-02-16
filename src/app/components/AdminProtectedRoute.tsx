@@ -13,7 +13,7 @@ export function AdminProtectedRoute({ children }: AdminProtectedRouteProps) {
   useEffect(() => {
     // Wait for auth check to complete
     if (!isLoading && !adminUser) {
-      navigate('/admin/login', { replace: true });
+      void navigate('/admin/login', { replace: true });
     }
   }, [adminUser, isLoading, navigate]);
 

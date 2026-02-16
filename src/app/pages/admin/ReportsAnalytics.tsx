@@ -170,10 +170,10 @@ export function ReportsAnalytics() {
     setIsLoading(true);
     try {
       const [ordersRes, giftsRes, sitesRes, clientsRes, celebrationsRes] = await Promise.all([
-        apiRequest<{ data: Order[] }>('/orders').catch(() => ({ data: [] as Order[] })),
+        apiRequest<{ data: Order[] }>('/v2/orders').catch(() => ({ data: [] as Order[] })),
         apiRequest<{ data: Gift[] }>('/admin/gifts').catch(() => ({ data: [] as Gift[] })),
-        apiRequest<{ data: Site[] }>('/sites').catch(() => ({ data: [] as Site[] })),
-        apiRequest<{ data: Client[] }>('/clients').catch(() => ({ data: [] as Client[] })),
+        apiRequest<{ data: Site[] }>('/v2/sites').catch(() => ({ data: [] as Site[] })),
+        apiRequest<{ data: Client[] }>('/v2/clients').catch(() => ({ data: [] as Client[] })),
         apiRequest<{ data: Celebration[] }>('/celebrations').catch(() => ({ data: [] as Celebration[] }))
       ]);
 

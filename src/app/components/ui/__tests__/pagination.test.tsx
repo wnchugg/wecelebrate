@@ -142,7 +142,7 @@ describe('Pagination Component', () => {
         </Pagination>
       );
 
-      expect(screen.getByText('...')).toBeInTheDocument();
+      expect(screen.getByText('More pages')).toBeInTheDocument();
     });
 
     it('should render complete pagination with ellipsis', () => {
@@ -179,7 +179,7 @@ describe('Pagination Component', () => {
       expect(screen.getByText('1')).toBeInTheDocument();
       expect(screen.getByText('5')).toBeInTheDocument();
       expect(screen.getByText('10')).toBeInTheDocument();
-      expect(screen.getAllByText('...')).toHaveLength(2);
+      expect(screen.getAllByText('More pages')).toHaveLength(2);
     });
   });
 

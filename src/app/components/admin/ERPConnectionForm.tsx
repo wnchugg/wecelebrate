@@ -54,10 +54,10 @@ interface ERPConnection {
 // Mock ERP integration service
 const erpIntegrationService = {
   updateERPConnection: async (id: string, data: Partial<ERPConnection>) => {
-    console.log('Updating ERP connection:', id, data);
+    console.warn('Updating ERP connection:', id, data);
   },
   createERPConnection: async (data: Omit<ERPConnection, 'id' | 'createdAt' | 'updatedAt' | 'lastSyncAt'>) => {
-    console.log('Creating ERP connection:', data);
+    console.warn('Creating ERP connection:', data);
   },
   testERPConnection: async (id: string) => {
     return { success: true, responseTime: 150, message: 'Connection successful' };

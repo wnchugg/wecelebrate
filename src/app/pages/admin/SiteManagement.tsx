@@ -136,8 +136,8 @@ export function SiteManagement() {
     setIsLoading(true);
     try {
       const [sitesRes, clientsRes] = await Promise.all([
-        apiRequest<{ success: boolean; data: Site[] }>('/sites'),
-        apiRequest<{ success: boolean; data: Client[] }>('/clients')
+        apiRequest<{ success: boolean; data: Site[] }>('/v2/sites'),
+        apiRequest<{ success: boolean; data: Client[] }>('/v2/clients')
       ]);
       setSites(sitesRes.data || []);
       setClients(clientsRes.data || []);
@@ -176,7 +176,7 @@ export function SiteManagement() {
     }
     
     try {
-      await apiRequest(`/sites/${site.id}`, {
+      await apiRequest(`/v2/sites/${site.id}`, {
         method: 'PUT',
         body: JSON.stringify({ ...site, status: newStatus })
       });
@@ -207,7 +207,7 @@ export function SiteManagement() {
         domain: site.domain ? `${site.domain.split('.')[0]}-copy.jala.com` : undefined,
         status: 'draft' as const,
       };
-      await apiRequest('/sites', {
+      await apiRequest('/v2/sites', {
         method: 'POST',
         body: JSON.stringify(newSite)
       });
@@ -225,7 +225,7 @@ export function SiteManagement() {
 
     setDeletingSiteId(siteId);
     try {
-      await apiRequest(`/sites/${siteId}`, { method: 'DELETE' });
+      await apiRequest(`/v2/sites/${siteId}`, { method: 'DELETE' });
       showSuccessToast(`"${siteName}" deleted successfully`);
       loadData();
     } catch (error: unknown) {
@@ -238,13 +238,13 @@ export function SiteManagement() {
   const handleSaveSite = async (siteData: Partial<Site>) => {
     try {
       if (editingSite) {
-        await apiRequest(`/sites/${editingSite.id}`, {
+        await apiRequest(`/v2/sites/${editingSite.id}`, {
           method: 'PUT',
           body: JSON.stringify(siteData)
         });
         showSuccessToast('Site updated successfully');
       } else {
-        await apiRequest('/sites', {
+        await apiRequest('/v2/sites', {
           method: 'POST',
           body: JSON.stringify(siteData)
         });
@@ -780,7 +780,7 @@ function SiteModal({ open, onClose, site, clients, onSave }: SiteModalProps) {
 
     setIsSaving(true);
     try {
-      await onSave(formData);
+      onSave(formData);
     } finally {
       setIsSaving(false);
     }

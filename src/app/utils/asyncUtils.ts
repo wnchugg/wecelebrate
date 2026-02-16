@@ -103,7 +103,7 @@ export function debounceAsync<T extends (...args: any[]) => Promise<any>>(
           }
         } catch (error) {
           if (latestReject === reject) {
-            reject(error);
+            reject(error instanceof Error ? error : new Error(String(error)));
           }
         }
       }, delay);

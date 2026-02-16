@@ -601,8 +601,9 @@ describe('Products Page Component Suite', () => {
         </TestWrapper>
       );
       
-      const button = screen.getByText('Electronics');
-      expect(button).toHaveClass('transition-all');
+      // Use getAllByText since "Electronics" appears multiple times
+      const buttons = screen.getAllByText('Electronics');
+      expect(buttons[0]).toHaveClass('transition-all');
     });
 
     it('should have shadow on selected button', () => {
@@ -623,8 +624,9 @@ describe('Products Page Component Suite', () => {
         </TestWrapper>
       );
       
-      const button = screen.getByText('Electronics');
-      expect(button).toHaveClass('hover:bg-gray-100');
+      // Use getAllByText since "Electronics" appears multiple times
+      const buttons = screen.getAllByText('Electronics');
+      expect(buttons[0]).toHaveClass('hover:bg-gray-100');
     });
   });
 

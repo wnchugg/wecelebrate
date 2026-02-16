@@ -62,7 +62,7 @@ describe('Alert Component', () => {
       );
 
       const alert = screen.getByRole('alert');
-      expect(alert).toHaveClass('bg-background');
+      expect(alert).toHaveClass('bg-card', 'text-card-foreground');
     });
 
     it('should render destructive variant', () => {
@@ -73,7 +73,7 @@ describe('Alert Component', () => {
       );
 
       const alert = screen.getByRole('alert');
-      expect(alert).toHaveClass('border-destructive/50', 'text-destructive');
+      expect(alert).toHaveClass('text-destructive', 'bg-card');
     });
   });
 

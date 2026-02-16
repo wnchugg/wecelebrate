@@ -16,29 +16,12 @@ import {
   useDeleteSite
 } from '../useSites';
 import type { Site, CreateSiteRequest, UpdateSiteRequest } from '../../types/api.types';
+import { useQuery, useMutation } from '../useApi';
 
 // Mock useApi hooks
 vi.mock('../useApi', () => ({
-  useQuery: vi.fn((queryKey, queryFn, options) => {
-    return {
-      data: null,
-      isLoading: false,
-      isError: false,
-      error: null,
-      refetch: vi.fn()
-    };
-  }),
-  useMutation: vi.fn((mutationFn, options) => {
-    return {
-      mutate: vi.fn(),
-      mutateAsync: vi.fn(),
-      isLoading: false,
-      isError: false,
-      error: null,
-      data: null,
-      reset: vi.fn()
-    };
-  })
+  useQuery: vi.fn(),
+  useMutation: vi.fn()
 }));
 
 // Mock apiClient
@@ -97,9 +80,9 @@ describe('useSites Hooks', () => {
 
   describe('Sites List Loading', () => {
     it('should initialize with default state', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
       
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: null,
         isLoading: false,
         isError: false,
@@ -114,7 +97,7 @@ describe('useSites Hooks', () => {
     });
 
     it('should fetch sites list', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
       const mockData = {
         data: [mockSite],
         total: 1,
@@ -122,7 +105,7 @@ describe('useSites Hooks', () => {
         limit: 10
       };
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: mockData,
         isLoading: false,
         isError: false,
@@ -136,9 +119,9 @@ describe('useSites Hooks', () => {
     });
 
     it('should set loading state during fetch', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: null,
         isLoading: true,
         isError: false,
@@ -152,10 +135,10 @@ describe('useSites Hooks', () => {
     });
 
     it('should handle fetch errors', () => {
-      const { useQuery } = require('../useApi');
-      const mockError = { message: 'Failed to fetch sites', status: 500 };
+      // useQuery is mocked
+      const mockError = { message: 'Failed to fetch sites', statusCode: 500, name: 'ApiError' };
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: null,
         isLoading: false,
         isError: true,
@@ -170,7 +153,7 @@ describe('useSites Hooks', () => {
     });
 
     it('should support pagination parameters', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
       const mockData = {
         data: [mockSite],
         total: 100,
@@ -178,7 +161,7 @@ describe('useSites Hooks', () => {
         limit: 25
       };
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: mockData,
         isLoading: false,
         isError: false,
@@ -198,10 +181,10 @@ describe('useSites Hooks', () => {
     });
 
     it('should fetch public sites', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
       const mockPublicSites = [mockSite];
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: mockPublicSites,
         isLoading: false,
         isError: false,
@@ -217,9 +200,9 @@ describe('useSites Hooks', () => {
 
   describe('Site Filtering', () => {
     it('should fetch single site by ID', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: mockSite,
         isLoading: false,
         isError: false,
@@ -238,10 +221,10 @@ describe('useSites Hooks', () => {
     });
 
     it('should fetch sites by client ID', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
       const mockClientSites = [mockSite];
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: mockClientSites,
         isLoading: false,
         isError: false,
@@ -260,9 +243,9 @@ describe('useSites Hooks', () => {
     });
 
     it('should handle empty client sites list', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: [],
         isLoading: false,
         isError: false,
@@ -276,10 +259,10 @@ describe('useSites Hooks', () => {
     });
 
     it('should handle site not found', () => {
-      const { useQuery } = require('../useApi');
-      const mockError = { message: 'Site not found', status: 404 };
+      // useQuery is mocked
+      const mockError = { message: 'Site not found', statusCode: 404, name: 'ApiError' };
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: null,
         isLoading: false,
         isError: true,
@@ -294,10 +277,10 @@ describe('useSites Hooks', () => {
     });
 
     it('should support refetch for filtered results', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
       const mockRefetch = vi.fn();
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: [mockSite],
         isLoading: false,
         isError: false,
@@ -315,14 +298,14 @@ describe('useSites Hooks', () => {
     });
 
     it('should handle multiple sites for same client', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
       const multipleSites = [
         mockSite,
         { ...mockSite, id: 'site-124', name: 'Test Site 2' },
         { ...mockSite, id: 'site-125', name: 'Test Site 3' }
       ];
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: multipleSites,
         isLoading: false,
         isError: false,
@@ -338,7 +321,7 @@ describe('useSites Hooks', () => {
 
   describe('Site CRUD Operations', () => {
     it('should create new site', async () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const mockMutate = vi.fn();
       const newSiteData: CreateSiteRequest = {
         name: 'New Site',
@@ -348,7 +331,7 @@ describe('useSites Hooks', () => {
         settings: mockSite.settings
       };
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: mockMutate,
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -368,13 +351,13 @@ describe('useSites Hooks', () => {
     });
 
     it('should update existing site', async () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const mockMutate = vi.fn();
       const updateData: UpdateSiteRequest = {
         name: 'Updated Site Name'
       };
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: mockMutate,
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -394,10 +377,10 @@ describe('useSites Hooks', () => {
     });
 
     it('should delete site', async () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const mockMutate = vi.fn();
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: mockMutate,
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -417,10 +400,10 @@ describe('useSites Hooks', () => {
     });
 
     it('should handle create site validation errors', () => {
-      const { useMutation } = require('../useApi');
-      const mockError = { message: 'Validation failed', status: 400 };
+      // useMutation is mocked
+      const mockError = { message: 'Validation failed', statusCode: 400, name: 'ApiError' };
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -437,10 +420,10 @@ describe('useSites Hooks', () => {
     });
 
     it('should return created site data', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const createdSite = { ...mockSite, id: 'new-site-456' };
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -456,9 +439,9 @@ describe('useSites Hooks', () => {
     });
 
     it('should set loading state during site creation', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: true,
@@ -474,10 +457,10 @@ describe('useSites Hooks', () => {
     });
 
     it('should handle update conflicts', () => {
-      const { useMutation } = require('../useApi');
-      const mockError = { message: 'Conflict', status: 409 };
+      // useMutation is mocked
+      const mockError = { message: 'Conflict', statusCode: 409, name: 'ApiError' };
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -494,10 +477,10 @@ describe('useSites Hooks', () => {
     });
 
     it('should handle delete authorization errors', () => {
-      const { useMutation } = require('../useApi');
-      const mockError = { message: 'Unauthorized', status: 403 };
+      // useMutation is mocked
+      const mockError = { message: 'Unauthorized', statusCode: 403, name: 'ApiError' };
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -514,10 +497,10 @@ describe('useSites Hooks', () => {
     });
 
     it('should call onSuccess callback after creation', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const onSuccess = vi.fn();
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -536,10 +519,10 @@ describe('useSites Hooks', () => {
     });
 
     it('should call onError callback on create failure', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const onError = vi.fn();
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -560,11 +543,11 @@ describe('useSites Hooks', () => {
 
   describe('Query Options', () => {
     it('should support custom query options for sites list', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
       const onSuccess = vi.fn();
       const onError = vi.fn();
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: null,
         isLoading: false,
         isError: false,
@@ -582,9 +565,9 @@ describe('useSites Hooks', () => {
     });
 
     it('should support enabled option', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: null,
         isLoading: false,
         isError: false,
@@ -602,9 +585,9 @@ describe('useSites Hooks', () => {
     });
 
     it('should support refetchOnMount option', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: null,
         isLoading: false,
         isError: false,
@@ -624,7 +607,7 @@ describe('useSites Hooks', () => {
 
   describe('Edge Cases', () => {
     it('should handle empty sites list', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
       const emptyData = {
         data: [] as Site[],
         total: 0,
@@ -632,7 +615,7 @@ describe('useSites Hooks', () => {
         limit: 10
       };
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: emptyData,
         isLoading: false,
         isError: false,
@@ -646,10 +629,10 @@ describe('useSites Hooks', () => {
     });
 
     it('should handle concurrent site operations', async () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const mockMutate = vi.fn();
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: mockMutate,
         mutateAsync: vi.fn().mockResolvedValue(mockSite),
         isLoading: false,
@@ -670,10 +653,10 @@ describe('useSites Hooks', () => {
     });
 
     it('should reset mutation state', () => {
-      const { useMutation } = require('../useApi');
+      // useMutation is mocked
       const mockReset = vi.fn();
 
-      useMutation.mockReturnValue({
+      vi.mocked(useMutation).mockReturnValue({
         mutate: vi.fn(),
         mutateAsync: vi.fn(),
         isLoading: false,
@@ -693,10 +676,10 @@ describe('useSites Hooks', () => {
     });
 
     it('should handle network timeout', () => {
-      const { useQuery } = require('../useApi');
-      const mockError = { message: 'Request timeout', status: 408 };
+      // useQuery is mocked
+      const mockError = { message: 'Request timeout', statusCode: 408, name: 'ApiError' };
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: null,
         isLoading: false,
         isError: true,
@@ -710,9 +693,9 @@ describe('useSites Hooks', () => {
     });
 
     it('should handle malformed pagination params', () => {
-      const { useQuery } = require('../useApi');
+      // useQuery is mocked
 
-      useQuery.mockReturnValue({
+      vi.mocked(useQuery).mockReturnValue({
         data: null,
         isLoading: false,
         isError: false,

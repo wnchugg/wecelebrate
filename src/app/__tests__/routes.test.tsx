@@ -109,12 +109,14 @@ describe('Route Configuration Suite', () => {
 
   describe('Site-Specific Routes', () => {
     it('should have site-specific routes', () => {
-      const siteRoute = router.routes.find(route => route.path?.includes('/site'));
+      const publicRoute = router.routes.find(route => route.path === undefined);
+      const siteRoute = publicRoute?.children?.find(child => child.path === 'site/:siteId');
       expect(siteRoute).toBeDefined();
     });
 
     it('should have SiteLoaderWrapper component', () => {
-      const siteRoute = router.routes.find(route => route.path?.includes('/site'));
+      const publicRoute = router.routes.find(route => route.path === undefined);
+      const siteRoute = publicRoute?.children?.find(child => child.path === 'site/:siteId');
       // Component may be transformed by React Router
       expect(siteRoute).toBeDefined();
       // Access properties safely with type assertion
@@ -123,25 +125,29 @@ describe('Route Configuration Suite', () => {
     });
 
     it('should have children routes for site', () => {
-      const siteRoute = router.routes.find(route => route.path?.includes('/site'));
+      const publicRoute = router.routes.find(route => route.path === undefined);
+      const siteRoute = publicRoute?.children?.find(child => child.path === 'site/:siteId');
       expect(siteRoute?.children).toBeDefined();
       expect(Array.isArray(siteRoute?.children)).toBe(true);
     });
 
     it('should have site index route', () => {
-      const siteRoute = router.routes.find(route => route.path?.includes('/site'));
+      const publicRoute = router.routes.find(route => route.path === undefined);
+      const siteRoute = publicRoute?.children?.find(child => child.path === 'site/:siteId');
       const indexRoute = siteRoute?.children?.find(child => child.index === true);
       expect(indexRoute).toBeDefined();
     });
 
     it('should have site access route', () => {
-      const siteRoute = router.routes.find(route => route.path?.includes('/site'));
+      const publicRoute = router.routes.find(route => route.path === undefined);
+      const siteRoute = publicRoute?.children?.find(child => child.path === 'site/:siteId');
       const accessRoute = siteRoute?.children?.find(child => child.path === 'access');
       expect(accessRoute || siteRoute?.children?.find(child => child.path?.includes('access'))).toBeDefined();
     });
 
     it('should have site not found route', () => {
-      const siteRoute = router.routes.find(route => route.path?.includes('/site'));
+      const publicRoute = router.routes.find(route => route.path === undefined);
+      const siteRoute = publicRoute?.children?.find(child => child.path === 'site/:siteId');
       const notFoundRoute = siteRoute?.children?.find(child => child.path === '*');
       expect(notFoundRoute).toBeDefined();
     });
@@ -437,7 +443,8 @@ describe('Route Configuration Suite', () => {
     });
 
     it('should have site not found route', () => {
-      const siteRoute = router.routes.find(route => route.path === '/site/:siteId');
+      const publicRoute = router.routes.find(route => route.path === undefined);
+      const siteRoute = publicRoute?.children?.find(child => child.path === 'site/:siteId');
       const notFoundRoute = siteRoute?.children?.find(child => child.path === '*');
       expect(notFoundRoute).toBeDefined();
     });
@@ -481,7 +488,8 @@ describe('Route Configuration Suite', () => {
 
   describe('Route Parameters', () => {
     it('should have siteId parameter in site route', () => {
-      const siteRoute = router.routes.find(route => route.path === '/site/:siteId');
+      const publicRoute = router.routes.find(route => route.path === undefined);
+      const siteRoute = publicRoute?.children?.find(child => child.path === 'site/:siteId');
       expect(siteRoute?.path).toContain(':siteId');
     });
 
@@ -522,7 +530,8 @@ describe('Route Configuration Suite', () => {
     });
 
     it('should have site index route', () => {
-      const siteRoute = router.routes.find(route => route.path === '/site/:siteId');
+      const publicRoute = router.routes.find(route => route.path === undefined);
+      const siteRoute = publicRoute?.children?.find(child => child.path === 'site/:siteId');
       const indexRoute = siteRoute?.children?.find(child => child.index === true);
       expect(indexRoute).toBeDefined();
       expect(indexRoute?.index).toBe(true);
@@ -544,14 +553,15 @@ describe('Route Configuration Suite', () => {
     });
 
     it('should have site nested routes', () => {
-      const siteRoute = router.routes.find(route => route.path === '/site/:siteId');
+      const publicRoute = router.routes.find(route => route.path === undefined);
+      const siteRoute = publicRoute?.children?.find(child => child.path === 'site/:siteId');
       expect(siteRoute?.children?.length).toBeGreaterThan(5);
     });
   });
 
   describe('Route Count', () => {
     it('should have correct number of top-level routes', () => {
-      expect(router.routes.length).toBe(3); // Public, Site, Admin
+      expect(router.routes.length).toBe(2); // Public (Root), Admin
     });
 
     it('should have public child routes', () => {
@@ -565,7 +575,8 @@ describe('Route Configuration Suite', () => {
     });
 
     it('should have site child routes', () => {
-      const siteRoute = router.routes.find(route => route.path === '/site/:siteId');
+      const publicRoute = router.routes.find(route => route.path === undefined);
+      const siteRoute = publicRoute?.children?.find(child => child.path === 'site/:siteId');
       expect(siteRoute?.children?.length).toBeGreaterThan(5);
     });
   });

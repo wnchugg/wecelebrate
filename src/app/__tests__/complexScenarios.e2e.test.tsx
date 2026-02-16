@@ -426,7 +426,14 @@ describe('Complex Scenarios E2E Suite', () => {
         </TestWrapper>
       );
       
-      // English (default)
+      // Reset to English first if needed
+      const pageTitle = screen.getByTestId('page-title');
+      if (pageTitle.textContent !== 'Welcome') {
+        await user.click(screen.getByText('English'));
+        await waitFor(() => expect(pageTitle).toHaveTextContent('Welcome'));
+      }
+      
+      // English (should be current)
       expect(screen.getByTestId('page-title')).toHaveTextContent('Welcome');
       
       // Spanish

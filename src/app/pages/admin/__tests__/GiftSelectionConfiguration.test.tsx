@@ -70,9 +70,22 @@ describe('GiftSelectionConfiguration Component', () => {
       updateSite: mockUpdateSite,
       sites: [mockSite],
       clients: [],
+      brands: [],
       isLoading: false,
       setCurrentSite: vi.fn(),
       setCurrentClient: vi.fn(),
+      addClient: vi.fn(),
+      updateClient: vi.fn(),
+      deleteClient: vi.fn(),
+      addSite: vi.fn(),
+      deleteSite: vi.fn(),
+      getSitesByClient: vi.fn(),
+      getClientById: vi.fn(),
+      refreshData: vi.fn(),
+      addBrand: vi.fn(),
+      updateBrand: vi.fn(),
+      deleteBrand: vi.fn(),
+      getSitesByBrand: vi.fn(),
     });
   });
 

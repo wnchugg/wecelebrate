@@ -18,6 +18,8 @@ describe('Logger Utils', () => {
     consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     consoleInfoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
+    // Reset log level to DEBUG for each test
+    setLogLevel('DEBUG');
   });
 
   afterEach(() => {
@@ -63,7 +65,10 @@ describe('Logger Utils', () => {
 
     it('should log with default log method', () => {
       logger.log('Log message');
-      expect(consoleLogSpy).toHaveBeenCalledWith('Log message');
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        expect.anything(),
+        'Log message'
+      );
     });
   });
 

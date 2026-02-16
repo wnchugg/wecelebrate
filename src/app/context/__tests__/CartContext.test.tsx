@@ -74,7 +74,7 @@ describe('CartContext', () => {
       });
       
       expect(result.current.items).toHaveLength(1);
-      expect(result.current.items[0].id).toBe('test-1');
+      expect(result.current.items[0].id).toBe('product-test-1');
       expect(result.current.items[0].quantity).toBe(1);
     });
 
@@ -109,7 +109,7 @@ describe('CartContext', () => {
       });
       
       expect(result.current.items).toHaveLength(2);
-      expect(result.current.items[0].id).toBe('test-1');
+      expect(result.current.items[0].id).toBe('product-test-1');
       expect(result.current.items[1].id).toBe('test-2');
     });
 
@@ -133,7 +133,7 @@ describe('CartContext', () => {
       
       act(() => {
         result.current.addToCart(mockProduct1);
-        result.current.removeFromCart('test-1');
+        result.current.removeFromCart('product-test-1');
       });
       
       expect(result.current.items).toHaveLength(0);
@@ -145,7 +145,7 @@ describe('CartContext', () => {
       act(() => {
         result.current.addToCart(mockProduct1);
         result.current.addToCart(mockProduct2);
-        result.current.removeFromCart('test-1');
+        result.current.removeFromCart('product-test-1');
       });
       
       expect(result.current.items).toHaveLength(1);
@@ -170,7 +170,7 @@ describe('CartContext', () => {
       
       act(() => {
         result.current.addToCart(mockProduct1);
-        result.current.updateQuantity('test-1', 5);
+        result.current.updateQuantity('product-test-1', 5);
       });
       
       expect(result.current.items[0].quantity).toBe(5);
@@ -181,7 +181,7 @@ describe('CartContext', () => {
       
       act(() => {
         result.current.addToCart(mockProduct1);
-        result.current.updateQuantity('test-1', 0);
+        result.current.updateQuantity('product-test-1', 0);
       });
       
       expect(result.current.items).toHaveLength(0);
@@ -192,7 +192,7 @@ describe('CartContext', () => {
       
       act(() => {
         result.current.addToCart(mockProduct1);
-        result.current.updateQuantity('test-1', -1);
+        result.current.updateQuantity('product-test-1', -1);
       });
       
       expect(result.current.items).toHaveLength(0);
@@ -204,7 +204,7 @@ describe('CartContext', () => {
       act(() => {
         result.current.addToCart(mockProduct1);
         result.current.addToCart(mockProduct2);
-        result.current.updateQuantity('test-1', 3);
+        result.current.updateQuantity('product-test-1', 3);
       });
       
       expect(result.current.items[0].quantity).toBe(3);
@@ -275,7 +275,7 @@ describe('CartContext', () => {
       
       act(() => {
         result.current.addToCart(mockProduct1);
-        result.current.updateQuantity('test-1', 5);
+        result.current.updateQuantity('product-test-1', 5);
       });
       
       expect(result.current.totalItems).toBe(5);
@@ -287,11 +287,11 @@ describe('CartContext', () => {
       const { result } = renderHook(() => useCart(), { wrapper });
       
       act(() => {
-        result.current.addToCart(mockProduct1); // 49.99
+        result.current.addToCart(mockProduct1); // 99.99
         result.current.addToCart(mockProduct2); // 79.99
       });
       
-      expect(result.current.totalPrice).toBe(129.98);
+      expect(result.current.totalPrice).toBe(179.98);
     });
 
     it('should calculate total price with quantities', () => {
@@ -299,10 +299,10 @@ describe('CartContext', () => {
       
       act(() => {
         result.current.addToCart(mockProduct1);
-        result.current.updateQuantity('test-1', 3); // 49.99 * 3 = 149.97
+        result.current.updateQuantity('product-test-1', 3); // 99.99 * 3 = 299.97
       });
       
-      expect(result.current.totalPrice).toBe(149.97);
+      expect(result.current.totalPrice).toBeCloseTo(299.97, 2);
     });
 
     it('should update total price when items are removed', () => {
@@ -311,7 +311,7 @@ describe('CartContext', () => {
       act(() => {
         result.current.addToCart(mockProduct1);
         result.current.addToCart(mockProduct2);
-        result.current.removeFromCart('test-1');
+        result.current.removeFromCart('product-test-1');
       });
       
       expect(result.current.totalPrice).toBe(79.99);

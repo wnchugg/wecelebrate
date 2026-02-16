@@ -58,7 +58,7 @@ export function Dashboard() {
       }
       setError(null);
 
-      console.log('[Dashboard] Fetching data for site:', currentSite.id, 'timeRange:', timeRange);
+      console.warn('[Dashboard] Fetching data for site:', currentSite.id, 'timeRange:', timeRange);
       
       const environment = getCurrentEnvironment();
       const data = await dashboardService.getDashboardData(
@@ -67,7 +67,7 @@ export function Dashboard() {
         environment.id
       );
 
-      console.log('[Dashboard] Data fetched successfully:', data);
+      console.warn('[Dashboard] Data fetched successfully:', data);
       
       setStats(data.stats);
       setRecentOrders(data.recentOrders);
@@ -99,7 +99,7 @@ export function Dashboard() {
   // Auto-refresh every 5 minutes
   useEffect(() => {
     const interval = setInterval(() => {
-      console.log('[Dashboard] Auto-refreshing data...');
+      console.warn('[Dashboard] Auto-refreshing data...');
       fetchDashboardData(false);
     }, 5 * 60 * 1000); // 5 minutes
 
@@ -108,7 +108,7 @@ export function Dashboard() {
 
   // Manual refresh handler
   const handleRefresh = () => {
-    console.log('[Dashboard] Manual refresh triggered');
+    console.warn('[Dashboard] Manual refresh triggered');
     fetchDashboardData(false);
   };
 

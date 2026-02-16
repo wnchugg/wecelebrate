@@ -1,5 +1,3 @@
-/// <reference types="vitest" />
-
 import { vi } from 'vitest';
 import type { ReactElement } from 'react';
 

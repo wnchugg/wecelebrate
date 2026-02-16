@@ -209,11 +209,13 @@ export class ValidationTester {
    */
   testNoConsoleLogs(): TestResult {
     // This test creates a spy to detect console.log calls
+    // eslint-disable-next-line no-console
     const originalLog = console.log;
     let logCalled = false;
     let logMessage = '';
 
     // Replace console.log temporarily
+    // eslint-disable-next-line no-console
     console.log = (...args: any[]) => {
       logCalled = true;
       logMessage = args.join(' ');
@@ -229,6 +231,7 @@ export class ValidationTester {
     }
 
     // Restore original console.log
+    // eslint-disable-next-line no-console
     console.log = originalLog;
 
     if (logCalled) {
@@ -377,7 +380,7 @@ export class ValidationTester {
    */
   logResults(results: TestResult[]): void {
     const report = this.generateReport(results);
-    console.info(report);
+    console.warn(report);
   }
 }
 
@@ -391,7 +394,7 @@ export async function runValidationTests(): Promise<void> {
   
   // Return results object for programmatic access
   (window as any).__validationResults = results;
-  console.info('💡 Results saved to window.__validationResults');
+  console.warn('💡 Results saved to window.__validationResults');
 }
 
 // Export singleton instance

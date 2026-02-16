@@ -81,7 +81,7 @@ describe('ProductCard Component', () => {
     it('should have link to product detail page', () => {
       renderProductCard();
       const link = screen.getByRole('link');
-      expect(link).toHaveAttribute('href', '/products/1');
+      expect(link).toHaveAttribute('href', '/products/product-test-1');
     });
 
     it('should render correct link for different product IDs', () => {

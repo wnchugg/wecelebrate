@@ -10,10 +10,10 @@
 import { assertEquals, assertExists } from "https://deno.land/std@0.210.0/assert/mod.ts";
 
 // Test configuration
-const BASE_URL = Deno.env.get('SUPABASE_URL') || 'http://localhost:54321';
+const BASE_URL = Deno.env.get('SUPABASE_URL') || 'https://wjfcqqrlhwdvvjmefxky.supabase.co';
 const FUNCTION_URL = `${BASE_URL}/functions/v1/make-server-6fcaeea3`;
-const ADMIN_TOKEN = 'test-admin-token'; // Replace with valid token for integration tests
-const TEST_SITE_ID = 'test-site-123';
+const ADMIN_TOKEN = Deno.env.get('TEST_ADMIN_TOKEN') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndqZmNxcXJsaHdkdnZqbWVmeGt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzNTQ4NjgsImV4cCI6MjA4NTkzMDg2OH0.utZqFFSYWNkpiHsvU8qQbu4-abPZ41hAZhNL1XDv6ec';
+const TEST_SITE_ID = '00000000-0000-0000-0000-000000000002'; // UUID of test site created by seed script
 
 /**
  * Helper to make authenticated requests
@@ -25,8 +25,8 @@ async function makeRequest(
   return fetch(`${FUNCTION_URL}${endpoint}`, {
     ...options,
     headers: {
-      'Authorization': `Bearer ${ADMIN_TOKEN}`,
-      'X-Environment-ID': 'test',
+      'X-Access-Token': ADMIN_TOKEN,
+      'X-Environment-ID': 'development',
       'Content-Type': 'application/json',
       ...options.headers,
     },

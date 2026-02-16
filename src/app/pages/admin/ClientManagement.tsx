@@ -102,18 +102,18 @@ export function ClientManagement() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      console.log('[ClientManagement] Loading data...');
-      console.log('[ClientManagement] Current environment:', localStorage.getItem('deployment_environment') || 'development');
+      console.warn('[ClientManagement] Loading data...');
+      console.warn('[ClientManagement] Current environment:', localStorage.getItem('deployment_environment') || 'development');
       
       const [clientsRes, sitesRes] = await Promise.all([
-        apiRequest<{ success: boolean; data: Client[] }>('/clients'),
-        apiRequest<{ success: boolean; data: Site[] }>('/sites')
+        apiRequest<{ success: boolean; data: Client[] }>('/v2/clients'),
+        apiRequest<{ success: boolean; data: Site[] }>('/v2/sites')
       ]);
       
-      console.log('[ClientManagement] Clients response:', clientsRes);
-      console.log('[ClientManagement] Sites response:', sitesRes);
-      console.log('[ClientManagement] Clients count:', clientsRes.data?.length || 0);
-      console.log('[ClientManagement] Sites count:', sitesRes.data?.length || 0);
+      console.warn('[ClientManagement] Clients response:', clientsRes);
+      console.warn('[ClientManagement] Sites response:', sitesRes);
+      console.warn('[ClientManagement] Clients count:', clientsRes.data?.length || 0);
+      console.warn('[ClientManagement] Sites count:', sitesRes.data?.length || 0);
       
       setClients(clientsRes.data || []);
       setSites(sitesRes.data || []);
@@ -193,7 +193,7 @@ export function ClientManagement() {
         showSuccessToast('Client updated successfully');
       } else {
         // Create new client
-        await apiRequest('/clients', {
+        await apiRequest('/v2/clients', {
           method: 'POST',
           body: JSON.stringify(clientData)
         });
@@ -675,7 +675,7 @@ function ClientModal({ open, onClose, client, onSave }: ClientModalProps) {
 
     setIsSaving(true);
     try {
-      await onSave(formData);
+      onSave(formData);
     } finally {
       setIsSaving(false);
     }

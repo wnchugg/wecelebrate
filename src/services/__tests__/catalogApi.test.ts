@@ -171,12 +171,16 @@ describe('Catalog API Service', () => {
       const config = await fetchSiteCatalogConfig('site-test-001');
 
       expect(config).toBeDefined();
-      expect(config).toBeNull(); // fetchSiteCatalogConfig returns null in placeholder implementation
+      expect(Array.isArray(config)).toBe(true);
+      expect(config.length).toBeGreaterThan(0);
+      expect(config[0].siteId).toBe('site-test-001');
+      expect(config[0].catalogId).toBe('cat-test-001');
     });
 
     it('should throw error for site without config', async () => {
-      const result = await fetchSiteCatalogConfig('site-nonexistent');
-      expect(result).toBeNull();
+      await expect(fetchSiteCatalogConfig('site-nonexistent')).rejects.toThrow(
+        'Site catalog config not found'
+      );
     });
   });
 

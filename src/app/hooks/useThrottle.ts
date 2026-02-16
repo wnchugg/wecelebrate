@@ -10,7 +10,7 @@ export function useThrottle<T extends (...args: any[]) => any>(
   callback: T,
   delay: number = 500
 ): (...args: Parameters<T>) => void {
-  const lastRan = useRef<number>(Date.now());
+  const lastRan = useRef<number>(0); // Start at 0 so first call executes immediately
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {

@@ -66,7 +66,7 @@ export function isNonEmptyArray<T>(value: unknown): value is [T, ...T[]] {
 
 // ==================== Function Type Guards ====================
 
-export function isFunction(value: unknown): value is Function {
+export function isFunction(value: unknown): value is (...args: any[]) => any {
   return typeof value === 'function';
 }
 

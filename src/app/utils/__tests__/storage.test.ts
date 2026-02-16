@@ -27,11 +27,48 @@ const localStorageMock = (() => {
     key: (index: number) => {
       const keys = Object.keys(store);
       return keys[index] || null;
-    }
+    },
+    // Make keys enumerable for Object.keys(localStorage)
+    [Symbol.iterator]: function* () {
+      for (const key of Object.keys(store)) {
+        yield key;
+      }
+    },
+    // Add keys as enumerable properties
+    ...Object.keys(store).reduce((acc, key) => {
+      Object.defineProperty(acc, key, {
+        get: () => store[key],
+        enumerable: true,
+        configurable: true
+      });
+      return acc;
+    }, {} as any)
   };
 })();
 
-global.localStorage = localStorageMock as Storage;
+// Wrap localStorage to make it properly enumerable
+const enumerableLocalStorage = new Proxy(localStorageMock, {
+  ownKeys: () => {
+    const keys: string[] = [];
+    for (let i = 0; i < localStorageMock.length; i++) {
+      const key = localStorageMock.key(i);
+      if (key) keys.push(key);
+    }
+    return keys;
+  },
+  getOwnPropertyDescriptor: (target, prop) => {
+    if (typeof prop === 'string' && localStorageMock.getItem(prop) !== null) {
+      return {
+        enumerable: true,
+        configurable: true,
+        value: localStorageMock.getItem(prop)
+      };
+    }
+    return Object.getOwnPropertyDescriptor(target, prop);
+  }
+});
+
+global.localStorage = enumerableLocalStorage as Storage;
 
 // Import after mocking
 import {
@@ -203,7 +240,9 @@ describe('Storage Utils', () => {
       const sensitive = { password: 'secret123' };
       setEncrypted('credentials', sensitive);
       
-      const raw = localStorage.getItem('credentials');
+      // setEncrypted uses sessionStorage, not localStorage
+      const raw = sessionStorage.getItem('credentials');
+      expect(raw).toBeDefined();
       expect(raw).not.toContain('secret123');
     });
 

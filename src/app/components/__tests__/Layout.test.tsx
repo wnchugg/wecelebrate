@@ -37,7 +37,8 @@ describe('Layout Component', () => {
         </MemoryRouter>
       );
 
-      expect(screen.getByText('wecelebrate')).toBeInTheDocument();
+      const logos = screen.getAllByText('wecelebrate');
+      expect(logos.length).toBeGreaterThan(0);
     });
 
     it('should render navigation links', () => {
@@ -47,8 +48,10 @@ describe('Layout Component', () => {
         </MemoryRouter>
       );
 
-      expect(screen.getByText('Home')).toBeInTheDocument();
-      expect(screen.getByText('Products')).toBeInTheDocument();
+      const homeLinks = screen.getAllByText('Home');
+      const productLinks = screen.getAllByText('Products');
+      expect(homeLinks.length).toBeGreaterThan(0);
+      expect(productLinks.length).toBeGreaterThan(0);
     });
 
     it('should display cart count badge', () => {
@@ -70,19 +73,25 @@ describe('Layout Component', () => {
         </MemoryRouter>
       );
 
-      const logo = screen.getByText('wecelebrate').closest('a');
+      const logos = screen.getAllByText('wecelebrate');
+      const logo = logos[0].closest('a');
       expect(logo).toHaveAttribute('href', '/');
     });
   });
 
   describe('Cart Badge', () => {
     it('should not show badge when cart is empty', () => {
-      vi.mocked(require('../../context/CartContext').useCart).mockReturnValue({
+      vi.mocked(useCart).mockReturnValue({
         getCartCount: () => 0,
         items: [],
         addToCart: vi.fn(),
         removeFromCart: vi.fn(),
+        updateQuantity: vi.fn(),
         clearCart: vi.fn(),
+        totalItems: 0,
+        totalPrice: 0,
+        shippingType: null,
+        setShippingType: vi.fn(),
       });
 
       render(

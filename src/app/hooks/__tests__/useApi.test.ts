@@ -384,7 +384,7 @@ describe('useApi Hooks', () => {
       const { result } = renderHook(() => usePagination());
 
       expect(result.current.page).toBe(1);
-      expect(result.current.limit).toBe(10);
+      expect(result.current.limit).toBe(50);
     });
 
     it('should initialize with custom values', () => {
@@ -459,18 +459,18 @@ describe('useApi Hooks', () => {
 
       act(() => {
         result.current.setPage(5);
-        result.current.setLimit(50);
+        result.current.setLimit(100);
       });
 
       expect(result.current.page).toBe(5);
-      expect(result.current.limit).toBe(50);
+      expect(result.current.limit).toBe(100);
 
       act(() => {
         result.current.reset();
       });
 
       expect(result.current.page).toBe(1);
-      expect(result.current.limit).toBe(10);
+      expect(result.current.limit).toBe(50);
     });
 
     it('should provide pagination params object', () => {

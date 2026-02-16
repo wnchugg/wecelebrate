@@ -396,7 +396,7 @@ export function clearRateLimit(key: string): void {
  */
 export function clearAllRateLimits(): void {
   rateLimitStore.clear();
-  console.log('All rate limits cleared');
+  console.warn('All rate limits cleared');
 }
 
 // ==================== SECURE AUTHENTICATION ====================
@@ -492,7 +492,7 @@ export function logSecurityEvent(event: {
       console.warn('Security Event:', event);
     } else {
       // Low severity events logged as debug info
-      console.log('Security Event:', event);
+      console.warn('Security Event:', event);
     }
   }
 

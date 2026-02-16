@@ -1,0 +1,416 @@
+/**
+ * Seed Test Data for Dashboard API Tests
+ * Uses Supabase database (not KV store)
+ */
+
+import { createClient } from 'jsr:@supabase/supabase-js@2';
+
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL') ?? '',
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+);
+
+/**
+ * Seed test data for dashboard API tests
+ */
+export async function seedTestData() {
+  console.log('🌱 Seeding test data for dashboard API tests...');
+  console.log('');
+
+  try {
+    // 1. Create test client
+    console.log('📦 Creating test client...');
+    const { data: client, error: clientError } = await supabase
+      .from('clients')
+      .upsert({
+        id: '00000000-0000-0000-0000-000000000001',
+        name: 'Test Corporation',
+        contact_email: 'test@testcorp.com',
+        status: 'active',
+        client_code: 'TEST001',
+        client_region: 'US/CA',
+      }, { onConflict: 'id' })
+      .select()
+      .single();
+
+    if (clientError && !clientError.message.includes('duplicate')) {
+      throw clientError;
+    }
+    console.log('✅ Test client created');
+
+    // 2. Create test site
+    console.log('🏢 Creating test site...');
+    const { data: site, error: siteError } = await supabase
+      .from('sites')
+      .upsert({
+        id: '00000000-0000-0000-0000-000000000002',
+        client_id: '00000000-0000-0000-0000-000000000001',
+        name: 'Test Site for Dashboard',
+        slug: 'test-dashboard',
+        status: 'active',
+        site_type: 'celebration',
+        site_url: 'test-dashboard.jala.com',
+      }, { onConflict: 'id' })
+      .select()
+      .single();
+
+    if (siteError && !siteError.message.includes('duplicate')) {
+      throw siteError;
+    }
+    console.log('✅ Test site created');
+
+    // 3. Create test catalog
+    console.log('📚 Creating test catalog...');
+    const { data: catalog, error: catalogError } = await supabase
+      .from('catalogs')
+      .upsert({
+        id: '00000000-0000-0000-0000-000000000003',
+        name: 'Test Gift Catalog',
+        description: 'Test catalog for dashboard API tests',
+        type: 'manual',
+        status: 'active',
+        total_products: 0,
+        active_products: 0,
+      }, { onConflict: 'id' })
+      .select()
+      .single();
+
+    if (catalogError && !catalogError.message.includes('duplicate')) {
+      throw catalogError;
+    }
+    console.log('✅ Test catalog created');
+
+    // 4. Create test employees
+    console.log('👥 Creating test employees...');
+    const employees = [
+      {
+        id: '00000000-0000-0000-0000-000000000010',
+        site_id: '00000000-0000-0000-0000-000000000002',
+        first_name: 'John',
+        last_name: 'Doe',
+        email: 'john.doe@testcorp.com',
+        employee_id: 'EMP001',
+        status: 'active',
+      },
+      {
+        id: '00000000-0000-0000-0000-000000000011',
+        site_id: '00000000-0000-0000-0000-000000000002',
+        first_name: 'Jane',
+        last_name: 'Smith',
+        email: 'jane.smith@testcorp.com',
+        employee_id: 'EMP002',
+        status: 'active',
+      },
+      {
+        id: '00000000-0000-0000-0000-000000000012',
+        site_id: '00000000-0000-0000-0000-000000000002',
+        first_name: 'Bob',
+        last_name: 'Johnson',
+        email: 'bob.johnson@testcorp.com',
+        employee_id: 'EMP003',
+        status: 'active',
+      },
+      {
+        id: '00000000-0000-0000-0000-000000000013',
+        site_id: '00000000-0000-0000-0000-000000000002',
+        first_name: 'Alice',
+        last_name: 'Williams',
+        email: 'alice.williams@testcorp.com',
+        employee_id: 'EMP004',
+        status: 'inactive',
+      },
+      {
+        id: '00000000-0000-0000-0000-000000000014',
+        site_id: '00000000-0000-0000-0000-000000000002',
+        first_name: 'Charlie',
+        last_name: 'Brown',
+        email: 'charlie.brown@testcorp.com',
+        employee_id: 'EMP005',
+        status: 'active',
+      },
+    ];
+
+    const { error: employeesError } = await supabase
+      .from('employees')
+      .upsert(employees, { onConflict: 'id' });
+
+    if (employeesError) {
+      console.warn('⚠️  Employee creation warning:', employeesError.message);
+    } else {
+      console.log(`✅ Created ${employees.length} employees`);
+    }
+
+    // 5. Create test products (gifts)
+    console.log('🎁 Creating test products...');
+    const products = [
+      {
+        id: '00000000-0000-0000-0000-000000000020',
+        catalog_id: '00000000-0000-0000-0000-000000000003',
+        name: 'Wireless Headphones',
+        description: 'Premium noise-canceling wireless headphones',
+        category: 'Electronics',
+        price: 149.99,
+        currency: 'USD',
+        sku: 'TEST-WH-001',
+        image_url: 'https://via.placeholder.com/400x400?text=Headphones',
+        status: 'active',
+        available_quantity: 100,
+      },
+      {
+        id: '00000000-0000-0000-0000-000000000021',
+        catalog_id: '00000000-0000-0000-0000-000000000003',
+        name: 'Coffee Maker',
+        description: 'Programmable coffee maker with thermal carafe',
+        category: 'Home & Kitchen',
+        price: 89.99,
+        currency: 'USD',
+        sku: 'TEST-CM-001',
+        image_url: 'https://via.placeholder.com/400x400?text=Coffee+Maker',
+        status: 'active',
+        available_quantity: 50,
+      },
+      {
+        id: '00000000-0000-0000-0000-000000000022',
+        catalog_id: '00000000-0000-0000-0000-000000000003',
+        name: 'Fitness Tracker',
+        description: 'Smart fitness tracker with heart rate monitor',
+        category: 'Electronics',
+        price: 79.99,
+        currency: 'USD',
+        sku: 'TEST-FT-001',
+        image_url: 'https://via.placeholder.com/400x400?text=Fitness+Tracker',
+        status: 'active',
+        available_quantity: 75,
+      },
+      {
+        id: '00000000-0000-0000-0000-000000000023',
+        catalog_id: '00000000-0000-0000-0000-000000000003',
+        name: 'Desk Organizer Set',
+        description: 'Premium desk organizer with multiple compartments',
+        category: 'Office',
+        price: 39.99,
+        currency: 'USD',
+        sku: 'TEST-DO-001',
+        image_url: 'https://via.placeholder.com/400x400?text=Desk+Organizer',
+        status: 'active',
+        available_quantity: 200,
+      },
+      {
+        id: '00000000-0000-0000-0000-000000000024',
+        catalog_id: '00000000-0000-0000-0000-000000000003',
+        name: 'Portable Speaker',
+        description: 'Waterproof Bluetooth portable speaker',
+        category: 'Electronics',
+        price: 59.99,
+        currency: 'USD',
+        sku: 'TEST-PS-001',
+        image_url: 'https://via.placeholder.com/400x400?text=Speaker',
+        status: 'active',
+        available_quantity: 150,
+      },
+    ];
+
+    const { error: productsError } = await supabase
+      .from('products')
+      .upsert(products, { onConflict: 'id' });
+
+    if (productsError) {
+      console.warn('⚠️  Product creation warning:', productsError.message);
+    } else {
+      console.log(`✅ Created ${products.length} products`);
+    }
+
+    // 6. Create site-catalog assignment
+    console.log('🔗 Creating site-catalog assignment...');
+    const { error: assignmentError } = await supabase
+      .from('site_catalog_assignments')
+      .upsert({
+        id: '00000000-0000-0000-0000-000000000030',
+        site_id: '00000000-0000-0000-0000-000000000002',
+        catalog_id: '00000000-0000-0000-0000-000000000003',
+        is_primary: true,
+      }, { onConflict: 'id' });
+
+    if (assignmentError) {
+      console.warn('⚠️  Site-catalog assignment warning:', assignmentError.message);
+    } else {
+      console.log('✅ Site-catalog assignment created');
+    }
+
+    // 7. Create test orders
+    console.log('📦 Creating test orders...');
+    const now = new Date();
+    const orders = [
+      {
+        id: '00000000-0000-0000-0000-000000000040',
+        client_id: '00000000-0000-0000-0000-000000000001',
+        site_id: '00000000-0000-0000-0000-000000000002',
+        employee_id: '00000000-0000-0000-0000-000000000010',
+        product_id: '00000000-0000-0000-0000-000000000020',
+        order_number: 'ORD-TEST-001',
+        customer_name: 'John Doe',
+        customer_email: 'john.doe@testcorp.com',
+        status: 'pending',
+        total_amount: 149.99,
+        currency: 'USD',
+        shipping_address: {
+          name: 'John Doe',
+          line1: '123 Main St',
+          city: 'Test City',
+          state: 'TC',
+          postal_code: '12345',
+          country: 'US',
+        },
+        items: [{ product_id: '00000000-0000-0000-0000-000000000020', quantity: 1, unit_price: 149.99 }],
+        created_at: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: '00000000-0000-0000-0000-000000000041',
+        client_id: '00000000-0000-0000-0000-000000000001',
+        site_id: '00000000-0000-0000-0000-000000000002',
+        employee_id: '00000000-0000-0000-0000-000000000011',
+        product_id: '00000000-0000-0000-0000-000000000021',
+        order_number: 'ORD-TEST-002',
+        customer_name: 'Jane Smith',
+        customer_email: 'jane.smith@testcorp.com',
+        status: 'shipped',
+        total_amount: 89.99,
+        currency: 'USD',
+        shipping_address: {
+          name: 'Jane Smith',
+          line1: '456 Oak Ave',
+          city: 'Test City',
+          state: 'TC',
+          postal_code: '12345',
+          country: 'US',
+        },
+        items: [{ product_id: '00000000-0000-0000-0000-000000000021', quantity: 1, unit_price: 89.99 }],
+        created_at: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        shipped_at: new Date(now.getTime() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: '00000000-0000-0000-0000-000000000042',
+        client_id: '00000000-0000-0000-0000-000000000001',
+        site_id: '00000000-0000-0000-0000-000000000002',
+        employee_id: '00000000-0000-0000-0000-000000000012',
+        product_id: '00000000-0000-0000-0000-000000000022',
+        order_number: 'ORD-TEST-003',
+        customer_name: 'Bob Johnson',
+        customer_email: 'bob.johnson@testcorp.com',
+        status: 'delivered',
+        total_amount: 79.99,
+        currency: 'USD',
+        shipping_address: {
+          name: 'Bob Johnson',
+          line1: '789 Pine Rd',
+          city: 'Test City',
+          state: 'TC',
+          postal_code: '12345',
+          country: 'US',
+        },
+        items: [{ product_id: '00000000-0000-0000-0000-000000000022', quantity: 1, unit_price: 79.99 }],
+        created_at: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+        shipped_at: new Date(now.getTime() - 8 * 24 * 60 * 60 * 1000).toISOString(),
+        delivered_at: new Date(now.getTime() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: '00000000-0000-0000-0000-000000000043',
+        client_id: '00000000-0000-0000-0000-000000000001',
+        site_id: '00000000-0000-0000-0000-000000000002',
+        employee_id: '00000000-0000-0000-0000-000000000014',
+        product_id: '00000000-0000-0000-0000-000000000023',
+        order_number: 'ORD-TEST-004',
+        customer_name: 'Charlie Brown',
+        customer_email: 'charlie.brown@testcorp.com',
+        status: 'pending',
+        total_amount: 39.99,
+        currency: 'USD',
+        shipping_address: {
+          name: 'Charlie Brown',
+          line1: '321 Elm St',
+          city: 'Test City',
+          state: 'TC',
+          postal_code: '12345',
+          country: 'US',
+        },
+        items: [{ product_id: '00000000-0000-0000-0000-000000000023', quantity: 1, unit_price: 39.99 }],
+        created_at: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: '00000000-0000-0000-0000-000000000044',
+        client_id: '00000000-0000-0000-0000-000000000001',
+        site_id: '00000000-0000-0000-0000-000000000002',
+        employee_id: '00000000-0000-0000-0000-000000000010',
+        product_id: '00000000-0000-0000-0000-000000000024',
+        order_number: 'ORD-TEST-005',
+        customer_name: 'John Doe',
+        customer_email: 'john.doe@testcorp.com',
+        status: 'shipped',
+        total_amount: 59.99,
+        currency: 'USD',
+        shipping_address: {
+          name: 'John Doe',
+          line1: '123 Main St',
+          city: 'Test City',
+          state: 'TC',
+          postal_code: '12345',
+          country: 'US',
+        },
+        items: [{ product_id: '00000000-0000-0000-0000-000000000024', quantity: 1, unit_price: 59.99 }],
+        created_at: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        shipped_at: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+    ];
+
+    const { error: ordersError } = await supabase
+      .from('orders')
+      .upsert(orders, { onConflict: 'id' });
+
+    if (ordersError) {
+      console.warn('⚠️  Order creation warning:', ordersError.message);
+    } else {
+      console.log(`✅ Created ${orders.length} orders`);
+    }
+
+    console.log('');
+    console.log('✅ Test data seeding completed successfully!');
+    console.log('');
+    console.log('📊 Summary:');
+    console.log('  - Client: test-client-001');
+    console.log('  - Site: test-site-123');
+    console.log('  - Catalog: test-catalog-001');
+    console.log('  - Employees: 5 (4 active, 1 inactive)');
+    console.log('  - Products: 5');
+    console.log('  - Orders: 5 (2 pending, 2 shipped, 1 delivered)');
+    console.log('');
+    console.log('🧪 Ready to run dashboard API tests!');
+
+    return {
+      success: true,
+      message: 'Test data seeded successfully',
+      data: {
+        client: '00000000-0000-0000-0000-000000000001',
+        site: '00000000-0000-0000-0000-000000000002',
+        catalog: '00000000-0000-0000-0000-000000000003',
+        employees: employees.length,
+        products: products.length,
+        orders: orders.length,
+      },
+    };
+  } catch (error) {
+    console.error('');
+    console.error('❌ Error seeding test data:', error);
+    throw error;
+  }
+}
+
+// Run if executed directly
+if (import.meta.main) {
+  try {
+    await seedTestData();
+    Deno.exit(0);
+  } catch (error) {
+    console.error('Fatal error:', error);
+    Deno.exit(1);
+  }
+}

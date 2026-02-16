@@ -9,20 +9,20 @@ export default function TokenClear() {
   const [autoRedirect, setAutoRedirect] = useState(true);
 
   useEffect(() => {
-    console.log('=== FORCE TOKEN CLEAR PAGE ===');
+    console.warn('=== FORCE TOKEN CLEAR PAGE ===');
     
     // Clear everything
     clearAccessToken();
     sessionStorage.clear();
     localStorage.clear();
     
-    console.log('✅ All storage cleared');
+    console.warn('✅ All storage cleared');
     setCleared(true);
     
     // Wait a moment then redirect (if auto-redirect enabled)
     if (autoRedirect) {
       setTimeout(() => {
-        console.log('🔄 Redirecting to login...');
+        console.warn('🔄 Redirecting to login...');
         navigate('/admin/login', { replace: true });
       }, 2000);
     }

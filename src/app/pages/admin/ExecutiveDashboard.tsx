@@ -57,10 +57,10 @@ export function ExecutiveDashboard() {
     setIsLoading(true);
     try {
       const [ordersRes, clientsRes, sitesRes, employeesRes, giftsRes, celebrationsRes] = await Promise.all([
-        apiRequest<{ data: any[] }>('/orders').catch(() => ({ data: [] as any[] })),
-        apiRequest<{ data: any[] }>('/clients').catch(() => ({ data: [] as any[] })),
-        apiRequest<{ data: any[] }>('/sites').catch(() => ({ data: [] as any[] })),
-        apiRequest<{ data: any[] }>('/employees').catch(() => ({ data: [] as any[] })),
+        apiRequest<{ data: any[] }>('/v2/orders').catch(() => ({ data: [] as any[] })),
+        apiRequest<{ data: any[] }>('/v2/clients').catch(() => ({ data: [] as any[] })),
+        apiRequest<{ data: any[] }>('/v2/sites').catch(() => ({ data: [] as any[] })),
+        apiRequest<{ data: any[] }>('/v2/employees').catch(() => ({ data: [] as any[] })),
         apiRequest<{ data: any[] }>('/admin/gifts').catch(() => ({ data: [] as any[] })),
         apiRequest<{ data: any[] }>('/celebrations').catch(() => ({ data: [] as any[] }))
       ]);

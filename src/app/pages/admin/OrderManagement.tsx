@@ -120,7 +120,7 @@ export function OrderManagement() {
   const loadOrders = async () => {
     setIsLoading(true);
     try {
-      const { orders: loadedOrders } = await apiRequest<{ orders: Order[] }>('/orders');
+      const { data: loadedOrders } = await apiRequest<{ data: Order[] }>('/v2/orders');
       // Sort by createdAt desc (newest first)
       const sorted = (loadedOrders || []).sort((a, b) => 
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()

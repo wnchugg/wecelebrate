@@ -5,7 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import prettierConfig from 'eslint-config-prettier'
 
 export default tseslint.config(
-  { ignores: ['dist', 'build', 'node_modules', 'supabase', 'types', 'utils'] },
+  { ignores: ['dist', 'build', 'node_modules', 'supabase', 'types', 'utils', 'e2e', '*.js', 'CLIENT_CONFIGURATION_UPDATED.tsx', 'RENAME_INSTRUCTIONS.js'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommendedTypeChecked],
     files: ['**/*.{ts,tsx}'],

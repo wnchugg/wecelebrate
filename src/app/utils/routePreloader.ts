@@ -41,7 +41,7 @@ export async function preloadRoutes(importFns: Array<() => Promise<any>>, delayM
  * Loads critical pages first, then secondary pages
  */
 export async function preloadAdminRoutes(): Promise<void> {
-  console.log('[Route Preloader] Starting admin route preload...');
+  console.warn('[Route Preloader] Starting admin route preload...');
   
   // Critical routes - load immediately
   const criticalRoutes = [
@@ -73,7 +73,7 @@ export async function preloadAdminRoutes(): Promise<void> {
     preloadRoutes(secondaryRoutes, 100);
   }, 500);
   
-  console.log('[Route Preloader] Critical admin routes preloaded');
+  console.warn('[Route Preloader] Critical admin routes preloaded');
 }
 
 /**

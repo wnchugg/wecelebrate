@@ -486,7 +486,7 @@ export function EnvironmentManagement() {
         method: 'DELETE',
       });
 
-      if (response.success) {
+      if ((response as { success: boolean }).success) {
         toast.success('Environment deleted successfully');
         setDeletingEnv(null);
         loadEnvironments();

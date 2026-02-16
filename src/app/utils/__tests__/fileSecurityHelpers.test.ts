@@ -116,7 +116,8 @@ describe('fileSecurityHelpers', () => {
     });
 
     it('should accept long strings under custom limit', () => {
-      const longString = 'a'.repeat(15000);
+      // Use a varied string that doesn't trigger repetition checks
+      const longString = 'abcdefghij'.repeat(1500); // 15000 chars, no excessive repetition
       expect(validateStringForReDoS(longString, 20000)).toBe(true);
     });
 

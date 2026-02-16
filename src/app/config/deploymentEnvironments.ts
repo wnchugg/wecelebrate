@@ -135,7 +135,7 @@ async function loadEnvironmentsFromBackend(): Promise<Record<string, DeploymentE
     return fallbackEnvironments;
   } catch (error) {
     // This is expected until backend is deployed - silently use fallback
-    console.info('ℹ️ Backend not deployed yet - using fallback environments. Deploy with: ./scripts/redeploy-backend.sh dev');
+    console.warn('ℹ️ Backend not deployed yet - using fallback environments. Deploy with: ./scripts/redeploy-backend.sh dev');
     return fallbackEnvironments;
   }
 }

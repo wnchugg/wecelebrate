@@ -75,7 +75,7 @@ export async function parseCSVFile(file: File): Promise<any[]> {
         }
       },
       error: (error) => {
-        reject(error);
+        reject(error instanceof Error ? error : new Error(String(error)));
       }
     });
   });
@@ -97,7 +97,7 @@ export async function parsePipeDelimitedFile(file: File): Promise<any[]> {
         }
       },
       error: (error) => {
-        reject(error);
+        reject(error instanceof Error ? error : new Error(String(error)));
       }
     });
   });
@@ -181,7 +181,7 @@ export async function parseExcelFile(file: File): Promise<any[]> {
         
         resolve(normalizedData);
       } catch (error) {
-        reject(error);
+        reject(error instanceof Error ? error : new Error(String(error)));
       }
     };
     

@@ -115,9 +115,9 @@ export function GiftSelection() {
         }
         
         // Debug logging for image fields
-        console.log('[GiftSelection] Received gifts:', data.gifts?.length || 0);
+        console.warn('[GiftSelection] Received gifts:', data.gifts?.length || 0);
         data.gifts?.forEach((gift: Gift) => {
-          console.log(`[GiftSelection] Gift ${gift.id} - imageUrl: "${gift.imageUrl}", name: "${gift.name}"`);
+          console.warn(`[GiftSelection] Gift ${gift.id} - imageUrl: "${gift.imageUrl}", name: "${gift.name}"`);
         });
         
         setGifts(data.gifts || []);

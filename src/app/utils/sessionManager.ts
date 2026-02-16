@@ -331,7 +331,11 @@ export function getSession(): SessionData | null {
     return null;
   }
   
-  return session;
+  // Return session with normalized expiresAt
+  return {
+    ...session,
+    expiresAt
+  };
 }
 
 /**

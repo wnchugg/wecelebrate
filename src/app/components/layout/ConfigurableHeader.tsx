@@ -123,8 +123,8 @@ export function ConfigurableHeader({ config, siteName, clientName }: Configurabl
     }
   };
 
-  const handleLogout = async () => {
-    await logout();
+  const handleLogout = () => {
+    logout();
     navigate('/');
   };
 

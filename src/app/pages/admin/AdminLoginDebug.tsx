@@ -36,7 +36,7 @@ export function AdminLoginDebug() {
       const data = await response.json();
 
       if (response.ok) {
-        console.log('Admin check response:', data);
+        console.warn('Admin check response:', data);
         if (data.admins && data.admins.length > 0) {
           setAdmins(data.admins);
           toast.success(`Found ${data.admins.length} admin account(s)`);
@@ -59,7 +59,7 @@ export function AdminLoginDebug() {
     setTestResult('');
 
     try {
-      console.log('[Debug Test] Testing login with:', { email: testEmail });
+      console.warn('[Debug Test] Testing login with:', { email: testEmail });
 
       const env = getCurrentEnvironment();
       const envProjectId = env.supabaseUrl.match(/https:\/\/([^.]+)/)?.[1];
@@ -77,7 +77,7 @@ export function AdminLoginDebug() {
       });
 
       const data = await response.json();
-      console.log('[Debug Test] Response:', { status: response.status, data });
+      console.warn('[Debug Test] Response:', { status: response.status, data });
 
       if (response.ok && data.token) {
         setTestResult(`✅ SUCCESS!\\n\\nToken received: ${data.token.substring(0, 20)}...\\nUser: ${data.user?.email || 'N/A'}`);

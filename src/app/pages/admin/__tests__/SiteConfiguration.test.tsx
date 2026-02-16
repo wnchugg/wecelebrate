@@ -105,22 +105,33 @@ describe('SiteConfiguration Component', () => {
       isLoading: false,
       setCurrentSite: vi.fn(),
       setCurrentClient: vi.fn(),
-      createSite: vi.fn(),
       deleteSite: vi.fn(),
-      createClient: vi.fn(),
       updateClient: vi.fn(),
-      deleteClient: vi.fn()
+      deleteClient: vi.fn(),
+      brands: [],
+      addClient: vi.fn(),
+      addSite: vi.fn(),
+      getSitesByClient: vi.fn(),
+      getClientById: vi.fn(),
+      refreshData: vi.fn(),
+      addBrand: vi.fn(),
+      updateBrand: vi.fn(),
+      deleteBrand: vi.fn(),
+      getSitesByBrand: vi.fn(),
     });
 
     vi.mocked(GiftContext.useGift).mockReturnValue({
       gifts: [],
       isLoading: false,
-      createGift: vi.fn(),
+      addGift: vi.fn(),
       updateGift: vi.fn(),
       deleteGift: vi.fn(),
+      deleteMultipleGifts: vi.fn(),
+      siteConfigurations: [],
       getGiftsBySite: vi.fn(),
       getSiteConfiguration: vi.fn(),
-      updateSiteConfiguration: vi.fn()
+      updateSiteConfiguration: vi.fn(),
+      refreshData: vi.fn(),
     });
   });
 
@@ -162,11 +173,19 @@ describe('SiteConfiguration Component', () => {
         isLoading: false,
         setCurrentSite: vi.fn(),
         setCurrentClient: vi.fn(),
-        createSite: vi.fn(),
         deleteSite: vi.fn(),
-        createClient: vi.fn(),
         updateClient: vi.fn(),
-        deleteClient: vi.fn()
+        deleteClient: vi.fn(),
+        brands: [],
+        addClient: vi.fn(),
+        addSite: vi.fn(),
+        getSitesByClient: vi.fn(),
+        getClientById: vi.fn(),
+        refreshData: vi.fn(),
+        addBrand: vi.fn(),
+        updateBrand: vi.fn(),
+        deleteBrand: vi.fn(),
+        getSitesByBrand: vi.fn(),
       });
 
       render(
@@ -271,11 +290,19 @@ describe('SiteConfiguration Component', () => {
         isLoading: false,
         setCurrentSite: vi.fn(),
         setCurrentClient: vi.fn(),
-        createSite: vi.fn(),
         deleteSite: vi.fn(),
-        createClient: vi.fn(),
         updateClient: vi.fn(),
-        deleteClient: vi.fn()
+        deleteClient: vi.fn(),
+        brands: [],
+        addClient: vi.fn(),
+        addSite: vi.fn(),
+        getSitesByClient: vi.fn(),
+        getClientById: vi.fn(),
+        refreshData: vi.fn(),
+        addBrand: vi.fn(),
+        updateBrand: vi.fn(),
+        deleteBrand: vi.fn(),
+        getSitesByBrand: vi.fn(),
       });
 
       render(

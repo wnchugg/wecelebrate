@@ -313,7 +313,7 @@ export interface SiteContextType {
 export const SiteContext = createContext<SiteContextType | undefined>(undefined);
 
 export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  console.log('[SiteProvider] Component rendering');
+  console.warn('[SiteProvider] Component rendering');
   
   const [clients, setClients] = useState<Client[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -324,7 +324,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { isAdminAuthenticated, isLoading: adminLoading } = useAdmin();
   const hasLoadedRef = useRef(false);
 
-  console.log('[SiteProvider] State:', {
+  console.warn('[SiteProvider] State:', {
     isAdminAuthenticated,
     adminLoading,
     hasLoadedRef: hasLoadedRef.current,
@@ -468,8 +468,8 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify(updates)
       });
       
-      if (!response.ok) {
-        const error = await response.json();
+      if (!(response as Response).ok) {
+        const error = await (response as Response).json();
         throw new Error(error.message || 'Failed to update site');
       }
       

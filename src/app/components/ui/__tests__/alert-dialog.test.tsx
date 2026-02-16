@@ -12,7 +12,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithRouter } from '@/test/helpers';
 import React from 'react';
@@ -210,8 +210,16 @@ describe('AlertDialog Component', () => {
         expect(screen.getByText('Confirm')).toBeInTheDocument();
       });
 
-      await user.click(screen.getAllByRole('button', { name: /delete/i })[1]);
+      // Find the action button and click it
+      await waitFor(() => {
+        // Look for the action button specifically (not the trigger)
+        const actionButton = screen.getByRole('button', { name: /^delete$/i });
+        expect(actionButton).toBeInTheDocument();
+        // Use fireEvent to bypass pointer-events
+        fireEvent.click(actionButton);
+      });
 
+      // Check if handler was called
       expect(handleAction).toHaveBeenCalled();
     });
 

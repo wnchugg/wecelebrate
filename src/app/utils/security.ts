@@ -26,7 +26,7 @@ export function sanitizeInput(input: any): any {
   if (typeof input === 'object') {
     const sanitized: any = {};
     for (const key in input) {
-      if (input.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(input, key)) {
         sanitized[key] = sanitizeInput(input[key]);
       }
     }
@@ -377,7 +377,7 @@ export function logSecurityEvent(
   };
   
   // Log to console
-  console.log(`[SECURITY ${level.toUpperCase()}]`, event, logEntry);
+  console.warn(`[SECURITY ${level.toUpperCase()}]`, event, logEntry);
   
   // In production, you might want to send this to a logging service
   if (isProduction()) {

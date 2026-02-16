@@ -32,17 +32,17 @@ vi.mock('../config/deploymentEnvironments', () => ({
   }))
 }));
 
-vi.mock('./security', () => ({
+vi.mock('../security', () => ({
   sanitizeInput: vi.fn((input) => input),
   checkSecureContext: vi.fn(() => true),
   logSecurityEvent: vi.fn()
 }));
 
-vi.mock('./csrfProtection', () => ({
+vi.mock('../csrfProtection', () => ({
   getOrCreateCSRFToken: vi.fn(() => 'test-csrf-token')
 }));
 
-vi.mock('./logger', () => ({
+vi.mock('../logger', () => ({
   logger: {
     log: vi.fn(),
     warn: vi.fn(),
@@ -53,6 +53,14 @@ vi.mock('./logger', () => ({
 }));
 
 describe('API Utils', () => {
+  // Helper to create mock response with proper headers
+  const createMockResponse = (data: any, ok = true, status = 200) => ({
+    ok,
+    status,
+    headers: new Headers({ 'content-type': 'application/json' }),
+    json: async () => data
+  });
+
   beforeEach(() => {
     // Clear session storage before each test
     sessionStorage.clear();
@@ -65,19 +73,21 @@ describe('API Utils', () => {
   });
 
   describe('Token Management', () => {
+    // Valid JWT format token for testing
+    const validToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlRlc3QgVXNlciIsImlhdCI6MTUxNjIzOTAyMiwiZXhwIjo5OTk5OTk5OTk5fQ.test-signature';
+    
     it('should store access token in sessionStorage', () => {
-      const token = 'test-token-123';
-      setAccessToken(token);
-      expect(getAccessToken()).toBe(token);
+      setAccessToken(validToken);
+      expect(getAccessToken()).toBe(validToken);
     });
 
     it('should retrieve stored access token', () => {
-      sessionStorage.setItem('jala_access_token', 'stored-token');
-      expect(getAccessToken()).toBe('stored-token');
+      sessionStorage.setItem('jala_access_token', validToken);
+      expect(getAccessToken()).toBe(validToken);
     });
 
     it('should clear access token', () => {
-      setAccessToken('test-token');
+      setAccessToken(validToken);
       clearAccessToken();
       expect(getAccessToken()).toBeNull();
     });
@@ -93,6 +103,7 @@ describe('API Utils', () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         status: 200,
+        headers: new Headers({ 'content-type': 'application/json' }),
         json: async () => mockData
       });
 
@@ -116,6 +127,7 @@ describe('API Utils', () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         status: 200,
+        headers: new Headers({ 'content-type': 'application/json' }),
         json: async () => mockData
       });
 
@@ -131,10 +143,12 @@ describe('API Utils', () => {
     });
 
     it('should include authorization header when token exists', async () => {
-      setAccessToken('test-token');
+      const validToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlRlc3QgVXNlciIsImlhdCI6MTUxNjIzOTAyMiwiZXhwIjo5OTk5OTk5OTk5fQ.test-signature';
+      setAccessToken(validToken);
       
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
+        headers: new Headers({ 'content-type': 'application/json' }),
         json: async () => ({ success: true })
       });
 
@@ -144,7 +158,7 @@ describe('API Utils', () => {
         expect.any(String),
         expect.objectContaining({
           headers: expect.objectContaining({
-            'Authorization': 'Bearer test-token'
+            'X-Access-Token': validToken
           })
         })
       );
@@ -154,6 +168,7 @@ describe('API Utils', () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 401,
+        headers: new Headers({ 'content-type': 'application/json' }),
         json: async () => ({ error: 'Unauthorized' })
       });
 
@@ -172,6 +187,7 @@ describe('API Utils', () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 404,
+        headers: new Headers({ 'content-type': 'application/json' }),
         json: async () => ({ error: 'Not found' })
       });
 
@@ -183,6 +199,7 @@ describe('API Utils', () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 500,
+        headers: new Headers({ 'content-type': 'application/json' }),
         json: async () => ({ error: 'Server error' })
       });
 
@@ -209,10 +226,9 @@ describe('API Utils', () => {
     ] as any as Gift[];
 
     it('should fetch all gifts', async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ success: true, gifts: mockGifts })
-      });
+      global.fetch = vi.fn().mockResolvedValue(
+        createMockResponse({ success: true, gifts: mockGifts })
+      );
 
       const result = await giftApi.getAll();
       expect(result.gifts).toEqual(mockGifts);
@@ -220,10 +236,9 @@ describe('API Utils', () => {
 
     it('should fetch gift by ID', async () => {
       const mockGift = mockGifts[0];
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ gift: mockGift })
-      });
+      global.fetch = vi.fn().mockResolvedValue(
+        createMockResponse({ gift: mockGift })
+      );
 
       const result = await giftApi.getById('1');
       expect(result.gift).toEqual(mockGift);
@@ -240,10 +255,9 @@ describe('API Utils', () => {
         inventory: { total: 10, available: 10, reserved: 0 }
       };
 
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ gift: { id: '2', ...newGift } })
-      });
+      global.fetch = vi.fn().mockResolvedValue(
+        createMockResponse({ gift: { id: '2', ...newGift } })
+      );
 
       const result = await giftApi.create(newGift);
       expect(result.gift).toBeDefined();
@@ -253,10 +267,9 @@ describe('API Utils', () => {
     it('should update gift', async () => {
       const updates = { name: 'Updated Name' };
       
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ gift: { ...mockGifts[0], ...updates } })
-      });
+      global.fetch = vi.fn().mockResolvedValue(
+        createMockResponse({ gift: { ...mockGifts[0], ...updates } })
+      );
 
       const result = await giftApi.update('1', updates);
       expect(result.gift).toBeDefined();
@@ -264,10 +277,9 @@ describe('API Utils', () => {
     });
 
     it('should delete gift', async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ success: true })
-      });
+      global.fetch = vi.fn().mockResolvedValue(
+        createMockResponse({ success: true })
+      );
 
       const result = await giftApi.delete('1');
       expect(result.success).toBe(true);
@@ -301,10 +313,9 @@ describe('API Utils', () => {
     ];
 
     it('should fetch all sites', async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ success: true, data: mockSites })
-      });
+      global.fetch = vi.fn().mockResolvedValue(
+        createMockResponse({ success: true, data: mockSites })
+      );
 
       const result = await siteApi.getAll();
       expect(result.data).toEqual(mockSites);
@@ -312,10 +323,9 @@ describe('API Utils', () => {
 
     it('should fetch site by ID', async () => {
       const mockSite = mockSites[0];
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ success: true, data: mockSite })
-      });
+      global.fetch = vi.fn().mockResolvedValue(
+        createMockResponse({ success: true, data: mockSite })
+      );
 
       const result = await siteApi.getById('1');
       expect(result.data).toEqual(mockSite);
@@ -342,10 +352,9 @@ describe('API Utils', () => {
         }
       };
 
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ success: true, data: { id: '2', ...newSite } })
-      });
+      global.fetch = vi.fn().mockResolvedValue(
+        createMockResponse({ success: true, data: { id: '2', ...newSite } })
+      );
 
       const result = await siteApi.create(newSite) as any;
       expect(result.success).toBe(true);
@@ -354,20 +363,18 @@ describe('API Utils', () => {
     it('should update site', async () => {
       const updates = { name: 'Updated Site' };
 
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ success: true })
-      });
+      global.fetch = vi.fn().mockResolvedValue(
+        createMockResponse({ success: true })
+      );
 
       const result = await siteApi.update('1', updates) as any;
       expect(result.success).toBe(true);
     });
 
     it('should delete site', async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ success: true })
-      });
+      global.fetch = vi.fn().mockResolvedValue(
+        createMockResponse({ success: true })
+      );
 
       const result = await siteApi.delete('1');
       expect(result.success).toBe(true);
@@ -387,10 +394,9 @@ describe('API Utils', () => {
     ];
 
     it('should fetch all clients', async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ success: true, data: mockClients })
-      });
+      global.fetch = vi.fn().mockResolvedValue(
+        createMockResponse({ success: true, data: mockClients })
+      );
 
       const result = await clientApi.getAll();
       expect(result.data).toEqual(mockClients);
@@ -398,10 +404,9 @@ describe('API Utils', () => {
 
     it('should fetch client by ID', async () => {
       const mockClient = mockClients[0];
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ success: true, data: mockClient })
-      });
+      global.fetch = vi.fn().mockResolvedValue(
+        createMockResponse({ success: true, data: mockClient })
+      );
 
       const result = await clientApi.getById('1');
       expect(result.data).toEqual(mockClient);
@@ -414,10 +419,9 @@ describe('API Utils', () => {
         status: 'active' as const
       };
 
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ success: true, data: { id: '2', ...newClient } })
-      });
+      global.fetch = vi.fn().mockResolvedValue(
+        createMockResponse({ success: true, data: { id: '2', ...newClient } })
+      );
 
       const result = await clientApi.create(newClient) as any;
       expect(result.success).toBe(true);
@@ -426,20 +430,18 @@ describe('API Utils', () => {
     it('should update client', async () => {
       const updates = { name: 'Updated Client' };
 
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ success: true })
-      });
+      global.fetch = vi.fn().mockResolvedValue(
+        createMockResponse({ success: true })
+      );
 
       const result = await clientApi.update('1', updates) as any;
       expect(result.success).toBe(true);
     });
 
     it('should delete client', async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ success: true })
-      });
+      global.fetch = vi.fn().mockResolvedValue(
+        createMockResponse({ success: true })
+      );
 
       const result = await clientApi.delete('1');
       expect(result.success).toBe(true);

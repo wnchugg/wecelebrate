@@ -150,7 +150,8 @@ describe('Select Component', () => {
       const trigger = screen.getByRole('combobox');
       await user.click(trigger);
       
-      expect(screen.queryByText('Option 1')).not.toBeVisible();
+      // When disabled, the dropdown shouldn't open, so options shouldn't be in the document
+      expect(screen.queryByText('Option 1')).not.toBeInTheDocument();
     });
   });
 
@@ -184,7 +185,12 @@ describe('Select Component', () => {
       await user.click(screen.getByRole('combobox'));
       
       const disabledItem = screen.getByText('Option 2 (Disabled)');
-      expect(disabledItem).toHaveAttribute('data-disabled', 'true');
+      // Verify the disabled item is rendered
+      expect(disabledItem).toBeInTheDocument();
+      
+      // Radix UI disabled items have data-disabled attribute on parent
+      const itemElement = disabledItem.closest('[role="option"]');
+      expect(itemElement).toHaveAttribute('data-disabled');
     });
   });
 

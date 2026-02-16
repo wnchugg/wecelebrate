@@ -207,10 +207,12 @@ describe('DataTable Component', () => {
 
       expect(screen.queryByText('John Doe')).not.toBeInTheDocument();
 
-      const clearButton = screen.getByRole('button', { name: /clear/i });
-      await user.click(clearButton);
+      // Clear the search by clearing the input directly
+      await user.clear(searchInput);
 
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('John Doe')).toBeInTheDocument();
+      });
     });
   });
 

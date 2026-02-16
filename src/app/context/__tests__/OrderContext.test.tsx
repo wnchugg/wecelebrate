@@ -9,6 +9,7 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { ReactNode } from 'react';
 import { OrderProvider, useOrder } from '../OrderContext';
 import { Gift } from '../GiftContext';
+import { orderApi } from '../../utils/api';
 
 // Mock API
 vi.mock('../../utils/api', () => ({
@@ -171,8 +172,7 @@ describe('OrderContext', () => {
 
   describe('Order Submission', () => {
     it('should submit order successfully', async () => {
-      const { orderApi } = require('../../utils/api');
-      orderApi.create.mockResolvedValue({
+      vi.mocked(orderApi.create).mockResolvedValue({
         order: { id: 'order-123' },
       });
       
@@ -200,8 +200,7 @@ describe('OrderContext', () => {
     });
 
     it('should clear order after successful submission', async () => {
-      const { orderApi } = require('../../utils/api');
-      orderApi.create.mockResolvedValue({
+      vi.mocked(orderApi.create).mockResolvedValue({
         order: { id: 'order-123' },
       });
       
@@ -223,8 +222,7 @@ describe('OrderContext', () => {
     });
 
     it('should handle submission error', async () => {
-      const { orderApi } = require('../../utils/api');
-      orderApi.create.mockRejectedValue(new Error('Submission failed'));
+      vi.mocked(orderApi.create).mockRejectedValue(new Error('Submission failed'));
       
       const { result } = renderHook(() => useOrder(), { wrapper });
       

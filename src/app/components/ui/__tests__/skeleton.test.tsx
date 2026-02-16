@@ -24,7 +24,7 @@ describe('Skeleton Component', () => {
     it('should have proper styling classes', () => {
       renderWithRouter(<Skeleton data-testid="skeleton" />);
       const skeleton = screen.getByTestId('skeleton');
-      expect(skeleton).toHaveClass('animate-pulse', 'rounded-md', 'bg-muted');
+      expect(skeleton).toHaveClass('animate-pulse', 'rounded-md', 'bg-accent');
     });
 
     it('should accept custom className', () => {

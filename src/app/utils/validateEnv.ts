@@ -75,19 +75,19 @@ export function validateEnvironmentConfiguration(): ValidationResult {
  * Print validation report to console
  */
 export function printValidationReport(): void {
-  console.group('🔍 Environment Configuration Report');
+  console.warn('🔍 Environment Configuration Report');
   
   const result = validateEnvironmentConfiguration();
   
   // Environment info
-  console.log('\n📍 Environment:', result.environment.toUpperCase());
-  console.log('Mode:', safeGetEnv('MODE'));
-  console.log('Production build:', safeGetEnv('PROD'));
-  console.log('Development mode:', safeGetEnv('DEV'));
+  console.warn('\n📍 Environment:', result.environment.toUpperCase());
+  console.warn('Mode:', safeGetEnv('MODE'));
+  console.warn('Production build:', safeGetEnv('PROD'));
+  console.warn('Development mode:', safeGetEnv('DEV'));
   
   // Status
   if (result.isValid) {
-    console.log('\n✅ Configuration is valid');
+    console.warn('\n✅ Configuration is valid');
   } else {
     console.error('\n❌ Configuration has errors:');
     result.errors.forEach(error => console.error(`  - ${error}`));
@@ -100,24 +100,24 @@ export function printValidationReport(): void {
   }
   
   // Integration status
-  console.log('\n🔌 Integrations:');
-  console.log('  Supabase:', result.info.hasSupabase ? '✅ Configured' : '❌ Not configured');
-  console.log('  Analytics:', result.info.hasAnalytics ? '✅ Configured' : '❌ Not configured');
-  console.log('  Monitoring:', result.info.hasMonitoring ? '✅ Configured' : '❌ Not configured');
+  console.warn('\n🔌 Integrations:');
+  console.warn('  Supabase:', result.info.hasSupabase ? '✅ Configured' : '❌ Not configured');
+  console.warn('  Analytics:', result.info.hasAnalytics ? '✅ Configured' : '❌ Not configured');
+  console.warn('  Monitoring:', result.info.hasMonitoring ? '✅ Configured' : '❌ Not configured');
   
   // API Configuration
-  console.log('\n🌐 API Configuration:');
-  console.log('  Base URL:', safeGetEnv('VITE_API_URL') || '(using default)');
+  console.warn('\n🌐 API Configuration:');
+  console.warn('  Base URL:', safeGetEnv('VITE_API_URL') || '(using default)');
   
   // Help text
   if (!result.isValid || result.warnings.length > 0) {
-    console.log('\n📚 For help:');
-    console.log('  - See ENVIRONMENT_VARIABLES.md for complete documentation');
-    console.log('  - See ENVIRONMENT_QUICK_REFERENCE.md for quick reference');
-    console.log('  - Check .env.example for available variables');
+    console.warn('\n📚 For help:');
+    console.warn('  - See ENVIRONMENT_VARIABLES.md for complete documentation');
+    console.warn('  - See ENVIRONMENT_QUICK_REFERENCE.md for quick reference');
+    console.warn('  - Check .env.example for available variables');
   }
   
-  console.groupEnd();
+  // End of report
 }
 
 /**

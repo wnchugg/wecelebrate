@@ -275,7 +275,7 @@ export function SiteConfiguration() {
     if (!currentSite || !hasChanges || configMode === 'live' || isAutoSaving) return;
     
     setIsAutoSaving(true);
-    console.log('[SiteConfiguration] Auto-saving draft...');
+    console.warn('[SiteConfiguration] Auto-saving draft...');
     
     try {
       await updateSite(currentSite.id, {

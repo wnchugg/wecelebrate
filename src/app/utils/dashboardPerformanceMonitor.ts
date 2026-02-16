@@ -41,7 +41,7 @@ class DashboardPerformanceMonitor {
     const startTime = performance.now();
     this.timers.set(name, startTime);
 
-    console.log(`[Performance] ⏱️ Started: ${name}`, metadata);
+    console.warn(`[Performance] ⏱️ Started: ${name}`, metadata);
   }
 
   /**
@@ -70,7 +70,7 @@ class DashboardPerformanceMonitor {
     this.timers.delete(name);
 
     const color = duration > 1000 ? '🔴' : duration > 500 ? '🟡' : '🟢';
-    console.log(`[Performance] ${color} Completed: ${name} in ${duration.toFixed(2)}ms`, metadata);
+    console.warn(`[Performance] ${color} Completed: ${name} in ${duration.toFixed(2)}ms`, metadata);
 
     // Warn about slow operations
     if (duration > 1000) {
@@ -85,7 +85,7 @@ class DashboardPerformanceMonitor {
     if (!this.enabled) return;
 
     performance.mark(name);
-    console.log(`[Performance] 📍 Mark: ${name}`, metadata);
+    console.warn(`[Performance] 📍 Mark: ${name}`, metadata);
   }
 
   /**
@@ -106,7 +106,7 @@ class DashboardPerformanceMonitor {
         };
 
         this.metrics.push(metric);
-        console.log(`[Performance] 📏 Measured: ${name} = ${measure.duration.toFixed(2)}ms`);
+        console.warn(`[Performance] 📏 Measured: ${name} = ${measure.duration.toFixed(2)}ms`);
       }
     } catch (error) {
       console.error(`[Performance] Failed to measure ${name}:`, error);
@@ -161,26 +161,26 @@ class DashboardPerformanceMonitor {
    */
   printReport() {
     if (!this.enabled) {
-      console.log('[Performance] Monitoring is disabled');
+      console.warn('[Performance] Monitoring is disabled');
       return;
     }
 
     const report = this.getReport();
 
-    console.group('📊 Dashboard Performance Report');
-    console.log(`Total Operations: ${report.metrics.length}`);
-    console.log(`Total Duration: ${report.summary.totalDuration.toFixed(2)}ms`);
-    console.log(`Average Duration: ${report.summary.averageDuration.toFixed(2)}ms`);
+    console.warn('📊 Dashboard Performance Report');
+    console.warn(`Total Operations: ${report.metrics.length}`);
+    console.warn(`Total Duration: ${report.summary.totalDuration.toFixed(2)}ms`);
+    console.warn(`Average Duration: ${report.summary.averageDuration.toFixed(2)}ms`);
     
     if (report.summary.slowest) {
-      console.log(`Slowest: ${report.summary.slowest.name} (${report.summary.slowest.duration.toFixed(2)}ms)`);
+      console.warn(`Slowest: ${report.summary.slowest.name} (${report.summary.slowest.duration.toFixed(2)}ms)`);
     }
     
     if (report.summary.fastest) {
-      console.log(`Fastest: ${report.summary.fastest.name} (${report.summary.fastest.duration.toFixed(2)}ms)`);
+      console.warn(`Fastest: ${report.summary.fastest.name} (${report.summary.fastest.duration.toFixed(2)}ms)`);
     }
 
-    console.table(
+    console.warn(
       report.metrics.map(m => ({
         Name: m.name,
         'Duration (ms)': m.duration.toFixed(2),
@@ -188,7 +188,7 @@ class DashboardPerformanceMonitor {
       }))
     );
     
-    console.groupEnd();
+    // End of report (no groupEnd needed)
   }
 
   /**
@@ -199,7 +199,7 @@ class DashboardPerformanceMonitor {
     this.timers.clear();
     performance.clearMarks();
     performance.clearMeasures();
-    console.log('[Performance] Cleared all metrics');
+    console.warn('[Performance] Cleared all metrics');
   }
 
   /**
@@ -208,7 +208,7 @@ class DashboardPerformanceMonitor {
   enable() {
     this.enabled = true;
     localStorage.setItem('enablePerformanceMonitoring', 'true');
-    console.log('[Performance] ✅ Monitoring enabled');
+    console.warn('[Performance] ✅ Monitoring enabled');
   }
 
   /**
@@ -217,7 +217,7 @@ class DashboardPerformanceMonitor {
   disable() {
     this.enabled = false;
     localStorage.removeItem('enablePerformanceMonitoring');
-    console.log('[Performance] ❌ Monitoring disabled');
+    console.warn('[Performance] ❌ Monitoring disabled');
   }
 
   /**
@@ -290,7 +290,7 @@ export function usePerformanceMonitor() {
 }
 
 // Console helper functions
-console.log(`
+console.warn(`
 📊 Dashboard Performance Monitor
 --------------------------------
 Access via: window.dashboardPerfMon

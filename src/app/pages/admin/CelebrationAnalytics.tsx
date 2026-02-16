@@ -82,9 +82,9 @@ export function CelebrationAnalytics() {
     try {
       const [celebrationsRes, ordersRes, employeesRes, clientsRes] = await Promise.all([
         apiRequest<{ data: Celebration[] }>('/celebrations').catch(() => ({ data: [] as Celebration[] })),
-        apiRequest<{ data: Order[] }>('/orders').catch(() => ({ data: [] as Order[] })),
-        apiRequest<{ data: Employee[] }>('/employees').catch(() => ({ data: [] as Employee[] })),
-        apiRequest<{ data: Client[] }>('/clients').catch(() => ({ data: [] as Client[] }))
+        apiRequest<{ data: Order[] }>('/v2/orders').catch(() => ({ data: [] as Order[] })),
+        apiRequest<{ data: Employee[] }>('/v2/employees').catch(() => ({ data: [] as Employee[] })),
+        apiRequest<{ data: Client[] }>('/v2/clients').catch(() => ({ data: [] as Client[] }))
       ]);
 
       setCelebrations(celebrationsRes.data || []);

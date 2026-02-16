@@ -87,7 +87,7 @@ export function getPublicSiteOrigin(): string {
     const withoutSuffix = hostname.replace('-v2-figmaiframepreview', '');
     if (withoutSuffix !== hostname && withoutSuffix.includes('.figma.site')) {
       // Log that we're using this approach
-      console.info('[URL Utils] Using suffix-removal approach for public site URL:', `https://${withoutSuffix}`);
+      console.warn('[URL Utils] Using suffix-removal approach for public site URL:', `https://${withoutSuffix}`);
       return `https://${withoutSuffix}`;
     }
     

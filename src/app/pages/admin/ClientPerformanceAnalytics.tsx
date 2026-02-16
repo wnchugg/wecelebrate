@@ -88,10 +88,10 @@ export function ClientPerformanceAnalytics() {
     setIsLoading(true);
     try {
       const [clientsRes, sitesRes, ordersRes, employeesRes] = await Promise.all([
-        apiRequest<{ data: Client[] }>('/clients').catch(() => ({ data: [] as Client[] })),
-        apiRequest<{ data: Site[] }>('/sites').catch(() => ({ data: [] as Site[] })),
-        apiRequest<{ data: Order[] }>('/orders').catch(() => ({ data: [] as Order[] })),
-        apiRequest<{ data: Employee[] }>('/employees').catch(() => ({ data: [] as Employee[] }))
+        apiRequest<{ data: Client[] }>('/v2/clients').catch(() => ({ data: [] as Client[] })),
+        apiRequest<{ data: Site[] }>('/v2/sites').catch(() => ({ data: [] as Site[] })),
+        apiRequest<{ data: Order[] }>('/v2/orders').catch(() => ({ data: [] as Order[] })),
+        apiRequest<{ data: Employee[] }>('/v2/employees').catch(() => ({ data: [] as Employee[] }))
       ]);
 
       setClients(clientsRes.data || []);

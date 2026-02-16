@@ -10,6 +10,7 @@ import userEvent from '@testing-library/user-event';
 import { Cart } from '../Cart';
 import { renderWithRouter } from '@/test/helpers';
 import { CartProvider } from '../../context/CartContext';
+import { LanguageProvider } from '../../context/LanguageContext';
 
 // Mock dependencies
 vi.mock('lucide-react', () => ({
@@ -50,9 +51,11 @@ vi.mock('../../utils/logger', () => ({
 
 function TestWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <CartProvider>
-      {children}
-    </CartProvider>
+    <LanguageProvider>
+      <CartProvider>
+        {children}
+      </CartProvider>
+    </LanguageProvider>
   );
 }
 
@@ -207,7 +210,8 @@ describe('Cart Page Component Suite', () => {
         </TestWrapper>
       );
       
-      expect(screen.getByText('Your cart is empty')).toBeInTheDocument();
+      const messages = screen.getAllByText('Your cart is empty');
+      expect(messages.length).toBeGreaterThan(0);
     });
   });
 
@@ -219,7 +223,8 @@ describe('Cart Page Component Suite', () => {
         </TestWrapper>
       );
       
-      expect(screen.getByText('Your cart is empty')).toBeInTheDocument();
+      const messages = screen.getAllByText('Your cart is empty');
+      expect(messages.length).toBeGreaterThan(0);
     });
 
     it('should render shopping cart icon', () => {
@@ -661,7 +666,8 @@ describe('Cart Page Component Suite', () => {
         </TestWrapper>
       );
       
-      expect(screen.getByText('Your cart is empty')).toBeInTheDocument();
+      const messages = screen.getAllByText('Your cart is empty');
+      expect(messages.length).toBeGreaterThan(0);
     });
 
     it('should render without errors', () => {

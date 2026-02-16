@@ -15,7 +15,7 @@ export function SecurityChecklist() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    performSecurityChecks();
+    void performSecurityChecks();
   }, []);
 
   const performSecurityChecks = async () => {
@@ -334,7 +334,7 @@ export function SecurityChecklist() {
       {/* Rerun Button */}
       <div className="text-center">
         <button
-          onClick={performSecurityChecks}
+          onClick={() => void performSecurityChecks()}
           className="px-6 py-3 bg-[#D91C81] text-white rounded-lg hover:bg-[#B71569] transition-colors font-medium"
         >
           Re-run Security Checks

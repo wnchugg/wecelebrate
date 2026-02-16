@@ -81,11 +81,11 @@ export function getAllEnvVars(): Partial<ImportMetaEnv> {
 export function logEnvVars(): void {
   try {
     if (safeGetEnv('DEV' as keyof ImportMetaEnv)) {
-      console.group('🔧 Environment Variables');
-      console.log('Mode:', safeGetEnv('MODE' as keyof ImportMetaEnv));
-      console.log('Base URL:', safeGetEnv('BASE_URL' as keyof ImportMetaEnv));
-      console.log('Production:', safeGetEnv('PROD' as keyof ImportMetaEnv));
-      console.log('Development:', safeGetEnv('DEV' as keyof ImportMetaEnv));
+      console.warn('🔧 Environment Variables');
+      console.warn('Mode:', safeGetEnv('MODE' as keyof ImportMetaEnv));
+      console.warn('Base URL:', safeGetEnv('BASE_URL' as keyof ImportMetaEnv));
+      console.warn('Production:', safeGetEnv('PROD' as keyof ImportMetaEnv));
+      console.warn('Development:', safeGetEnv('DEV' as keyof ImportMetaEnv));
       
       // Log custom VITE_ variables (filter out built-ins)
       const env = safeGetEnv();
@@ -102,9 +102,9 @@ export function logEnvVars(): void {
             return acc;
           }, {} as Record<string, unknown>);
         
-        console.table(customVars);
+        console.warn(customVars);
       }
-      console.groupEnd();
+      // End of environment variables log
     }
   } catch (e) {
     // Silently fail if import.meta.env is not available

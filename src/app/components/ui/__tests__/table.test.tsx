@@ -231,8 +231,12 @@ describe('Table Component', () => {
       );
 
       expect(screen.getByRole('table')).toBeInTheDocument();
-      expect(screen.getByRole('rowgroup')).toBeInTheDocument();
-      expect(screen.getByRole('row')).toBeInTheDocument();
+      // There are multiple rowgroups (thead and tbody)
+      const rowgroups = screen.getAllByRole('rowgroup');
+      expect(rowgroups.length).toBeGreaterThanOrEqual(1);
+      // There are multiple rows (header and body)
+      const rows = screen.getAllByRole('row');
+      expect(rows.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should support caption for accessibility', () => {

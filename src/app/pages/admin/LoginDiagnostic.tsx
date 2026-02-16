@@ -12,11 +12,11 @@ export function LoginDiagnostic() {
     setDiagnosticData(null);
 
     try {
-      console.log('[LoginDiagnostic] Starting diagnostic...');
-      console.log('[LoginDiagnostic] Project ID:', projectId);
+      console.warn('[LoginDiagnostic] Starting diagnostic...');
+      console.warn('[LoginDiagnostic] Project ID:', projectId);
       
       // Call the debug/check-admin-users endpoint
-      console.log('[LoginDiagnostic] Calling /debug/check-admin-users...');
+      console.warn('[LoginDiagnostic] Calling /debug/check-admin-users...');
       const response = await fetch(
         `https://${projectId}.supabase.co/functions/v1/make-server-6fcaeea3/debug/check-admin-users`,
         {
@@ -36,7 +36,7 @@ export function LoginDiagnostic() {
         throw new Error(`Failed to parse response: ${jsonError.message}. Response may not be valid JSON.`);
       }
       
-      console.log('[LoginDiagnostic] Diagnostic result:', data);
+      console.warn('[LoginDiagnostic] Diagnostic result:', data);
 
       if (!response.ok) {
         console.error('Diagnostic response not OK:', response.status, data);

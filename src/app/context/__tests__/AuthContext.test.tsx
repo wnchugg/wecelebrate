@@ -8,6 +8,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { ReactNode } from 'react';
 import { AuthProvider, useAuth, User } from '../AuthContext';
+import { logSecurityEvent, startSessionTimer, clearSessionTimer, resetSessionTimer } from '../../utils/security';
 
 // Mock security utilities
 vi.mock('../../utils/security', () => ({
@@ -119,7 +120,6 @@ describe('AuthContext', () => {
     });
 
     it('should log security event on authentication', () => {
-      const { logSecurityEvent } = require('../../utils/security');
       const { result } = renderHook(() => useAuth(), { wrapper });
       
       act(() => {
@@ -134,7 +134,6 @@ describe('AuthContext', () => {
     });
 
     it('should start session timer on authentication', () => {
-      const { startSessionTimer } = require('../../utils/security');
       const { result } = renderHook(() => useAuth(), { wrapper });
       
       act(() => {
@@ -198,7 +197,6 @@ describe('AuthContext', () => {
     });
 
     it('should log security event on logout', () => {
-      const { logSecurityEvent } = require('../../utils/security');
       const { result } = renderHook(() => useAuth(), { wrapper });
       
       act(() => {
@@ -219,7 +217,6 @@ describe('AuthContext', () => {
     });
 
     it('should clear session timer on logout', () => {
-      const { clearSessionTimer } = require('../../utils/security');
       const { result } = renderHook(() => useAuth(), { wrapper });
       
       act(() => {
@@ -271,7 +268,6 @@ describe('AuthContext', () => {
 
   describe('Session Management', () => {
     it('should reset session timer on user activity when authenticated', () => {
-      const { resetSessionTimer } = require('../../utils/security');
       const { result } = renderHook(() => useAuth(), { wrapper });
       
       act(() => {
@@ -289,7 +285,6 @@ describe('AuthContext', () => {
     });
 
     it('should listen to multiple activity events', () => {
-      const { resetSessionTimer } = require('../../utils/security');
       const { result } = renderHook(() => useAuth(), { wrapper });
       
       act(() => {
@@ -310,7 +305,6 @@ describe('AuthContext', () => {
     });
 
     it('should not reset timer when not authenticated', () => {
-      const { resetSessionTimer } = require('../../utils/security');
       const { result } = renderHook(() => useAuth(), { wrapper });
       
       // Not authenticated
@@ -341,7 +335,6 @@ describe('AuthContext', () => {
     });
 
     it('should clear timer on unmount', () => {
-      const { clearSessionTimer } = require('../../utils/security');
       const { result, unmount } = renderHook(() => useAuth(), { wrapper });
       
       act(() => {

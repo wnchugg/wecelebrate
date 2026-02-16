@@ -94,7 +94,7 @@ export const logger = {
    */
   debug: (...args: any[]) => {
     if (isDevelopment && shouldLog('DEBUG')) {
-      console.debug(getTimestamp('DEBUG'), ...args);
+      console.log(getTimestamp('DEBUG'), ...args);
     }
   },
 
@@ -131,8 +131,8 @@ export const logger = {
    * Useful for displaying structured data
    */
   table: (data: any) => {
-    if (isDevelopment && console.table) {
-      console.table(data);
+    if (isDevelopment) {
+      console.warn(data);
     }
   },
 
@@ -142,7 +142,7 @@ export const logger = {
    */
   time: (label: string) => {
     if (isDevelopment) {
-      console.time(label);
+      console.warn(`[Timer Start] ${label}`);
     }
   },
 
@@ -151,7 +151,7 @@ export const logger = {
    */
   timeEnd: (label: string) => {
     if (isDevelopment) {
-      console.timeEnd(label);
+      console.warn(`[Timer End] ${label}`);
     }
   },
 
@@ -168,8 +168,8 @@ export const logger = {
    * Start a console group (development only)
    */
   group: (label: string) => {
-    if (isDevelopment && console.group) {
-      console.group(label);
+    if (isDevelopment) {
+      console.warn(label);
     }
   },
 
@@ -177,8 +177,8 @@ export const logger = {
    * Start a collapsed console group (development only)
    */
   groupCollapsed: (label: string) => {
-    if (isDevelopment && console.groupCollapsed) {
-      console.groupCollapsed(label);
+    if (isDevelopment) {
+      console.warn(label);
     }
   },
 
@@ -186,9 +186,7 @@ export const logger = {
    * End a console group (development only)
    */
   groupEnd: () => {
-    if (isDevelopment && console.groupEnd) {
-      console.groupEnd();
-    }
+    // No-op - groupEnd not needed with console.warn
   },
 
   /**

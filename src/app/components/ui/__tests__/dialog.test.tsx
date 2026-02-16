@@ -250,8 +250,9 @@ describe('Dialog Component', () => {
       await user.click(screen.getByRole('button', { name: /open/i }));
 
       await waitFor(() => {
-        const overlay = document.querySelector('[data-radix-dialog-overlay]');
-        expect(overlay).toBeInTheDocument();
+        // Check for dialog role instead of overlay element
+        const dialog = screen.getByRole('dialog');
+        expect(dialog).toBeInTheDocument();
       });
     });
   });

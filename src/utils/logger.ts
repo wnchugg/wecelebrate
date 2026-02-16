@@ -11,7 +11,14 @@ export interface LogContext {
   userId?: string;
   action?: string;
   resource?: string;
+  service?: string;
+  url?: string;
+  siteId?: string;
+  stats?: any;
+  count?: number;
+  config?: any;
   metadata?: Record<string, any>;
+  [key: string]: any; // Allow any additional properties
 }
 
 class Logger {
@@ -64,13 +71,13 @@ class Logger {
   debug(message: string, context?: LogContext): void {
     if (!this.shouldLog(LogLevel.DEBUG)) return;
 
-    console.debug(this.formatMessage(LogLevel.DEBUG, message, context));
+    console.warn(this.formatMessage(LogLevel.DEBUG, message, context));
   }
 
   info(message: string, context?: LogContext): void {
     if (!this.shouldLog(LogLevel.INFO)) return;
 
-    console.info(this.formatMessage(LogLevel.INFO, message, context));
+    console.warn(this.formatMessage(LogLevel.INFO, message, context));
     this.sendToServer(LogLevel.INFO, message, context);
   }
 

@@ -7,7 +7,7 @@
  * Simple event emitter
  */
 export class EventEmitter<T extends Record<string, any> = Record<string, any>> {
-  private events: Map<keyof T, Set<Function>> = new Map();
+  private events: Map<keyof T, Set<(...args: any[]) => void>> = new Map();
   
   /**
    * Subscribe to an event

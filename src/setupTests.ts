@@ -164,7 +164,7 @@ beforeAll(() => {
   // Request animation frame (if not already provided by jsdom)
   if (!window.requestAnimationFrame) {
     window.requestAnimationFrame = vi.fn((callback) => {
-      return setTimeout(callback, 16) as any;
+      return setTimeout(() => callback(), 16) as any;
     });
   }
   
@@ -191,6 +191,22 @@ beforeAll(() => {
     // jsdom doesn't implement scrollIntoView but Radix UI uses it for keyboard navigation
     if (!Element.prototype.scrollIntoView) {
       Element.prototype.scrollIntoView = vi.fn();
+    }
+  }
+  
+  // Also add to HTMLElement for broader compatibility
+  if (typeof HTMLElement !== 'undefined') {
+    if (!HTMLElement.prototype.hasPointerCapture) {
+      HTMLElement.prototype.hasPointerCapture = vi.fn(() => false);
+    }
+    if (!HTMLElement.prototype.setPointerCapture) {
+      HTMLElement.prototype.setPointerCapture = vi.fn();
+    }
+    if (!HTMLElement.prototype.releasePointerCapture) {
+      HTMLElement.prototype.releasePointerCapture = vi.fn();
+    }
+    if (!HTMLElement.prototype.scrollIntoView) {
+      HTMLElement.prototype.scrollIntoView = vi.fn();
     }
   }
 });

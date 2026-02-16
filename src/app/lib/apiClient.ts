@@ -154,12 +154,15 @@ function validateTokenType(token: string): void {
     const header = JSON.parse(atob(parts[0]));
     const algorithm = header.alg || '';
 
-    if (algorithm !== 'HS256') {
+    // Accept both HS256 (legacy) and EdDSA/ES256 (Ed25519) tokens
+    // Backend was migrated to Ed25519 on 2026-02-15 for better security
+    const validAlgorithms = ['HS256', 'EdDSA', 'ES256'];
+    if (!validAlgorithms.includes(algorithm)) {
       console.error('═══════════════════════════════════════════════════════');
       console.error('🚨 CRITICAL: INVALID TOKEN DETECTED IN API CLIENT');
       console.error('═══════════════════════════════════════════════════════');
-      console.error(`Algorithm: ${algorithm} (Expected: HS256)`);
-      console.error('This is a Supabase Auth token (ES256), NOT our backend token.');
+      console.error(`Algorithm: ${algorithm} (Expected: ${validAlgorithms.join(' or ')})`);
+      console.error('This token uses an unsupported algorithm.');
       console.error('Clearing ALL storage and redirecting to token clear page...');
       console.error('═══════════════════════════════════════════════════════');
       

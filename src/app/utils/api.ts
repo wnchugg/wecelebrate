@@ -158,17 +158,18 @@ function isValidTokenFormat(token: string): boolean {
       type: header.typ
     });
     
-    // CRITICAL FIX: ONLY accept HS256 tokens (our custom backend JWT)
-    // Reject ES256 (Supabase Auth) and any other algorithms
-    if (header.alg !== 'HS256') {
+    // CRITICAL FIX: Accept BOTH HS256 (legacy) and EdDSA/ES256 (Ed25519) tokens
+    // Backend was migrated to Ed25519 on 2026-02-15 for better security
+    const validAlgorithms = ['HS256', 'EdDSA', 'ES256'];
+    if (!validAlgorithms.includes(header.alg)) {
       logger.info('[Token Validation] Token rejected - invalid algorithm', { 
         algorithm: header.alg,
-        expected: 'HS256'
+        expected: validAlgorithms.join(' or ')
       });
       return false;
     }
     
-    logger.info('[Token Validation] Algorithm is HS256, checking expiration...');
+    logger.info('[Token Validation] Algorithm is valid (' + header.alg + '), checking expiration...');
     
     // Check expiration in payload
     const payload = JSON.parse(atob(parts[1])) as JWTPayload;

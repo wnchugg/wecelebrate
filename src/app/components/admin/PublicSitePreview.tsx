@@ -76,7 +76,9 @@ export function PublicSitePreview() {
             </div>
             <div>
               <p className="text-gray-600 mb-1">Validation Method</p>
-              <p className="font-semibold text-gray-900 capitalize">{currentSite.settings.validationMethod.replace('_', ' ')}</p>
+              <p className="font-semibold text-gray-900 capitalize">
+                {currentSite.settings?.validationMethod?.replace('_', ' ') || 'Not configured'}
+              </p>
             </div>
           </div>
         </div>

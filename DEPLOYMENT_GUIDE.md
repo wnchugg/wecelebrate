@@ -233,27 +233,153 @@ curl https://wjfcqqrlhwdvvjmefxky.supabase.co/functions/v1/make-server-6fcaeea3/
 3. Ensure frontend accepts EdDSA tokens
 4. Clear browser cache and sessionStorage
 
+**Debug token in browser console:**
+```javascript
+// Paste this in browser console
+const token = sessionStorage.getItem('jala_access_token');
+if (token) {
+  const parts = token.split('.');
+  const header = JSON.parse(atob(parts[0]));
+  const payload = JSON.parse(atob(parts[1]));
+  console.log('Token Header:', header);
+  console.log('Token Payload:', payload);
+  console.log('Algorithm:', header.alg); // Should be "EdDSA"
+}
+```
+
+### Ed25519 Key Issues
+
+**Error**: `JWT Ed25519 private key not initialized`
+
+**Solutions**:
+1. Verify keys are set in Supabase secrets:
+   ```bash
+   supabase secrets list
+   ```
+2. Check keys are valid base64-encoded JWK format
+3. Regenerate keys if corrupted
+4. Redeploy Edge Function after setting keys
+
+**Error**: `Invalid or expired token`
+
+**Solutions**:
+1. Check token expiration (24 hour default)
+2. Verify frontend and backend are using same keys
+3. Clear browser sessionStorage and login again
+4. Check backend logs for verification errors
+
 ## Backend Deployment
 
-The backend (Supabase Edge Functions) must be deployed separately:
+The backend (Supabase Edge Functions) must be deployed separately and requires Ed25519 JWT keys.
+
+### Step 1: Generate Ed25519 Keys (First Time Only)
+
+The backend uses Ed25519 asymmetric keys for JWT authentication (more secure than HS256).
+
+#### Option A: Browser Tool (Easiest)
+
+1. Open `generate_ed25519_keys.html` in your browser
+2. Click "Generate Ed25519 Key Pair"
+3. Copy the `JWT_PUBLIC_KEY` and `JWT_PRIVATE_KEY` values
+
+#### Option B: Command Line
+
+```bash
+cd supabase/functions/server
+deno run --allow-all generate_ed25519_keys.ts
+```
+
+#### Option C: Online Tool
+
+Visit https://mkjwk.org/
+- Key Use: Signature
+- Algorithm: EdDSA
+- Curve: Ed25519
+- Click "Generate"
+- Copy the keys in JWK format
+
+**Important**: Generate separate keys for each environment (dev, staging, production).
+
+### Step 2: Configure Supabase Secrets
+
+Add the generated keys to Supabase:
 
 ```bash
 # Login to Supabase
 supabase login
 
-# Link to project
+# Link to project (Development)
 supabase link --project-ref wjfcqqrlhwdvvjmefxky
 
-# Set secrets (Ed25519 keys)
-supabase secrets set JWT_PRIVATE_KEY="[base64-encoded-private-key]"
-supabase secrets set JWT_PUBLIC_KEY="[base64-encoded-public-key]"
+# Set Ed25519 keys (paste the base64-encoded values from Step 1)
+supabase secrets set JWT_PRIVATE_KEY="eyJrdHkiOiJPS1AiLCJjcnYiOiJFZDI1NTE5..."
+supabase secrets set JWT_PUBLIC_KEY="eyJrdHkiOiJPS1AiLCJjcnYiOiJFZDI1NTE5..."
 
-# Deploy Edge Function
-supabase functions deploy make-server-6fcaeea3
-
-# Verify deployment
-curl https://wjfcqqrlhwdvvjmefxky.supabase.co/functions/v1/make-server-6fcaeea3/health
+# Also set Supabase keys (if not already set)
+supabase secrets set SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
+supabase secrets set SUPABASE_ANON_KEY="your-anon-key"
 ```
+
+**For Production**: Repeat with production project ID and different keys:
+```bash
+supabase link --project-ref [production-project-id]
+supabase secrets set JWT_PRIVATE_KEY="[production-private-key]"
+supabase secrets set JWT_PUBLIC_KEY="[production-public-key]"
+```
+
+### Step 3: Deploy Edge Function
+
+```bash
+# Deploy to development
+supabase functions deploy make-server-6fcaeea3 --no-verify-jwt
+
+# Or deploy to production (after linking to prod project)
+supabase functions deploy make-server-6fcaeea3 --no-verify-jwt
+```
+
+### Step 4: Verify Deployment
+
+Check the Supabase logs for successful key loading:
+
+```bash
+# In Supabase Dashboard → Edge Functions → make-server-6fcaeea3 → Logs
+# Look for:
+✅ JWT Ed25519 private key loaded
+✅ JWT Ed25519 public key loaded
+```
+
+Test the health endpoint:
+```bash
+curl https://wjfcqqrlhwdvvjmefxky.supabase.co/functions/v1/make-server-6fcaeea3/health
+
+# Expected response:
+# {"status":"ok","message":"JALA2 Backend is running"}
+```
+
+Test admin login:
+```bash
+curl -X POST https://wjfcqqrlhwdvvjmefxky.supabase.co/functions/v1/make-server-6fcaeea3/auth/login \
+  -H "Content-Type: application/json" \
+  -H "X-Environment-ID: development" \
+  -d '{"identifier": "test-admin@wecelebrate.test", "password": "TestPassword123!"}'
+
+# Should return access_token and user object
+```
+
+### Ed25519 Security Benefits
+
+- ✅ **Cryptographically secure**: Can't be guessed from public project ID
+- ✅ **Asymmetric**: Private key signs, public key verifies
+- ✅ **Performance**: 4x faster than HS256 (40k ops/sec vs 10k ops/sec)
+- ✅ **Industry standard**: Used by GitHub, SSH, Signal, etc.
+
+### Key Rotation (Every 90 Days)
+
+1. Generate new Ed25519 keys
+2. Add new keys to Supabase secrets
+3. Deploy backend
+4. Old tokens remain valid for 24 hours (grace period)
+5. Remove old keys after grace period
 
 ## CI/CD Pipeline (Future)
 

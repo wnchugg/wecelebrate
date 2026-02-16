@@ -475,11 +475,11 @@ export function AdminLayout() {
                         style={{ color: currentSite.branding?.primaryColor || '#D91C81' }}
                         aria-hidden="true"
                       >
-                        {currentClient.name.substring(0, 2).toUpperCase()}
+                        {currentClient?.name?.substring(0, 2).toUpperCase()}
                       </div>
                       <div className="hidden sm:flex flex-col items-start">
-                        <span className="text-xs font-medium opacity-90">{currentClient.name}</span>
-                        <span className="text-sm font-bold">{currentSite.name}</span>
+                        <span className="text-xs font-medium opacity-90">{currentClient?.name}</span>
+                        <span className="text-sm font-bold">{currentSite?.name}</span>
                       </div>
                       <ChevronDown className="w-4 h-4 ml-1" aria-hidden="true" />
                     </>
@@ -572,7 +572,7 @@ export function AdminLayout() {
                                 >
                                   <div 
                                     className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold flex-shrink-0 shadow-sm"
-                                    style={{ backgroundColor: site.branding.primaryColor }}
+                                    style={{ backgroundColor: site?.branding?.primaryColor }}
                                     aria-hidden="true"
                                   >
                                     {siteClient ? siteClient.name.substring(0, 2).toUpperCase() : 'NA'}

@@ -194,15 +194,15 @@ export function SiteSelection() {
                       <div className="flex gap-1">
                         <div
                           className="w-6 h-6 rounded-full border-2 border-white/30"
-                          style={{ backgroundColor: site.branding.primaryColor }}
-                          title={`Primary: ${site.branding.primaryColor}`}
+                          style={{ backgroundColor: site?.branding?.primaryColor }}
+                          title={`Primary: ${site?.branding?.primaryColor}`}
                         />
                         <div
                           className="w-6 h-6 rounded-full border-2 border-white/30"
-                          style={{ backgroundColor: site.branding.secondaryColor }}
-                          title={`Secondary: ${site.branding.secondaryColor}`}
+                          style={{ backgroundColor: site?.branding?.secondaryColor }}
+                          title={`Secondary: ${site?.branding?.secondaryColor}`}
                         />
-                        {site.branding.accentColor && (
+                        {site?.branding?.accentColor && (
                           <div
                             className="w-6 h-6 rounded-full border-2 border-white/30"
                             style={{ backgroundColor: site.branding.accentColor }}
@@ -216,12 +216,12 @@ export function SiteSelection() {
                     <div className="flex items-center gap-2">
                       <span className="text-white/60 text-sm">{t('siteSelection.validationMethod')}:</span>
                       <Badge variant="outline" className="text-white border-white/30">
-                        {site.settings.validationMethod}
+                        {site?.settings?.validationMethod}
                       </Badge>
                     </div>
 
                     {/* Languages */}
-                    {site.settings.languages && site.settings.languages.length > 0 && (
+                    {site?.settings?.languages && site.settings.languages.length > 0 && (
                       <div className="flex items-center gap-2">
                         <span className="text-white/60 text-sm">{t('siteSelection.languages')}:</span>
                         <div className="flex gap-1">

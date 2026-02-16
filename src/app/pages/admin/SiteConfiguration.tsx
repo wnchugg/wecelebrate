@@ -719,9 +719,9 @@ export function SiteConfiguration() {
             {/* Site Logo/Icon */}
             <div
               className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-md"
-              style={{ backgroundColor: currentSite.branding?.primaryColor || '#D91C81' }}
+              style={{ backgroundColor: currentSite?.branding?.primaryColor || '#D91C81' }}
             >
-              {currentClient.name.substring(0, 2).toUpperCase()}
+              {currentClient?.name?.substring(0, 2).toUpperCase()}
             </div>
             
             {/* Site Details */}
@@ -729,7 +729,7 @@ export function SiteConfiguration() {
               <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
                 <Building2 className="w-3.5 h-3.5" />
                 <Link to="/admin/sites" className="hover:text-[#D91C81] transition-colors">
-                  {currentClient.name}
+                  {currentClient?.name}
                 </Link>
                 <span>•</span>
                 <span className="flex items-center gap-1">

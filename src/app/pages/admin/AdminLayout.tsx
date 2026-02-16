@@ -472,7 +472,7 @@ export function AdminLayout() {
                     <>
                       <div 
                         className="w-6 h-6 rounded flex items-center justify-center bg-white text-xs font-bold"
-                        style={{ color: currentSite.branding.primaryColor }}
+                        style={{ color: currentSite.branding?.primaryColor || '#D91C81' }}
                         aria-hidden="true"
                       >
                         {currentClient.name.substring(0, 2).toUpperCase()}

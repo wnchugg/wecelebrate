@@ -275,7 +275,7 @@ export function SiteGiftConfiguration() {
   }
 
   // Get site currency (define early so it's available in filters)
-  const currency = currentSite.settings.defaultCurrency || 'USD';
+  const currency = currentSite.settings?.defaultCurrency || 'USD';
   const currencySymbol = getCurrencySymbol(currency);
 
   const allActiveGifts = gifts.filter(g => g.status === 'active');

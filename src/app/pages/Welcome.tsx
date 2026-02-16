@@ -78,11 +78,11 @@ export function Welcome() {
     if (currentSite) {
       // Check if welcome page is explicitly disabled
       // If not set or set to true, show welcome page (backward compatibility)
-      const enableWelcomePage = currentSite.settings.enableWelcomePage;
+      const enableWelcomePage = currentSite.settings?.enableWelcomePage;
       
       logger.log('[Welcome] Welcome page setting:', {
         enableWelcomePage,
-        rawSetting: currentSite.settings.enableWelcomePage,
+        rawSetting: currentSite.settings?.enableWelcomePage,
         willRedirect: enableWelcomePage === false,
         siteId,
         currentPath: window.location.pathname,
@@ -180,7 +180,7 @@ As a token of our appreciation for your continued service, we invite you to sele
   }
 
   // Early return if welcome page is disabled - prevents flash of content before redirect
-  if (currentSite.settings.enableWelcomePage === false) {
+  if (currentSite.settings?.enableWelcomePage === false) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

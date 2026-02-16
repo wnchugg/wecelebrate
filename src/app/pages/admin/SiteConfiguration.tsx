@@ -226,18 +226,18 @@ export function SiteConfiguration() {
       setSsoClientOfficeName((currentSite as any).ssoClientOfficeName || '');
       
       // Additional Optional Fields
-      setShippingMode(currentSite.settings.shippingMode || 'employee');
-      setDefaultShippingAddress(currentSite.settings.defaultShippingAddress || '');
-      setWelcomeMessage(currentSite.settings.welcomeMessage || '');
-      setEnableWelcomePage(currentSite.settings.enableWelcomePage ?? false);
-      setWelcomePageTitle(currentSite.settings.welcomePageContent?.title || '');
-      setWelcomePageMessage(currentSite.settings.welcomePageContent?.message || '');
-      setWelcomePageAuthorName(currentSite.settings.welcomePageContent?.authorName || '');
-      setWelcomePageAuthorTitle(currentSite.settings.welcomePageContent?.authorTitle || '');
-      setWelcomePageImageUrl(currentSite.settings.welcomePageContent?.imageUrl || '');
-      setAllowedCountries(currentSite.settings.allowedCountries || []);
-      setEnableAddressValidation(currentSite.settings.addressValidation?.enabled ?? false);
-      setAddressValidationProvider(currentSite.settings.addressValidation?.provider || 'none');
+      setShippingMode(currentSite.settings?.shippingMode || 'employee');
+      setDefaultShippingAddress(currentSite.settings?.defaultShippingAddress || '');
+      setWelcomeMessage(currentSite.settings?.welcomeMessage || '');
+      setEnableWelcomePage(currentSite.settings?.enableWelcomePage ?? false);
+      setWelcomePageTitle(currentSite.settings?.welcomePageContent?.title || '');
+      setWelcomePageMessage(currentSite.settings?.welcomePageContent?.message || '');
+      setWelcomePageAuthorName(currentSite.settings?.welcomePageContent?.authorName || '');
+      setWelcomePageAuthorTitle(currentSite.settings?.welcomePageContent?.authorTitle || '');
+      setWelcomePageImageUrl(currentSite.settings?.welcomePageContent?.imageUrl || '');
+      setAllowedCountries(currentSite.settings?.allowedCountries || []);
+      setEnableAddressValidation(currentSite.settings?.addressValidation?.enabled ?? false);
+      setAddressValidationProvider(currentSite.settings?.addressValidation?.provider || 'none');
       setSkipReviewPage(currentSite.settings.skipReviewPage ?? false);
       
       // Set configMode based on site status

@@ -69,9 +69,9 @@ export function PublicSitePreview() {
               <div className="flex items-center gap-2">
                 <div 
                   className="w-6 h-6 rounded border border-gray-300" 
-                  style={{ backgroundColor: currentSite.branding.primaryColor }}
+                  style={{ backgroundColor: currentSite?.branding?.primaryColor }}
                 />
-                <span className="font-mono text-xs text-gray-700">{currentSite.branding.primaryColor}</span>
+                <span className="font-mono text-xs text-gray-700">{currentSite?.branding?.primaryColor}</span>
               </div>
             </div>
             <div>

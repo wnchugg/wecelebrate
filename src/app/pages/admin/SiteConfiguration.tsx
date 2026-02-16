@@ -67,43 +67,43 @@ export function SiteConfiguration() {
   const [siteType, setSiteType] = useState<'event-gifting' | 'onboarding-kit' | 'service-awards' | 'incentives' | 'custom'>(
     currentSite?.type || 'custom'
   );
-  const [primaryColor, setPrimaryColor] = useState(currentSite?.branding.primaryColor || '#D91C81');
-  const [secondaryColor, setSecondaryColor] = useState(currentSite?.branding.secondaryColor || '#1B2A5E');
-  const [tertiaryColor, setTertiaryColor] = useState(currentSite?.branding.tertiaryColor || '#00B4CC');
-  const [allowQuantitySelection, setAllowQuantitySelection] = useState(currentSite?.settings.allowQuantitySelection ?? false);
-  const [showPricing, setShowPricing] = useState(currentSite?.settings.showPricing ?? true);
-  const [skipLandingPage, setSkipLandingPage] = useState(currentSite?.settings.skipLandingPage ?? false);
-  const [enableLandingPage, setEnableLandingPage] = useState(currentSite?.settings.skipLandingPage === false);
-  const [giftsPerUser, setGiftsPerUser] = useState(currentSite?.settings.giftsPerUser || 1);
+  const [primaryColor, setPrimaryColor] = useState(currentSite?.branding?.primaryColor || '#D91C81');
+  const [secondaryColor, setSecondaryColor] = useState(currentSite?.branding?.secondaryColor || '#1B2A5E');
+  const [tertiaryColor, setTertiaryColor] = useState(currentSite?.branding?.tertiaryColor || '#00B4CC');
+  const [allowQuantitySelection, setAllowQuantitySelection] = useState(currentSite?.settings?.allowQuantitySelection ?? false);
+  const [showPricing, setShowPricing] = useState(currentSite?.settings?.showPricing ?? true);
+  const [skipLandingPage, setSkipLandingPage] = useState(currentSite?.settings?.skipLandingPage ?? false);
+  const [enableLandingPage, setEnableLandingPage] = useState(currentSite?.settings?.skipLandingPage === false);
+  const [giftsPerUser, setGiftsPerUser] = useState(currentSite?.settings?.giftsPerUser || 1);
   const [validationMethod, setValidationMethod] = useState<'email' | 'employeeId' | 'serialCard' | 'magic_link' | 'sso'>(
-    currentSite?.settings.validationMethod || 'email'
+    currentSite?.settings?.validationMethod || 'email'
   );
-  const [defaultLanguage, setDefaultLanguage] = useState(currentSite?.settings.defaultLanguage || 'en');
-  const [defaultCurrency, setDefaultCurrency] = useState(currentSite?.settings.defaultCurrency || 'USD');
-  const [defaultCountry, setDefaultCountry] = useState(currentSite?.settings.defaultCountry || 'US');
-  const [availabilityStartDate, setAvailabilityStartDate] = useState(currentSite?.settings.availabilityStartDate || '');
-  const [availabilityEndDate, setAvailabilityEndDate] = useState(currentSite?.settings.availabilityEndDate || '');
+  const [defaultLanguage, setDefaultLanguage] = useState(currentSite?.settings?.defaultLanguage || 'en');
+  const [defaultCurrency, setDefaultCurrency] = useState(currentSite?.settings?.defaultCurrency || 'USD');
+  const [defaultCountry, setDefaultCountry] = useState(currentSite?.settings?.defaultCountry || 'US');
+  const [availabilityStartDate, setAvailabilityStartDate] = useState(currentSite?.settings?.availabilityStartDate || '');
+  const [availabilityEndDate, setAvailabilityEndDate] = useState(currentSite?.settings?.availabilityEndDate || '');
   const [expiredMessage, setExpiredMessage] = useState(
-    currentSite?.settings.expiredMessage || 
+    currentSite?.settings?.expiredMessage || 
     'Thank you for your interest. The gift selection period for this program has ended. If you have questions, please contact your program administrator.'
   );
-  const [defaultGiftId, setDefaultGiftId] = useState(currentSite?.settings.defaultGiftId || '');
-  const [defaultGiftDaysAfterClose, setDefaultGiftDaysAfterClose] = useState(currentSite?.settings.defaultGiftDaysAfterClose || 0);
+  const [defaultGiftId, setDefaultGiftId] = useState(currentSite?.settings?.defaultGiftId || '');
+  const [defaultGiftDaysAfterClose, setDefaultGiftDaysAfterClose] = useState(currentSite?.settings?.defaultGiftDaysAfterClose || 0);
 
   // Header/Footer Settings State
-  const [showHeader, setShowHeader] = useState(currentSite?.settings.showHeader ?? true);
-  const [showFooter, setShowFooter] = useState(currentSite?.settings.showFooter ?? true);
-  const [headerLayout, setHeaderLayout] = useState<'left' | 'center' | 'split'>(currentSite?.settings.headerLayout || 'left');
-  const [showLanguageSelector, setShowLanguageSelector] = useState(currentSite?.settings.showLanguageSelector ?? true);
-  const [companyName, setCompanyName] = useState(currentSite?.settings.companyName || '');
-  const [footerText, setFooterText] = useState(currentSite?.settings.footerText || '© 2026 All rights reserved.');
+  const [showHeader, setShowHeader] = useState(currentSite?.settings?.showHeader ?? true);
+  const [showFooter, setShowFooter] = useState(currentSite?.settings?.showFooter ?? true);
+  const [headerLayout, setHeaderLayout] = useState<'left' | 'center' | 'split'>(currentSite?.settings?.headerLayout || 'left');
+  const [showLanguageSelector, setShowLanguageSelector] = useState(currentSite?.settings?.showLanguageSelector ?? true);
+  const [companyName, setCompanyName] = useState(currentSite?.settings?.companyName || '');
+  const [footerText, setFooterText] = useState(currentSite?.settings?.footerText || '© 2026 All rights reserved.');
 
   // Gift Selection UX Settings State
-  const [enableSearch, setEnableSearch] = useState(currentSite?.settings.enableSearch ?? true);
-  const [enableFilters, setEnableFilters] = useState(currentSite?.settings.enableFilters ?? true);
-  const [gridColumns, setGridColumns] = useState<number>(currentSite?.settings.gridColumns || 3);
-  const [showDescription, setShowDescription] = useState(currentSite?.settings.showDescription ?? true);
-  const [sortOptions, setSortOptions] = useState<string[]>(currentSite?.settings.sortOptions || ['name', 'price', 'popularity']);
+  const [enableSearch, setEnableSearch] = useState(currentSite?.settings?.enableSearch ?? true);
+  const [enableFilters, setEnableFilters] = useState(currentSite?.settings?.enableFilters ?? true);
+  const [gridColumns, setGridColumns] = useState<number>(currentSite?.settings?.gridColumns || 3);
+  const [showDescription, setShowDescription] = useState(currentSite?.settings?.showDescription ?? true);
+  const [sortOptions, setSortOptions] = useState<string[]>(currentSite?.settings?.sortOptions || ['name', 'price', 'popularity']);
 
   // Phase 1: ERP Integration State
   const [siteCode, setSiteCode] = useState(currentSite?.siteCode || '');
@@ -139,19 +139,19 @@ export function SiteConfiguration() {
   const [ssoClientOfficeName, setSsoClientOfficeName] = useState(currentSite?.ssoClientOfficeName || '');
 
   // Phase 5: Additional Optional Fields
-  const [shippingMode, setShippingMode] = useState<'company' | 'employee' | 'store'>(currentSite?.settings.shippingMode || 'employee');
-  const [defaultShippingAddress, setDefaultShippingAddress] = useState(currentSite?.settings.defaultShippingAddress || '');
-  const [welcomeMessage, setWelcomeMessage] = useState(currentSite?.settings.welcomeMessage || '');
-  const [enableWelcomePage, setEnableWelcomePage] = useState(currentSite?.settings.enableWelcomePage ?? false);
-  const [welcomePageTitle, setWelcomePageTitle] = useState(currentSite?.settings.welcomePageContent?.title || '');
-  const [welcomePageMessage, setWelcomePageMessage] = useState(currentSite?.settings.welcomePageContent?.message || '');
-  const [welcomePageAuthorName, setWelcomePageAuthorName] = useState(currentSite?.settings.welcomePageContent?.authorName || '');
-  const [welcomePageAuthorTitle, setWelcomePageAuthorTitle] = useState(currentSite?.settings.welcomePageContent?.authorTitle || '');
-  const [welcomePageImageUrl, setWelcomePageImageUrl] = useState(currentSite?.settings.welcomePageContent?.imageUrl || '');
-  const [allowedCountries, setAllowedCountries] = useState<string[]>(currentSite?.settings.allowedCountries || []);
-  const [enableAddressValidation, setEnableAddressValidation] = useState(currentSite?.settings.addressValidation?.enabled ?? false);
-  const [addressValidationProvider, setAddressValidationProvider] = useState(currentSite?.settings.addressValidation?.provider || 'none');
-  const [skipReviewPage, setSkipReviewPage] = useState(currentSite?.settings.skipReviewPage ?? false);
+  const [shippingMode, setShippingMode] = useState<'company' | 'employee' | 'store'>(currentSite?.settings?.shippingMode || 'employee');
+  const [defaultShippingAddress, setDefaultShippingAddress] = useState(currentSite?.settings?.defaultShippingAddress || '');
+  const [welcomeMessage, setWelcomeMessage] = useState(currentSite?.settings?.welcomeMessage || '');
+  const [enableWelcomePage, setEnableWelcomePage] = useState(currentSite?.settings?.enableWelcomePage ?? false);
+  const [welcomePageTitle, setWelcomePageTitle] = useState(currentSite?.settings?.welcomePageContent?.title || '');
+  const [welcomePageMessage, setWelcomePageMessage] = useState(currentSite?.settings?.welcomePageContent?.message || '');
+  const [welcomePageAuthorName, setWelcomePageAuthorName] = useState(currentSite?.settings?.welcomePageContent?.authorName || '');
+  const [welcomePageAuthorTitle, setWelcomePageAuthorTitle] = useState(currentSite?.settings?.welcomePageContent?.authorTitle || '');
+  const [welcomePageImageUrl, setWelcomePageImageUrl] = useState(currentSite?.settings?.welcomePageContent?.imageUrl || '');
+  const [allowedCountries, setAllowedCountries] = useState<string[]>(currentSite?.settings?.allowedCountries || []);
+  const [enableAddressValidation, setEnableAddressValidation] = useState(currentSite?.settings?.addressValidation?.enabled ?? false);
+  const [addressValidationProvider, setAddressValidationProvider] = useState(currentSite?.settings?.addressValidation?.provider || 'none');
+  const [skipReviewPage, setSkipReviewPage] = useState(currentSite?.settings?.skipReviewPage ?? false);
 
   // Sync state when currentSite changes
   useEffect(() => {
@@ -238,7 +238,7 @@ export function SiteConfiguration() {
       setAllowedCountries(currentSite.settings?.allowedCountries || []);
       setEnableAddressValidation(currentSite.settings?.addressValidation?.enabled ?? false);
       setAddressValidationProvider(currentSite.settings?.addressValidation?.provider || 'none');
-      setSkipReviewPage(currentSite.settings.skipReviewPage ?? false);
+      setSkipReviewPage(currentSite.settings?.skipReviewPage ?? false);
       
       // Set configMode based on site status
       setConfigMode(currentSite.status === 'active' ? 'live' : 'draft');

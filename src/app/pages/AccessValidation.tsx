@@ -218,7 +218,7 @@ export function AccessValidation() {
           placeholder: t('validation.email.placeholder'),
           type: 'email' as const,
           label: t('validation.email.label'),
-          hint: currentSite?.settings?.allowedDomains && currentSite.settings.allowedDomains.length > 0
+          hint: currentSite?.settings?.allowedDomains && currentSite?.settings?.allowedDomains.length > 0
             ? `Please use an email from: ${currentSite.settings.allowedDomains.join(', ')}`
             : t('validation.email.hint'),
         };

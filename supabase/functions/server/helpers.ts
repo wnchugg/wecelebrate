@@ -204,6 +204,82 @@ export function objectToSnakeCase(obj: Record<string, any>): Record<string, any>
 }
 
 /**
+ * Maps frontend Site fields to database column names and filters out non-existent fields
+ * This handles the mismatch between frontend camelCase names and database snake_case columns
+ */
+export function mapSiteFieldsToDatabase(input: Record<string, any>): Record<string, any> {
+  const fieldMapping: Record<string, string> = {
+    // Direct mappings (camelCase -> snake_case)
+    'clientId': 'client_id',
+    'catalogId': 'catalog_id',
+    'name': 'name',
+    'slug': 'slug',
+    'status': 'status',
+    'validationMethods': 'validation_methods',
+    'branding': 'branding',
+    'selectionStartDate': 'selection_start_date',
+    'selectionEndDate': 'selection_end_date',
+    
+    // ERP Integration Fields
+    'siteCode': 'site_code',
+    'siteErpIntegration': 'site_erp_integration',
+    'siteErpInstance': 'site_erp_instance',
+    'siteShipFromCountry': 'site_ship_from_country',
+    'siteHrisSystem': 'site_hris_system',
+    
+    // Site Management Fields
+    'siteDropDownName': 'site_drop_down_name',
+    'siteCustomDomainUrl': 'site_custom_domain_url',
+    'siteAccountManager': 'site_account_manager',
+    'siteAccountManagerEmail': 'site_account_manager_email',
+    'siteCelebrationsEnabled': 'site_celebrations_enabled',
+    'allowSessionTimeoutExtend': 'allow_session_timeout_extend',
+    'enableEmployeeLogReport': 'enable_employee_log_report',
+    
+    // Regional Client Info
+    'regionalClientInfo': 'regional_client_info',
+    
+    // Advanced Authentication
+    'disableDirectAccessAuth': 'disable_direct_access_auth',
+    'ssoProvider': 'sso_provider',
+    'ssoClientOfficeName': 'sso_client_office_name',
+    
+    // Timestamps
+    'createdAt': 'created_at',
+    'updatedAt': 'updated_at',
+  };
+  
+  // Fields that should be ignored (don't exist in database)
+  const ignoredFields = new Set([
+    'id', // Never update ID
+    'domain', // Doesn't exist - use siteCustomDomainUrl instead
+    'isActive', // Computed from status
+    'settings', // Not in current schema
+    'type', // Not in current schema
+    'headerFooterConfig', // UX customization - not in schema yet
+    'brandingAssets', // UX customization - not in schema yet
+    'giftSelectionConfig', // UX customization - not in schema yet
+    'reviewScreenConfig', // UX customization - not in schema yet
+    'orderTrackingConfig', // UX customization - not in schema yet
+  ]);
+  
+  const result: Record<string, any> = {};
+  
+  for (const [key, value] of Object.entries(input)) {
+    // Skip ignored fields
+    if (ignoredFields.has(key)) {
+      continue;
+    }
+    
+    // Use mapping if available, otherwise convert to snake_case
+    const dbColumn = fieldMapping[key] || camelToSnake(key);
+    result[dbColumn] = value;
+  }
+  
+  return result;
+}
+
+/**
  * Converts object keys from snake_case to camelCase
  */
 export function objectToCamelCase(obj: Record<string, any>): Record<string, any> {

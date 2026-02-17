@@ -589,22 +589,22 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateSite = async (id: string, updates: Partial<Site>): Promise<void> => {
     try {
       // Make API call to update site in backend
-      const response = await apiRequest(`/v2/sites/${id}`, {
+      // apiRequest returns parsed JSON data, not a Response object
+      const result = await apiRequest<{ success: boolean; data: Site; message?: string }>(`/v2/sites/${id}`, {
         method: 'PUT',
         body: JSON.stringify(updates)
       });
       
-      if (!(response as Response).ok) {
-        const error = await (response as Response).json();
-        throw new Error(error.message || 'Failed to update site');
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to update site');
       }
       
-      // Update local state
-      setSites(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
+      // Update local state with the returned data from backend
+      setSites(prev => prev.map(s => s.id === id ? { ...s, ...result.data } : s));
       
       // Update currentSite if it's the one being updated
       if (currentSite?.id === id) {
-        setCurrentSite({ ...currentSite, ...updates });
+        setCurrentSite({ ...currentSite, ...result.data });
       }
     } catch (error) {
       console.error('Failed to update site:', error);

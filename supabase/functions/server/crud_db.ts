@@ -6,7 +6,7 @@
  */
 
 import * as db from './database/db.ts';
-import { objectToCamelCase } from './helpers.ts';
+import { objectToCamelCase, objectToSnakeCase, mapSiteFieldsToDatabase } from './helpers.ts';
 import type {
   Client, CreateClientInput, UpdateClientInput,
   Site, CreateSiteInput, UpdateSiteInput,
@@ -78,11 +78,18 @@ export async function getClientById(id: string) {
 export async function createClient(input: Omit<CreateClientInput, 'id'>) {
   try {
     console.log('[CRUD DB] Creating client:', input.name);
-    const client = await db.insertClient(input as CreateClientInput);
+    
+    // Convert camelCase to snake_case for database
+    const snakeCaseInput = objectToSnakeCase(input);
+    
+    const client = await db.insertClient(snakeCaseInput as CreateClientInput);
+    
+    // Convert snake_case back to camelCase for frontend
+    const transformedClient = objectToCamelCase(client);
     
     return {
       success: true,
-      data: client,
+      data: transformedClient,
       message: 'Client created successfully',
     };
   } catch (error: any) {
@@ -97,11 +104,18 @@ export async function createClient(input: Omit<CreateClientInput, 'id'>) {
 export async function updateClient(id: string, input: UpdateClientInput) {
   try {
     console.log('[CRUD DB] Updating client:', id);
-    const client = await db.updateClient(id, input);
+    
+    // Convert camelCase to snake_case for database
+    const snakeCaseInput = objectToSnakeCase(input);
+    
+    const client = await db.updateClient(id, snakeCaseInput as UpdateClientInput);
+    
+    // Convert snake_case back to camelCase for frontend
+    const transformedClient = objectToCamelCase(client);
     
     return {
       success: true,
-      data: client,
+      data: transformedClient,
       message: 'Client updated successfully',
     };
   } catch (error: any) {
@@ -220,11 +234,20 @@ export async function getSiteBySlug(slug: string) {
 export async function createSite(input: Omit<CreateSiteInput, 'id'>) {
   try {
     console.log('[CRUD DB] Creating site:', input.name);
-    const site = await db.createSite(input as CreateSiteInput);
+    console.log('[CRUD DB] Input fields:', Object.keys(input));
+    
+    // Map frontend fields to database columns and filter out non-existent fields
+    const mappedInput = mapSiteFieldsToDatabase(input as any);
+    console.log('[CRUD DB] Mapped fields:', Object.keys(mappedInput));
+    
+    const site = await db.createSite(mappedInput as CreateSiteInput);
+    
+    // Convert snake_case back to camelCase for frontend
+    const transformedSite = objectToCamelCase(site);
     
     return {
       success: true,
-      data: site,
+      data: transformedSite,
       message: 'Site created successfully',
     };
   } catch (error: any) {
@@ -239,11 +262,20 @@ export async function createSite(input: Omit<CreateSiteInput, 'id'>) {
 export async function updateSite(id: string, input: UpdateSiteInput) {
   try {
     console.log('[CRUD DB] Updating site:', id);
-    const site = await db.updateSite(id, input);
+    console.log('[CRUD DB] Input fields:', Object.keys(input));
+    
+    // Map frontend fields to database columns and filter out non-existent fields
+    const mappedInput = mapSiteFieldsToDatabase(input as any);
+    console.log('[CRUD DB] Mapped fields:', Object.keys(mappedInput));
+    
+    const site = await db.updateSite(id, mappedInput as UpdateSiteInput);
+    
+    // Convert snake_case back to camelCase for frontend
+    const transformedSite = objectToCamelCase(site);
     
     return {
       success: true,
-      data: site,
+      data: transformedSite,
       message: 'Site updated successfully',
     };
   } catch (error: any) {
@@ -338,11 +370,18 @@ export async function getProductById(id: string) {
 export async function createProduct(input: Omit<CreateProductInput, 'id'>) {
   try {
     console.log('[CRUD DB] Creating product:', input.name);
-    const product = await db.createProduct(input as CreateProductInput);
+    
+    // Convert camelCase to snake_case for database
+    const snakeCaseInput = objectToSnakeCase(input);
+    
+    const product = await db.createProduct(snakeCaseInput as CreateProductInput);
+    
+    // Convert snake_case back to camelCase for frontend
+    const transformedProduct = objectToCamelCase(product);
     
     return {
       success: true,
-      data: product,
+      data: transformedProduct,
       message: 'Product created successfully',
     };
   } catch (error: any) {
@@ -357,11 +396,18 @@ export async function createProduct(input: Omit<CreateProductInput, 'id'>) {
 export async function updateProduct(id: string, input: UpdateProductInput) {
   try {
     console.log('[CRUD DB] Updating product:', id);
-    const product = await db.updateProduct(id, input);
+    
+    // Convert camelCase to snake_case for database
+    const snakeCaseInput = objectToSnakeCase(input);
+    
+    const product = await db.updateProduct(id, snakeCaseInput as UpdateProductInput);
+    
+    // Convert snake_case back to camelCase for frontend
+    const transformedProduct = objectToCamelCase(product);
     
     return {
       success: true,
-      data: product,
+      data: transformedProduct,
       message: 'Product updated successfully',
     };
   } catch (error: any) {
@@ -453,11 +499,18 @@ export async function getEmployeeById(id: string) {
 export async function createEmployee(input: Omit<CreateEmployeeInput, 'id'>) {
   try {
     console.log('[CRUD DB] Creating employee:', input.employee_id);
-    const employee = await db.createEmployee(input as CreateEmployeeInput);
+    
+    // Convert camelCase to snake_case for database
+    const snakeCaseInput = objectToSnakeCase(input);
+    
+    const employee = await db.createEmployee(snakeCaseInput as CreateEmployeeInput);
+    
+    // Convert snake_case back to camelCase for frontend
+    const transformedEmployee = objectToCamelCase(employee);
     
     return {
       success: true,
-      data: employee,
+      data: transformedEmployee,
       message: 'Employee created successfully',
     };
   } catch (error: any) {
@@ -472,11 +525,18 @@ export async function createEmployee(input: Omit<CreateEmployeeInput, 'id'>) {
 export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
   try {
     console.log('[CRUD DB] Updating employee:', id);
-    const employee = await db.updateEmployee(id, input);
+    
+    // Convert camelCase to snake_case for database
+    const snakeCaseInput = objectToSnakeCase(input);
+    
+    const employee = await db.updateEmployee(id, snakeCaseInput as UpdateEmployeeInput);
+    
+    // Convert snake_case back to camelCase for frontend
+    const transformedEmployee = objectToCamelCase(employee);
     
     return {
       success: true,
-      data: employee,
+      data: transformedEmployee,
       message: 'Employee updated successfully',
     };
   } catch (error: any) {
@@ -607,11 +667,17 @@ export async function createOrder(input: Omit<CreateOrderInput, 'id'>) {
       input.order_number = db.generateOrderNumber();
     }
     
-    const order = await db.createOrder(input as CreateOrderInput);
+    // Convert camelCase to snake_case for database
+    const snakeCaseInput = objectToSnakeCase(input);
+    
+    const order = await db.createOrder(snakeCaseInput as CreateOrderInput);
+    
+    // Convert snake_case back to camelCase for frontend
+    const transformedOrder = objectToCamelCase(order);
     
     return {
       success: true,
-      data: order,
+      data: transformedOrder,
       message: 'Order created successfully',
     };
   } catch (error: any) {
@@ -626,11 +692,18 @@ export async function createOrder(input: Omit<CreateOrderInput, 'id'>) {
 export async function updateOrder(id: string, input: UpdateOrderInput) {
   try {
     console.log('[CRUD DB] Updating order:', id);
-    const order = await db.updateOrder(id, input);
+    
+    // Convert camelCase to snake_case for database
+    const snakeCaseInput = objectToSnakeCase(input);
+    
+    const order = await db.updateOrder(id, snakeCaseInput as UpdateOrderInput);
+    
+    // Convert snake_case back to camelCase for frontend
+    const transformedOrder = objectToCamelCase(order);
     
     return {
       success: true,
-      data: order,
+      data: transformedOrder,
       message: 'Order updated successfully',
     };
   } catch (error: any) {

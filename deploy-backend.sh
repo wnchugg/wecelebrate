@@ -45,13 +45,12 @@ echo -e "${BLUE}   Environment: $ENV_NAME${NC}"
 echo -e "${BLUE}════════════════════════════════════════${NC}"
 echo ""
 
-# Step 1: Rename directory
+# Step 1: Check directory structure
 echo -e "${YELLOW}→${NC} Preparing deployment..."
-if [ -d "supabase/functions/server" ]; then
-    mv supabase/functions/server supabase/functions/make-server-6fcaeea3
-    echo -e "${GREEN}✓${NC} Directory renamed"
-elif [ -d "supabase/functions/make-server-6fcaeea3" ]; then
-    echo -e "${GREEN}✓${NC} Directory already prepared"
+if [ -L "supabase/functions/make-server-6fcaeea3" ]; then
+    echo -e "${GREEN}✓${NC} Symlink already exists"
+elif [ -d "supabase/functions/server" ]; then
+    echo -e "${GREEN}✓${NC} Server directory found"
 else
     echo -e "${RED}✗${NC} Error: Function directory not found!"
     exit 1
@@ -65,11 +64,9 @@ supabase functions deploy make-server-6fcaeea3 --project-ref $PROJECT_REF --no-v
 echo ""
 echo -e "${GREEN}✓${NC} Deployed successfully!"
 
-# Step 3: Rename back
+# Step 3: No cleanup needed (using symlink)
 echo ""
-echo -e "${YELLOW}→${NC} Cleaning up..."
-mv supabase/functions/make-server-6fcaeea3 supabase/functions/server
-echo -e "${GREEN}✓${NC} Directory restored"
+echo -e "${GREEN}✓${NC} Deployment files ready"
 
 # Step 4: Test
 echo ""

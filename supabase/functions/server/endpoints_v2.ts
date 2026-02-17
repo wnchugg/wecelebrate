@@ -88,6 +88,41 @@ export async function getSitesV2(c: Context) {
   }
 }
 
+// Public endpoint: Get active sites (no auth required)
+export async function getPublicSitesV2(c: Context) {
+  try {
+    console.log('[Public Sites V2] Fetching active sites from database');
+    
+    // Get only active sites
+    const result = await crudDb.getSites({ status: 'active', limit: 100, offset: 0 });
+    
+    if (!result.success || !result.data) {
+      return c.json({ success: false, error: 'Failed to fetch sites' }, 500);
+    }
+    
+    // Transform to public site format (remove sensitive fields)
+    const publicSites = result.data.map((site: any) => ({
+      id: site.id,
+      name: site.name,
+      clientId: site.clientId,
+      domain: site.slug, // Using slug as domain
+      status: site.status || 'active',
+      branding: site.branding || {},
+      settings: site.settings || {},
+      siteUrl: site.siteCustomDomainUrl,
+      createdAt: site.createdAt,
+      updatedAt: site.updatedAt,
+    }));
+    
+    console.log('[Public Sites V2] Returning', publicSites.length, 'active sites');
+    
+    return c.json({ sites: publicSites });
+  } catch (error: any) {
+    console.error('[Public Sites V2] Error:', error);
+    return c.json({ success: false, error: error.message }, 500);
+  }
+}
+
 export async function getSiteByIdV2(c: Context) {
   try {
     const id = c.req.param('id');

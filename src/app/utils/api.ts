@@ -732,7 +732,7 @@ export const authApi = {
 // Export a publicSiteApi object for public endpoints (no authentication required)
 export const publicSiteApi = {
   async getActiveSites() {
-    return apiRequest<{ sites: PublicSite[] }>('/public/sites', {
+    return apiRequest<{ sites: PublicSite[] }>('/v2/public/sites', {
       method: 'GET',
     });
   },

@@ -9159,6 +9159,9 @@ app.post("/make-server-6fcaeea3/v2/sites", verifyAdmin, v2.createSiteV2);
 app.put("/make-server-6fcaeea3/v2/sites/:id", verifyAdmin, v2.updateSiteV2);
 app.delete("/make-server-6fcaeea3/v2/sites/:id", verifyAdmin, v2.deleteSiteV2);
 
+// PUBLIC SITES (no auth required)
+app.get("/make-server-6fcaeea3/v2/public/sites", v2.getPublicSitesV2);
+
 // PRODUCTS
 app.get("/make-server-6fcaeea3/v2/products", verifyAdmin, v2.getProductsV2);
 app.get("/make-server-6fcaeea3/v2/products/:id", verifyAdmin, v2.getProductByIdV2);

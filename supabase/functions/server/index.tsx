@@ -3692,44 +3692,9 @@ app.put("/make-server-6fcaeea3/sites/:siteId/gift-config", verifyAdmin, async (c
   }
 });
 
-// Update site
-app.put("/make-server-6fcaeea3/sites/:siteId", verifyAdmin, async (c) => {
-  const environmentId = c.get('environmentId') || 'development';
-  
-  try {
-    const siteId = c.req.param('siteId');
-    const updates = await c.req.json();
-    
-    console.log('[Update Site] Site ID:', siteId);
-    console.log('[Update Site] Environment:', environmentId);
-    console.log('[Update Site] Updates:', JSON.stringify(updates, null, 2));
-    
-    // Get existing site
-    const existingSite = await kv.get(`site:${environmentId}:${siteId}`, environmentId);
-    
-    if (!existingSite) {
-      return c.json({ error: 'Site not found' }, 404);
-    }
-    
-    // Merge updates with existing site
-    const updatedSite = {
-      ...existingSite,
-      ...updates,
-      id: siteId, // Ensure ID doesn't change
-      updatedAt: new Date().toISOString(),
-    };
-    
-    // Save updated site
-    await kv.set(`site:${environmentId}:${siteId}`, updatedSite, environmentId);
-    
-    console.log('[Update Site] ✅ Successfully updated site');
-    
-    return c.json({ site: updatedSite });
-  } catch (error: any) {
-    console.error('[Update Site] ❌ Error:', error);
-    return c.json({ error: error.message }, 500);
-  }
-});
+// ===== OLD SITE UPDATE ENDPOINT REMOVED =====
+// This has been replaced by v2 database-backed endpoint:
+// - PUT /v2/sites/:id (replaces PUT /sites/:siteId)
 
 // Get gifts available for a specific site
 app.get("/make-server-6fcaeea3/sites/:siteId/gifts", async (c) => {
@@ -3810,177 +3775,14 @@ app.get("/make-server-6fcaeea3/sites/:siteId/gifts", async (c) => {
 
 // ==================== ORDER ROUTES ====================
 
-// Rate limiting for order creation (moderate)
-const orderRateLimit = rateLimit(10, 60 * 60 * 1000); // 10 orders per hour per IP
-
-// Create order
-app.post(
-  "/make-server-6fcaeea3/orders",
-  orderRateLimit,
-  validateRequest({
-    giftId: { type: 'string', required: true },
-    userId: { type: 'string', required: true },
-    shippingAddress: { type: 'object', required: true }
-  }),
-  async (c) => {
-    try {
-      const orderData = c.get('validatedBody');
-      const id = `ORD-${Date.now()}`;
-      
-      // Sanitize user input
-      const sanitizedData = {
-        ...orderData,
-        userId: sanitize.string(orderData.userId),
-        giftId: sanitize.string(orderData.giftId),
-      };
-      
-      const order = {
-        ...sanitizedData,
-        id,
-        status: 'pending',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      
-      // Use environmentId from header for public endpoint
-      const environmentId = c.req.header('X-Environment-ID') || 'development';
-      await kv.set(`orders:${id}`, order, environmentId);
-      
-      await auditLog({
-        action: 'order_created',
-        userId: orderData.userId,
-        status: 'success',
-        ip: c.req.header('x-forwarded-for') || c.req.header('x-real-ip'),
-        userAgent: c.req.header('user-agent'),
-        details: { orderId: id, giftId: orderData.giftId }
-      });
-      
-      return c.json({ order });
-    } catch (error: any) {
-      console.error('Create order error:', error);
-      return errorResponse(c, error, 500);
-    }
-  }
-);
-
-// Note: GET /orders (list all) is handled by migrated_resources.ts
-// Custom order routes with business logic kept here:
-
-// Get order by ID (PUBLIC - for order tracking)
-app.get("/make-server-6fcaeea3/orders/:id", async (c) => {
-  const environmentId = c.req.header('X-Environment-ID') || 'development';
-  
-  try {
-    const id = c.req.param('id');
-    const order = await kv.get(`orders:${id}`, environmentId);
-    
-    if (!order) {
-      return c.json({ error: 'Order not found' }, 404);
-    }
-    
-    return c.json({ order });
-  } catch (error: any) {
-    console.error('Get order error:', error);
-    return c.json({ error: error.message }, 500);
-  }
-});
-
-// Update order
-app.put("/make-server-6fcaeea3/orders/:id", verifyAdmin, async (c) => {
-  const environmentId = c.get('environmentId') || 'development';
-  
-  try {
-    const id = c.req.param('id');
-    const updates = await c.req.json();
-    
-    const existing = await kv.get(`orders:${id}`, environmentId);
-    if (!existing) {
-      return c.json({ error: 'Order not found' }, 404);
-    }
-    
-    // Check if status changed
-    const statusChanged = updates.status && updates.status !== existing.status;
-    const previousStatus = existing.status;
-    
-    // Update timestamps based on status
-    if (updates.status === 'shipped' && !existing.shippedAt) {
-      updates.shippedAt = new Date().toISOString();
-    }
-    if (updates.status === 'delivered' && !existing.deliveredAt) {
-      updates.deliveredAt = new Date().toISOString();
-    }
-    
-    const order = {
-      ...existing,
-      ...updates,
-      id,
-      updatedAt: new Date().toISOString(),
-    };
-    
-    await kv.set(`orders:${id}`, order, environmentId);
-    
-    // Send automatic emails based on status change
-    if (statusChanged) {
-      try {
-        // Get site details for company name
-        const site = await kv.get(`site:${order.siteId}`, environmentId);
-        const companyName = site?.clientName || 'JALA 2';
-        
-        // Status changed to SHIPPED - send shipping notification
-        if (updates.status === 'shipped' && order.trackingNumber) {
-          console.log(`Sending shipping notification email for order ${order.orderNumber}`);
-          await emailService.sendShippingNotificationEmail({
-            to: order.employeeEmail,
-            userName: order.employeeName,
-            orderNumber: order.orderNumber,
-            giftName: order.giftName,
-            trackingNumber: order.trackingNumber,
-            companyName: companyName,
-            environmentId
-          });
-          console.log(`Shipping notification email sent to ${order.employeeEmail}`);
-        }
-        
-        // Status changed to DELIVERED - send delivery confirmation
-        if (updates.status === 'delivered') {
-          console.log(`Sending delivery confirmation email for order ${order.orderNumber}`);
-          await emailService.sendDeliveryConfirmationEmail({
-            to: order.employeeEmail,
-            userName: order.employeeName,
-            giftName: order.giftName,
-            companyName: companyName,
-            environmentId
-          });
-          console.log(`Delivery confirmation email sent to ${order.employeeEmail}`);
-        }
-      } catch (emailError) {
-        console.error('Failed to send status change email:', emailError);
-        // Don't fail the order update if email fails
-      }
-    }
-    
-    // Audit log
-    await auditLog({
-      action: 'order_updated',
-      userId: c.get('userId'),
-      status: 'success',
-      ip: c.req.header('x-forwarded-for') || c.req.header('x-real-ip'),
-      userAgent: c.req.header('user-agent'),
-      details: {
-        orderId: id,
-        orderNumber: order.orderNumber,
-        previousStatus: previousStatus,
-        newStatus: order.status,
-        trackingNumber: order.trackingNumber
-      }
-    });
-    
-    return c.json({ order });
-  } catch (error: any) {
-    console.error('Update order error:', error);
-    return c.json({ error: error.message }, 500);
-  }
-});
+// ===== OLD ORDER CRUD ENDPOINTS REMOVED =====
+// These have been replaced by v2 database-backed endpoints:
+// - POST /v2/orders (replaces POST /orders)
+// - GET /v2/orders/:id (replaces GET /orders/:id)
+// - PUT /v2/orders/:id (replaces PUT /orders/:id)
+// - DELETE /v2/orders/:id (new endpoint)
+// - GET /v2/orders (list all orders)
+// - GET /v2/orders/number/:orderNumber (get by order number)
 
 // ==================== ENVIRONMENT CONFIGURATION ROUTES ====================
 
@@ -4747,63 +4549,319 @@ app.post("/make-server-6fcaeea3/dev/reseed", verifyAdmin, async (c) => {
   try {
     console.log('Manual reseed triggered by admin for environment:', environmentId);
     
-    // Clear existing data - Clear BOTH old (plural) and new (singular) key patterns
-    console.log('Clearing old clients data with plural prefix...');
-    const oldClients = await kv.getByPrefix('clients:', environmentId); // OLD pattern
+    // STEP 1: Clear database tables (in correct order due to foreign key constraints)
+    console.log('Clearing database tables...');
+    const dbClearResults = {
+      orders: 0,
+      employees: 0,
+      products: 0,
+      sites: 0,
+      clients: 0,
+    };
+    
+    try {
+      // Clear orders FIRST (has foreign keys to clients, sites, products, employees)
+      const { count: orderCount, error: orderCountError } = await supabase
+        .from('orders')
+        .select('*', { count: 'exact', head: true });
+      
+      console.log(`Found ${orderCount || 0} orders to delete`);
+      
+      if (!orderCountError && orderCount && orderCount > 0) {
+        const { error: deleteError } = await supabase
+          .from('orders')
+          .delete()
+          .gte('id', '00000000-0000-0000-0000-000000000000');
+        
+        if (deleteError) {
+          console.error('Error deleting orders:', deleteError);
+        } else {
+          dbClearResults.orders = orderCount;
+          console.log(`Successfully deleted ${orderCount} orders from database`);
+        }
+      } else {
+        console.log('No orders to delete');
+      }
+      
+      // Clear employees (has foreign key to sites)
+      const { count: employeeCount, error: employeeCountError } = await supabase
+        .from('employees')
+        .select('*', { count: 'exact', head: true });
+      
+      console.log(`Found ${employeeCount || 0} employees to delete`);
+      
+      if (!employeeCountError && employeeCount && employeeCount > 0) {
+        const { error: deleteError } = await supabase
+          .from('employees')
+          .delete()
+          .gte('id', '00000000-0000-0000-0000-000000000000');
+        
+        if (deleteError) {
+          console.error('Error deleting employees:', deleteError);
+        } else {
+          dbClearResults.employees = employeeCount;
+          console.log(`Successfully deleted ${employeeCount} employees from database`);
+        }
+      } else {
+        console.log('No employees to delete');
+      }
+      
+      // Clear products (has foreign key to catalogs, but we're not managing catalogs yet)
+      const { count: productCount, error: productCountError } = await supabase
+        .from('products')
+        .select('*', { count: 'exact', head: true });
+      
+      console.log(`Found ${productCount || 0} products to delete`);
+      
+      if (!productCountError && productCount && productCount > 0) {
+        const { error: deleteError } = await supabase
+          .from('products')
+          .delete()
+          .gte('id', '00000000-0000-0000-0000-000000000000');
+        
+        if (deleteError) {
+          console.error('Error deleting products:', deleteError);
+        } else {
+          dbClearResults.products = productCount;
+          console.log(`Successfully deleted ${productCount} products from database`);
+        }
+      } else {
+        console.log('No products to delete');
+      }
+      
+      // Clear sites (has foreign key to clients)
+      const { count: siteCount, error: siteCountError } = await supabase
+        .from('sites')
+        .select('*', { count: 'exact', head: true });
+      
+      console.log(`Found ${siteCount || 0} sites to delete`);
+      
+      if (!siteCountError && siteCount && siteCount > 0) {
+        const { data: deletedSites, error: deleteError } = await supabase
+          .from('sites')
+          .delete()
+          .gte('id', '00000000-0000-0000-0000-000000000000')
+          .select();
+        
+        if (deleteError) {
+          console.error('Error deleting sites:', deleteError);
+        } else {
+          dbClearResults.sites = deletedSites?.length || 0;
+          console.log(`Successfully deleted ${deletedSites?.length || 0} sites from database`);
+        }
+      } else {
+        console.log('No sites to delete');
+      }
+      
+      // Clear clients LAST (referenced by sites and orders)
+      const { count: clientCount, error: clientCountError } = await supabase
+        .from('clients')
+        .select('*', { count: 'exact', head: true });
+      
+      console.log(`Found ${clientCount || 0} clients to delete`);
+      
+      if (!clientCountError && clientCount && clientCount > 0) {
+        const { data: deletedClients, error: deleteError } = await supabase
+          .from('clients')
+          .delete()
+          .gte('id', '00000000-0000-0000-0000-000000000000')
+          .select(); // Select to see what was deleted
+        
+        if (deleteError) {
+          console.error('Error deleting clients:', deleteError);
+          console.error('Delete error details:', JSON.stringify(deleteError, null, 2));
+        } else {
+          dbClearResults.clients = deletedClients?.length || 0;
+          console.log(`Successfully deleted ${deletedClients?.length || 0} clients from database`);
+          if (deletedClients && deletedClients.length > 0) {
+            console.log('Deleted client IDs:', deletedClients.map((c: any) => c.id));
+          }
+        }
+      } else {
+        console.log('No clients to delete');
+      }
+      
+      // Verify clients table is empty
+      const { count: remainingClients } = await supabase
+        .from('clients')
+        .select('*', { count: 'exact', head: true });
+      console.log(`After delete: ${remainingClients || 0} clients remaining in database`);
+      
+    } catch (dbError: any) {
+      console.error('Error clearing database tables:', dbError);
+      console.error('Error details:', JSON.stringify(dbError, null, 2));
+    }
+    
+    // STEP 2: Clear KV store - Clear BOTH old (plural) and new (singular) key patterns
+    console.log('Clearing KV store...');
+    const oldClients = await kv.getByPrefix('clients:', environmentId);
     for (const client of oldClients) {
       await kv.del(`clients:${environmentId}:${client.id}`, environmentId);
     }
-    console.log(`Cleared ${oldClients.length} old clients`);
+    console.log(`Cleared ${oldClients.length} old clients from KV`);
     
-    console.log('Clearing new clients data with singular prefix...');
-    const clients = await kv.getByPrefix('client:', environmentId); // NEW pattern
+    const clients = await kv.getByPrefix('client:', environmentId);
     for (const client of clients) {
       await kv.del(`client:${environmentId}:${client.id}`, environmentId);
     }
-    console.log(`Cleared ${clients.length} new clients`);
+    console.log(`Cleared ${clients.length} new clients from KV`);
     
-    console.log('Clearing old sites data with plural prefix...');
-    const oldSites = await kv.getByPrefix('sites:', environmentId); // OLD pattern
+    const oldSites = await kv.getByPrefix('sites:', environmentId);
     for (const site of oldSites) {
       await kv.del(`sites:${environmentId}:${site.id}`, environmentId);
     }
-    console.log(`Cleared ${oldSites.length} old sites`);
+    console.log(`Cleared ${oldSites.length} old sites from KV`);
     
-    console.log('Clearing new sites data with singular prefix...');
-    const sites = await kv.getByPrefix('site:', environmentId); // NEW pattern
+    const sites = await kv.getByPrefix('site:', environmentId);
     for (const site of sites) {
       await kv.del(`site:${environmentId}:${site.id}`, environmentId);
     }
-    console.log(`Cleared ${sites.length} new sites`);
+    console.log(`Cleared ${sites.length} new sites from KV`);
     
     const gifts = await kv.getByPrefix('gifts:', environmentId);
     for (const gift of gifts) {
       await kv.del(`gifts:${gift.id}`, environmentId);
     }
-    console.log(`Cleared ${gifts.length} gifts`);
+    console.log(`Cleared ${gifts.length} gifts from KV`);
     
     const configs = await kv.getByPrefix('site_configs:', environmentId);
     for (const config of configs) {
       await kv.del(`site_configs:${config.siteId}`, environmentId);
     }
-    console.log(`Cleared ${configs.length} site configs`);
+    console.log(`Cleared ${configs.length} site configs from KV`);
     
-    console.log('All old data cleared, reseeding with new key patterns...');
+    // STEP 3: Seed database tables with new data
+    console.log('Seeding database tables...');
+    const seedClients = [
+      {
+        id: '00000000-0000-0000-0000-000000000001',
+        name: 'TechCorp Inc.',
+        contact_email: 'admin@techcorp.com',
+        status: 'active',
+        client_code: 'TECHCORP',
+        client_contact_name: 'John Smith',
+        client_contact_phone: '(555) 100-0000',
+        client_address_line_1: '123 Tech Street',
+        client_city: 'San Francisco',
+        client_postal_code: '94102',
+        client_country_state: 'CA',
+        client_country: 'US',
+      },
+      {
+        id: '00000000-0000-0000-0000-000000000002',
+        name: 'GlobalRetail Group',
+        contact_email: 'contact@globalretail.com',
+        status: 'active',
+        client_code: 'GLOBALRETAIL',
+        client_contact_name: 'Jane Doe',
+        client_contact_phone: '(555) 200-0000',
+        client_address_line_1: '456 Retail Ave',
+        client_city: 'New York',
+        client_postal_code: '10001',
+        client_country_state: 'NY',
+        client_country: 'US',
+      },
+      {
+        id: '00000000-0000-0000-0000-000000000003',
+        name: 'HealthCare Services Ltd.',
+        contact_email: 'info@healthcareservices.com',
+        status: 'active',
+        client_code: 'HEALTHCARE',
+        client_contact_name: 'Dr. Sarah Johnson',
+        client_contact_phone: '(555) 300-0000',
+      },
+      {
+        id: '00000000-0000-0000-0000-000000000004',
+        name: 'EduTech Solutions',
+        contact_email: 'hello@edutech.com',
+        status: 'active',
+        client_code: 'EDUTECH',
+        client_contact_name: 'Michael Brown',
+        client_contact_phone: '(555) 400-0000',
+      },
+    ];
     
-    // Trigger reseed
-    await seedDatabase(environmentId);
+    // Insert new clients (tables were already cleared in STEP 1)
+    console.log('Attempting to insert clients:', seedClients.map(c => ({ id: c.id, name: c.name })));
+    const { data: insertedClients, error: clientInsertError } = await supabase
+      .from('clients')
+      .insert(seedClients)
+      .select();
+    
+    if (clientInsertError) {
+      console.error('ERROR inserting clients:', clientInsertError);
+      console.error('Full error details:', JSON.stringify(clientInsertError, null, 2));
+    } else {
+      console.log(`Successfully inserted ${insertedClients?.length || 0} clients to database`);
+      console.log('Inserted client IDs:', insertedClients?.map(c => c.id));
+    }
+    
+    const seedSites = [
+      {
+        id: '10000000-0000-0000-0000-000000000001',
+        name: 'TechCorp US - Employee Gifts 2026',
+        slug: 'techcorp-us-gifts-2026',
+        client_id: '00000000-0000-0000-0000-000000000001',
+        status: 'active',
+        site_code: 'TC-US-001',
+        site_custom_domain_url: 'techcorp-us-gifts.jala.com',
+      },
+      {
+        id: '10000000-0000-0000-0000-000000000002',
+        name: 'TechCorp EU - Employee Recognition',
+        slug: 'techcorp-eu-recognition-2026',
+        client_id: '00000000-0000-0000-0000-000000000001',
+        status: 'active',
+        site_code: 'TC-EU-001',
+        site_custom_domain_url: 'techcorp-eu-recognition.jala.com',
+      },
+      {
+        id: '10000000-0000-0000-0000-000000000003',
+        name: 'GlobalRetail Premium - US',
+        slug: 'globalretail-premium-us-2026',
+        client_id: '00000000-0000-0000-0000-000000000002',
+        status: 'active',
+        site_code: 'GR-US-001',
+        site_custom_domain_url: 'globalretail-premium-us.jala.com',
+      },
+    ];
+    
+    // Insert new sites (tables were already cleared in STEP 1)
+    console.log('Attempting to insert sites:', seedSites.map(s => ({ id: s.id, name: s.name })));
+    const { data: insertedSites, error: siteInsertError } = await supabase
+      .from('sites')
+      .insert(seedSites)
+      .select();
+    
+    if (siteInsertError) {
+      console.error('ERROR inserting sites:', siteInsertError);
+      console.error('Full error details:', JSON.stringify(siteInsertError, null, 2));
+    } else {
+      console.log(`Successfully inserted ${insertedSites?.length || 0} sites to database`);
+      console.log('Inserted site IDs:', insertedSites?.map(s => s.id));
+    }
+    
+    // STEP 4: KV store seeding skipped - using PostgreSQL database only
+    console.log('KV store seeding skipped - all data now in PostgreSQL database');
     
     return c.json({ 
       success: true, 
-      message: 'Database reseeded successfully with new key patterns',
+      message: 'Database and KV store reseeded successfully',
       environment: environmentId,
       cleared: {
-        oldClients: oldClients.length,
-        newClients: clients.length,
-        oldSites: oldSites.length,
-        newSites: sites.length,
-        gifts: gifts.length,
-        configs: configs.length,
+        database: dbClearResults,
+        kv: {
+          oldClients: oldClients.length,
+          newClients: clients.length,
+          oldSites: oldSites.length,
+          newSites: sites.length,
+          gifts: gifts.length,
+          configs: configs.length,
+        }
+      },
+      seeded: {
+        clients: seedClients.length,
+        sites: seedSites.length,
       }
     });
   } catch (error: any) {
@@ -6010,211 +6068,13 @@ app.post("/make-server-6fcaeea3/employees/import", verifyAdmin, async (c) => {
   }
 });
 
-// Get all employees for a site
-app.get("/make-server-6fcaeea3/sites/:siteId/employees", verifyAdmin, async (c) => {
-  const environmentId = c.get('environmentId') || 'development';
-  const siteId = c.req.param('siteId');
-  
-  try {
-    const employees = await kv.getByPrefix(`employee:${siteId}:`, environmentId);
-    
-    // Sort by name
-    employees.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-    
-    return c.json({ employees });
-  } catch (error: any) {
-    console.error('Get employees error:', error);
-    return c.json({ error: error.message }, 500);
-  }
-});
-
-// Create single employee
-app.post("/make-server-6fcaeea3/sites/:siteId/employees", verifyAdmin, async (c) => {
-  const environmentId = c.get('environmentId') || 'development';
-  const userId = c.get('userId');
-  const siteId = c.req.param('siteId');
-  
-  try {
-    const data = await c.req.json();
-    
-    // Validate required fields based on validation method
-    if (!data.email && !data.employeeId && !data.serialCard) {
-      return c.json({ error: 'At least one identifier (email, employeeId, or serialCard) is required' }, 400);
-    }
-    
-    // Validate site exists
-    const site = await kv.get(`site:${siteId}`, environmentId);
-    if (!site) {
-      return c.json({ error: 'Site not found' }, 404);
-    }
-    
-    const employee = {
-      id: crypto.randomUUID(),
-      siteId,
-      email: data.email?.toLowerCase().trim() || '',
-      employeeId: data.employeeId?.trim() || '',
-      serialCard: data.serialCard?.trim() || '',
-      name: data.name?.trim() || '',
-      department: data.department?.trim() || '',
-      status: 'active',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    
-    await kv.set(`employee:${siteId}:${employee.id}`, employee, environmentId);
-    
-    // Trigger employee_added email automation if employee has email
-    if (employee.email && employee.serialCard) {
-      try {
-        const client = await kv.get(`client:${site.clientId}`, environmentId);
-        await emailEventHelper.notifyEmployeeAdded(
-          siteId,
-          {
-            email: employee.email,
-            name: employee.name,
-            serialCode: employee.serialCard,
-          },
-          {
-            name: site.name || 'Your Site',
-          },
-          {
-            name: client?.name || 'Your Company',
-          },
-          environmentId
-        );
-        console.log(`[Employee Create] Triggered employee_added email for ${employee.email}`);
-      } catch (emailError: any) {
-        console.error(`[Employee Create] Failed to send email for ${employee.email}:`, emailError);
-        // Don't fail the creation if email fails
-      }
-    }
-    
-    await auditLog({
-      action: 'employee_created',
-      userId,
-      status: 'success',
-      ip: c.req.header('x-forwarded-for') || c.req.header('x-real-ip'),
-      userAgent: c.req.header('user-agent'),
-      details: { employeeId: employee.id, siteId }
-    });
-    
-    return c.json({ employee });
-  } catch (error: any) {
-    console.error('Create employee error:', error);
-    return c.json({ error: error.message }, 500);
-  }
-});
-
-// Get single employee
-app.get("/make-server-6fcaeea3/employees/:id", verifyAdmin, async (c) => {
-  const environmentId = c.get('environmentId') || 'development';
-  const id = c.req.param('id');
-  const siteId = c.req.query('siteId');
-  
-  if (!siteId) {
-    return c.json({ error: 'siteId query parameter required' }, 400);
-  }
-  
-  try {
-    const employee = await kv.get(`employee:${siteId}:${id}`, environmentId);
-    
-    if (!employee) {
-      return c.json({ error: 'Employee not found' }, 404);
-    }
-    
-    return c.json({ employee });
-  } catch (error: any) {
-    console.error('Get employee error:', error);
-    return c.json({ error: error.message }, 500);
-  }
-});
-
-// Update employee
-app.put("/make-server-6fcaeea3/employees/:id", verifyAdmin, async (c) => {
-  const environmentId = c.get('environmentId') || 'development';
-  const userId = c.get('userId');
-  const id = c.req.param('id');
-  
-  try {
-    const updates = await c.req.json();
-    const { siteId, ...employeeUpdates } = updates;
-    
-    if (!siteId) {
-      return c.json({ error: 'siteId is required' }, 400);
-    }
-    
-    const key = `employee:${siteId}:${id}`;
-    const employee = await kv.get(key, environmentId);
-    
-    if (!employee) {
-      return c.json({ error: 'Employee not found' }, 404);
-    }
-    
-    const updated = {
-      ...employee,
-      ...employeeUpdates,
-      id: employee.id, // Prevent ID change
-      siteId: employee.siteId, // Prevent siteId change
-      updatedAt: new Date().toISOString()
-    };
-    
-    await kv.set(key, updated, environmentId);
-    
-    await auditLog({
-      action: 'employee_updated',
-      userId,
-      status: 'success',
-      ip: c.req.header('x-forwarded-for') || c.req.header('x-real-ip'),
-      userAgent: c.req.header('user-agent'),
-      details: { employeeId: id, siteId }
-    });
-    
-    return c.json({ employee: updated });
-  } catch (error: any) {
-    console.error('Update employee error:', error);
-    return c.json({ error: error.message }, 500);
-  }
-});
-
-// Deactivate employee
-app.delete("/make-server-6fcaeea3/employees/:id", verifyAdmin, async (c) => {
-  const environmentId = c.get('environmentId') || 'development';
-  const userId = c.get('userId');
-  const id = c.req.param('id');
-  const siteId = c.req.query('siteId');
-  
-  if (!siteId) {
-    return c.json({ error: 'siteId query parameter required' }, 400);
-  }
-  
-  try {
-    const key = `employee:${siteId}:${id}`;
-    const employee = await kv.get(key, environmentId);
-    
-    if (!employee) {
-      return c.json({ error: 'Employee not found' }, 404);
-    }
-    
-    employee.status = 'inactive';
-    employee.updatedAt = new Date().toISOString();
-    
-    await kv.set(key, employee, environmentId);
-    
-    await auditLog({
-      action: 'employee_deactivated',
-      userId,
-      status: 'success',
-      ip: c.req.header('x-forwarded-for') || c.req.header('x-real-ip'),
-      userAgent: c.req.header('user-agent'),
-      details: { employeeId: id, siteId }
-    });
-    
-    return c.json({ success: true, employee });
-  } catch (error: any) {
-    console.error('Deactivate employee error:', error);
-    return c.json({ error: error.message }, 500);
-  }
-});
+// ===== OLD EMPLOYEE CRUD ENDPOINTS REMOVED =====
+// These have been replaced by v2 database-backed endpoints:
+// - GET /v2/employees?site_id=:siteId (replaces GET /sites/:siteId/employees)
+// - POST /v2/employees (replaces POST /sites/:siteId/employees)
+// - GET /v2/employees/:id (replaces GET /employees/:id)
+// - PUT /v2/employees/:id (replaces PUT /employees/:id)
+// - DELETE /v2/employees/:id (replaces DELETE /employees/:id)
 
 // Validate employee access (PUBLIC - no auth required)
 app.post("/make-server-6fcaeea3/public/validate/employee", async (c) => {
@@ -9325,7 +9185,29 @@ app.delete("/make-server-6fcaeea3/v2/orders/:id", verifyAdmin, v2.deleteOrderV2)
 app.get("/make-server-6fcaeea3/v2/product-categories", verifyAdmin, v2.getProductCategoriesV2);
 app.get("/make-server-6fcaeea3/v2/order-stats", verifyAdmin, v2.getOrderStatsV2);
 
-console.log('✅ V2 Database-backed CRUD endpoints registered (32 endpoints)');
+// SITE GIFT CONFIGURATION
+app.get("/make-server-6fcaeea3/v2/sites/:siteId/gift-config", verifyAdmin, v2.getSiteGiftConfigV2);
+app.put("/make-server-6fcaeea3/v2/sites/:siteId/gift-config", verifyAdmin, v2.updateSiteGiftConfigV2);
+app.get("/make-server-6fcaeea3/v2/sites/:siteId/gifts", v2.getSiteGiftsV2);  // Public endpoint
+
+// BRANDS
+console.log('[Routes] Registering brands routes... (deployed at ' + new Date().toISOString() + ')');
+app.get("/make-server-6fcaeea3/v2/brands", verifyAdmin, v2.getBrandsV2);
+app.post("/make-server-6fcaeea3/v2/brands/extract-colors", verifyAdmin, v2.extractColorsFromWebsiteV2);
+app.post("/make-server-6fcaeea3/v2/brands", verifyAdmin, v2.createBrandV2);
+app.get("/make-server-6fcaeea3/v2/brands/:id", verifyAdmin, v2.getBrandByIdV2);
+app.put("/make-server-6fcaeea3/v2/brands/:id", verifyAdmin, v2.updateBrandV2);
+app.delete("/make-server-6fcaeea3/v2/brands/:id", verifyAdmin, v2.deleteBrandV2);
+console.log('[Routes] Brands routes registered, including extract-colors');
+
+// EMAIL TEMPLATES
+app.get("/make-server-6fcaeea3/v2/email-templates", verifyAdmin, v2.getEmailTemplatesV2);
+app.get("/make-server-6fcaeea3/v2/email-templates/:id", verifyAdmin, v2.getEmailTemplateByIdV2);
+app.post("/make-server-6fcaeea3/v2/email-templates", verifyAdmin, v2.createEmailTemplateV2);
+app.put("/make-server-6fcaeea3/v2/email-templates/:id", verifyAdmin, v2.updateEmailTemplateV2);
+app.delete("/make-server-6fcaeea3/v2/email-templates/:id", verifyAdmin, v2.deleteEmailTemplateV2);
+
+console.log('✅ V2 Database-backed CRUD endpoints registered (46 endpoints)');
 
 // ===== CELEBRATION SYSTEM =====
 

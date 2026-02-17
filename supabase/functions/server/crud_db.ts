@@ -6,6 +6,7 @@
  */
 
 import * as db from './database/db.ts';
+import { objectToCamelCase } from './helpers.ts';
 import type {
   Client, CreateClientInput, UpdateClientInput,
   Site, CreateSiteInput, UpdateSiteInput,
@@ -29,10 +30,13 @@ export async function getClients(filters?: {
     console.log('[CRUD DB] Getting clients with filters:', filters);
     const clients = await db.getClients(filters);
     
+    // Transform snake_case to camelCase for frontend
+    const transformedClients = clients.map(client => objectToCamelCase(client));
+    
     return {
       success: true,
-      data: clients,
-      total: clients.length,
+      data: transformedClients,
+      total: transformedClients.length,
     };
   } catch (error: any) {
     console.error('[CRUD DB] Error getting clients:', error);
@@ -55,9 +59,12 @@ export async function getClientById(id: string) {
       };
     }
     
+    // Transform snake_case to camelCase for frontend
+    const transformedClient = objectToCamelCase(client);
+    
     return {
       success: true,
-      data: client,
+      data: transformedClient,
     };
   } catch (error: any) {
     console.error('[CRUD DB] Error getting client:', error);
@@ -137,10 +144,13 @@ export async function getSites(filters?: {
     console.log('[CRUD DB] Getting sites with filters:', filters);
     const sites = await db.getSites(filters);
     
+    // Transform snake_case to camelCase for frontend
+    const transformedSites = sites.map(site => objectToCamelCase(site));
+    
     return {
       success: true,
-      data: sites,
-      total: sites.length,
+      data: transformedSites,
+      total: transformedSites.length,
     };
   } catch (error: any) {
     console.error('[CRUD DB] Error getting sites:', error);
@@ -163,9 +173,12 @@ export async function getSiteById(id: string) {
       };
     }
     
+    // Transform snake_case to camelCase for frontend
+    const transformedSite = objectToCamelCase(site);
+    
     return {
       success: true,
-      data: site,
+      data: transformedSite,
     };
   } catch (error: any) {
     console.error('[CRUD DB] Error getting site:', error);
@@ -188,9 +201,12 @@ export async function getSiteBySlug(slug: string) {
       };
     }
     
+    // Transform snake_case to camelCase for frontend
+    const transformedSite = objectToCamelCase(site);
+    
     return {
       success: true,
-      data: site,
+      data: transformedSite,
     };
   } catch (error: any) {
     console.error('[CRUD DB] Error getting site by slug:', error);
@@ -274,10 +290,13 @@ export async function getProducts(filters?: {
     console.log('[CRUD DB] Getting products with filters:', filters);
     const products = await db.getProducts(filters);
     
+    // Transform snake_case to camelCase for frontend
+    const transformedProducts = products.map(product => objectToCamelCase(product));
+    
     return {
       success: true,
-      data: products,
-      total: products.length,
+      data: transformedProducts,
+      total: transformedProducts.length,
     };
   } catch (error: any) {
     console.error('[CRUD DB] Error getting products:', error);
@@ -300,9 +319,12 @@ export async function getProductById(id: string) {
       };
     }
     
+    // Transform snake_case to camelCase for frontend
+    const transformedProduct = objectToCamelCase(product);
+    
     return {
       success: true,
-      data: product,
+      data: transformedProduct,
     };
   } catch (error: any) {
     console.error('[CRUD DB] Error getting product:', error);
@@ -383,10 +405,13 @@ export async function getEmployees(filters?: {
     console.log('[CRUD DB] Getting employees with filters:', filters);
     const employees = await db.getEmployees(filters);
     
+    // Transform snake_case to camelCase for frontend
+    const transformedEmployees = employees.map(employee => objectToCamelCase(employee));
+    
     return {
       success: true,
-      data: employees,
-      total: employees.length,
+      data: transformedEmployees,
+      total: transformedEmployees.length,
     };
   } catch (error: any) {
     console.error('[CRUD DB] Error getting employees:', error);
@@ -409,9 +434,12 @@ export async function getEmployeeById(id: string) {
       };
     }
     
+    // Transform snake_case to camelCase for frontend
+    const transformedEmployee = objectToCamelCase(employee);
+    
     return {
       success: true,
-      data: employee,
+      data: transformedEmployee,
     };
   } catch (error: any) {
     console.error('[CRUD DB] Error getting employee:', error);
@@ -497,10 +525,13 @@ export async function getOrders(filters?: {
     console.log('[CRUD DB] Getting orders with filters:', filters);
     const orders = await db.getOrders(filters);
     
+    // Transform snake_case to camelCase for frontend
+    const transformedOrders = orders.map(order => objectToCamelCase(order));
+    
     return {
       success: true,
-      data: orders,
-      total: orders.length,
+      data: transformedOrders,
+      total: transformedOrders.length,
     };
   } catch (error: any) {
     console.error('[CRUD DB] Error getting orders:', error);
@@ -523,9 +554,12 @@ export async function getOrderById(id: string) {
       };
     }
     
+    // Transform snake_case to camelCase for frontend
+    const transformedOrder = objectToCamelCase(order);
+    
     return {
       success: true,
-      data: order,
+      data: transformedOrder,
     };
   } catch (error: any) {
     console.error('[CRUD DB] Error getting order:', error);
@@ -548,9 +582,12 @@ export async function getOrderByNumber(orderNumber: string) {
       };
     }
     
+    // Transform snake_case to camelCase for frontend
+    const transformedOrder = objectToCamelCase(order);
+    
     return {
       success: true,
-      data: order,
+      data: transformedOrder,
     };
   } catch (error: any) {
     console.error('[CRUD DB] Error getting order by number:', error);
@@ -659,6 +696,675 @@ export async function getOrderStats(filters?: {
     };
   } catch (error: any) {
     console.error('[CRUD DB] Error getting order stats:', error);
+    throw error;
+  }
+}
+
+
+// ==================== SITE GIFT CONFIGURATION ====================
+
+/**
+ * Get site gift configuration
+ */
+export async function getSiteGiftConfig(siteId: string) {
+  try {
+    console.log('[CRUD DB] Getting site gift config for site:', siteId);
+    const { data, error } = await db.supabase
+      .from('site_gift_configs')
+      .select('*')
+      .eq('site_id', siteId)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') {  // PGRST116 = not found
+      throw error;
+    }
+    
+    // Return default config if not found
+    if (!data) {
+      return {
+        site_id: siteId,
+        assignment_strategy: 'all',
+        selected_product_ids: [],
+        excluded_product_ids: [],
+        included_categories: [],
+        excluded_categories: [],
+        filters: {}
+      };
+    }
+    
+    return objectToCamelCase(data);
+  } catch (error: any) {
+    console.error('[CRUD DB] Error getting site gift config:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update site gift configuration
+ */
+export async function updateSiteGiftConfig(siteId: string, config: any) {
+  try {
+    console.log('[CRUD DB] Updating site gift config for site:', siteId);
+    
+    const { data, error } = await db.supabase
+      .from('site_gift_configs')
+      .upsert({
+        site_id: siteId,
+        assignment_strategy: config.assignmentStrategy || config.assignment_strategy || 'all',
+        selected_product_ids: config.selectedProductIds || config.selected_product_ids || [],
+        excluded_product_ids: config.excludedProductIds || config.excluded_product_ids || [],
+        included_categories: config.includedCategories || config.included_categories || [],
+        excluded_categories: config.excludedCategories || config.excluded_categories || [],
+        min_price: config.minPrice || config.min_price,
+        max_price: config.maxPrice || config.max_price,
+        filters: config.filters || {},
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    return objectToCamelCase(data);
+  } catch (error: any) {
+    console.error('[CRUD DB] Error updating site gift config:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get filtered gifts/products for a site
+ */
+export async function getSiteGifts(siteId: string, filters?: {
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  try {
+    console.log('[CRUD DB] Getting site gifts for site:', siteId, 'with filters:', filters);
+    
+    // Get site to find catalog_id
+    const { data: site, error: siteError } = await db.supabase
+      .from('sites')
+      .select('catalog_id')
+      .eq('id', siteId)
+      .single();
+    
+    if (siteError) throw siteError;
+    
+    if (!site?.catalog_id) {
+      console.log('[CRUD DB] Site has no catalog assigned');
+      return { success: true, data: [], total: 0 };
+    }
+    
+    // Get site gift configuration
+    const config = await getSiteGiftConfig(siteId);
+    
+    // Build query
+    let query = db.supabase
+      .from('products')
+      .select('*', { count: 'exact' })
+      .eq('catalog_id', site.catalog_id)
+      .eq('status', 'active');
+    
+    // Apply configuration filters
+    if (config.assignmentStrategy === 'selected' && config.selectedProductIds?.length > 0) {
+      query = query.in('id', config.selectedProductIds);
+    }
+    
+    if (config.excludedProductIds?.length > 0) {
+      query = query.not('id', 'in', `(${config.excludedProductIds.join(',')})`);
+    }
+    
+    if (config.includedCategories?.length > 0) {
+      query = query.in('category', config.includedCategories);
+    }
+    
+    if (config.excludedCategories?.length > 0) {
+      query = query.not('category', 'in', `(${config.excludedCategories.join(',')})`);
+    }
+    
+    if (config.minPrice) {
+      query = query.gte('price', config.minPrice);
+    }
+    
+    if (config.maxPrice) {
+      query = query.lte('price', config.maxPrice);
+    }
+    
+    // Apply additional filters from request
+    if (filters?.category) {
+      query = query.eq('category', filters.category);
+    }
+    
+    if (filters?.minPrice) {
+      query = query.gte('price', filters.minPrice);
+    }
+    
+    if (filters?.maxPrice) {
+      query = query.lte('price', filters.maxPrice);
+    }
+    
+    if (filters?.search) {
+      query = query.ilike('name', `%${filters.search}%`);
+    }
+    
+    // Apply pagination
+    if (filters?.limit) {
+      query = query.limit(filters.limit);
+    }
+    
+    if (filters?.offset) {
+      query = query.range(filters.offset, filters.offset + (filters.limit || 50) - 1);
+    }
+    
+    const { data, error, count } = await query;
+    
+    if (error) throw error;
+    
+    const transformedData = (data || []).map(product => objectToCamelCase(product));
+    
+    return {
+      success: true,
+      data: transformedData,
+      total: count || 0
+    };
+  } catch (error: any) {
+    console.error('[CRUD DB] Error getting site gifts:', error);
+    throw error;
+  }
+}
+
+// ==================== BRANDS ====================
+
+/**
+ * Get all brands
+ */
+export async function getBrands(filters?: {
+  status?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  try {
+    console.log('[CRUD DB] Getting brands with filters:', filters);
+    
+    let query = db.supabase
+      .from('brands')
+      .select('*', { count: 'exact' });
+    
+    if (filters?.status) {
+      query = query.eq('status', filters.status);
+    }
+    
+    if (filters?.search) {
+      query = query.ilike('name', `%${filters.search}%`);
+    }
+    
+    if (filters?.limit) {
+      query = query.limit(filters.limit);
+    }
+    
+    if (filters?.offset) {
+      query = query.range(filters.offset, filters.offset + (filters.limit || 50) - 1);
+    }
+    
+    query = query.order('name', { ascending: true });
+    
+    const { data, error, count } = await query;
+    
+    if (error) throw error;
+    
+    const transformedData = (data || []).map(brand => objectToCamelCase(brand));
+    
+    return {
+      success: true,
+      data: transformedData,
+      total: count || 0
+    };
+  } catch (error: any) {
+    console.error('[CRUD DB] Error getting brands:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get brand by ID
+ */
+export async function getBrandById(id: string) {
+  try {
+    console.log('[CRUD DB] Getting brand by ID:', id);
+    
+    const { data, error } = await db.supabase
+      .from('brands')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error) throw error;
+    
+    return objectToCamelCase(data);
+  } catch (error: any) {
+    console.error('[CRUD DB] Error getting brand:', error);
+    throw error;
+  }
+}
+
+/**
+ * Create brand
+ */
+export async function createBrand(input: any) {
+  try {
+    console.log('[CRUD DB] Creating brand:', input);
+    
+    const { data, error } = await db.supabase
+      .from('brands')
+      .insert({
+        name: input.name,
+        description: input.description,
+        logo_url: input.logoUrl || input.logo_url,
+        settings: input.settings || {},
+        primary_color: input.primaryColor || input.primary_color,
+        secondary_color: input.secondaryColor || input.secondary_color,
+        status: input.status || 'active'
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    return objectToCamelCase(data);
+  } catch (error: any) {
+    console.error('[CRUD DB] Error creating brand:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update brand
+ */
+export async function updateBrand(id: string, updates: any) {
+  try {
+    console.log('[CRUD DB] Updating brand:', id, updates);
+    
+    const updateData: any = {
+      updated_at: new Date().toISOString()
+    };
+    
+    if (updates.name !== undefined) updateData.name = updates.name;
+    if (updates.description !== undefined) updateData.description = updates.description;
+    if (updates.logoUrl !== undefined || updates.logo_url !== undefined) {
+      updateData.logo_url = updates.logoUrl || updates.logo_url;
+    }
+    if (updates.settings !== undefined) updateData.settings = updates.settings;
+    if (updates.primaryColor !== undefined || updates.primary_color !== undefined) {
+      updateData.primary_color = updates.primaryColor || updates.primary_color;
+    }
+    if (updates.secondaryColor !== undefined || updates.secondary_color !== undefined) {
+      updateData.secondary_color = updates.secondaryColor || updates.secondary_color;
+    }
+    if (updates.status !== undefined) updateData.status = updates.status;
+    
+    const { data, error } = await db.supabase
+      .from('brands')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    return objectToCamelCase(data);
+  } catch (error: any) {
+    console.error('[CRUD DB] Error updating brand:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete brand
+ */
+export async function deleteBrand(id: string) {
+  try {
+    console.log('[CRUD DB] Deleting brand:', id);
+    
+    const { error } = await db.supabase
+      .from('brands')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+    
+    return { success: true };
+  } catch (error: any) {
+    console.error('[CRUD DB] Error deleting brand:', error);
+    throw error;
+  }
+}
+
+// ==================== EMAIL TEMPLATES ====================
+
+/**
+ * Get all email templates
+ */
+export async function getEmailTemplates(filters?: {
+  templateType?: string;
+  eventType?: string;
+  siteId?: string;
+  clientId?: string;
+  status?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  try {
+    console.log('[CRUD DB] Getting email templates with filters:', filters);
+    
+    let query = db.supabase
+      .from('email_templates')
+      .select('*', { count: 'exact' });
+    
+    if (filters?.templateType) {
+      query = query.eq('template_type', filters.templateType);
+    }
+    
+    if (filters?.eventType) {
+      query = query.eq('event_type', filters.eventType);
+    }
+    
+    if (filters?.siteId) {
+      query = query.eq('site_id', filters.siteId);
+    }
+    
+    if (filters?.clientId) {
+      query = query.eq('client_id', filters.clientId);
+    }
+    
+    if (filters?.status) {
+      query = query.eq('status', filters.status);
+    }
+    
+    if (filters?.limit) {
+      query = query.limit(filters.limit);
+    }
+    
+    if (filters?.offset) {
+      query = query.range(filters.offset, filters.offset + (filters.limit || 50) - 1);
+    }
+    
+    query = query.order('name', { ascending: true });
+    
+    const { data, error, count } = await query;
+    
+    if (error) throw error;
+    
+    const transformedData = (data || []).map(template => objectToCamelCase(template));
+    
+    return {
+      success: true,
+      data: transformedData,
+      total: count || 0
+    };
+  } catch (error: any) {
+    console.error('[CRUD DB] Error getting email templates:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get email template by ID
+ */
+export async function getEmailTemplateById(id: string) {
+  try {
+    console.log('[CRUD DB] Getting email template by ID:', id);
+    
+    const { data, error } = await db.supabase
+      .from('email_templates')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error) throw error;
+    
+    return objectToCamelCase(data);
+  } catch (error: any) {
+    console.error('[CRUD DB] Error getting email template:', error);
+    throw error;
+  }
+}
+
+/**
+ * Create email template
+ */
+export async function createEmailTemplate(input: any) {
+  try {
+    console.log('[CRUD DB] Creating email template:', input);
+    
+    const { data, error } = await db.supabase
+      .from('email_templates')
+      .insert({
+        site_id: input.siteId || input.site_id,
+        client_id: input.clientId || input.client_id,
+        name: input.name,
+        description: input.description,
+        template_type: input.templateType || input.template_type,
+        event_type: input.eventType || input.event_type,
+        subject: input.subject,
+        body_html: input.bodyHtml || input.body_html,
+        body_text: input.bodyText || input.body_text,
+        variables: input.variables || [],
+        from_name: input.fromName || input.from_name,
+        from_email: input.fromEmail || input.from_email,
+        reply_to: input.replyTo || input.reply_to,
+        status: input.status || 'active',
+        is_default: input.isDefault || input.is_default || false
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    return objectToCamelCase(data);
+  } catch (error: any) {
+    console.error('[CRUD DB] Error creating email template:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update email template
+ */
+export async function updateEmailTemplate(id: string, updates: any) {
+  try {
+    console.log('[CRUD DB] Updating email template:', id, updates);
+    
+    const updateData: any = {
+      updated_at: new Date().toISOString()
+    };
+    
+    if (updates.name !== undefined) updateData.name = updates.name;
+    if (updates.description !== undefined) updateData.description = updates.description;
+    if (updates.subject !== undefined) updateData.subject = updates.subject;
+    if (updates.bodyHtml !== undefined || updates.body_html !== undefined) {
+      updateData.body_html = updates.bodyHtml || updates.body_html;
+    }
+    if (updates.bodyText !== undefined || updates.body_text !== undefined) {
+      updateData.body_text = updates.bodyText || updates.body_text;
+    }
+    if (updates.variables !== undefined) updateData.variables = updates.variables;
+    if (updates.fromName !== undefined || updates.from_name !== undefined) {
+      updateData.from_name = updates.fromName || updates.from_name;
+    }
+    if (updates.fromEmail !== undefined || updates.from_email !== undefined) {
+      updateData.from_email = updates.fromEmail || updates.from_email;
+    }
+    if (updates.replyTo !== undefined || updates.reply_to !== undefined) {
+      updateData.reply_to = updates.replyTo || updates.reply_to;
+    }
+    if (updates.status !== undefined) updateData.status = updates.status;
+    if (updates.isDefault !== undefined || updates.is_default !== undefined) {
+      updateData.is_default = updates.isDefault || updates.is_default;
+    }
+    
+    const { data, error } = await db.supabase
+      .from('email_templates')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    return objectToCamelCase(data);
+  } catch (error: any) {
+    console.error('[CRUD DB] Error updating email template:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete email template
+ */
+export async function deleteEmailTemplate(id: string) {
+  try {
+    console.log('[CRUD DB] Deleting email template:', id);
+    
+    const { error } = await db.supabase
+      .from('email_templates')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+    
+    return { success: true };
+  } catch (error: any) {
+    console.error('[CRUD DB] Error deleting email template:', error);
+    throw error;
+  }
+}
+
+
+// ==================== BRANDING HELPERS ====================
+
+/**
+ * Get effective branding for a site
+ * Combines brand template + client overrides + site overrides
+ */
+export async function getSiteEffectiveBranding(siteId: string) {
+  try {
+    console.log('[CRUD DB] Getting effective branding for site:', siteId);
+    
+    // Get site with client and brand data
+    const { data: site, error: siteError } = await db.supabase
+      .from('sites')
+      .select(`
+        *,
+        client:clients!inner(
+          id,
+          name,
+          default_brand_id,
+          branding_overrides,
+          header_footer_config
+        )
+      `)
+      .eq('id', siteId)
+      .single();
+    
+    if (siteError) throw siteError;
+    if (!site) throw new Error('Site not found');
+    
+    // Determine which brand to use (site brand or client default brand)
+    const brandId = site.brand_id || site.client.default_brand_id;
+    
+    let brandTemplate = null;
+    if (brandId) {
+      const { data: brand, error: brandError } = await db.supabase
+        .from('brands')
+        .select('*')
+        .eq('id', brandId)
+        .single();
+      
+      if (!brandError && brand) {
+        brandTemplate = objectToCamelCase(brand);
+      }
+    }
+    
+    // Build effective branding by layering:
+    // 1. Brand template (base)
+    // 2. Client overrides
+    // 3. Site overrides
+    const effectiveBranding = {
+      ...(brandTemplate || {}),
+      ...(site.client.branding_overrides || {}),
+      ...(site.branding_overrides || {}),
+    };
+    
+    return {
+      success: true,
+      data: {
+        site: objectToCamelCase(site),
+        brand: brandTemplate,
+        clientOverrides: site.client.branding_overrides || {},
+        siteOverrides: site.branding_overrides || {},
+        effectiveBranding,
+        headerFooterConfig: site.client.header_footer_config || {},
+      }
+    };
+  } catch (error: any) {
+    console.error('[CRUD DB] Error getting effective branding:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get effective branding for a client
+ * Combines brand template + client overrides
+ */
+export async function getClientEffectiveBranding(clientId: string) {
+  try {
+    console.log('[CRUD DB] Getting effective branding for client:', clientId);
+    
+    const { data: client, error: clientError } = await db.supabase
+      .from('clients')
+      .select('*')
+      .eq('id', clientId)
+      .single();
+    
+    if (clientError) throw clientError;
+    if (!client) throw new Error('Client not found');
+    
+    let brandTemplate = null;
+    if (client.default_brand_id) {
+      const { data: brand, error: brandError } = await db.supabase
+        .from('brands')
+        .select('*')
+        .eq('id', client.default_brand_id)
+        .single();
+      
+      if (!brandError && brand) {
+        brandTemplate = objectToCamelCase(brand);
+      }
+    }
+    
+    const effectiveBranding = {
+      ...(brandTemplate || {}),
+      ...(client.branding_overrides || {}),
+    };
+    
+    return {
+      success: true,
+      data: {
+        client: objectToCamelCase(client),
+        brand: brandTemplate,
+        clientOverrides: client.branding_overrides || {},
+        effectiveBranding,
+        headerFooterConfig: client.header_footer_config || {},
+      }
+    };
+  } catch (error: any) {
+    console.error('[CRUD DB] Error getting effective branding:', error);
     throw error;
   }
 }

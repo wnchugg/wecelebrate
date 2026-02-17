@@ -26,6 +26,9 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
 // Initialize Supabase client
 const supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+// Export the supabase client for use in other modules
+export { supabase };
+
 // ==================== Helper Functions ====================
 
 function handleError(operation: string, error: any): never {
@@ -59,6 +62,13 @@ export async function getClients(filters?: ClientFilters): Promise<Client[]> {
     const { data, error } = await query.order('created_at', { ascending: false });
     
     if (error) handleError('getClients', error);
+    
+    // Debug logging
+    console.log('[DB] getClients returned:', data?.length || 0, 'clients');
+    if (data && data.length > 0) {
+      console.log('[DB] First client ID:', data[0].id, 'Name:', data[0].name);
+    }
+    
     return data || [];
   } catch (error) {
     handleError('getClients', error);

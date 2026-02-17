@@ -172,7 +172,7 @@ export function ClientManagement() {
 
     setIsDeleting(true);
     try {
-      await apiRequest(`/clients/${clientId}`, { method: 'DELETE' });
+      await apiRequest(`/v2/clients/${clientId}`, { method: 'DELETE' });
       showSuccessToast('Client deleted successfully');
       loadData();
     } catch (error: unknown) {
@@ -186,7 +186,7 @@ export function ClientManagement() {
     try {
       if (editingClient) {
         // Update existing client
-        await apiRequest(`/clients/${editingClient.id}`, {
+        await apiRequest(`/v2/clients/${editingClient.id}`, {
           method: 'PUT',
           body: JSON.stringify(clientData)
         });

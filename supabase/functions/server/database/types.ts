@@ -43,6 +43,9 @@ export interface Client {
   client_erp_system?: string;
   client_sso?: string;
   client_hris_system?: string;
+  default_brand_id?: string;
+  branding_overrides?: Record<string, any>;
+  header_footer_config?: Record<string, any>;
   created_at: string;
   updated_at: string;
 }
@@ -86,6 +89,8 @@ export interface Site {
   font_family?: string;
   custom_css?: string;
   settings?: Record<string, any>;
+  brand_id?: string;
+  branding_overrides?: Record<string, any>;
   created_at: string;
   updated_at: string;
   created_by?: string;

@@ -139,7 +139,7 @@ export function ClientConfiguration() {
   const loadClient = async () => {
     setIsLoading(true);
     try {
-      const response = await apiRequest<{ success: boolean; data: Client }>(`/clients/${clientId}`);
+      const response = await apiRequest<{ success: boolean; data: Client }>(`/v2/clients/${clientId}`);
       const client = response.data;
       
       // Basic Info
@@ -206,7 +206,7 @@ export function ClientConfiguration() {
 
     setIsSaving(true);
     try {
-      await apiRequest(`/clients/${clientId}`, {
+      await apiRequest(`/v2/clients/${clientId}`, {
         method: 'PUT',
         body: JSON.stringify({
           name: clientName,
@@ -276,7 +276,7 @@ export function ClientConfiguration() {
 
     setIsAutoSaving(true);
     try {
-      await apiRequest(`/clients/${clientId}`, {
+      await apiRequest(`/v2/clients/${clientId}`, {
         method: 'PUT',
         body: JSON.stringify({
           name: clientName,

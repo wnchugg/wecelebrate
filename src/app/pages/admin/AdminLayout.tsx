@@ -92,6 +92,19 @@ export function AdminLayout() {
   const { currentSite, currentClient, sites, clients, setCurrentSite, setCurrentClient, getClientById, isLoading } = useSite();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showSiteSelector, setShowSiteSelector] = useState(false);
+  
+  // Debug logging
+  useEffect(() => {
+    console.warn('[AdminLayout] Sites/Clients state:', {
+      sitesCount: sites.length,
+      clientsCount: clients.length,
+      currentSite: currentSite?.name,
+      currentClient: currentClient?.name,
+      isLoading,
+      sites: sites.map(s => ({ id: s.id, name: s.name, clientId: s.clientId })),
+      clients: clients.map(c => ({ id: c.id, name: c.name }))
+    });
+  }, [sites, clients, currentSite, currentClient, isLoading]);
   const [showClientSelector, setShowClientSelector] = useState(false);
   const [showClientFilter, setShowClientFilter] = useState<string>('all');
   const [siteSettingsOpen, setSiteSettingsOpen] = useState(true);
@@ -152,6 +165,19 @@ export function AdminLayout() {
   const filteredSites = showClientFilter === 'all' 
     ? sites 
     : sites.filter(s => s.clientId === showClientFilter);
+
+  // Debug logging for filtered sites
+  useEffect(() => {
+    if (showSiteSelector) {
+      console.warn('[AdminLayout] Site selector opened:', {
+        showClientFilter,
+        sitesCount: sites.length,
+        filteredSitesCount: filteredSites.length,
+        sites: sites.map(s => ({ id: s.id, name: s.name, clientId: s.clientId })),
+        filteredSites: filteredSites.map(s => ({ id: s.id, name: s.name, clientId: s.clientId }))
+      });
+    }
+  }, [showSiteSelector, sites, filteredSites, showClientFilter]);
 
   const allNavigation = [...clientNavigation, ...globalNavigation, ...developerToolsNavigation, ...siteSpecificNavigation];
 
@@ -540,7 +566,17 @@ export function AdminLayout() {
 
                       {/* Sites List */}
                       <div className="flex-1 overflow-y-auto p-2">
-                        {filteredSites.length === 0 ? (
+                        {/* Debug info */}
+                        <div className="mb-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
+                          <strong>Debug:</strong> isLoading={String(isLoading)}, sites.length={sites.length}, filteredSites.length={filteredSites.length}
+                        </div>
+                        
+                        {isLoading ? (
+                          <div className="text-center py-8">
+                            <div className="w-12 h-12 border-4 border-[#D91C81] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                            <p className="text-sm font-medium text-gray-600">Loading sites...</p>
+                          </div>
+                        ) : filteredSites.length === 0 ? (
                           <div className="text-center py-8">
                             <Globe className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                             <p className="text-sm font-medium text-gray-600">No sites available</p>

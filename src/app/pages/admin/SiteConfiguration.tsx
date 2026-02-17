@@ -36,6 +36,15 @@ export function SiteConfiguration() {
   const { currentSite, currentClient, updateSite } = useSite();
   const { gifts } = useGift();
   const [searchParams] = useSearchParams();
+  
+  // Debug logging
+  useEffect(() => {
+    console.warn('[SiteConfiguration] Component state:', {
+      currentSite: currentSite ? { id: currentSite.id, name: currentSite.name } : null,
+      currentClient: currentClient ? { id: currentClient.id, name: currentClient.name } : null,
+      hasCurrentSite: !!currentSite
+    });
+  }, [currentSite, currentClient]);
   const [activeTab, setActiveTab] = useState('general');
   const [hasChanges, setHasChanges] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -675,7 +684,7 @@ export function SiteConfiguration() {
     }
   };
 
-  if (!currentSite || !currentClient) {
+  if (!currentSite) {
     return (
       <div className="space-y-6">
         <Alert className="border-amber-200 bg-amber-50">
@@ -709,8 +718,25 @@ export function SiteConfiguration() {
     );
   }
 
+  // Show warning if client is missing but allow configuration
+  const showClientWarning = !currentClient;
+
   return (
     <div className="space-y-6">
+      {/* Client Missing Warning */}
+      {showClientWarning && (
+        <Alert className="border-yellow-200 bg-yellow-50">
+          <AlertCircle className="w-5 h-5 text-yellow-600" />
+          <AlertDescription className="text-yellow-800">
+            <strong className="block mb-1">Client Information Missing</strong>
+            <p className="text-sm">
+              This site doesn't have a client assigned. Some features may not work correctly. 
+              Please update the site's clientId in the database or contact your administrator.
+            </p>
+          </AlertDescription>
+        </Alert>
+      )}
+      
       {/* Site Context Header - Sticky */}
       <div className="bg-white border border-gray-200 rounded-xl p-4 sticky top-0 z-10 shadow-sm">
         <div className="flex items-center justify-between">

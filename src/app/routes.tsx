@@ -119,6 +119,9 @@ const AuthSync = lazy(() => import('./pages/admin/AuthSync'));
 const HeaderFooterConfiguration = lazy(() => import('./pages/admin/HeaderFooterConfiguration').then(m => ({ default: m.HeaderFooterConfiguration })));
 const BrandingConfiguration = lazy(() => import('./pages/admin/BrandingConfiguration').then(m => ({ default: m.BrandingConfiguration })));
 const GiftSelectionConfiguration = lazy(() => import('./pages/admin/GiftSelectionConfiguration').then(m => ({ default: m.GiftSelectionConfiguration })));
+const BrandsManagement = lazy(() => import('./pages/admin/BrandsManagement').then(m => ({ default: m.BrandsManagement })));
+const BrandEdit = lazy(() => import('./pages/admin/BrandEdit').then(m => ({ default: m.BrandEdit })));
+const EmailTemplatesManagement = lazy(() => import('./pages/admin/EmailTemplatesManagement').then(m => ({ default: m.EmailTemplatesManagement })));
 
 const AuditLogs = lazy(() => import('./pages/admin/AuditLogs').then(m => ({ default: m.AuditLogs })));
 const SecurityDashboard = lazy(() => import('./pages/admin/SecurityDashboard').then(m => ({ default: m.SecurityDashboard })));
@@ -332,9 +335,12 @@ export const router = createBrowserRouter([
           { path: "celebration-analytics", Component: CelebrationAnalytics, HydrateFallback: LoadingFallback },
           { path: "executive-dashboard", Component: ExecutiveDashboard, HydrateFallback: LoadingFallback },
           { path: "brands", Component: BrandManagement, HydrateFallback: LoadingFallback },
+          { path: "brands-management", Component: BrandsManagement, HydrateFallback: LoadingFallback },
+          { path: "brands/:id/edit", Component: BrandEdit, HydrateFallback: LoadingFallback },
           { path: "site-configuration", Component: SiteConfiguration, HydrateFallback: LoadingFallback },
           { path: "site-gifts", Component: SiteGiftConfiguration, HydrateFallback: LoadingFallback },
           { path: "email-templates", Component: EmailTemplates, HydrateFallback: LoadingFallback },
+          { path: "email-templates-management", Component: EmailTemplatesManagement, HydrateFallback: LoadingFallback },
           { path: "email-notification-configuration", Component: EmailNotificationConfiguration, HydrateFallback: LoadingFallback },
           { path: "email-history", Component: EmailHistory, HydrateFallback: LoadingFallback },
           { path: "global-template-library", Component: GlobalTemplateLibrary, HydrateFallback: LoadingFallback },

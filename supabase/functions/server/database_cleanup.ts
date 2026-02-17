@@ -289,30 +289,72 @@ export function setupCleanupRoutes(app: any) {
       }
       
       const client = supabase();
+      let totalDeleted = 0;
       
-      // Get count first
-      const { count } = await client
-        .from('kv_store_6fcaeea3')
-        .select('*', { count: 'exact', head: true })
-        .like('key', `${prefix}:%`);
+      // Delete from KV store (both singular and plural patterns)
+      const patterns = [`${prefix}:%`, `${prefix}s:%`];
+      for (const pattern of patterns) {
+        const { count } = await client
+          .from('kv_store_6fcaeea3')
+          .select('*', { count: 'exact', head: true })
+          .like('key', pattern);
+        
+        if (count && count > 0) {
+          const { error } = await client
+            .from('kv_store_6fcaeea3')
+            .delete()
+            .like('key', pattern);
+          
+          if (!error) {
+            totalDeleted += count;
+            console.log(`Deleted ${count} KV records with pattern: ${pattern}`);
+          }
+        }
+      }
       
-      // Delete
-      const { error } = await client
-        .from('kv_store_6fcaeea3')
-        .delete()
-        .like('key', `${prefix}:%`);
+      // Also delete from database tables if they exist
+      const tableMap: Record<string, string> = {
+        'client': 'clients',
+        'site': 'sites',
+        'product': 'products',
+        'employee': 'employees',
+        'order': 'orders',
+        'gift': 'gifts',
+      };
       
-      if (error) {
-        return c.json({
-          success: false,
-          error: error.message
-        }, 500);
+      const tableName = tableMap[prefix];
+      if (tableName) {
+        try {
+          // Get count from table
+          const { count: tableCount } = await client
+            .from(tableName)
+            .select('*', { count: 'exact', head: true });
+          
+          if (tableCount && tableCount > 0) {
+            // Delete all records from table using gte with minimum UUID
+            const { error: deleteError } = await client
+              .from(tableName)
+              .delete()
+              .gte('id', '00000000-0000-0000-0000-000000000000');
+            
+            if (!deleteError) {
+              totalDeleted += tableCount;
+              console.log(`Deleted ${tableCount} records from table: ${tableName}`);
+            } else {
+              console.error(`Error deleting from table ${tableName}:`, deleteError);
+            }
+          }
+        } catch (tableError: any) {
+          console.warn(`Table ${tableName} might not exist or error occurred:`, tableError.message);
+        }
       }
       
       return c.json({
         success: true,
-        deleted: count || 0,
-        prefix
+        deleted: totalDeleted,
+        prefix,
+        clearedKvStore: true,
+        clearedTable: !!tableName
       });
     } catch (error: any) {
       return c.json({

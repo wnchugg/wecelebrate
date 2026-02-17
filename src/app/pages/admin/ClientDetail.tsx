@@ -46,8 +46,8 @@ export function ClientDetail() {
     setIsLoading(true);
     try {
       const [clientRes, sitesRes] = await Promise.all([
-        apiRequest<{ success: boolean; data: Client }>(`/clients/${clientId}`),
-        apiRequest<{ success: boolean; data: Site[] }>(`/sites?clientId=${clientId}`)
+        apiRequest<{ success: boolean; data: Client }>(`/v2/clients/${clientId}`),
+        apiRequest<{ success: boolean; data: Site[] }>(`/v2/sites?clientId=${clientId}`)
       ]);
       setClient(clientRes.data);
       setSites(sitesRes.data || []);

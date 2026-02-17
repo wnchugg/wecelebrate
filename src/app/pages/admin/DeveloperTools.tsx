@@ -33,6 +33,7 @@ export function DeveloperTools() {
   const [globalReseedResult, setGlobalReseedResult] = useState<string | null>(null);
   const [jwtDiagnostic, setJwtDiagnostic] = useState<any>(null);
   const [isCheckingJWT, setIsCheckingJWT] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
 
   const currentEnv = getCurrentEnvironment();
   const allEnvs = getAvailableEnvironments();
@@ -204,8 +205,8 @@ export function DeveloperTools() {
     // Test endpoints
     const endpoints = [
       { name: 'Health Check', url: `${baseUrl}/health`, method: 'GET', requiresAuth: false },
-      { name: 'Get Clients', url: `${baseUrl}/clients`, method: 'GET', requiresAuth: true },
-      { name: 'Get Sites', url: `${baseUrl}/sites`, method: 'GET', requiresAuth: true },
+      { name: 'Get Clients', url: `${baseUrl}/v2/clients`, method: 'GET', requiresAuth: true },
+      { name: 'Get Sites', url: `${baseUrl}/v2/sites`, method: 'GET', requiresAuth: true },
       { name: 'Get Gifts', url: `${baseUrl}/gifts`, method: 'GET', requiresAuth: true },
       { name: 'Check Admin', url: `${baseUrl}/debug/check-admin-users`, method: 'GET', requiresAuth: false },
     ];
@@ -288,9 +289,22 @@ export function DeveloperTools() {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success('Database reseeded successfully!');
+        // Clear localStorage to remove stale site/client selections
+        try {
+          localStorage.removeItem('admin_selected_site_id');
+          console.log('Cleared stale site selection from localStorage');
+        } catch (e) {
+          console.warn('Failed to clear localStorage:', e);
+        }
+        
+        toast.success('Database reseeded successfully! Page will reload...');
         // Re-run diagnostic after reseed
         await runDataDiagnostic();
+        
+        // Reload the page to clear any cached state
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       } else {
         console.error('Reseed failed:', data);
         toast.error(`Failed to reseed: ${data.error || 'Unknown error'}`);
@@ -300,6 +314,70 @@ export function DeveloperTools() {
       toast.error(`Network error: ${error.message}`);
     } finally {
       setIsSeeding(false);
+    }
+  };
+
+  const clearAllData = async () => {
+    if (!confirm('⚠️ WARNING: This will delete ALL data from the database. Are you sure?')) {
+      return;
+    }
+
+    setIsClearing(true);
+    const token = getAccessToken();
+    const baseUrl = `https://${projectId}.supabase.co/functions/v1/make-server-6fcaeea3`;
+
+    // Check if user is logged in
+    if (!token) {
+      toast.error('You must be logged in as an admin to clear the database');
+      setIsClearing(false);
+      return;
+    }
+
+    const headers: any = {
+      'Content-Type': 'application/json',
+      'X-Access-Token': token,
+      'Authorization': `Bearer ${publicAnonKey}`,
+    };
+
+    try {
+      // Delete all major data prefixes (including both singular and plural forms)
+      const prefixes = [
+        'client', 'clients',  // Both singular and plural
+        'site', 'sites',      // Both singular and plural
+        'gift', 'gifts',      // Both singular and plural
+        'employee', 'employees',
+        'order', 'orders',
+        'admin', 'admins',
+        'role', 'roles',
+        'celebration', 'celebrations'
+      ];
+      let totalDeleted = 0;
+
+      for (const prefix of prefixes) {
+        try {
+          const response = await fetch(`${baseUrl}/admin/database/prefix/${prefix}`, {
+            method: 'DELETE',
+            headers,
+          });
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            totalDeleted += data.deleted || 0;
+            console.log(`Deleted ${data.deleted} records with prefix: ${prefix}`);
+          }
+        } catch (error) {
+          console.error(`Failed to delete prefix ${prefix}:`, error);
+        }
+      }
+
+      toast.success(`Successfully cleared ${totalDeleted} records from the database`);
+      // Re-run diagnostic after clearing
+      await runDataDiagnostic();
+    } catch (error: any) {
+      console.error('Clear error:', error);
+      toast.error(`Failed to clear database: ${error.message}`);
+    } finally {
+      setIsClearing(false);
     }
   };
 
@@ -751,7 +829,26 @@ export function DeveloperTools() {
                   </div>
 
                   {/* Reseed Button - Always visible */}
-                  <div className="flex justify-center pt-4">
+                  <div className="flex justify-center gap-4 pt-4">
+                    <Button
+                      onClick={clearAllData}
+                      disabled={isClearing}
+                      size="lg"
+                      variant="outline"
+                      className="border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700 font-semibold shadow-lg"
+                    >
+                      {isClearing ? (
+                        <>
+                          <AlertTriangle className="w-5 h-5 mr-2 animate-pulse" />
+                          Clearing...
+                        </>
+                      ) : (
+                        <>
+                          <AlertTriangle className="w-5 h-5 mr-2" />
+                          Clear All Data
+                        </>
+                      )}
+                    </Button>
                     <Button
                       onClick={reseedDatabase}
                       disabled={isSeeding}

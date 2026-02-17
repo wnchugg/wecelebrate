@@ -825,21 +825,21 @@ export const siteApi = {
   },
   
   async create(siteData: Partial<Site>) {
-    return apiRequest<{ data: Site }>('/v2/sites', {
+    return apiRequest<{ data: Site }>('/sites', {
       method: 'POST',
       body: JSON.stringify(siteData),
     });
   },
   
   async update(id: string, updates: Partial<Site>) {
-    return apiRequest<{ data: Site }>(`/v2/sites/${id}`, {
+    return apiRequest<{ data: Site }>(`/sites/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updates),
     });
   },
   
   async delete(id: string) {
-    return apiRequest<{ success: boolean }>(`/v2/sites/${id}`, {
+    return apiRequest<{ success: boolean }>(`/sites/${id}`, {
       method: 'DELETE',
     });
   },
@@ -879,21 +879,21 @@ export const clientApi = {
   },
   
   async create(clientData: Partial<Client>) {
-    return apiRequest<{ data: Client }>('/v2/clients', {
+    return apiRequest<{ data: Client }>('/clients', {
       method: 'POST',
       body: JSON.stringify(clientData),
     });
   },
   
   async update(id: string, updates: Partial<Client>) {
-    return apiRequest<{ data: Client }>(`/v2/clients/${id}`, {
+    return apiRequest<{ data: Client }>(`/clients/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updates),
     });
   },
   
   async delete(id: string) {
-    return apiRequest<{ success: boolean }>(`/v2/clients/${id}`, {
+    return apiRequest<{ success: boolean }>(`/clients/${id}`, {
       method: 'DELETE',
     });
   },
@@ -928,45 +928,45 @@ export const clientApi = {
 // Export an orderApi object for order management
 export const orderApi = {
   async getAll() {
-    return apiRequest<{ orders: any[] }>('/v2/orders', {
+    return apiRequest<{ orders: any[] }>('/orders', {
       method: 'GET',
     });
   },
   
   async getById(id: string) {
-    return apiRequest<{ order: any }>(`/v2/orders/${id}`, {
+    return apiRequest<{ order: any }>(`/orders/${id}`, {
       method: 'GET',
     });
   },
   
   async create(orderData: any) {
-    return apiRequest<{ order: any }>('/v2/orders', {
+    return apiRequest<{ order: any }>('/orders', {
       method: 'POST',
       body: JSON.stringify(orderData),
     });
   },
   
   async update(id: string, updates: any) {
-    return apiRequest<{ order: any }>(`/v2/orders/${id}`, {
+    return apiRequest<{ order: any }>(`/orders/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updates),
     });
   },
   
   async delete(id: string) {
-    return apiRequest<{ success: boolean }>(`/v2/orders/${id}`, {
+    return apiRequest<{ success: boolean }>(`/orders/${id}`, {
       method: 'DELETE',
     });
   },
   
   async getUserOrders(userId: string) {
-    return apiRequest<{ orders: any[] }>(`/v2/orders?user_id=${userId}`, {
+    return apiRequest<{ orders: any[] }>(`/orders?user_id=${userId}`, {
       method: 'GET',
     });
   },
   
   async updateStatus(id: string, status: string) {
-    return apiRequest<{ order: any }>(`/v2/orders/${id}`, {
+    return apiRequest<{ order: any }>(`/orders/${id}`, {
       method: 'PUT',
       body: JSON.stringify({ status }),
     });

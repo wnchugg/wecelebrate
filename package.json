@@ -15,7 +15,6 @@
     "clean:all": "npm run clean && rm -rf node_modules/.vite node_modules/.tmp/*.tsbuildinfo 2>/dev/null || true",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
-    
     "test": "echo '⚠️  Use test:safe for local testing or test:full for CI' && exit 1",
     "test:safe": "vitest run --maxConcurrency=2 --maxWorkers=2",
     "test:full": "vitest run --maxConcurrency=4 --maxWorkers=4",
@@ -25,10 +24,8 @@
     "test:watch": "vitest --maxConcurrency=2",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage --maxConcurrency=2",
-    
     "test:changed": "vitest run --changed --maxConcurrency=2",
     "test:related": "vitest run --related --maxConcurrency=2",
-    
     "test:button": "vitest run src/app/components/ui/__tests__/button.test.tsx",
     "test:button:watch": "vitest src/app/components/ui/__tests__/button.test.tsx",
     "test:ui-components": "vitest run src/app/components/ui/__tests__/",
@@ -58,7 +55,6 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
-    "@playwright/test": "^1.58.2",
     "@popperjs/core": "2.11.8",
     "@radix-ui/react-accordion": "1.2.3",
     "@radix-ui/react-alert-dialog": "1.1.6",
@@ -134,6 +130,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.20.0",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/vite": "4.1.12",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

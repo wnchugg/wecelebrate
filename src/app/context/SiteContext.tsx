@@ -282,6 +282,10 @@ export interface Site extends Omit<GlobalSite, 'settings'> {
   ssoProvider?: string;
   ssoClientOfficeName?: string;
 
+  // Draft/Live Mode Flags
+  _hasUnpublishedChanges?: boolean; // True when draft_settings is populated
+  _draftSettings?: any; // Copy of draft_settings for reference
+
   createdAt: string;
   updatedAt: string;
 }
@@ -300,6 +304,10 @@ export interface SiteContextType {
   deleteClient: (id: string) => Promise<void>;
   addSite: (site: Partial<Site>) => Promise<Site>;
   updateSite: (id: string, updates: Partial<Site>) => Promise<void>;
+  saveSiteDraft: (id: string, updates: Partial<Site>) => Promise<void>;
+  publishSite: (id: string) => Promise<void>;
+  discardSiteDraft: (id: string) => Promise<void>;
+  getSiteLive: (id: string) => Promise<Site>;
   deleteSite: (id: string) => Promise<void>;
   getSitesByClient: (clientId: string) => Site[];
   getClientById: (clientId: string) => Client | undefined;
@@ -612,6 +620,97 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const saveSiteDraft = async (id: string, updates: Partial<Site>): Promise<void> => {
+    try {
+      // Save changes to draft_settings column
+      const result = await apiRequest<{ success: boolean; data: Site; message?: string }>(`/v2/sites/${id}/draft`, {
+        method: 'PATCH',
+        body: JSON.stringify(updates)
+      });
+      
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to save draft');
+      }
+      
+      // Update local state with merged draft data
+      setSites(prev => prev.map(s => s.id === id ? { ...s, ...result.data } : s));
+      
+      // Update currentSite if it's the one being updated
+      if (currentSite?.id === id) {
+        setCurrentSite({ ...currentSite, ...result.data });
+      }
+    } catch (error) {
+      console.error('Failed to save draft:', error);
+      throw error;
+    }
+  };
+
+  const publishSite = async (id: string): Promise<void> => {
+    try {
+      // Merge draft_settings into live columns and clear draft
+      const result = await apiRequest<{ success: boolean; data: Site; message?: string }>(`/v2/sites/${id}/publish`, {
+        method: 'POST'
+      });
+      
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to publish site');
+      }
+      
+      // Update local state with published data
+      setSites(prev => prev.map(s => s.id === id ? { ...s, ...result.data } : s));
+      
+      // Update currentSite if it's the one being published
+      if (currentSite?.id === id) {
+        setCurrentSite({ ...currentSite, ...result.data });
+      }
+    } catch (error) {
+      console.error('Failed to publish site:', error);
+      throw error;
+    }
+  };
+
+  const discardSiteDraft = async (id: string): Promise<void> => {
+    try {
+      // Clear draft_settings column
+      const result = await apiRequest<{ success: boolean; data: Site; message?: string }>(`/v2/sites/${id}/draft`, {
+        method: 'DELETE'
+      });
+      
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to discard draft');
+      }
+      
+      // Update local state with live-only data
+      setSites(prev => prev.map(s => s.id === id ? { ...s, ...result.data } : s));
+      
+      // Update currentSite if it's the one being updated
+      if (currentSite?.id === id) {
+        setCurrentSite({ ...currentSite, ...result.data });
+      }
+    } catch (error) {
+      console.error('Failed to discard draft:', error);
+      throw error;
+    }
+  };
+
+  const getSiteLive = async (id: string): Promise<Site> => {
+    try {
+      // Get only live data (no draft merged)
+      const result = await apiRequest<{ success: boolean; data: Site; message?: string }>(`/v2/sites/${id}/live`, {
+        method: 'GET'
+      });
+      
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to get live site data');
+      }
+      
+      return result.data;
+    } catch (error) {
+      console.error('Failed to get live site data:', error);
+      throw error;
+    }
+  };
+
   const deleteSite = async (id: string): Promise<void> => {
     setSites(prev => prev.filter(s => s.id !== id));
   };
@@ -666,6 +765,10 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       deleteClient,
       addSite,
       updateSite,
+      saveSiteDraft,
+      publishSite,
+      discardSiteDraft,
+      getSiteLive,
       deleteSite,
       getSitesByClient,
       getClientById,

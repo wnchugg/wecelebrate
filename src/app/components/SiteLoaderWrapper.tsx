@@ -20,17 +20,28 @@ function SiteRouteFallback() {
 /**
  * SiteLoaderWrapper - Loads a specific site based on the URL parameter
  * Used for routes like /site/:siteId to allow viewing different sites
+ * Supports both UUID and slug-based routing
  */
 export function SiteLoaderWrapper() {
   const { siteId } = useParams<{ siteId: string }>();
-  const { setSiteById, site, isLoading, error } = usePublicSite();
+  const { setSiteById, setSiteBySlug, site, isLoading, error } = usePublicSite();
 
   useEffect(() => {
     if (siteId) {
       logger.info('[SiteLoaderWrapper] Loading site', { siteId });
-      setSiteById(siteId);
+      
+      // Check if siteId is a UUID (contains hyphens in UUID format)
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(siteId);
+      
+      if (isUUID) {
+        logger.info('[SiteLoaderWrapper] Loading by UUID');
+        setSiteById(siteId);
+      } else {
+        logger.info('[SiteLoaderWrapper] Loading by slug');
+        setSiteBySlug(siteId);
+      }
     }
-  }, [siteId, setSiteById]);
+  }, [siteId, setSiteById, setSiteBySlug]);
 
   // Show loading state while site is being loaded
   if (isLoading) {
@@ -66,7 +77,9 @@ export function SiteLoaderWrapper() {
   }
 
   // Show error if site doesn't match (shouldn't happen, but just in case)
-  if (!site || site.id !== siteId) {
+  // When using slug-based routing, we can't compare site.id to siteId (slug)
+  // So we just check if site exists
+  if (!site) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-blue-50 flex items-center justify-center">
         <div className="text-center">

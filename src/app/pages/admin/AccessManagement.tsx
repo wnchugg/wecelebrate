@@ -1,27 +1,33 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Mail, IdCard, CreditCard, Edit, Trash2, Upload, Download, Server, Zap, Globe, Loader2 } from 'lucide-react';
+import { Plus, Search, Mail, IdCard, CreditCard, Edit, Trash2, Upload, Download, Globe, Loader2, Users } from 'lucide-react';
 import { useSite } from '../../context/SiteContext';
 import { EmployeeImportModal, EmployeeRecord } from '../../components/admin/EmployeeImportModal';
-import { SftpConfigModal, SftpConfig } from '../../components/admin/SftpConfigModal';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { toast } from 'sonner';
 import ExcelJS from 'exceljs';
 import { getEmployees, createEmployee, updateEmployee, deleteEmployee, importEmployees, type Employee } from '../../services/employeeApi';
+import { AdvancedUserList } from '../../components/admin/AdvancedUserList';
+import { EditUserModal } from '../../components/admin/EditUserModal';
+import { SetPasswordModal } from '../../components/admin/SetPasswordModal';
+import { getUsers, updateUser, setUserPassword } from '../../services/userApi';
+import { AdvancedAuthUser } from '../../../types/advancedAuth';
 
 // SECURITY NOTE: This file only exports data to Excel (ExcelJS.writeBuffer).
 // It does NOT import/parse external Excel files, so there are no security concerns.
 // We migrated from xlsx to exceljs for better security and active maintenance.
 
-export function AccessManagement() {
+interface AccessManagementProps {
+  mode?: 'simple' | 'advanced';
+  validationMethod?: 'email' | 'employeeId' | 'serialCard' | 'magic_link' | 'sso';
+}
+
+export function AccessManagement({ 
+  mode = 'simple', 
+  validationMethod = 'email' 
+}: AccessManagementProps) {
   const { currentSite, currentClient, updateSite } = useSite();
-  const [validationSettings, setValidationSettings] = useState({
-    method: currentSite?.settings.validationMethod || 'email',
-    requireApproval: false,
-    allowSelfRegistration: true,
-  });
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [showSftpModal, setShowSftpModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [employeeData, setEmployeeData] = useState<EmployeeRecord[]>([]);
@@ -29,7 +35,6 @@ export function AccessManagement() {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [allowedDomains, setAllowedDomains] = useState<string>('');
-  const [sftpConfig, setSftpConfig] = useState<SftpConfig | undefined>(undefined);
   
   // Form state for adding/editing employee
   const [formData, setFormData] = useState({
@@ -40,17 +45,42 @@ export function AccessManagement() {
     department: '',
   });
 
-  // Load employees when site changes
+  // Advanced Auth state
+  const [users, setUsers] = useState<AdvancedAuthUser[]>([]);
+  const [selectedUser, setSelectedUser] = useState<AdvancedAuthUser | null>(null);
+  const [showEditUserModal, setShowEditUserModal] = useState(false);
+  const [showSetPasswordModal, setShowSetPasswordModal] = useState(false);
+  const [hasProxyPermission] = useState(true); // TODO: Get from actual permissions
+
   // Load employees when site changes
   useEffect(() => {
     if (currentSite?.id) {
-      void loadEmployees();
+      if (mode === 'advanced') {
+        void loadUsers();
+      } else {
+        void loadEmployees();
+      }
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
       const domains = (currentSite.settings as any).allowedDomains;
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       setAllowedDomains(domains ? domains.join(', ') : '');
     }
-  }, [currentSite?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentSite?.id, mode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const loadUsers = async () => {
+    if (!currentSite?.id) return;
+    
+    setLoading(true);
+    try {
+      const data = await getUsers(currentSite.id);
+      setUsers(data);
+    } catch (error) {
+      console.error('Failed to load users:', error);
+      toast.error('Failed to load users');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const loadEmployees = async () => {
     if (!currentSite?.id) return;
@@ -61,7 +91,10 @@ export function AccessManagement() {
       setEmployees(data);
     } catch (error) {
       console.error('Failed to load employees:', error);
-      toast.error('Failed to load employees');
+      // Only show error toast if it's not just an empty table
+      if (error instanceof Error && !error.message.includes('PGRST116')) {
+        toast.error('Failed to load employees');
+      }
     } finally {
       setLoading(false);
     }
@@ -174,6 +207,59 @@ export function AccessManagement() {
     }
   };
 
+  // Advanced Auth handlers
+  const handleEditUser = (user: AdvancedAuthUser) => {
+    setSelectedUser(user);
+    setShowEditUserModal(true);
+  };
+
+  const handleSetPassword = (user: AdvancedAuthUser) => {
+    setSelectedUser(user);
+    setShowSetPasswordModal(true);
+  };
+
+  const handleProxyLogin = (user: AdvancedAuthUser) => {
+    // TODO: Implement proxy login
+    toast.info(`Proxy login for ${user.firstName} ${user.lastName} - Coming soon`);
+  };
+
+  const handleSaveUser = async (userId: string, updates: Partial<AdvancedAuthUser>) => {
+    try {
+      await updateUser({
+        userId,
+        firstName: updates.firstName,
+        lastName: updates.lastName,
+        email: updates.email,
+        employeeId: updates.employeeId,
+        role: updates.role,
+        status: updates.status,
+      });
+      toast.success('User updated successfully');
+      await loadUsers();
+    } catch (error) {
+      console.error('Failed to update user:', error);
+      toast.error('Failed to update user');
+      throw error;
+    }
+  };
+
+  const handleSavePassword = async (userId: string, password: string, forceReset: boolean) => {
+    try {
+      await setUserPassword({
+        userId,
+        temporaryPassword: password,
+        forcePasswordReset: forceReset,
+        sendEmail: true,
+      });
+      toast.success('Password set successfully. Email sent to user.');
+      await loadUsers();
+    } catch (error) {
+      console.error('Failed to set password:', error);
+      toast.error('Failed to set password');
+      throw error;
+    }
+  };
+
   const openEditModal = (employee: Employee) => {
     setEditingEmployee(employee);
     setFormData({
@@ -196,13 +282,8 @@ export function AccessManagement() {
     );
   });
 
-  const handleSftpSave = (config: SftpConfig) => {
-    setSftpConfig(config);
-    toast.success('SFTP configuration saved successfully');
-  };
-
   const exportTemplate = () => {
-    const validationType = validationSettings.method;
+    const validationType = validationMethod;
     let headers: string[] = [];
     let sampleData: string[][] = [];
 
@@ -268,84 +349,8 @@ export function AccessManagement() {
 
   return (
     <div className="space-y-6">
-      {/* Validation Method Selector */}
-      <div className="bg-white rounded-xl p-6 border border-gray-200">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Validation Method</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button
-            onClick={() => setValidationSettings({ ...validationSettings, method: 'email' })}
-            className={`p-4 rounded-lg border-2 transition-all ${
-              validationSettings.method === 'email'
-                ? 'border-[#D91C81] bg-pink-50'
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-          >
-            <Mail className={`w-8 h-8 mb-2 ${validationSettings.method === 'email' ? 'text-[#D91C81]' : 'text-gray-400'}`} />
-            <h3 className="font-semibold text-gray-900 mb-1">Email Address</h3>
-            <p className="text-sm text-gray-600">Validate using employee email addresses</p>
-          </button>
-
-          <button
-            onClick={() => setValidationSettings({ ...validationSettings, method: 'employeeId' })}
-            className={`p-4 rounded-lg border-2 transition-all ${
-              validationSettings.method === 'employeeId'
-                ? 'border-[#D91C81] bg-pink-50'
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-          >
-            <IdCard className={`w-8 h-8 mb-2 ${validationSettings.method === 'employeeId' ? 'text-[#D91C81]' : 'text-gray-400'}`} />
-            <h3 className="font-semibold text-gray-900 mb-1">Employee ID</h3>
-            <p className="text-sm text-gray-600">Validate using employee ID numbers</p>
-          </button>
-
-          <button
-            onClick={() => setValidationSettings({ ...validationSettings, method: 'serialCard' })}
-            className={`p-4 rounded-lg border-2 transition-all ${
-              validationSettings.method === 'serialCard'
-                ? 'border-[#D91C81] bg-pink-50'
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-          >
-            <CreditCard className={`w-8 h-8 mb-2 ${validationSettings.method === 'serialCard' ? 'text-[#D91C81]' : 'text-gray-400'}`} />
-            <h3 className="font-semibold text-gray-900 mb-1">Serial Card</h3>
-            <p className="text-sm text-gray-600">Validate using unique card numbers</p>
-          </button>
-        </div>
-      </div>
-
-      {/* SFTP Automation Card */}
-      <div className="bg-gradient-to-r from-[#1B2A5E] to-[#D91C81] rounded-xl p-6 text-white">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <Zap className="w-5 h-5" />
-              <h3 className="font-bold text-lg">Automated Employee Data Import</h3>
-            </div>
-            <p className="text-white/90 text-sm mb-4">
-              Configure SFTP automation to automatically import employee data on a schedule
-            </p>
-            <div className="flex items-center gap-3">
-              <Button
-                onClick={() => setShowSftpModal(true)}
-                variant="secondary"
-                className="bg-white text-[#1B2A5E] hover:bg-white/90"
-              >
-                <Server className="w-4 h-4 mr-2" />
-                Configure SFTP
-              </Button>
-              {sftpConfig?.enabled && (
-                <Badge className="bg-green-500 text-white">
-                  Automation Active
-                </Badge>
-              )}
-            </div>
-          </div>
-          <Server className="w-16 h-16 text-white/20" />
-        </div>
-      </div>
-
       {/* Email Management */}
-      {validationSettings.method === 'email' && (
+      {validationMethod === 'email' && (
         <div className="bg-white rounded-xl p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -471,7 +476,7 @@ export function AccessManagement() {
       )}
 
       {/* Employee ID Management */}
-      {validationSettings.method === 'employeeId' && (
+      {validationMethod === 'employeeId' && (
         <div className="bg-white rounded-xl p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -535,7 +540,7 @@ export function AccessManagement() {
       )}
 
       {/* Serial Card Management */}
-      {validationSettings.method === 'serialCard' && (
+      {validationMethod === 'serialCard' && (
         <div className="bg-white rounded-xl p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -601,19 +606,38 @@ export function AccessManagement() {
         </div>
       )}
 
+      {/* Advanced Auth User Management */}
+      {mode === 'advanced' && (
+        <div className="bg-white rounded-xl p-6 border border-gray-200">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <Users className="w-5 h-5 text-[#D91C81]" />
+                User Management
+              </h2>
+              <p className="text-sm text-gray-600 mt-1">
+                Manage employee accounts, passwords, and permissions
+              </p>
+            </div>
+          </div>
+
+          <AdvancedUserList
+            users={users}
+            loading={loading}
+            onEditUser={handleEditUser}
+            onSetPassword={handleSetPassword}
+            onProxyLogin={handleProxyLogin}
+            hasProxyPermission={hasProxyPermission}
+          />
+        </div>
+      )}
+
       {/* Modals */}
       <EmployeeImportModal
         open={showUploadModal}
         onClose={() => setShowUploadModal(false)}
-        validationType={validationSettings.method as 'email' | 'employeeId' | 'serialCard' | 'magicLink'}
+        validationType={validationMethod as 'email' | 'employeeId' | 'serialCard' | 'magicLink'}
         onImport={(records) => void handleImport(records)}
-      />
-
-      <SftpConfigModal
-        open={showSftpModal}
-        onClose={() => setShowSftpModal(false)}
-        config={sftpConfig}
-        onSave={handleSftpSave}
       />
 
       {/* Add/Edit Employee Modal */}
@@ -627,7 +651,7 @@ export function AccessManagement() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email Address {validationSettings.method === 'email' && <span className="text-red-500">*</span>}
+                  Email Address {validationMethod === 'email' && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="email"
@@ -638,7 +662,7 @@ export function AccessManagement() {
                 />
               </div>
 
-              {validationSettings.method === 'employeeId' && (
+              {validationMethod === 'employeeId' && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Employee ID <span className="text-red-500">*</span>
@@ -653,7 +677,7 @@ export function AccessManagement() {
                 </div>
               )}
 
-              {validationSettings.method === 'serialCard' && (
+              {validationMethod === 'serialCard' && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Serial Card <span className="text-red-500">*</span>
@@ -725,6 +749,27 @@ export function AccessManagement() {
           </div>
         </div>
       )}
+
+      {/* Advanced Auth Modals */}
+      <EditUserModal
+        open={showEditUserModal}
+        user={selectedUser}
+        onClose={() => {
+          setShowEditUserModal(false);
+          setSelectedUser(null);
+        }}
+        onSave={handleSaveUser}
+      />
+
+      <SetPasswordModal
+        open={showSetPasswordModal}
+        user={selectedUser}
+        onClose={() => {
+          setShowSetPasswordModal(false);
+          setSelectedUser(null);
+        }}
+        onSetPassword={handleSavePassword}
+      />
     </div>
   );
 }

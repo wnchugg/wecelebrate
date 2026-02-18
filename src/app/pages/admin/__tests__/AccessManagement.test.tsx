@@ -87,15 +87,15 @@ describe('AccessManagement Component', () => {
   describe('Component Rendering', () => {
     it('should render without crashing', () => {
       render(<AccessManagement />);
-      // The component should render the validation method selector
-      expect(screen.getByText('Validation Method')).toBeInTheDocument();
+      // The component should render the email management section
+      expect(screen.getByText('Authorized Email Addresses')).toBeInTheDocument();
     });
 
-    it('should show validation method selector', () => {
-      render(<AccessManagement />);
-      expect(screen.getByText('Email Address')).toBeInTheDocument();
-      expect(screen.getByText('Employee ID')).toBeInTheDocument();
-      expect(screen.getByText('Serial Card')).toBeInTheDocument();
+    it('should show email management UI for email validation method', () => {
+      render(<AccessManagement validationMethod="email" />);
+      expect(screen.getByText('Authorized Email Addresses')).toBeInTheDocument();
+      expect(screen.getByText('Add Email')).toBeInTheDocument();
+      expect(screen.getByText('Import CSV')).toBeInTheDocument();
     });
   });
 
@@ -224,30 +224,26 @@ describe('AccessManagement Component', () => {
       expect(screen.getByText('Download Template')).toBeInTheDocument();
     });
 
-    it('should have Configure SFTP button', () => {
+    it('should have Add Email button', () => {
       render(<AccessManagement />);
-      expect(screen.getByText('Configure SFTP')).toBeInTheDocument();
+      expect(screen.getByText('Add Email')).toBeInTheDocument();
     });
   });
 
-  describe('Validation Method Selection', () => {
-    it('should highlight selected validation method', () => {
-      render(<AccessManagement />);
+  describe('Validation Method Prop', () => {
+    it('should render email management when validation method is email', () => {
+      render(<AccessManagement validationMethod="email" />);
       
-      // Email should be selected by default
-      const emailButton = screen.getByText('Email Address').closest('button');
-      expect(emailButton).toHaveClass('border-[#D91C81]');
+      expect(screen.getByText('Authorized Email Addresses')).toBeInTheDocument();
     });
 
-    it('should change validation method on click', async () => {
-      render(<AccessManagement />);
-      
-      const employeeIdButton = screen.getByText('Employee ID').closest('button');
-      fireEvent.click(employeeIdButton);
+    it('should accept different validation methods via props', () => {
+      const { rerender } = render(<AccessManagement validationMethod="email" />);
+      expect(screen.getByText('Authorized Email Addresses')).toBeInTheDocument();
 
-      await waitFor(() => {
-        expect(employeeIdButton).toHaveClass('border-[#D91C81]');
-      });
+      rerender(<AccessManagement validationMethod="employeeId" />);
+      // Component should re-render with different validation method
+      expect(screen.queryByText('Authorized Email Addresses')).not.toBeInTheDocument();
     });
   });
 
@@ -259,7 +255,7 @@ describe('AccessManagement Component', () => {
 
       await waitFor(() => {
         // Component should still render even with API error
-        expect(screen.getByText('Validation Method')).toBeInTheDocument();
+        expect(screen.getByText('Authorized Email Addresses')).toBeInTheDocument();
       });
     });
   });

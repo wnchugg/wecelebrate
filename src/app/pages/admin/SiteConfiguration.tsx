@@ -15,14 +15,27 @@ import { Input } from '../../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Badge } from '../../components/ui/badge';
-import { getPublicSiteUrl } from '../../utils/url';
+import { getPublicSiteUrl, getPublicSiteUrlBySlug, getEnvironmentBaseUrl } from '../../utils/url';
+import { getCurrentEnvironment } from '../../config/deploymentEnvironments';
+import { PublishConfirmationModal } from '../../components/PublishConfirmationModal';
+import { DiscardConfirmationModal } from '../../components/DiscardConfirmationModal';
+import { UnpublishedChangesIndicator } from '../../components/UnpublishedChangesIndicator';
+import { UnsavedChangesModal } from '../../components/UnsavedChangesModal';
+import { detectSiteChanges } from '../../utils/siteChangesDetector';
+import { CustomSelect } from '../../components/ui/select-custom';
 
 // Lazy load the heavy components
-const LandingPageEditor = lazy(() => import('./LandingPageEditor').then(m => ({ default: m.LandingPageEditor })));
-const WelcomePageEditor = lazy(() => import('./WelcomePageEditor').then(m => ({ default: m.WelcomePageEditor })));
+const LandingPageEditor = lazy(() => import('./LandingPageEditorNew').then(m => ({ default: m.LandingPageEditorNew })));
+const WelcomePageEditor = lazy(() => import('./WelcomePageEditorNew').then(m => ({ default: m.WelcomePageEditorNew })));
 const SiteGiftConfiguration = lazy(() => import('./SiteGiftConfiguration'));
 const ShippingConfiguration = lazy(() => import('./ShippingConfiguration').then(m => ({ default: m.ShippingConfiguration })));
 const AccessManagement = lazy(() => import('./AccessManagement').then(m => ({ default: m.AccessManagement })));
+
+// Import SSO components
+import { OAuthFields } from '../../components/admin/OAuthFields';
+import { SAMLFields } from '../../components/admin/SAMLFields';
+import { ConfiguredStateSummary } from '../../components/admin/ConfiguredStateSummary';
+import { SSOConfigCard } from '../../components/admin/SSOConfigCard';
 
 function LoadingSpinner() {
   return (
@@ -32,8 +45,43 @@ function LoadingSpinner() {
   );
 }
 
+// SSO Helper Functions
+const OAUTH_PROVIDERS = ['azure', 'okta', 'google', 'oauth2', 'openid', 'custom'];
+const SAML_PROVIDERS = ['saml'];
+
+function getProviderCategory(provider: string | null): 'oauth' | 'saml' | null {
+  if (!provider) return null;
+  if (OAUTH_PROVIDERS.includes(provider)) return 'oauth';
+  if (SAML_PROVIDERS.includes(provider)) return 'saml';
+  return null;
+}
+
+function getUIState(
+  ssoProvider: string | null,
+  ssoConfigured: boolean,
+  ssoEditMode: boolean
+): 'unconfigured' | 'initial' | 'configured' | 'edit' {
+  if (!ssoProvider) return 'unconfigured';
+  if (ssoConfigured && !ssoEditMode) return 'configured';
+  if (ssoConfigured && ssoEditMode) return 'edit';
+  return 'initial';
+}
+
+function getProviderDisplayName(provider: string | null): string {
+  const providerNames: Record<string, string> = {
+    azure: 'Microsoft Azure AD / Entra ID',
+    okta: 'Okta',
+    google: 'Google Workspace',
+    saml: 'Generic SAML 2.0',
+    oauth2: 'Generic OAuth 2.0',
+    openid: 'OpenID Connect',
+    custom: 'Custom Provider'
+  };
+  return provider ? providerNames[provider] || provider : '';
+}
+
 export function SiteConfiguration() {
-  const { currentSite, currentClient, updateSite } = useSite();
+  const { currentSite, currentClient, saveSiteDraft, publishSite, discardSiteDraft, getSiteLive } = useSite();
   const { gifts } = useGift();
   const [searchParams] = useSearchParams();
   
@@ -44,12 +92,30 @@ export function SiteConfiguration() {
       currentClient: currentClient ? { id: currentClient.id, name: currentClient.name } : null,
       hasCurrentSite: !!currentSite
     });
+    
+    // Debug: Log currentSite to check _hasUnpublishedChanges flag
+    if (currentSite) {
+      console.log('[SiteConfiguration] currentSite:', {
+        id: currentSite.id,
+        name: currentSite.name,
+        _hasUnpublishedChanges: currentSite._hasUnpublishedChanges,
+        _draftSettings: currentSite._draftSettings
+      });
+    }
   }, [currentSite, currentClient]);
   const [activeTab, setActiveTab] = useState('general');
   const [hasChanges, setHasChanges] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
-  const [configMode, setConfigMode] = useState<'live' | 'draft'>('draft');
+  const [configMode, setConfigMode] = useState<'live' | 'draft'>('live'); // Default to live for published sites
+  const [initialModeSet, setInitialModeSet] = useState(false); // Track if we've set initial mode
+  const [isUserInitiatedChange, setIsUserInitiatedChange] = useState(false); // Track user-initiated changes to prevent auto-reload
   const [isPublishing, setIsPublishing] = useState(false);
+  const [showPublishModal, setShowPublishModal] = useState(false);
+  const [showDiscardModal, setShowDiscardModal] = useState(false);
+  const [isDiscarding, setIsDiscarding] = useState(false);
+  const [showUnsavedChangesModal, setShowUnsavedChangesModal] = useState(false);
+  const [pendingModeSwitch, setPendingModeSwitch] = useState<'live' | null>(null);
+  const [originalSiteData, setOriginalSiteData] = useState<any>(null);
   
   // Error handling and validation
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -72,7 +138,7 @@ export function SiteConfiguration() {
 
   // General Settings State
   const [siteName, setSiteName] = useState(currentSite?.name || '');
-  const [siteUrl, setSiteUrl] = useState(currentSite?.domain || '');
+  const [siteUrl, setSiteUrl] = useState(currentSite?.slug || '');
   const [siteType, setSiteType] = useState<'event-gifting' | 'onboarding-kit' | 'service-awards' | 'incentives' | 'custom'>(
     currentSite?.type || 'custom'
   );
@@ -96,7 +162,7 @@ export function SiteConfiguration() {
     currentSite?.settings?.expiredMessage || 
     'Thank you for your interest. The gift selection period for this program has ended. If you have questions, please contact your program administrator.'
   );
-  const [defaultGiftId, setDefaultGiftId] = useState(currentSite?.settings?.defaultGiftId || '');
+  const [defaultGiftId, setDefaultGiftId] = useState(currentSite?.settings?.defaultGiftId || null);
   const [defaultGiftDaysAfterClose, setDefaultGiftDaysAfterClose] = useState(currentSite?.settings?.defaultGiftDaysAfterClose || 0);
 
   // Header/Footer Settings State
@@ -146,6 +212,28 @@ export function SiteConfiguration() {
   const [disableDirectAccessAuth, setDisableDirectAccessAuth] = useState(currentSite?.disableDirectAccessAuth ?? false);
   const [ssoProvider, setSsoProvider] = useState(currentSite?.ssoProvider || '');
   const [ssoClientOfficeName, setSsoClientOfficeName] = useState(currentSite?.ssoClientOfficeName || '');
+  
+  // SSO Configuration State
+  const [ssoConfigured, setSsoConfigured] = useState(!!currentSite?.ssoProvider);
+  const [ssoEditMode, setSsoEditMode] = useState(false);
+  
+  // SSO Field State Variables
+  const [ssoClientId, setSsoClientId] = useState(currentSite?.settings?.ssoConfig?.clientId || '');
+  const [ssoClientSecret, setSsoClientSecret] = useState(currentSite?.settings?.ssoConfig?.clientSecret || '');
+  const [ssoAuthUrl, setSsoAuthUrl] = useState(currentSite?.settings?.ssoConfig?.authUrl || '');
+  const [ssoTokenUrl, setSsoTokenUrl] = useState(currentSite?.settings?.ssoConfig?.tokenUrl || '');
+  const [ssoUserInfoUrl, setSsoUserInfoUrl] = useState(currentSite?.settings?.ssoConfig?.userInfoUrl || '');
+  const [ssoScope, setSsoScope] = useState(currentSite?.settings?.ssoConfig?.scope || 'openid profile email');
+  const [ssoIdpEntryPoint, setSsoIdpEntryPoint] = useState(currentSite?.settings?.ssoConfig?.idpEntryPoint || '');
+  const [ssoEntityId, setSsoEntityId] = useState(currentSite?.settings?.ssoConfig?.entityId || '');
+  const [ssoCertificate, setSsoCertificate] = useState(currentSite?.settings?.ssoConfig?.certificate || '');
+  const [ssoAutoProvision, setSsoAutoProvision] = useState(currentSite?.settings?.ssoConfig?.autoProvision ?? true);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  
+  // Admin Bypass for SSO
+  const [allowAdminBypass, setAllowAdminBypass] = useState(currentSite?.settings?.ssoConfig?.allowAdminBypass ?? false);
+  const [bypassRequires2FA, setBypassRequires2FA] = useState(currentSite?.settings?.ssoConfig?.bypassRequires2FA ?? true);
+  const [bypassAllowedIPs, setBypassAllowedIPs] = useState(currentSite?.settings?.ssoConfig?.bypassAllowedIPs?.join('\n') || '');
 
   // Phase 5: Additional Optional Fields
   const [shippingMode, setShippingMode] = useState<'company' | 'employee' | 'store'>(currentSite?.settings?.shippingMode || 'employee');
@@ -164,9 +252,9 @@ export function SiteConfiguration() {
 
   // Sync state when currentSite changes
   useEffect(() => {
-    if (currentSite) {
+    if (currentSite && !isUserInitiatedChange) {
       setSiteName(currentSite.name || '');
-      setSiteUrl(currentSite.domain || '');
+      setSiteUrl(currentSite.slug || '');
       setSiteType(currentSite.type || 'custom');
       setPrimaryColor(currentSite.branding?.primaryColor || '#D91C81');
       setSecondaryColor(currentSite.branding?.secondaryColor || '#1B2A5E');
@@ -180,10 +268,19 @@ export function SiteConfiguration() {
       setDefaultLanguage(currentSite.settings?.defaultLanguage || 'en');
       setDefaultCurrency(currentSite.settings?.defaultCurrency || 'USD');
       setDefaultCountry(currentSite.settings?.defaultCountry || 'US');
-      setAvailabilityStartDate(currentSite.settings?.availabilityStartDate || '');
-      setAvailabilityEndDate(currentSite.settings?.availabilityEndDate || '');
+      
+      // Convert ISO 8601 to datetime-local format for inputs
+      const formatDateForInput = (isoDate: string) => {
+        if (!isoDate) return '';
+        // ISO format: "2024-02-17T14:30:00.000Z"
+        // datetime-local needs: "2024-02-17T14:30"
+        return isoDate.slice(0, 16);
+      };
+      
+      setAvailabilityStartDate(formatDateForInput(currentSite.settings?.availabilityStartDate || ''));
+      setAvailabilityEndDate(formatDateForInput(currentSite.settings?.availabilityEndDate || ''));
       setExpiredMessage(currentSite.settings?.expiredMessage || 'Thank you for your interest. The gift selection period for this program has ended. If you have questions, please contact your program administrator.');
-      setDefaultGiftId(currentSite.settings?.defaultGiftId || '');
+      setDefaultGiftId(currentSite.settings?.defaultGiftId || null);
       setDefaultGiftDaysAfterClose(currentSite.settings?.defaultGiftDaysAfterClose || 0);
       
       // Header/Footer settings
@@ -234,6 +331,22 @@ export function SiteConfiguration() {
       setSsoProvider((currentSite as any).ssoProvider || '');
       setSsoClientOfficeName((currentSite as any).ssoClientOfficeName || '');
       
+      // SSO Configuration State
+      setSsoConfigured(!!(currentSite as any).ssoProvider);
+      setSsoClientId(currentSite.settings?.ssoConfig?.clientId || '');
+      setSsoClientSecret(currentSite.settings?.ssoConfig?.clientSecret || '');
+      setSsoAuthUrl(currentSite.settings?.ssoConfig?.authUrl || '');
+      setSsoTokenUrl(currentSite.settings?.ssoConfig?.tokenUrl || '');
+      setSsoUserInfoUrl(currentSite.settings?.ssoConfig?.userInfoUrl || '');
+      setSsoScope(currentSite.settings?.ssoConfig?.scope || 'openid profile email');
+      setSsoIdpEntryPoint(currentSite.settings?.ssoConfig?.idpEntryPoint || '');
+      setSsoEntityId(currentSite.settings?.ssoConfig?.entityId || '');
+      setSsoCertificate(currentSite.settings?.ssoConfig?.certificate || '');
+      setSsoAutoProvision(currentSite.settings?.ssoConfig?.autoProvision ?? true);
+      setAllowAdminBypass(currentSite.settings?.ssoConfig?.allowAdminBypass ?? false);
+      setBypassRequires2FA(currentSite.settings?.ssoConfig?.bypassRequires2FA ?? true);
+      setBypassAllowedIPs(currentSite.settings?.ssoConfig?.bypassAllowedIPs?.join('\n') || '');
+      
       // Additional Optional Fields
       setShippingMode(currentSite.settings?.shippingMode || 'employee');
       setDefaultShippingAddress(currentSite.settings?.defaultShippingAddress || '');
@@ -248,18 +361,256 @@ export function SiteConfiguration() {
       setEnableAddressValidation(currentSite.settings?.addressValidation?.enabled ?? false);
       setAddressValidationProvider(currentSite.settings?.addressValidation?.provider || 'none');
       setSkipReviewPage(currentSite.settings?.skipReviewPage ?? false);
-      
-      // Set configMode based on site status
-      setConfigMode(currentSite.status === 'active' ? 'live' : 'draft');
     }
-  }, [currentSite]);
+    
+    if (currentSite) {
+      // Set configMode based on site status (only on initial load)
+      if (!initialModeSet) {
+        const initialMode = currentSite.status === 'active' ? 'live' : 'draft';
+        setConfigMode(initialMode);
+        setInitialModeSet(true);
+        
+        // Fetch appropriate data based on initial mode
+        const loadInitialData = async () => {
+        try {
+          let dataToLoad = currentSite;
+          
+          // If starting in live mode, fetch live data only
+          if (initialMode === 'live') {
+            dataToLoad = await getSiteLive(currentSite.id);
+          }
+          // If starting in draft mode, currentSite already has draft merged
+          
+          // Update all form fields with the appropriate data
+          setSiteName(dataToLoad.name || '');
+          setSiteUrl(dataToLoad.slug || '');
+          setSiteType(dataToLoad.type || 'custom');
+          setPrimaryColor(dataToLoad.branding?.primaryColor || '#D91C81');
+          setSecondaryColor(dataToLoad.branding?.secondaryColor || '#1B2A5E');
+          setTertiaryColor(dataToLoad.branding?.tertiaryColor || '#00B4CC');
+          setAllowQuantitySelection(dataToLoad.settings?.allowQuantitySelection ?? false);
+          setShowPricing(dataToLoad.settings?.showPricing ?? true);
+          setSkipLandingPage(dataToLoad.settings?.skipLandingPage ?? false);
+          setEnableLandingPage(dataToLoad.settings?.skipLandingPage === false);
+          setGiftsPerUser(dataToLoad.settings?.giftsPerUser || 1);
+          setValidationMethod(dataToLoad.settings?.validationMethod || 'email');
+          setDefaultLanguage(dataToLoad.settings?.defaultLanguage || 'en');
+          setDefaultCurrency(dataToLoad.settings?.defaultCurrency || 'USD');
+          setDefaultCountry(dataToLoad.settings?.defaultCountry || 'US');
+          
+          const formatDateForInput = (isoDate: string) => {
+            if (!isoDate) return '';
+            return isoDate.slice(0, 16);
+          };
+          
+          setAvailabilityStartDate(formatDateForInput(dataToLoad.settings?.availabilityStartDate || ''));
+          setAvailabilityEndDate(formatDateForInput(dataToLoad.settings?.availabilityEndDate || ''));
+          setExpiredMessage(dataToLoad.settings?.expiredMessage || 'Thank you for your interest. The gift selection period for this program has ended. If you have questions, please contact your program administrator.');
+          setDefaultGiftId(dataToLoad.settings?.defaultGiftId || null);
+          setDefaultGiftDaysAfterClose(dataToLoad.settings?.defaultGiftDaysAfterClose || 0);
+          
+          // Header/Footer settings
+          setShowHeader(dataToLoad.settings?.showHeader ?? true);
+          setShowFooter(dataToLoad.settings?.showFooter ?? true);
+          setHeaderLayout(dataToLoad.settings?.headerLayout || 'left');
+          setShowLanguageSelector(dataToLoad.settings?.showLanguageSelector ?? true);
+          setCompanyName(dataToLoad.settings?.companyName || '');
+          setFooterText(dataToLoad.settings?.footerText || '© 2026 All rights reserved.');
+          
+          // Gift Selection UX settings
+          setEnableSearch(dataToLoad.settings?.enableSearch ?? true);
+          setEnableFilters(dataToLoad.settings?.enableFilters ?? true);
+          setGridColumns(dataToLoad.settings?.gridColumns || 3);
+          setShowDescription(dataToLoad.settings?.showDescription ?? true);
+          setSortOptions(dataToLoad.settings?.sortOptions || ['name', 'price', 'popularity']);
+          
+          // ERP Integration settings
+          setSiteCode((dataToLoad as any).siteCode || '');
+          setSiteErpIntegration((dataToLoad as any).siteErpIntegration || '');
+          setSiteErpInstance((dataToLoad as any).siteErpInstance || '');
+          setSiteShipFromCountry((dataToLoad as any).siteShipFromCountry || 'US');
+          setSiteHrisSystem((dataToLoad as any).siteHrisSystem || '');
+          
+          // Site Management settings
+          setSiteDropDownName((dataToLoad as any).siteDropDownName || '');
+          setSiteCustomDomainUrl((dataToLoad as any).siteCustomDomainUrl || '');
+          setSiteAccountManager((dataToLoad as any).siteAccountManager || '');
+          setSiteAccountManagerEmail((dataToLoad as any).siteAccountManagerEmail || '');
+          setSiteCelebrationsEnabled((dataToLoad as any).siteCelebrationsEnabled ?? false);
+          setAllowSessionTimeoutExtend((dataToLoad as any).allowSessionTimeoutExtend ?? false);
+          setEnableEmployeeLogReport((dataToLoad as any).enableEmployeeLogReport ?? false);
+          
+          // Regional Client Info settings
+          setRegionalOfficeName((dataToLoad as any).regionalClientInfo?.officeName || '');
+          setRegionalContactName((dataToLoad as any).regionalClientInfo?.contactName || '');
+          setRegionalContactEmail((dataToLoad as any).regionalClientInfo?.contactEmail || '');
+          setRegionalContactPhone((dataToLoad as any).regionalClientInfo?.contactPhone || '');
+          setRegionalAddressLine1((dataToLoad as any).regionalClientInfo?.addressLine1 || '');
+          setRegionalAddressLine2((dataToLoad as any).regionalClientInfo?.addressLine2 || '');
+          setRegionalAddressLine3((dataToLoad as any).regionalClientInfo?.addressLine3 || '');
+          setRegionalCity((dataToLoad as any).regionalClientInfo?.city || '');
+          setRegionalCountryState((dataToLoad as any).regionalClientInfo?.countryState || '');
+          setRegionalTaxId((dataToLoad as any).regionalClientInfo?.taxId || '');
+          
+          // Authentication settings
+          setDisableDirectAccessAuth((dataToLoad as any).disableDirectAccessAuth ?? false);
+          setSsoProvider((dataToLoad as any).ssoProvider || '');
+          setSsoClientOfficeName((dataToLoad as any).ssoClientOfficeName || '');
+          
+          // Additional Optional Fields
+          setShippingMode(dataToLoad.settings?.shippingMode || 'employee');
+          setDefaultShippingAddress(dataToLoad.settings?.defaultShippingAddress || '');
+          setWelcomeMessage(dataToLoad.settings?.welcomeMessage || '');
+          setEnableWelcomePage(dataToLoad.settings?.enableWelcomePage ?? false);
+          setWelcomePageTitle(dataToLoad.settings?.welcomePageContent?.title || '');
+          setWelcomePageMessage(dataToLoad.settings?.welcomePageContent?.message || '');
+          setWelcomePageAuthorName(dataToLoad.settings?.welcomePageContent?.authorName || '');
+          setWelcomePageAuthorTitle(dataToLoad.settings?.welcomePageContent?.authorTitle || '');
+          setWelcomePageImageUrl(dataToLoad.settings?.welcomePageContent?.imageUrl || '');
+          setAllowedCountries(dataToLoad.settings?.allowedCountries || []);
+          setEnableAddressValidation(dataToLoad.settings?.addressValidation?.enabled ?? false);
+          setAddressValidationProvider(dataToLoad.settings?.addressValidation?.provider || 'none');
+          setSkipReviewPage(dataToLoad.settings?.skipReviewPage ?? false);
+        } catch (error) {
+          console.error('[SiteConfiguration] Failed to load initial data:', error);
+        }
+      };
+      
+      loadInitialData();
+      }
+      
+      // Fetch live site data for comparison (used in publish modal)
+      // This ensures we compare draft vs live, not draft vs draft
+      const loadLiveData = async () => {
+        try {
+          const liveData = await getSiteLive(currentSite.id);
+          
+          setOriginalSiteData({
+            name: liveData.name || '',
+            slug: liveData.slug || '',
+            type: liveData.type || 'custom',
+            branding: {
+              primaryColor: liveData.branding?.primaryColor || '#D91C81',
+              secondaryColor: liveData.branding?.secondaryColor || '#1B2A5E',
+              tertiaryColor: liveData.branding?.tertiaryColor || '#00B4CC',
+            },
+            settings: {
+              allowQuantitySelection: liveData.settings?.allowQuantitySelection ?? false,
+              showPricing: liveData.settings?.showPricing ?? true,
+              skipLandingPage: liveData.settings?.skipLandingPage ?? false,
+              giftsPerUser: liveData.settings?.giftsPerUser || 1,
+              validationMethod: liveData.settings?.validationMethod || 'email',
+              defaultLanguage: liveData.settings?.defaultLanguage || 'en',
+              defaultCurrency: liveData.settings?.defaultCurrency || 'USD',
+              defaultCountry: liveData.settings?.defaultCountry || 'US',
+              availabilityStartDate: liveData.settings?.availabilityStartDate || null,
+              availabilityEndDate: liveData.settings?.availabilityEndDate || null,
+              expiredMessage: liveData.settings?.expiredMessage || '',
+              defaultGiftId: liveData.settings?.defaultGiftId || null,
+              defaultGiftDaysAfterClose: liveData.settings?.defaultGiftDaysAfterClose || 0,
+              showHeader: liveData.settings?.showHeader ?? true,
+              showFooter: liveData.settings?.showFooter ?? true,
+              headerLayout: liveData.settings?.headerLayout || 'left',
+              showLanguageSelector: liveData.settings?.showLanguageSelector ?? true,
+              companyName: liveData.settings?.companyName || '',
+              footerText: liveData.settings?.footerText || '',
+              enableSearch: liveData.settings?.enableSearch ?? true,
+              enableFilters: liveData.settings?.enableFilters ?? true,
+              gridColumns: liveData.settings?.gridColumns || 3,
+              showDescription: liveData.settings?.showDescription ?? true,
+              sortOptions: liveData.settings?.sortOptions || ['name', 'price', 'popularity'],
+              shippingMode: liveData.settings?.shippingMode || 'employee',
+              defaultShippingAddress: liveData.settings?.defaultShippingAddress || '',
+              welcomeMessage: liveData.settings?.welcomeMessage || '',
+              enableWelcomePage: liveData.settings?.enableWelcomePage ?? false,
+              skipReviewPage: liveData.settings?.skipReviewPage ?? false,
+            },
+            siteCode: (liveData as any).siteCode || '',
+            siteErpIntegration: (liveData as any).siteErpIntegration || '',
+            siteErpInstance: (liveData as any).siteErpInstance || '',
+            siteShipFromCountry: (liveData as any).siteShipFromCountry || 'US',
+            siteHrisSystem: (liveData as any).siteHrisSystem || '',
+            siteDropDownName: (liveData as any).siteDropDownName || '',
+            siteCustomDomainUrl: (liveData as any).siteCustomDomainUrl || '',
+            siteAccountManager: (liveData as any).siteAccountManager || '',
+            siteAccountManagerEmail: (liveData as any).siteAccountManagerEmail || '',
+            siteCelebrationsEnabled: (liveData as any).siteCelebrationsEnabled ?? false,
+            allowSessionTimeoutExtend: (liveData as any).allowSessionTimeoutExtend ?? false,
+            enableEmployeeLogReport: (liveData as any).enableEmployeeLogReport ?? false,
+            disableDirectAccessAuth: (liveData as any).disableDirectAccessAuth ?? false,
+            ssoProvider: (liveData as any).ssoProvider || '',
+          });
+        } catch (error) {
+          console.error('[SiteConfiguration] Failed to load live data for comparison:', error);
+          // Fallback to current site data if live fetch fails
+          setOriginalSiteData({
+            name: currentSite.name || '',
+            slug: currentSite.slug || '',
+            type: currentSite.type || 'custom',
+            branding: {
+              primaryColor: currentSite.branding?.primaryColor || '#D91C81',
+              secondaryColor: currentSite.branding?.secondaryColor || '#1B2A5E',
+              tertiaryColor: currentSite.branding?.tertiaryColor || '#00B4CC',
+            },
+            settings: {
+              allowQuantitySelection: currentSite.settings?.allowQuantitySelection ?? false,
+              showPricing: currentSite.settings?.showPricing ?? true,
+              skipLandingPage: currentSite.settings?.skipLandingPage ?? false,
+              giftsPerUser: currentSite.settings?.giftsPerUser || 1,
+              validationMethod: currentSite.settings?.validationMethod || 'email',
+              defaultLanguage: currentSite.settings?.defaultLanguage || 'en',
+              defaultCurrency: currentSite.settings?.defaultCurrency || 'USD',
+              defaultCountry: currentSite.settings?.defaultCountry || 'US',
+              availabilityStartDate: currentSite.settings?.availabilityStartDate || null,
+              availabilityEndDate: currentSite.settings?.availabilityEndDate || null,
+              expiredMessage: currentSite.settings?.expiredMessage || '',
+              defaultGiftId: currentSite.settings?.defaultGiftId || null,
+              defaultGiftDaysAfterClose: currentSite.settings?.defaultGiftDaysAfterClose || 0,
+              showHeader: currentSite.settings?.showHeader ?? true,
+              showFooter: currentSite.settings?.showFooter ?? true,
+              headerLayout: currentSite.settings?.headerLayout || 'left',
+              showLanguageSelector: currentSite.settings?.showLanguageSelector ?? true,
+              companyName: currentSite.settings?.companyName || '',
+              footerText: currentSite.settings?.footerText || '',
+              enableSearch: currentSite.settings?.enableSearch ?? true,
+              enableFilters: currentSite.settings?.enableFilters ?? true,
+              gridColumns: currentSite.settings?.gridColumns || 3,
+              showDescription: currentSite.settings?.showDescription ?? true,
+              sortOptions: currentSite.settings?.sortOptions || ['name', 'price', 'popularity'],
+              shippingMode: currentSite.settings?.shippingMode || 'employee',
+              defaultShippingAddress: currentSite.settings?.defaultShippingAddress || '',
+              welcomeMessage: currentSite.settings?.welcomeMessage || '',
+              enableWelcomePage: currentSite.settings?.enableWelcomePage ?? false,
+              skipReviewPage: currentSite.settings?.skipReviewPage ?? false,
+            },
+            siteCode: (currentSite as any).siteCode || '',
+            siteErpIntegration: (currentSite as any).siteErpIntegration || '',
+            siteErpInstance: (currentSite as any).siteErpInstance || '',
+            siteShipFromCountry: (currentSite as any).siteShipFromCountry || 'US',
+            siteHrisSystem: (currentSite as any).siteHrisSystem || '',
+            siteDropDownName: (currentSite as any).siteDropDownName || '',
+            siteCustomDomainUrl: (currentSite as any).siteCustomDomainUrl || '',
+            siteAccountManager: (currentSite as any).siteAccountManager || '',
+            siteAccountManagerEmail: (currentSite as any).siteAccountManagerEmail || '',
+            siteCelebrationsEnabled: (currentSite as any).siteCelebrationsEnabled ?? false,
+            allowSessionTimeoutExtend: (currentSite as any).allowSessionTimeoutExtend ?? false,
+            enableEmployeeLogReport: (currentSite as any).enableEmployeeLogReport ?? false,
+            disableDirectAccessAuth: (currentSite as any).disableDirectAccessAuth ?? false,
+            ssoProvider: (currentSite as any).ssoProvider || '',
+          });
+        }
+      };
+      
+      loadLiveData();
+    }
+  }, [currentSite, getSiteLive]);
 
   // Auto-save effect (only in draft mode)
   useEffect(() => {
     if (hasChanges && configMode === 'draft' && !isAutoSaving && currentSite) {
       const timer = setTimeout(() => {
         handleAutoSave();
-      }, 30000); // Auto-save every 30 seconds
+      }, 10000); // Auto-save every 10 seconds
 
       return () => clearTimeout(timer);
     }
@@ -279,6 +630,203 @@ export function SiteConfiguration() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasChanges, configMode]);
 
+  // Auto-switch to draft mode when changes are detected
+  useEffect(() => {
+    if (hasChanges && configMode === 'live') {
+      setConfigMode('draft');
+      toast.info('Switched to Draft mode', {
+        description: 'Your changes will be saved as a draft. Publish when ready.',
+        duration: 3000
+      });
+    }
+  }, [hasChanges, configMode]);
+
+  // Clear user-initiated change flag after mode switch completes
+  useEffect(() => {
+    if (configMode === 'draft' && isUserInitiatedChange) {
+      // Use setTimeout to ensure this runs after the sync useEffect
+      const timer = setTimeout(() => {
+        setIsUserInitiatedChange(false);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [configMode, isUserInitiatedChange]);
+
+  // Handle mode toggle - fetch appropriate data
+  const handleModeToggle = async (newMode: 'live' | 'draft') => {
+    if (newMode === configMode) return; // Already in this mode
+    
+    // Check for unsaved changes when leaving draft mode
+    if (configMode === 'draft' && newMode === 'live' && hasChanges) {
+      setPendingModeSwitch('live');
+      setShowUnsavedChangesModal(true);
+      return;
+    }
+    
+    if (newMode === 'live') {
+      // Switching to live mode - fetch and display live data
+      if (!currentSite) return;
+      
+      try {
+        const liveData = await getSiteLive(currentSite.id);
+        
+        // Update all form fields with live data
+        setSiteName(liveData.name || '');
+        setSiteUrl(liveData.slug || '');
+        setSiteType(liveData.type || 'custom');
+        setPrimaryColor(liveData.branding?.primaryColor || '#D91C81');
+        setSecondaryColor(liveData.branding?.secondaryColor || '#1B2A5E');
+        setTertiaryColor(liveData.branding?.tertiaryColor || '#00B4CC');
+        setAllowQuantitySelection(liveData.settings?.allowQuantitySelection ?? false);
+        setShowPricing(liveData.settings?.showPricing ?? true);
+        setSkipLandingPage(liveData.settings?.skipLandingPage ?? false);
+        setEnableLandingPage(liveData.settings?.skipLandingPage === false);
+        setGiftsPerUser(liveData.settings?.giftsPerUser || 1);
+        setValidationMethod(liveData.settings?.validationMethod || 'email');
+        setDefaultLanguage(liveData.settings?.defaultLanguage || 'en');
+        setDefaultCurrency(liveData.settings?.defaultCurrency || 'USD');
+        setDefaultCountry(liveData.settings?.defaultCountry || 'US');
+        
+        // Format dates for input
+        const formatDateForInput = (isoDate: string) => {
+          if (!isoDate) return '';
+          return isoDate.slice(0, 16);
+        };
+        
+        setAvailabilityStartDate(formatDateForInput(liveData.settings?.availabilityStartDate || ''));
+        setAvailabilityEndDate(formatDateForInput(liveData.settings?.availabilityEndDate || ''));
+        setExpiredMessage(liveData.settings?.expiredMessage || '');
+        setDefaultGiftId(liveData.settings?.defaultGiftId || null);
+        setDefaultGiftDaysAfterClose(liveData.settings?.defaultGiftDaysAfterClose || 0);
+        
+        // Header/Footer settings
+        setShowHeader(liveData.settings?.showHeader ?? true);
+        setShowFooter(liveData.settings?.showFooter ?? true);
+        setHeaderLayout(liveData.settings?.headerLayout || 'left');
+        setShowLanguageSelector(liveData.settings?.showLanguageSelector ?? true);
+        setCompanyName(liveData.settings?.companyName || '');
+        setFooterText(liveData.settings?.footerText || '© 2026 All rights reserved.');
+        
+        // Gift Selection UX settings
+        setEnableSearch(liveData.settings?.enableSearch ?? true);
+        setEnableFilters(liveData.settings?.enableFilters ?? true);
+        setGridColumns(liveData.settings?.gridColumns || 3);
+        setShowDescription(liveData.settings?.showDescription ?? true);
+        setSortOptions(liveData.settings?.sortOptions || ['name', 'price', 'popularity']);
+        
+        // All other settings...
+        setSiteCode((liveData as any).siteCode || '');
+        setSiteErpIntegration((liveData as any).siteErpIntegration || '');
+        setSiteErpInstance((liveData as any).siteErpInstance || '');
+        setSiteShipFromCountry((liveData as any).siteShipFromCountry || 'US');
+        setSiteHrisSystem((liveData as any).siteHrisSystem || '');
+        setSiteDropDownName((liveData as any).siteDropDownName || '');
+        setSiteCustomDomainUrl((liveData as any).siteCustomDomainUrl || '');
+        setSiteAccountManager((liveData as any).siteAccountManager || '');
+        setSiteAccountManagerEmail((liveData as any).siteAccountManagerEmail || '');
+        setSiteCelebrationsEnabled((liveData as any).siteCelebrationsEnabled ?? false);
+        setAllowSessionTimeoutExtend((liveData as any).allowSessionTimeoutExtend ?? false);
+        setEnableEmployeeLogReport((liveData as any).enableEmployeeLogReport ?? false);
+        setDisableDirectAccessAuth((liveData as any).disableDirectAccessAuth ?? false);
+        setSsoProvider((liveData as any).ssoProvider || '');
+        setSsoClientOfficeName((liveData as any).ssoClientOfficeName || '');
+        
+        // Additional optional fields
+        setShippingMode(liveData.settings?.shippingMode || 'employee');
+        setDefaultShippingAddress(liveData.settings?.defaultShippingAddress || '');
+        setWelcomeMessage(liveData.settings?.welcomeMessage || '');
+        setEnableWelcomePage(liveData.settings?.enableWelcomePage ?? false);
+        setWelcomePageTitle(liveData.settings?.welcomePageContent?.title || '');
+        setWelcomePageMessage(liveData.settings?.welcomePageContent?.message || '');
+        setWelcomePageAuthorName(liveData.settings?.welcomePageContent?.authorName || '');
+        setWelcomePageAuthorTitle(liveData.settings?.welcomePageContent?.authorTitle || '');
+        setWelcomePageImageUrl(liveData.settings?.welcomePageContent?.imageUrl || '');
+        setAllowedCountries(liveData.settings?.allowedCountries || []);
+        setEnableAddressValidation(liveData.settings?.addressValidation?.enabled ?? false);
+        setAddressValidationProvider(liveData.settings?.addressValidation?.provider || 'none');
+        setSkipReviewPage(liveData.settings?.skipReviewPage ?? false);
+        
+        // Regional client info
+        setRegionalOfficeName((liveData as any).regionalClientInfo?.officeName || '');
+        setRegionalContactName((liveData as any).regionalClientInfo?.contactName || '');
+        setRegionalContactEmail((liveData as any).regionalClientInfo?.contactEmail || '');
+        setRegionalContactPhone((liveData as any).regionalClientInfo?.contactPhone || '');
+        setRegionalAddressLine1((liveData as any).regionalClientInfo?.addressLine1 || '');
+        setRegionalAddressLine2((liveData as any).regionalClientInfo?.addressLine2 || '');
+        setRegionalAddressLine3((liveData as any).regionalClientInfo?.addressLine3 || '');
+        setRegionalCity((liveData as any).regionalClientInfo?.city || '');
+        setRegionalCountryState((liveData as any).regionalClientInfo?.countryState || '');
+        setRegionalTaxId((liveData as any).regionalClientInfo?.taxId || '');
+        
+        setConfigMode('live');
+        setHasChanges(false); // Clear changes flag when viewing live
+        
+        toast.info('Viewing Live Configuration', {
+          description: 'Showing published settings. Switch to Draft to make changes.',
+          duration: 3000
+        });
+      } catch (error) {
+        console.error('[SiteConfiguration] Failed to load live data:', error);
+        toast.error('Failed to load live configuration', {
+          description: 'Could not fetch live data. Please try again.',
+          duration: 5000
+        });
+      }
+    } else {
+      // Switching to draft mode - reload current site (which has draft merged)
+      if (!currentSite) return;
+      
+      // Reload form fields from currentSite (which has draft merged)
+      setSiteName(currentSite.name || '');
+      setSiteUrl(currentSite.slug || '');
+      setSiteType(currentSite.type || 'custom');
+      setPrimaryColor(currentSite.branding?.primaryColor || '#D91C81');
+      setSecondaryColor(currentSite.branding?.secondaryColor || '#1B2A5E');
+      setTertiaryColor(currentSite.branding?.tertiaryColor || '#00B4CC');
+      setAllowQuantitySelection(currentSite.settings?.allowQuantitySelection ?? false);
+      setShowPricing(currentSite.settings?.showPricing ?? true);
+      setSkipLandingPage(currentSite.settings?.skipLandingPage ?? false);
+      setEnableLandingPage(currentSite.settings?.skipLandingPage === false);
+      setGiftsPerUser(currentSite.settings?.giftsPerUser || 1);
+      setValidationMethod(currentSite.settings?.validationMethod || 'email');
+      setDefaultLanguage(currentSite.settings?.defaultLanguage || 'en');
+      setDefaultCurrency(currentSite.settings?.defaultCurrency || 'USD');
+      setDefaultCountry(currentSite.settings?.defaultCountry || 'US');
+      
+      const formatDateForInput = (isoDate: string) => {
+        if (!isoDate) return '';
+        return isoDate.slice(0, 16);
+      };
+      
+      setAvailabilityStartDate(formatDateForInput(currentSite.settings?.availabilityStartDate || ''));
+      setAvailabilityEndDate(formatDateForInput(currentSite.settings?.availabilityEndDate || ''));
+      setExpiredMessage(currentSite.settings?.expiredMessage || '');
+      setDefaultGiftId(currentSite.settings?.defaultGiftId || null);
+      setDefaultGiftDaysAfterClose(currentSite.settings?.defaultGiftDaysAfterClose || 0);
+      
+      // All other settings (same as above)...
+      setShowHeader(currentSite.settings?.showHeader ?? true);
+      setShowFooter(currentSite.settings?.showFooter ?? true);
+      setHeaderLayout(currentSite.settings?.headerLayout || 'left');
+      setShowLanguageSelector(currentSite.settings?.showLanguageSelector ?? true);
+      setCompanyName(currentSite.settings?.companyName || '');
+      setFooterText(currentSite.settings?.footerText || '© 2026 All rights reserved.');
+      setEnableSearch(currentSite.settings?.enableSearch ?? true);
+      setEnableFilters(currentSite.settings?.enableFilters ?? true);
+      setGridColumns(currentSite.settings?.gridColumns || 3);
+      setShowDescription(currentSite.settings?.showDescription ?? true);
+      setSortOptions(currentSite.settings?.sortOptions || ['name', 'price', 'popularity']);
+      
+      setConfigMode('draft');
+      setHasChanges(false); // Clear changes flag when switching back
+      
+      toast.info('Switched to Draft Mode', {
+        description: 'You can now edit and save changes.',
+        duration: 3000
+      });
+    }
+  };
+
   // Auto-save function
   const handleAutoSave = async () => {
     if (!currentSite || !hasChanges || configMode === 'live' || isAutoSaving) return;
@@ -286,10 +834,19 @@ export function SiteConfiguration() {
     setIsAutoSaving(true);
     console.warn('[SiteConfiguration] Auto-saving draft...');
     
+    // Helper to convert datetime-local to ISO 8601 with timezone
+    const formatDateForDB = (dateStr: string) => {
+      if (!dateStr) return null;
+      // datetime-local format: "2024-02-17T14:30"
+      // Convert to ISO 8601: "2024-02-17T14:30:00.000Z"
+      return new Date(dateStr).toISOString();
+    };
+    
     try {
-      await updateSite(currentSite.id, {
+      // Save to draft_settings column (not live columns)
+      await saveSiteDraft(currentSite.id, {
         name: siteName,
-        domain: siteUrl,
+        slug: siteUrl,
         type: siteType,
         branding: {
           ...currentSite.branding,
@@ -303,15 +860,15 @@ export function SiteConfiguration() {
           showPricing,
           skipLandingPage: !enableLandingPage, // Invert for backend
           skipReviewPage,
-          giftsPerUser,
+          giftsPerUser: Math.max(1, giftsPerUser || 1), // Ensure at least 1
           validationMethod,
           defaultLanguage,
           defaultCurrency,
           defaultCountry,
-          availabilityStartDate,
-          availabilityEndDate,
+          availabilityStartDate: formatDateForDB(availabilityStartDate),
+          availabilityEndDate: formatDateForDB(availabilityEndDate),
           expiredMessage,
-          defaultGiftId,
+          defaultGiftId: defaultGiftId || null, // Convert empty string to null for UUID field
           defaultGiftDaysAfterClose,
           showHeader,
           showFooter,
@@ -453,11 +1010,19 @@ export function SiteConfiguration() {
     setErrors({});
     setSaveStatus('saving');
     
+    // Helper to convert datetime-local to ISO 8601 with timezone
+    const formatDateForDB = (dateStr: string) => {
+      if (!dateStr) return null;
+      // datetime-local format: "2024-02-17T14:30"
+      // Convert to ISO 8601: "2024-02-17T14:30:00.000Z"
+      return new Date(dateStr).toISOString();
+    };
+    
     try {
-      // Attempt save with all settings
-      await updateSite(currentSite.id, {
+      // Save changes to draft_settings (not live columns)
+      await saveSiteDraft(currentSite.id, {
         name: siteName,
-        domain: siteUrl,
+        slug: siteUrl,
         type: siteType,
         branding: {
           ...currentSite.branding,
@@ -470,15 +1035,15 @@ export function SiteConfiguration() {
           allowQuantitySelection,
           showPricing,
           skipLandingPage: !enableLandingPage, // Invert for backend
-          giftsPerUser,
+          giftsPerUser: Math.max(1, giftsPerUser || 1), // Ensure at least 1
           validationMethod,
           defaultLanguage,
           defaultCurrency,
           defaultCountry,
-          availabilityStartDate,
-          availabilityEndDate,
+          availabilityStartDate: formatDateForDB(availabilityStartDate),
+          availabilityEndDate: formatDateForDB(availabilityEndDate),
           expiredMessage,
-          defaultGiftId,
+          defaultGiftId: defaultGiftId || null, // Convert empty string to null for UUID field
           defaultGiftDaysAfterClose,
           // Header/Footer settings
           showHeader,
@@ -551,6 +1116,10 @@ export function SiteConfiguration() {
       setSaveStatus('saved');
       setHasChanges(false);
       setLastManualSave(new Date());
+      
+      // Update original site data to reflect the saved state
+      // This prevents false positives in change detection
+      setOriginalSiteData(buildCurrentStateForComparison());
       
       // Add to change history
       setChangeHistory(prev => [...prev, {
@@ -635,25 +1204,25 @@ export function SiteConfiguration() {
       return;
     }
     
-    // Confirm with user
-    const confirmed = window.confirm(
-      '⚠️  Are you sure you want to publish this site to production?\n\n' +
-      'This will:\n' +
-      '✓ Make the site accessible to all users\n' +
-      '✓ Lock the configuration from further edits\n' +
-      '✓ Change the site status to "Active"\n\n' +
-      'You can still make changes by switching to Draft mode, but they won\'t be visible until you publish again.'
-    );
-    
-    if (!confirmed) return;
+    // Show publish confirmation modal
+    setShowPublishModal(true);
+  };
+
+  const handleConfirmPublish = async () => {
+    if (!currentSite) return;
     
     setIsPublishing(true);
     
     try {
-      await updateSite(currentSite.id, { status: 'active' });
+      // Publish draft to live (merges draft_settings into live columns)
+      await publishSite(currentSite.id);
       
       setConfigMode('live');
       setSaveStatus('saved');
+      setShowPublishModal(false);
+      
+      // Update original site data to match the published state
+      setOriginalSiteData(buildCurrentStateForComparison());
       
       toast.success('Site published successfully! 🎉', {
         description: 'Your site is now live and accessible to users',
@@ -674,7 +1243,7 @@ export function SiteConfiguration() {
         description: error instanceof Error ? error.message : 'Please try again',
         action: {
           label: 'Retry',
-          onClick: () => handlePublish()
+          onClick: () => handleConfirmPublish()
         },
         duration: 8000
       });
@@ -682,6 +1251,344 @@ export function SiteConfiguration() {
     } finally {
       setIsPublishing(false);
     }
+  };
+
+  const handleDiscardDraft = async () => {
+    setShowDiscardModal(true);
+  };
+
+  const handleConfirmDiscard = async () => {
+    if (!currentSite) return;
+    
+    try {
+      setIsDiscarding(true);
+      
+      // Clear draft_settings column
+      await discardSiteDraft(currentSite.id);
+      
+      // Reload site data to show live values
+      const liveData = await getSiteLive(currentSite.id);
+      
+      // Update all form fields with live values
+      setSiteName(liveData.name || '');
+      setSiteUrl(liveData.slug || '');
+      setSiteType(liveData.type || 'custom');
+      setPrimaryColor(liveData.branding?.primaryColor || '#D91C81');
+      setSecondaryColor(liveData.branding?.secondaryColor || '#1B2A5E');
+      setTertiaryColor(liveData.branding?.tertiaryColor || '#00B4CC');
+      setAllowQuantitySelection(liveData.settings?.allowQuantitySelection ?? false);
+      setShowPricing(liveData.settings?.showPricing ?? true);
+      setSkipLandingPage(liveData.settings?.skipLandingPage ?? false);
+      setEnableLandingPage(liveData.settings?.skipLandingPage === false);
+      setGiftsPerUser(liveData.settings?.giftsPerUser || 1);
+      setValidationMethod(liveData.settings?.validationMethod || 'email');
+      setDefaultLanguage(liveData.settings?.defaultLanguage || 'en');
+      setDefaultCurrency(liveData.settings?.defaultCurrency || 'USD');
+      setDefaultCountry(liveData.settings?.defaultCountry || 'US');
+      
+      const formatDateForInput = (isoDate: string) => {
+        if (!isoDate) return '';
+        return isoDate.slice(0, 16);
+      };
+      
+      setAvailabilityStartDate(formatDateForInput(liveData.settings?.availabilityStartDate || ''));
+      setAvailabilityEndDate(formatDateForInput(liveData.settings?.availabilityEndDate || ''));
+      setExpiredMessage(liveData.settings?.expiredMessage || 'Thank you for your interest. The gift selection period for this program has ended. If you have questions, please contact your program administrator.');
+      setDefaultGiftId(liveData.settings?.defaultGiftId || null);
+      setDefaultGiftDaysAfterClose(liveData.settings?.defaultGiftDaysAfterClose || 0);
+      
+      // Header/Footer settings
+      setShowHeader(liveData.settings?.showHeader ?? true);
+      setShowFooter(liveData.settings?.showFooter ?? true);
+      setHeaderLayout(liveData.settings?.headerLayout || 'left');
+      setShowLanguageSelector(liveData.settings?.showLanguageSelector ?? true);
+      setCompanyName(liveData.settings?.companyName || '');
+      setFooterText(liveData.settings?.footerText || '© 2026 All rights reserved.');
+      
+      // Gift Selection UX settings
+      setEnableSearch(liveData.settings?.enableSearch ?? true);
+      setEnableFilters(liveData.settings?.enableFilters ?? true);
+      setGridColumns(liveData.settings?.gridColumns || 3);
+      setShowDescription(liveData.settings?.showDescription ?? true);
+      setSortOptions(liveData.settings?.sortOptions || ['name', 'price', 'popularity']);
+      
+      // ERP Integration settings
+      setSiteCode((liveData as any).siteCode || '');
+      setSiteErpIntegration((liveData as any).siteErpIntegration || '');
+      setSiteErpInstance((liveData as any).siteErpInstance || '');
+      setSiteShipFromCountry((liveData as any).siteShipFromCountry || 'US');
+      setSiteHrisSystem((liveData as any).siteHrisSystem || '');
+      
+      // Site Management settings
+      setSiteDropDownName((liveData as any).siteDropDownName || '');
+      setSiteCustomDomainUrl((liveData as any).siteCustomDomainUrl || '');
+      setSiteAccountManager((liveData as any).siteAccountManager || '');
+      setSiteAccountManagerEmail((liveData as any).siteAccountManagerEmail || '');
+      setSiteCelebrationsEnabled((liveData as any).siteCelebrationsEnabled ?? false);
+      setAllowSessionTimeoutExtend((liveData as any).allowSessionTimeoutExtend ?? false);
+      setEnableEmployeeLogReport((liveData as any).enableEmployeeLogReport ?? false);
+      
+      // Regional Client Info settings
+      setRegionalOfficeName((liveData as any).regionalClientInfo?.officeName || '');
+      setRegionalContactName((liveData as any).regionalClientInfo?.contactName || '');
+      setRegionalContactEmail((liveData as any).regionalClientInfo?.contactEmail || '');
+      setRegionalContactPhone((liveData as any).regionalClientInfo?.contactPhone || '');
+      setRegionalAddressLine1((liveData as any).regionalClientInfo?.addressLine1 || '');
+      setRegionalAddressLine2((liveData as any).regionalClientInfo?.addressLine2 || '');
+      setRegionalAddressLine3((liveData as any).regionalClientInfo?.addressLine3 || '');
+      setRegionalCity((liveData as any).regionalClientInfo?.city || '');
+      setRegionalCountryState((liveData as any).regionalClientInfo?.countryState || '');
+      setRegionalTaxId((liveData as any).regionalClientInfo?.taxId || '');
+      
+      // Authentication settings
+      setDisableDirectAccessAuth((liveData as any).disableDirectAccessAuth ?? false);
+      setSsoProvider((liveData as any).ssoProvider || '');
+      setSsoClientOfficeName((liveData as any).ssoClientOfficeName || '');
+      
+      // Additional Optional Fields
+      setShippingMode(liveData.settings?.shippingMode || 'employee');
+      setDefaultShippingAddress(liveData.settings?.defaultShippingAddress || '');
+      setWelcomeMessage(liveData.settings?.welcomeMessage || '');
+      setEnableWelcomePage(liveData.settings?.enableWelcomePage ?? false);
+      setWelcomePageTitle(liveData.settings?.welcomePageContent?.title || '');
+      setWelcomePageMessage(liveData.settings?.welcomePageContent?.message || '');
+      setWelcomePageAuthorName(liveData.settings?.welcomePageContent?.authorName || '');
+      setWelcomePageAuthorTitle(liveData.settings?.welcomePageContent?.authorTitle || '');
+      setWelcomePageImageUrl(liveData.settings?.welcomePageContent?.imageUrl || '');
+      setAllowedCountries(liveData.settings?.allowedCountries || []);
+      setEnableAddressValidation(liveData.settings?.addressValidation?.enabled ?? false);
+      setAddressValidationProvider(liveData.settings?.addressValidation?.provider || 'none');
+      setSkipReviewPage(liveData.settings?.skipReviewPage ?? false);
+      
+      // Reset change tracking
+      setHasChanges(false);
+      setShowDiscardModal(false);
+      
+      toast.success('Draft discarded', {
+        description: 'All changes have been reverted to the published version.'
+      });
+      
+    } catch (error: unknown) {
+      console.error('[SiteConfiguration] Error discarding draft:', error);
+      
+      toast.error('Failed to discard draft', {
+        description: error instanceof Error ? error.message : 'Please try again'
+      });
+    } finally {
+      setIsDiscarding(false);
+    }
+  };
+
+  // Handle unsaved changes modal - Save and continue
+  const handleSaveUnsavedChanges = async () => {
+    await handleAutoSave();
+    setShowUnsavedChangesModal(false);
+    if (pendingModeSwitch) {
+      await handleModeToggle(pendingModeSwitch);
+      setPendingModeSwitch(null);
+    }
+  };
+
+  // Handle unsaved changes modal - Discard and continue
+  const handleDiscardUnsavedChanges = () => {
+    setHasChanges(false);
+    setShowUnsavedChangesModal(false);
+    if (pendingModeSwitch) {
+      handleModeToggle(pendingModeSwitch);
+      setPendingModeSwitch(null);
+    }
+  };
+
+  // SSO Validation Functions
+  const isValidUrl = (url: string): boolean => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const validateOAuthFields = (): Record<string, string> => {
+    const errors: Record<string, string> = {};
+    
+    if (!ssoClientId?.trim()) {
+      errors.clientId = 'Client ID is required';
+    }
+    
+    if (!ssoClientSecret?.trim()) {
+      errors.clientSecret = 'Client Secret is required';
+    }
+    
+    if (!ssoAuthUrl?.trim()) {
+      errors.authUrl = 'Authorization URL is required';
+    } else if (!isValidUrl(ssoAuthUrl)) {
+      errors.authUrl = 'Please enter a valid URL';
+    }
+    
+    if (!ssoTokenUrl?.trim()) {
+      errors.tokenUrl = 'Token URL is required';
+    } else if (!isValidUrl(ssoTokenUrl)) {
+      errors.tokenUrl = 'Please enter a valid URL';
+    }
+    
+    return errors;
+  };
+
+  const validateSAMLFields = (): Record<string, string> => {
+    const errors: Record<string, string> = {};
+    
+    if (!ssoIdpEntryPoint?.trim()) {
+      errors.idpEntryPoint = 'IdP Entry Point is required';
+    } else if (!isValidUrl(ssoIdpEntryPoint)) {
+      errors.idpEntryPoint = 'Please enter a valid URL';
+    }
+    
+    if (!ssoEntityId?.trim()) {
+      errors.entityId = 'Entity ID is required';
+    }
+    
+    if (!ssoCertificate?.trim()) {
+      errors.certificate = 'X.509 Certificate is required';
+    }
+    
+    return errors;
+  };
+
+  // SSO State Transition Handlers
+  const handleSaveConfiguration = () => {
+    const providerCategory = getProviderCategory(ssoProvider);
+    const errors = providerCategory === 'oauth' 
+      ? validateOAuthFields()
+      : validateSAMLFields();
+    
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      toast.error('Please fix validation errors before saving');
+      return;
+    }
+    
+    setSsoConfigured(true);
+    setSsoEditMode(false);
+    setValidationErrors({});
+    setHasChanges(true);
+    toast.success('SSO configuration saved successfully');
+  };
+
+  const handleEditConfiguration = () => {
+    setSsoEditMode(true);
+  };
+
+  const handleCancelEdit = () => {
+    setSsoEditMode(false);
+    setValidationErrors({});
+    toast.info('Changes discarded');
+  };
+
+  const handleDisableSSO = () => {
+    if (confirm('Are you sure you want to disable SSO? Users will no longer be able to authenticate through your identity provider.')) {
+      setSsoProvider('');
+      setSsoConfigured(false);
+      setSsoEditMode(false);
+      setSsoClientId('');
+      setSsoClientSecret('');
+      setSsoAuthUrl('');
+      setSsoTokenUrl('');
+      setSsoUserInfoUrl('');
+      setSsoScope('openid profile email');
+      setSsoIdpEntryPoint('');
+      setSsoEntityId('');
+      setSsoCertificate('');
+      setValidationErrors({});
+      setHasChanges(true);
+      toast.success('SSO has been disabled');
+    }
+  };
+
+  const handleProviderChange = (newProvider: string) => {
+    setSsoProvider(newProvider);
+    setValidationErrors({});
+    setHasChanges(true);
+  };
+
+  // Helper function to build current state for comparison
+  // This ensures consistent format between saves and comparisons
+  const buildCurrentStateForComparison = () => {
+    const formatDateForDB = (dateStr: string) => {
+      if (!dateStr) return null;
+      return new Date(dateStr).toISOString();
+    };
+    
+    return {
+      name: siteName,
+      slug: siteUrl,
+      type: siteType,
+      branding: {
+        primaryColor,
+        secondaryColor,
+        tertiaryColor,
+      },
+      settings: {
+        allowQuantitySelection,
+        showPricing,
+        skipLandingPage: !enableLandingPage,
+        giftsPerUser,
+        validationMethod,
+        defaultLanguage,
+        defaultCurrency,
+        defaultCountry,
+        availabilityStartDate: formatDateForDB(availabilityStartDate),
+        availabilityEndDate: formatDateForDB(availabilityEndDate),
+        expiredMessage,
+        defaultGiftId: defaultGiftId || null,
+        defaultGiftDaysAfterClose,
+        showHeader,
+        showFooter,
+        headerLayout,
+        showLanguageSelector,
+        companyName,
+        footerText,
+        enableSearch,
+        enableFilters,
+        gridColumns,
+        showDescription,
+        sortOptions,
+        shippingMode,
+        defaultShippingAddress,
+        welcomeMessage,
+        enableWelcomePage,
+        skipReviewPage,
+        ssoConfig: {
+          clientId: ssoClientId,
+          clientSecret: ssoClientSecret,
+          authUrl: ssoAuthUrl,
+          tokenUrl: ssoTokenUrl,
+          userInfoUrl: ssoUserInfoUrl,
+          scope: ssoScope,
+          idpEntryPoint: ssoIdpEntryPoint,
+          entityId: ssoEntityId,
+          certificate: ssoCertificate,
+          autoProvision: ssoAutoProvision,
+          allowAdminBypass,
+          bypassRequires2FA,
+          bypassAllowedIPs: bypassAllowedIPs ? bypassAllowedIPs.split('\n').filter(ip => ip.trim()) : []
+        }
+      },
+      siteCode,
+      siteErpIntegration,
+      siteErpInstance,
+      siteShipFromCountry,
+      siteHrisSystem,
+      siteDropDownName,
+      siteCustomDomainUrl,
+      siteAccountManager,
+      siteAccountManagerEmail,
+      siteCelebrationsEnabled,
+      allowSessionTimeoutExtend,
+      enableEmployeeLogReport,
+      disableDirectAccessAuth,
+      ssoProvider,
+    };
   };
 
   if (!currentSite) {
@@ -738,7 +1645,7 @@ export function SiteConfiguration() {
       )}
       
       {/* Site Context Header - Sticky */}
-      <div className="bg-white border border-gray-200 rounded-xl p-4 sticky top-0 z-10 shadow-sm">
+      <div className="bg-white border border-gray-200 rounded-xl p-4 sticky top-0 z-40 shadow-md backdrop-blur-sm bg-white/95">
         <div className="flex items-center justify-between">
           {/* Site Info with Switcher */}
           <div className="flex items-center gap-4">
@@ -765,6 +1672,20 @@ export function SiteConfiguration() {
               </div>
               <div className="flex items-center gap-3">
                 <h1 className="text-xl font-bold text-gray-900">{currentSite.name}</h1>
+                
+                {/* View Live Site - Moved here next to site name */}
+                {currentSite.status === 'active' && currentSite.slug && (
+                  <a
+                    href={getPublicSiteUrlBySlug(currentSite.slug)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">View Live</span>
+                  </a>
+                )}
+                
                 <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium border ${
                   currentSite.status === 'active' 
                     ? 'bg-green-100 text-green-800 border-green-200'
@@ -810,50 +1731,55 @@ export function SiteConfiguration() {
               </div>
             )}
             
-            {/* Live/Draft Mode Toggle - Moved to header for easy access */}
+            {/* Live/Draft Mode Toggle - Always editable, auto-switches to draft */}
             <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
               <button
-                onClick={() => setConfigMode('live')}
+                onClick={() => handleModeToggle('live')}
                 disabled={currentSite.status === 'draft'}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-semibold transition-all ${
                   configMode === 'live'
                     ? 'bg-green-600 text-white shadow-sm'
                     : 'text-gray-600 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed'
                 }`}
-                title={currentSite.status === 'draft' ? 'Publish site first to view live mode' : 'View live configuration (read-only)'}
+                title={currentSite.status === 'draft' ? 'Publish site first to view live mode' : 'View live configuration'}
               >
                 <Eye className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Live</span>
               </button>
               <button
-                onClick={() => setConfigMode('draft')}
+                onClick={() => handleModeToggle('draft')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-semibold transition-all ${
                   configMode === 'draft'
                     ? 'bg-amber-500 text-white shadow-sm'
                     : 'text-gray-600 hover:bg-gray-200'
                 }`}
-                title="Edit configuration in draft mode"
+                title="Edit configuration (auto-switches when you make changes)"
               >
                 <Edit3 className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Edit</span>
               </button>
             </div>
             
-            {/* View Live Site */}
-            {currentSite.status === 'active' && (
-              <a
-                href={getPublicSiteUrl(currentSite.id)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-all"
-              >
-                <ExternalLink className="w-4 h-4" />
-                <span className="hidden sm:inline">View Live</span>
-              </a>
+            {/* Info message when in live mode - only show if no draft exists */}
+            {configMode === 'live' && currentSite.status === 'active' && !currentSite._hasUnpublishedChanges && !(currentSite as any).draftSettings && (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="hidden sm:inline">Start editing to create a draft</span>
+                <span className="sm:hidden">Edit to create draft</span>
+              </div>
+            )}
+            
+            {/* Unpublished Changes Indicator - Show in live mode when draft changes exist */}
+            {configMode === 'live' && (currentSite._hasUnpublishedChanges || (currentSite as any).draftSettings) && (
+              <UnpublishedChangesIndicator 
+                onNavigateToDraft={() => handleModeToggle('draft')}
+              />
             )}
 
-            {/* Publish Button - Visible when in draft mode and site is not published or has unpublished changes */}
-            {configMode === 'draft' && (currentSite.status === 'draft' || hasChanges) && (
+            {/* Publish Button - Show in draft mode when there are unpublished changes (saved or unsaved) */}
+            {configMode === 'draft' && (currentSite.status === 'draft' || hasChanges || currentSite._hasUnpublishedChanges || (currentSite as any).draftSettings) && (
               <Button
                 onClick={handlePublish}
                 className="bg-green-600 hover:bg-green-700 text-white"
@@ -875,44 +1801,25 @@ export function SiteConfiguration() {
                 )}
               </Button>
             )}
-
-            {/* Save Button */}
-            <button
-              onClick={handleSave}
-              disabled={!hasChanges || saveStatus === 'saving'}
-              className="inline-flex items-center gap-2 bg-[#D91C81] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#B71569] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
-            >
-              {saveStatus === 'saving' ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Saving...
-                </>
-              ) : saveStatus === 'saved' ? (
-                <>
-                  <Check className="w-5 h-5" />
-                  Saved!
-                </>
-              ) : (
-                <>
-                  <Save className="w-5 h-5" />
-                  Save Changes
-                </>
-              )}
-            </button>
+            
+            {/* Discard Draft Button - Only show in draft mode if there are saved draft changes */}
+            {configMode === 'draft' && !hasChanges && (currentSite._hasUnpublishedChanges || (currentSite as any).draftSettings) && (
+              <Button
+                onClick={handleDiscardDraft}
+                variant="outline"
+                className="border-red-300 text-red-600 hover:bg-red-50"
+                size="default"
+                title="Discard all draft changes and revert to live version"
+              >
+                <History className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Discard Draft</span>
+                <span className="sm:hidden">Discard</span>
+              </Button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Mode Status Banner */}
-      {configMode === 'live' && currentSite.status === 'active' && (
-        <Alert className="border-blue-200 bg-blue-50">
-          <Eye className="w-4 h-4 text-blue-600" />
-          <AlertDescription className="text-blue-800">
-            <strong>🔒 Read-Only Mode:</strong> You are viewing the live configuration. Click "Edit" in the header to make changes.
-          </AlertDescription>
-        </Alert>
-      )}
-      
       {configMode === 'draft' && currentSite.status === 'draft' && (
         <Alert className="border-amber-200 bg-amber-50">
           <AlertCircle className="w-4 h-4 text-amber-600" />
@@ -930,6 +1837,90 @@ export function SiteConfiguration() {
           </AlertDescription>
         </Alert>
       )}
+
+      {/* Site Type Selector - Determines configuration template */}
+      <Card className="border-2 border-[#D91C81]/20 bg-gradient-to-br from-pink-50 to-white mb-8">
+        <CardContent className="pt-4 pb-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Settings className="w-5 h-5 text-[#D91C81]" />
+            <h3 className="text-lg font-semibold">Site Type</h3>
+            <span className="text-sm text-gray-600 ml-2">— Select the type of site to show relevant configuration options</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            {/* Left Column - Site Type Selector */}
+            <div className="w-full">
+              <CustomSelect
+                value={siteType}
+                onChange={(value) => {
+                  setSiteType(value as any);
+                  setHasChanges(true);
+                }}
+                disabled={configMode === 'live'}
+                options={[
+                  { value: 'event-gifting', label: '🎉 Event Gifting' },
+                  { value: 'onboarding-kit', label: '👋 Employee Onboarding Kit' },
+                  { value: 'service-awards', label: '🏆 Service Awards' },
+                  { value: 'incentives', label: '💎 Incentives & Rewards' },
+                  { value: 'custom', label: '⚙️ Custom Configuration' }
+                ]}
+              />
+            </div>
+
+            {/* Right Column - Info Box */}
+            <div className="w-full p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <h4 className="font-semibold text-blue-900 mb-1.5 text-sm">
+                {siteType === 'event-gifting' && '🎉 Event Gifting'}
+                {siteType === 'onboarding-kit' && '👋 Employee Onboarding Kit'}
+                {siteType === 'service-awards' && '🏆 Service Awards'}
+                {siteType === 'incentives' && '💎 Incentives & Rewards'}
+                {siteType === 'custom' && '⚙️ Custom Configuration'}
+              </h4>
+              <ul className="text-xs text-blue-900 space-y-1">
+                {siteType === 'event-gifting' && (
+                  <>
+                    <li>• Perfect for corporate events and conferences</li>
+                    <li>• Time-limited gift selection windows</li>
+                    <li>• Bulk gift distribution for attendees</li>
+                    <li>• Event-specific branding and messaging</li>
+                  </>
+                )}
+                {siteType === 'onboarding-kit' && (
+                  <>
+                    <li>• Streamline new hire onboarding process</li>
+                    <li>• Customizable welcome kits and swag</li>
+                    <li>• Automated delivery to new employees</li>
+                    <li>• First-day experience enhancement</li>
+                  </>
+                )}
+                {siteType === 'service-awards' && (
+                  <>
+                    <li>• Recognize employee milestones</li>
+                    <li>• Years of service celebrations</li>
+                    <li>• Tiered reward options by tenure</li>
+                    <li>• Automated anniversary notifications</li>
+                  </>
+                )}
+                {siteType === 'incentives' && (
+                  <>
+                    <li>• Drive performance with rewards</li>
+                    <li>• Points-based incentive programs</li>
+                    <li>• Goal achievement recognition</li>
+                    <li>• Flexible redemption options</li>
+                  </>
+                )}
+                {siteType === 'custom' && (
+                  <>
+                    <li>• Fully customizable configuration</li>
+                    <li>• Flexible settings for any use case</li>
+                    <li>• No predefined templates or restrictions</li>
+                    <li>• Complete control over all options</li>
+                  </>
+                )}
+              </ul>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Tabs Navigation - Horizontal Scroll */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -1020,168 +2011,138 @@ export function SiteConfiguration() {
               <CardDescription>Basic site identification and portal settings</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Site Name
-                </label>
-                <Input
-                  type="text"
-                  value={siteName}
-                  onChange={(e) => {
-                    setSiteName(e.target.value);
-                    setHasChanges(true);
-                  }}
-                  disabled={configMode === 'live'}
-                  placeholder="Enter site name"
-                />
-              </div>
+              {siteUrl && (
+                <div className="flex items-center gap-2 text-sm p-3 bg-green-50 rounded-lg border border-green-200">
+                  <Globe className="w-4 h-4 text-green-600" />
+                  <span className="text-gray-700">
+                    Your site will be accessible at:{' '}
+                    <a 
+                      href={getPublicSiteUrlBySlug(siteUrl)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline font-medium"
+                    >
+                      {getPublicSiteUrlBySlug(siteUrl)}
+                    </a>
+                  </span>
+                </div>
+              )}
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Site URL Slug
-                </label>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500 whitespace-nowrap">
-                      https://wecelebrate.netlify.app/site/
-                    </span>
-                    <Input
-                      type="text"
-                      value={siteUrl}
-                      onChange={(e) => {
-                        // Only allow lowercase letters, numbers, and hyphens
-                        const slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
-                        setSiteUrl(slug);
-                        setHasChanges(true);
-                      }}
-                      disabled={configMode === 'live'}
-                      placeholder="techcorpus"
-                      className="flex-1"
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    Enter a unique identifier for your site URL (lowercase letters, numbers, and hyphens only)
-                  </p>
-                  {siteUrl && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Globe className="w-4 h-4 text-green-600" />
-                      <span className="text-gray-700">
-                        Your site will be accessible at:{' '}
-                        <a 
-                          href={`https://wecelebrate.netlify.app/site/${siteUrl}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
-                        >
-                          https://wecelebrate.netlify.app/site/{siteUrl}
-                        </a>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Site Name
+                  </label>
+                  <Input
+                    type="text"
+                    value={siteName}
+                    onChange={(e) => {
+                      setSiteName(e.target.value);
+                      setHasChanges(true);
+                    }}
+                    disabled={false}
+                    placeholder="Enter site name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Site URL Slug
+                  </label>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-500 whitespace-nowrap">
+                        {getEnvironmentBaseUrl()}/site/
                       </span>
+                      <Input
+                        type="text"
+                        value={siteUrl}
+                        onChange={(e) => {
+                          // Only allow lowercase letters, numbers, and hyphens
+                          const slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+                          setSiteUrl(slug);
+                          setHasChanges(true);
+                        }}
+                        disabled={false}
+                        placeholder="techcorpus"
+                        className="flex-1"
+                      />
                     </div>
-                  )}
+                    <p className="text-xs text-gray-500">
+                      Lowercase letters, numbers, and hyphens only
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Site Type
-                </label>
-                <select
-                  value={siteType}
-                  onChange={(e) => {
-                    setSiteType(e.target.value as any);
-                    setHasChanges(true);
-                  }}
-                  disabled={configMode === 'live'}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  <option value="event-gifting">🎉 Event Gifting</option>
-                  <option value="onboarding-kit">👋 Employee Onboarding Kit</option>
-                  <option value="service-awards">🏆 Service Awards</option>
-                  <option value="incentives">💎 Incentives & Rewards</option>
-                  <option value="custom">⚙️ Custom Configuration</option>
-                </select>
-                <p className="text-xs text-gray-500 mt-1">
-                  {siteType === 'event-gifting' && 'Perfect for corporate events, conferences, and celebrations'}
-                  {siteType === 'onboarding-kit' && 'Streamline new hire onboarding with customizable welcome kits'}
-                  {siteType === 'service-awards' && 'Recognize employee milestones and years of service'}
-                  {siteType === 'incentives' && 'Drive performance with points-based rewards and incentives'}
-                  {siteType === 'custom' && 'Fully customizable site with flexible configuration'}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Internationalization */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="w-5 h-5 text-[#00B4CC]" />
-                Internationalization
-              </CardTitle>
-              <CardDescription>Language, currency, and regional settings</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Default Language
+                    Dropdown Display Name <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
-                  <select
-                    value={defaultLanguage}
+                  <Input
+                    value={siteDropDownName}
                     onChange={(e) => {
-                      setDefaultLanguage(e.target.value);
+                      setSiteDropDownName(e.target.value);
                       setHasChanges(true);
                     }}
+                    placeholder="US - 2026 Gift Program"
                     disabled={configMode === 'live'}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    <option value="en">English</option>
-                    <option value="es">Spanish</option>
-                    <option value="fr">French</option>
-                    <option value="de">German</option>
-                  </select>
+                    maxLength={100}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Display name for multi-site dropdown (max 100 chars)</p>
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Default Currency
+                    Custom Domain URL <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
-                  <select
-                    value={defaultCurrency}
+                  <Input
+                    value={siteCustomDomainUrl}
                     onChange={(e) => {
-                      setDefaultCurrency(e.target.value);
+                      setSiteCustomDomainUrl(e.target.value);
                       setHasChanges(true);
                     }}
+                    placeholder="https://gifts.yourcompany.com"
                     disabled={configMode === 'live'}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    <option value="USD">USD ($)</option>
-                    <option value="EUR">EUR (€)</option>
-                    <option value="GBP">GBP (£)</option>
-                    <option value="CAD">CAD ($)</option>
-                  </select>
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Custom domain for this site</p>
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Default Country
+                    Account Manager <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
-                  <select
-                    value={defaultCountry}
+                  <Input
+                    value={siteAccountManager}
                     onChange={(e) => {
-                      setDefaultCountry(e.target.value);
+                      setSiteAccountManager(e.target.value);
                       setHasChanges(true);
                     }}
+                    placeholder="Sarah Williams"
                     disabled={configMode === 'live'}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    <option value="US">United States</option>
-                    <option value="CA">Canada</option>
-                    <option value="GB">United Kingdom</option>
-                    <option value="AU">Australia</option>
-                  </select>
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Primary contact for this site</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Account Manager Email <span className="text-gray-400 font-normal ml-1">(Optional)</span>
+                  </label>
+                  <Input
+                    type="email"
+                    value={siteAccountManagerEmail}
+                    onChange={(e) => {
+                      setSiteAccountManagerEmail(e.target.value);
+                      setHasChanges(true);
+                    }}
+                    placeholder="sarah@halo.com"
+                    disabled={configMode === 'live'}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Contact email for account manager</p>
                 </div>
               </div>
+
             </CardContent>
           </Card>
 
@@ -1217,7 +2178,7 @@ export function SiteConfiguration() {
                       setAvailabilityStartDate(e.target.value);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                   />
                   <p className="text-xs text-gray-500 mt-1">
                     Gift selection becomes available on this date and time
@@ -1235,7 +2196,7 @@ export function SiteConfiguration() {
                       setAvailabilityEndDate(e.target.value);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                   />
                   <p className="text-xs text-gray-500 mt-1">
                     Gift selection ends on this date and time
@@ -1254,7 +2215,7 @@ export function SiteConfiguration() {
                     setExpiredMessage(e.target.value);
                     setHasChanges(true);
                   }}
-                  disabled={configMode === 'live'}
+                  disabled={false}
                   placeholder="Enter the message to display when the selection period has ended..."
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
                 />
@@ -1311,7 +2272,7 @@ export function SiteConfiguration() {
                       setHasChanges(true);
                     }}
                     placeholder="e.g., TC-EG-2026"
-                    disabled={configMode === 'live'}
+                    disabled={false}
                   />
                   <p className="text-xs text-gray-500 mt-1">Unique identifier for ERP sync</p>
                 </div>
@@ -1326,7 +2287,7 @@ export function SiteConfiguration() {
                       setSiteErpIntegration(e.target.value);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <option value="">Select ERP System</option>
@@ -1352,7 +2313,7 @@ export function SiteConfiguration() {
                       setHasChanges(true);
                     }}
                     placeholder="e.g., NAJ, Fourgen"
-                    disabled={configMode === 'live'}
+                    disabled={false}
                   />
                   <p className="text-xs text-gray-500 mt-1">Specific ERP instance</p>
                 </div>
@@ -1369,7 +2330,7 @@ export function SiteConfiguration() {
                     }}
                     placeholder="US"
                     maxLength={2}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                   />
                   <p className="text-xs text-gray-500 mt-1">2-letter ISO code (US, CA, GB)</p>
                 </div>
@@ -1385,7 +2346,7 @@ export function SiteConfiguration() {
                       setHasChanges(true);
                     }}
                     placeholder="e.g., Workday, ADP"
-                    disabled={configMode === 'live'}
+                    disabled={false}
                   />
                   <p className="text-xs text-gray-500 mt-1">HR information system</p>
                 </div>
@@ -1401,268 +2362,270 @@ export function SiteConfiguration() {
                 Site Management
               </CardTitle>
               <CardDescription>
-                Configure account management and site display settings
+                Configure feature toggles and site behavior
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Dropdown Display Name <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                  </label>
-                  <Input
-                    value={siteDropDownName}
-                    onChange={(e) => {
-                      setSiteDropDownName(e.target.value);
-                      setHasChanges(true);
-                    }}
-                    placeholder="US - 2026 Gift Program"
-                    disabled={configMode === 'live'}
-                    maxLength={100}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Multi-site dropdown (max 100 chars)</p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Custom Domain URL <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                  </label>
-                  <Input
-                    value={siteCustomDomainUrl}
-                    onChange={(e) => {
-                      setSiteCustomDomainUrl(e.target.value);
-                      setHasChanges(true);
-                    }}
-                    placeholder="https://gifts.yourcompany.com"
-                    disabled={configMode === 'live'}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Account Manager <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                  </label>
-                  <Input
-                    value={siteAccountManager}
-                    onChange={(e) => {
-                      setSiteAccountManager(e.target.value);
-                      setHasChanges(true);
-                    }}
-                    placeholder="Sarah Williams"
-                    disabled={configMode === 'live'}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Account Manager Email <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                  </label>
-                  <Input
-                    type="email"
-                    value={siteAccountManagerEmail}
-                    onChange={(e) => {
-                      setSiteAccountManagerEmail(e.target.value);
-                      setHasChanges(true);
-                    }}
-                    placeholder="sarah@halo.com"
-                    disabled={configMode === 'live'}
-                  />
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-gray-200">
-                <p className="text-sm font-semibold text-gray-700 mb-4">Feature Toggles</p>
-                <div className="grid grid-cols-1 gap-3">
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-semibold text-gray-900">Enable Celebrations</p>
-                      <p className="text-sm text-gray-600">Show celebration feature</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox"
-                        checked={siteCelebrationsEnabled}
-                        onChange={(e) => {
-                          setSiteCelebrationsEnabled(e.target.checked);
-                          setHasChanges(true);
-                        }}
-                        disabled={configMode === 'live'}
-                        className="sr-only peer" 
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
-                    </label>
+              <p className="text-sm font-semibold text-gray-700 mb-4">Feature Toggles</p>
+              <div className="grid grid-cols-1 gap-3">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-semibold text-gray-900">Enable Celebrations</p>
+                    <p className="text-sm text-gray-600">Show celebration feature</p>
                   </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input 
+                      type="checkbox"
+                      checked={siteCelebrationsEnabled}
+                      onChange={(e) => {
+                        setSiteCelebrationsEnabled(e.target.checked);
+                        setHasChanges(true);
+                      }}
+                      disabled={false}
+                      className="sr-only peer" 
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                  </label>
+                </div>
 
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-semibold text-gray-900">4-Hour Session Timeout</p>
-                      <p className="text-sm text-gray-600">Extend timeout to 4 hours</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox"
-                        checked={allowSessionTimeoutExtend}
-                        onChange={(e) => {
-                          setAllowSessionTimeoutExtend(e.target.checked);
-                          setHasChanges(true);
-                        }}
-                        disabled={configMode === 'live'}
-                        className="sr-only peer" 
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
-                    </label>
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-semibold text-gray-900">4-Hour Session Timeout</p>
+                    <p className="text-sm text-gray-600">Extend timeout to 4 hours</p>
                   </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input 
+                      type="checkbox"
+                      checked={allowSessionTimeoutExtend}
+                      onChange={(e) => {
+                        setAllowSessionTimeoutExtend(e.target.checked);
+                        setHasChanges(true);
+                      }}
+                      disabled={false}
+                      className="sr-only peer" 
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                  </label>
+                </div>
 
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-semibold text-gray-900">Employee Activity Logging</p>
-                      <p className="text-sm text-gray-600">Track employee interactions</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox"
-                        checked={enableEmployeeLogReport}
-                        onChange={(e) => {
-                          setEnableEmployeeLogReport(e.target.checked);
-                          setHasChanges(true);
-                        }}
-                        disabled={configMode === 'live'}
-                        className="sr-only peer" 
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
-                    </label>
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-semibold text-gray-900">Employee Activity Logging</p>
+                    <p className="text-sm text-gray-600">Track employee interactions</p>
                   </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input 
+                      type="checkbox"
+                      checked={enableEmployeeLogReport}
+                      onChange={(e) => {
+                        setEnableEmployeeLogReport(e.target.checked);
+                        setHasChanges(true);
+                      }}
+                      disabled={false}
+                      className="sr-only peer" 
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                  </label>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* ========== SHIPPING & FULFILLMENT (NEW) ========== */}
+          {/* ========== INTERNATIONALIZATION & REGIONAL SETTINGS ========== */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Package className="w-5 h-5 text-blue-600" />
-                Shipping & Fulfillment
+                <Globe className="w-5 h-5 text-[#00B4CC]" />
+                Internationalization & Regional Settings
               </CardTitle>
               <CardDescription>
-                Configure shipping mode and address settings
+                Language, currency, regional settings, and allowed countries
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
+              {/* Language, Currency, Country */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Shipping Mode *
-                </label>
-                <select
-                  value={shippingMode}
-                  onChange={(e) => {
-                    setShippingMode(e.target.value as 'company' | 'employee' | 'store');
-                    setHasChanges(true);
-                  }}
-                  disabled={configMode === 'live'}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  <option value="employee">Ship to Employee</option>
-                  <option value="company">Ship to Company</option>
-                  <option value="store">Store Pickup</option>
-                </select>
-                <p className="text-xs text-gray-500 mt-1">Where gifts will be shipped</p>
+                <h3 className="text-sm font-semibold text-gray-700 mb-4">Default Settings</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Default Language
+                    </label>
+                    <select
+                      value={defaultLanguage}
+                      onChange={(e) => {
+                        setDefaultLanguage(e.target.value);
+                        setHasChanges(true);
+                      }}
+                      disabled={false}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <option value="en">English</option>
+                      <option value="en-GB">English (British)</option>
+                      <option value="es">Spanish</option>
+                      <option value="es-MX">Spanish (Mexican)</option>
+                      <option value="fr">French</option>
+                      <option value="fr-CA">French (Canadian)</option>
+                      <option value="de">German</option>
+                      <option value="it">Italian</option>
+                      <option value="pt-BR">Portuguese (Brazilian)</option>
+                      <option value="pt-PT">Portuguese (Portugal)</option>
+                      <option value="ja">Japanese</option>
+                      <option value="zh">Chinese (Simplified)</option>
+                      <option value="zh-TW">Chinese (Traditional)</option>
+                      <option value="hi">Hindi</option>
+                      <option value="ko">Korean</option>
+                      <option value="pl">Polish</option>
+                      <option value="ru">Russian</option>
+                      <option value="ar">Arabic</option>
+                      <option value="he">Hebrew</option>
+                      <option value="ta">Tamil</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Default Currency
+                    </label>
+                    <select
+                      value={defaultCurrency}
+                      onChange={(e) => {
+                        setDefaultCurrency(e.target.value);
+                        setHasChanges(true);
+                      }}
+                      disabled={false}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <option value="USD">USD ($)</option>
+                      <option value="EUR">EUR (€)</option>
+                      <option value="GBP">GBP (£)</option>
+                      <option value="CAD">CAD ($)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Default Country
+                    </label>
+                    <select
+                      value={defaultCountry}
+                      onChange={(e) => {
+                        setDefaultCountry(e.target.value);
+                        setHasChanges(true);
+                      }}
+                      disabled={false}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <option value="US">United States</option>
+                      <option value="CA">Canada</option>
+                      <option value="GB">United Kingdom</option>
+                      <option value="AU">Australia</option>
+                      <option value="DE">Germany</option>
+                      <option value="FR">France</option>
+                      <option value="IT">Italy</option>
+                      <option value="ES">Spain</option>
+                      <option value="NL">Netherlands</option>
+                      <option value="BE">Belgium</option>
+                      <option value="CH">Switzerland</option>
+                      <option value="AT">Austria</option>
+                      <option value="SE">Sweden</option>
+                      <option value="NO">Norway</option>
+                      <option value="DK">Denmark</option>
+                      <option value="FI">Finland</option>
+                      <option value="IE">Ireland</option>
+                      <option value="PL">Poland</option>
+                      <option value="PT">Portugal</option>
+                      <option value="GR">Greece</option>
+                      <option value="CZ">Czech Republic</option>
+                      <option value="HU">Hungary</option>
+                      <option value="RO">Romania</option>
+                      <option value="BG">Bulgaria</option>
+                      <option value="HR">Croatia</option>
+                      <option value="SK">Slovakia</option>
+                      <option value="SI">Slovenia</option>
+                      <option value="LT">Lithuania</option>
+                      <option value="LV">Latvia</option>
+                      <option value="EE">Estonia</option>
+                      <option value="LU">Luxembourg</option>
+                      <option value="MT">Malta</option>
+                      <option value="CY">Cyprus</option>
+                      <option value="IS">Iceland</option>
+                      <option value="NZ">New Zealand</option>
+                      <option value="SG">Singapore</option>
+                      <option value="HK">Hong Kong</option>
+                      <option value="JP">Japan</option>
+                      <option value="KR">South Korea</option>
+                      <option value="CN">China</option>
+                      <option value="IN">India</option>
+                      <option value="MY">Malaysia</option>
+                      <option value="TH">Thailand</option>
+                      <option value="ID">Indonesia</option>
+                      <option value="PH">Philippines</option>
+                      <option value="VN">Vietnam</option>
+                      <option value="AE">United Arab Emirates</option>
+                      <option value="SA">Saudi Arabia</option>
+                      <option value="IL">Israel</option>
+                      <option value="TR">Turkey</option>
+                      <option value="ZA">South Africa</option>
+                      <option value="EG">Egypt</option>
+                      <option value="NG">Nigeria</option>
+                      <option value="KE">Kenya</option>
+                      <option value="MX">Mexico</option>
+                      <option value="BR">Brazil</option>
+                      <option value="AR">Argentina</option>
+                      <option value="CL">Chile</option>
+                      <option value="CO">Colombia</option>
+                      <option value="PE">Peru</option>
+                      <option value="VE">Venezuela</option>
+                      <option value="UY">Uruguay</option>
+                      <option value="PY">Paraguay</option>
+                      <option value="BO">Bolivia</option>
+                      <option value="EC">Ecuador</option>
+                      <option value="CR">Costa Rica</option>
+                      <option value="PA">Panama</option>
+                      <option value="GT">Guatemala</option>
+                      <option value="DO">Dominican Republic</option>
+                      <option value="PR">Puerto Rico</option>
+                      <option value="RU">Russia</option>
+                      <option value="UA">Ukraine</option>
+                      <option value="BY">Belarus</option>
+                      <option value="KZ">Kazakhstan</option>
+                      <option value="RS">Serbia</option>
+                      <option value="BA">Bosnia and Herzegovina</option>
+                      <option value="MK">North Macedonia</option>
+                      <option value="AL">Albania</option>
+                      <option value="ME">Montenegro</option>
+                      <option value="XK">Kosovo</option>
+                      <option value="MD">Moldova</option>
+                      <option value="GE">Georgia</option>
+                      <option value="AM">Armenia</option>
+                      <option value="AZ">Azerbaijan</option>
+                    </select>
+                  </div>
+                </div>
               </div>
 
-              {shippingMode === 'company' && (
+              {/* Allowed Countries */}
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="text-sm font-semibold text-gray-700 mb-4">Regional Restrictions</h3>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Default Shipping Address <span className="text-gray-400 font-normal ml-1">(Optional)</span>
+                    Allowed Countries <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
-                  <textarea
-                    value={defaultShippingAddress}
+                  <Input
+                    value={allowedCountries.join(', ')}
                     onChange={(e) => {
-                      setDefaultShippingAddress(e.target.value);
+                      const countries = e.target.value.split(',').map(c => c.trim()).filter(c => c);
+                      setAllowedCountries(countries);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
-                    rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
-                    placeholder="123 Company St, Suite 100&#10;San Francisco, CA 94105&#10;USA"
+                    disabled={false}
+                    placeholder="US, CA, GB, DE (leave empty for all countries)"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Company address for bulk shipments</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Comma-separated ISO country codes. Leave empty to allow all countries.
+                  </p>
                 </div>
-              )}
-
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-semibold text-gray-900">Enable Address Validation</p>
-                  <p className="text-sm text-gray-600">Validate addresses before submission</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox"
-                    checked={enableAddressValidation}
-                    onChange={(e) => {
-                      setEnableAddressValidation(e.target.checked);
-                      setHasChanges(true);
-                    }}
-                    disabled={configMode === 'live'}
-                    className="sr-only peer" 
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
-                </label>
-              </div>
-
-              {enableAddressValidation && (
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Validation Provider
-                  </label>
-                  <select
-                    value={addressValidationProvider}
-                    onChange={(e) => {
-                      setAddressValidationProvider(e.target.value as 'none' | 'usps' | 'google' | 'smartystreets' | 'loqate' | 'here');
-                      setHasChanges(true);
-                    }}
-                    disabled={configMode === 'live'}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    <option value="none">None</option>
-                    <option value="usps">USPS</option>
-                    <option value="google">Google Maps</option>
-                    <option value="smartystreets">SmartyStreets</option>
-                    <option value="loqate">Loqate</option>
-                  </select>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* ========== INTERNATIONAL SETTINGS (NEW) ========== */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="w-5 h-5 text-blue-600" />
-                International Settings
-              </CardTitle>
-              <CardDescription>
-                Configure allowed countries and regional restrictions
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Allowed Countries <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                </label>
-                <Input
-                  value={allowedCountries.join(', ')}
-                  onChange={(e) => {
-                    const countries = e.target.value.split(',').map(c => c.trim()).filter(c => c);
-                    setAllowedCountries(countries);
-                    setHasChanges(true);
-                  }}
-                  disabled={configMode === 'live'}
-                  placeholder="US, CA, GB, DE (leave empty for all countries)"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Comma-separated ISO country codes. Leave empty to allow all countries.
-                </p>
               </div>
             </CardContent>
           </Card>
@@ -1690,7 +2653,7 @@ export function SiteConfiguration() {
                       setRegionalOfficeName(e.target.value);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     placeholder="EMEA Office"
                   />
                   <p className="text-xs text-gray-500 mt-1">Name of regional office or branch</p>
@@ -1706,7 +2669,7 @@ export function SiteConfiguration() {
                       setRegionalContactName(e.target.value);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     placeholder="Jane Smith"
                   />
                 </div>
@@ -1722,7 +2685,7 @@ export function SiteConfiguration() {
                       setRegionalContactEmail(e.target.value);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     placeholder="jane.smith@company.com"
                   />
                 </div>
@@ -1738,7 +2701,7 @@ export function SiteConfiguration() {
                       setRegionalContactPhone(e.target.value);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     placeholder="+44 20 1234 5678"
                   />
                 </div>
@@ -1757,7 +2720,7 @@ export function SiteConfiguration() {
                         setRegionalAddressLine1(e.target.value);
                         setHasChanges(true);
                       }}
-                      disabled={configMode === 'live'}
+                      disabled={false}
                       placeholder="123 Business Street"
                     />
                   </div>
@@ -1772,7 +2735,7 @@ export function SiteConfiguration() {
                         setRegionalAddressLine2(e.target.value);
                         setHasChanges(true);
                       }}
-                      disabled={configMode === 'live'}
+                      disabled={false}
                       placeholder="Suite 400"
                     />
                   </div>
@@ -1787,7 +2750,7 @@ export function SiteConfiguration() {
                         setRegionalAddressLine3(e.target.value);
                         setHasChanges(true);
                       }}
-                      disabled={configMode === 'live'}
+                      disabled={false}
                       placeholder="Building B"
                     />
                   </div>
@@ -1803,7 +2766,7 @@ export function SiteConfiguration() {
                           setRegionalCity(e.target.value);
                           setHasChanges(true);
                         }}
-                        disabled={configMode === 'live'}
+                        disabled={false}
                         placeholder="London"
                       />
                     </div>
@@ -1818,7 +2781,7 @@ export function SiteConfiguration() {
                           setRegionalCountryState(e.target.value);
                           setHasChanges(true);
                         }}
-                        disabled={configMode === 'live'}
+                        disabled={false}
                         placeholder="United Kingdom"
                       />
                     </div>
@@ -1834,7 +2797,7 @@ export function SiteConfiguration() {
                         setRegionalTaxId(e.target.value);
                         setHasChanges(true);
                       }}
-                      disabled={configMode === 'live'}
+                      disabled={false}
                       placeholder="GB123456789"
                     />
                     <p className="text-xs text-gray-500 mt-1">Tax identification number for this region</p>
@@ -1844,91 +2807,6 @@ export function SiteConfiguration() {
             </CardContent>
           </Card>
 
-          {/* ========== ADVANCED AUTHENTICATION (NEW) ========== */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-[#D91C81]" />
-                Advanced Authentication
-              </CardTitle>
-              <CardDescription>
-                Additional authentication and access control settings
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-semibold text-gray-900">Disable Direct Access Authentication</p>
-                  <p className="text-sm text-gray-600">Require SSO/external authentication only</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox"
-                    checked={disableDirectAccessAuth}
-                    onChange={(e) => {
-                      setDisableDirectAccessAuth(e.target.checked);
-                      setHasChanges(true);
-                    }}
-                    disabled={configMode === 'live'}
-                    className="sr-only peer" 
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
-                </label>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    SSO Provider <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                  </label>
-                  <select
-                    value={ssoProvider}
-                    onChange={(e) => {
-                      setSsoProvider(e.target.value);
-                      setHasChanges(true);
-                    }}
-                    disabled={configMode === 'live'}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    <option value="">Select SSO Provider</option>
-                    <option value="google">Google</option>
-                    <option value="microsoft">Microsoft / Azure AD</option>
-                    <option value="okta">Okta</option>
-                    <option value="azure">Azure AD</option>
-                    <option value="saml">SAML 2.0</option>
-                    <option value="oauth2">OAuth 2.0</option>
-                    <option value="custom">Custom</option>
-                  </select>
-                  <p className="text-xs text-gray-500 mt-1">Primary SSO authentication provider</p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    SSO Client/Office Name <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                  </label>
-                  <Input
-                    value={ssoClientOfficeName}
-                    onChange={(e) => {
-                      setSsoClientOfficeName(e.target.value);
-                      setHasChanges(true);
-                    }}
-                    disabled={configMode === 'live'}
-                    placeholder="CompanyName - US Office"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Display name for SSO configuration</p>
-                </div>
-              </div>
-
-              {disableDirectAccessAuth && (
-                <Alert className="border-amber-200 bg-amber-50">
-                  <AlertCircle className="w-4 h-4 text-amber-600" />
-                  <AlertDescription className="text-amber-800 text-sm">
-                    <strong>Warning:</strong> Direct access authentication is disabled. Users will only be able to log in through the configured SSO provider. Make sure SSO is properly configured before enabling this option.
-                  </AlertDescription>
-                </Alert>
-              )}
-            </CardContent>
-          </Card>
         </TabsContent>
 
         {/* Header/Footer Configuration Tab */}
@@ -1968,7 +2846,7 @@ export function SiteConfiguration() {
                       setShowHeader(e.target.checked);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -1985,7 +2863,7 @@ export function SiteConfiguration() {
                     setHeaderLayout(e.target.value as any);
                     setHasChanges(true);
                   }}
-                  disabled={configMode === 'live'}
+                  disabled={false}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <option value="left">Left-aligned (Logo | Navigation)</option>
@@ -2010,7 +2888,7 @@ export function SiteConfiguration() {
                       setShowLanguageSelector(e.target.checked);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -2028,7 +2906,7 @@ export function SiteConfiguration() {
                     setCompanyName(e.target.value);
                     setHasChanges(true);
                   }}
-                  disabled={configMode === 'live'}
+                  disabled={false}
                   placeholder="Enter company name"
                 />
                 <p className="text-xs text-gray-500 mt-1">
@@ -2061,7 +2939,7 @@ export function SiteConfiguration() {
                       setShowFooter(e.target.checked);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -2079,7 +2957,7 @@ export function SiteConfiguration() {
                     setFooterText(e.target.value);
                     setHasChanges(true);
                   }}
-                  disabled={configMode === 'live'}
+                  disabled={false}
                   placeholder="© 2026 All rights reserved."
                 />
                 <p className="text-xs text-gray-500 mt-1">
@@ -2171,7 +3049,7 @@ export function SiteConfiguration() {
                         setPrimaryColor(e.target.value);
                         setHasChanges(true);
                       }}
-                      disabled={configMode === 'live'}
+                      disabled={false}
                       className="w-12 h-10 border border-gray-300 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                     <Input
@@ -2181,7 +3059,7 @@ export function SiteConfiguration() {
                         setPrimaryColor(e.target.value);
                         setHasChanges(true);
                       }}
-                      disabled={configMode === 'live'}
+                      disabled={false}
                       className="flex-1 font-mono text-sm"
                       placeholder="#D91C81"
                     />
@@ -2203,7 +3081,7 @@ export function SiteConfiguration() {
                         setSecondaryColor(e.target.value);
                         setHasChanges(true);
                       }}
-                      disabled={configMode === 'live'}
+                      disabled={false}
                       className="w-12 h-10 border border-gray-300 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                     <Input
@@ -2213,7 +3091,7 @@ export function SiteConfiguration() {
                         setSecondaryColor(e.target.value);
                         setHasChanges(true);
                       }}
-                      disabled={configMode === 'live'}
+                      disabled={false}
                       className="flex-1 font-mono text-sm"
                       placeholder="#1B2A5E"
                     />
@@ -2235,7 +3113,7 @@ export function SiteConfiguration() {
                         setTertiaryColor(e.target.value);
                         setHasChanges(true);
                       }}
-                      disabled={configMode === 'live'}
+                      disabled={false}
                       className="w-12 h-10 border border-gray-300 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                     <Input
@@ -2245,7 +3123,7 @@ export function SiteConfiguration() {
                         setTertiaryColor(e.target.value);
                         setHasChanges(true);
                       }}
-                      disabled={configMode === 'live'}
+                      disabled={false}
                       className="flex-1 font-mono text-sm"
                       placeholder="#00B4CC"
                     />
@@ -2303,7 +3181,7 @@ export function SiteConfiguration() {
                 <input
                   type="file"
                   accept="image/*"
-                  disabled={configMode === 'live'}
+                  disabled={false}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
                 />
                 <p className="text-xs text-gray-500 mt-1">
@@ -2318,7 +3196,7 @@ export function SiteConfiguration() {
                 <input
                   type="file"
                   accept="image/x-icon,image/png"
-                  disabled={configMode === 'live'}
+                  disabled={false}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
                 />
                 <p className="text-xs text-gray-500 mt-1">
@@ -2406,7 +3284,7 @@ export function SiteConfiguration() {
                       setAllowQuantitySelection(e.target.checked);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -2426,7 +3304,7 @@ export function SiteConfiguration() {
                       setShowPricing(e.target.checked);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -2437,19 +3315,67 @@ export function SiteConfiguration() {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Gifts Per User
                 </label>
-                <Input
-                  type="number"
-                  value={giftsPerUser}
-                  onChange={(e) => {
-                    setGiftsPerUser(parseInt(e.target.value));
-                    setHasChanges(true);
-                  }}
-                  disabled={configMode === 'live'}
-                  min="1"
-                  placeholder="1"
-                />
+                <div className="flex items-center gap-3">
+                  {/* Minus Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (giftsPerUser > 1) {
+                        setGiftsPerUser(giftsPerUser - 1);
+                        setHasChanges(true);
+                      }
+                    }}
+                    disabled={configMode === 'live' || giftsPerUser <= 1}
+                    className="w-10 h-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white hover:bg-gray-50 hover:border-[#D91C81] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 transition-colors"
+                    aria-label="Decrease gifts per user"
+                  >
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                    </svg>
+                  </button>
+                  
+                  {/* Editable Input */}
+                  <div className="relative flex-1 max-w-[120px]">
+                    <Input
+                      type="number"
+                      value={giftsPerUser}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        // Ensure value is at least 1 (database constraint)
+                        if (!isNaN(value) && value >= 1) {
+                          setGiftsPerUser(value);
+                          setHasChanges(true);
+                        } else if (e.target.value === '') {
+                          // Allow empty input temporarily, will default to 1 on save
+                          setGiftsPerUser(1);
+                          setHasChanges(true);
+                        }
+                      }}
+                      disabled={false}
+                      min="1"
+                      className="text-center text-lg font-semibold"
+                      placeholder="1"
+                    />
+                  </div>
+                  
+                  {/* Plus Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setGiftsPerUser(giftsPerUser + 1);
+                      setHasChanges(true);
+                    }}
+                    disabled={false}
+                    className="w-10 h-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white hover:bg-gray-50 hover:border-[#D91C81] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 transition-colors"
+                    aria-label="Increase gifts per user"
+                  >
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </button>
+                </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  Maximum number of gifts each user can select
+                  Maximum number of gifts each user can select (minimum 1)
                 </p>
               </div>
             </CardContent>
@@ -2480,12 +3406,12 @@ export function SiteConfiguration() {
                   Default Gift
                 </label>
                 <select
-                  value={defaultGiftId}
+                  value={defaultGiftId || ''}
                   onChange={(e) => {
-                    setDefaultGiftId(e.target.value);
+                    setDefaultGiftId(e.target.value || null);
                     setHasChanges(true);
                   }}
-                  disabled={configMode === 'live'}
+                  disabled={false}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <option value="">No default gift (employees must make a selection)</option>
@@ -2514,7 +3440,7 @@ export function SiteConfiguration() {
                       setDefaultGiftDaysAfterClose(parseInt(e.target.value) || 0);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     placeholder="0"
                   />
                   <p className="text-xs text-gray-500 mt-1">
@@ -2581,7 +3507,7 @@ export function SiteConfiguration() {
                       setEnableSearch(e.target.checked);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -2601,7 +3527,7 @@ export function SiteConfiguration() {
                       setEnableFilters(e.target.checked);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -2630,7 +3556,7 @@ export function SiteConfiguration() {
                     setGridColumns(parseInt(e.target.value));
                     setHasChanges(true);
                   }}
-                  disabled={configMode === 'live'}
+                  disabled={false}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <option value={2}>2 Columns (Large cards)</option>
@@ -2656,7 +3582,7 @@ export function SiteConfiguration() {
                       setShowDescription(e.target.checked);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -2699,7 +3625,7 @@ export function SiteConfiguration() {
                           }
                           setHasChanges(true);
                         }}
-                        disabled={configMode === 'live'}
+                        disabled={false}
                         className="sr-only peer" 
                       />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -2797,7 +3723,7 @@ export function SiteConfiguration() {
                       setEnableLandingPage(e.target.checked);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -2840,7 +3766,7 @@ export function SiteConfiguration() {
                       setEnableWelcomePage(e.target.checked);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -2859,7 +3785,7 @@ export function SiteConfiguration() {
                         setWelcomeMessage(e.target.value);
                         setHasChanges(true);
                       }}
-                      disabled={configMode === 'live'}
+                      disabled={false}
                       placeholder="Welcome to our gift selection program!"
                     />
                     <p className="text-xs text-gray-500 mt-1">Short welcome message</p>
@@ -2876,7 +3802,7 @@ export function SiteConfiguration() {
                           setWelcomePageTitle(e.target.value);
                           setHasChanges(true);
                         }}
-                        disabled={configMode === 'live'}
+                        disabled={false}
                         placeholder="Welcome!"
                       />
                     </div>
@@ -2891,7 +3817,7 @@ export function SiteConfiguration() {
                           setWelcomePageImageUrl(e.target.value);
                           setHasChanges(true);
                         }}
-                        disabled={configMode === 'live'}
+                        disabled={false}
                         placeholder="https://..."
                       />
                     </div>
@@ -2907,7 +3833,7 @@ export function SiteConfiguration() {
                         setWelcomePageMessage(e.target.value);
                         setHasChanges(true);
                       }}
-                      disabled={configMode === 'live'}
+                      disabled={false}
                       rows={3}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
                       placeholder="Thank you for your dedication and hard work..."
@@ -2925,7 +3851,7 @@ export function SiteConfiguration() {
                           setWelcomePageAuthorName(e.target.value);
                           setHasChanges(true);
                         }}
-                        disabled={configMode === 'live'}
+                        disabled={false}
                         placeholder="CEO John Smith"
                       />
                     </div>
@@ -2940,7 +3866,7 @@ export function SiteConfiguration() {
                           setWelcomePageAuthorTitle(e.target.value);
                           setHasChanges(true);
                         }}
-                        disabled={configMode === 'live'}
+                        disabled={false}
                         placeholder="Chief Executive Officer"
                       />
                     </div>
@@ -3032,6 +3958,7 @@ export function SiteConfiguration() {
                   onClick={() => {
                     // Set to simple auth method if currently SSO
                     if (validationMethod === 'sso') {
+                      setIsUserInitiatedChange(true);
                       setValidationMethod('email');
                       setHasChanges(true);
                     }
@@ -3060,6 +3987,7 @@ export function SiteConfiguration() {
 
                 <button
                   onClick={() => {
+                    setIsUserInitiatedChange(true);
                     setValidationMethod('sso');
                     setHasChanges(true);
                   }}
@@ -3110,7 +4038,7 @@ export function SiteConfiguration() {
                         setValidationMethod(e.target.value as any);
                         setHasChanges(true);
                       }}
-                      disabled={configMode === 'live'}
+                      disabled={false}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       <option value="email">Email Address Validation</option>
@@ -3123,44 +4051,6 @@ export function SiteConfiguration() {
                       {validationMethod === 'magic_link' && 'Users request a magic link sent to their email'}
                     </p>
                   </div>
-
-                  {/* Email-specific settings */}
-                  {(validationMethod === 'email' || validationMethod === 'magic_link') && (
-                    <div className="space-y-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <h4 className="font-semibold text-gray-900">Email Configuration</h4>
-                      
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Allowed Email Domains
-                        </label>
-                        <Input
-                          type="text"
-                          placeholder="example.com, company.com"
-                          onChange={() => setHasChanges(true)}
-                          disabled={configMode === 'live'}
-                        />
-                        <p className="text-xs text-gray-500 mt-1">
-                          Comma-separated list of allowed email domains. Leave empty to allow all domains.
-                        </p>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Email Whitelist (Optional)
-                        </label>
-                        <textarea
-                          rows={4}
-                          placeholder="user1@example.com&#10;user2@example.com&#10;user3@example.com"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 font-mono text-sm"
-                          onChange={() => setHasChanges(true)}
-                          disabled={configMode === 'live'}
-                        />
-                        <p className="text-xs text-gray-500 mt-1">
-                          One email per line. If specified, only these emails will be allowed access.
-                        </p>
-                      </div>
-                    </div>
-                  )}
 
                   {/* Serial Card settings */}
                   {validationMethod === 'serialCard' && (
@@ -3193,7 +4083,10 @@ export function SiteConfiguration() {
                 </CardHeader>
                 <CardContent>
                   <Suspense fallback={<LoadingSpinner />}>
-                    <AccessManagement />
+                    <AccessManagement 
+                      mode="simple"
+                      validationMethod={validationMethod}
+                    />
                   </Suspense>
                 </CardContent>
               </Card>
@@ -3203,365 +4096,53 @@ export function SiteConfiguration() {
           {/* Advanced Auth Configuration (SSO) */}
           {validationMethod === 'sso' && (
             <>
-              <Card className="border-2 border-[#D91C81]">
-                <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
-                  <CardTitle className="flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-[#D91C81]" />
-                    SSO Configuration
-                  </CardTitle>
-                  <CardDescription>Configure Single Sign-On authentication settings</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6 pt-6">
-                  {/* Provider Selection */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      SSO Provider *
-                    </label>
-                    <select
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                      onChange={() => setHasChanges(true)}
-                      disabled={configMode === 'live'}
-                    >
-                      <option value="">Select a provider...</option>
-                      <option value="azure">Microsoft Azure AD / Entra ID</option>
-                      <option value="okta">Okta</option>
-                      <option value="google">Google Workspace</option>
-                      <option value="saml">Generic SAML 2.0</option>
-                      <option value="oauth2">Generic OAuth 2.0</option>
-                      <option value="openid">OpenID Connect</option>
-                      <option value="custom">Custom Provider</option>
-                    </select>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Select your organization's identity provider
-                    </p>
-                  </div>
+              <SSOConfigCard
+                ssoProvider={ssoProvider}
+                ssoConfigured={ssoConfigured}
+                ssoEditMode={ssoEditMode}
+                ssoClientId={ssoClientId}
+                ssoClientSecret={ssoClientSecret}
+                ssoAuthUrl={ssoAuthUrl}
+                ssoTokenUrl={ssoTokenUrl}
+                ssoUserInfoUrl={ssoUserInfoUrl}
+                ssoScope={ssoScope}
+                ssoIdpEntryPoint={ssoIdpEntryPoint}
+                ssoEntityId={ssoEntityId}
+                ssoCertificate={ssoCertificate}
+                ssoAutoProvision={ssoAutoProvision}
+                allowAdminBypass={allowAdminBypass}
+                bypassRequires2FA={bypassRequires2FA}
+                bypassAllowedIPs={bypassAllowedIPs}
+                validationErrors={validationErrors}
+                configMode={configMode}
+                currentSiteDomain={currentSite.domain}
+                siteUrl={siteUrl}
+                setSsoProvider={setSsoProvider}
+                setSsoClientId={setSsoClientId}
+                setSsoClientSecret={setSsoClientSecret}
+                setSsoAuthUrl={setSsoAuthUrl}
+                setSsoTokenUrl={setSsoTokenUrl}
+                setSsoUserInfoUrl={setSsoUserInfoUrl}
+                setSsoScope={setSsoScope}
+                setSsoIdpEntryPoint={setSsoIdpEntryPoint}
+                setSsoEntityId={setSsoEntityId}
+                setSsoCertificate={setSsoCertificate}
+                setSsoAutoProvision={setSsoAutoProvision}
+                setAllowAdminBypass={setAllowAdminBypass}
+                setBypassRequires2FA={setBypassRequires2FA}
+                setBypassAllowedIPs={setBypassAllowedIPs}
+                setHasChanges={setHasChanges}
+                handleProviderChange={handleProviderChange}
+                handleSaveConfiguration={handleSaveConfiguration}
+                handleEditConfiguration={handleEditConfiguration}
+                handleCancelEdit={handleCancelEdit}
+                handleDisableSSO={handleDisableSSO}
+                getUIState={getUIState}
+                getProviderCategory={getProviderCategory}
+                getProviderDisplayName={getProviderDisplayName}
+                getPublicSiteUrlBySlug={getPublicSiteUrlBySlug}
+              />
 
-                  {/* OAuth/OpenID Configuration */}
-                  <div className="space-y-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 15V17M12 7V13M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      OAuth 2.0 / OpenID Connect Settings
-                    </h4>
-                    
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Client ID *
-                      </label>
-                      <Input
-                        type="text"
-                        placeholder="e.g., abc123xyz789"
-                        onChange={() => setHasChanges(true)}
-                        disabled={configMode === 'live'}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Client Secret *
-                      </label>
-                      <Input
-                        type="password"
-                        placeholder="Enter client secret"
-                        onChange={() => setHasChanges(true)}
-                        disabled={configMode === 'live'}
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Keep this secret secure. Never share it publicly.
-                      </p>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Authorization URL *
-                      </label>
-                      <Input
-                        type="url"
-                        placeholder="https://login.provider.com/oauth/authorize"
-                        onChange={() => setHasChanges(true)}
-                        disabled={configMode === 'live'}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Token URL *
-                      </label>
-                      <Input
-                        type="url"
-                        placeholder="https://login.provider.com/oauth/token"
-                        onChange={() => setHasChanges(true)}
-                        disabled={configMode === 'live'}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        User Info URL
-                      </label>
-                      <Input
-                        type="url"
-                        placeholder="https://login.provider.com/oauth/userinfo"
-                        onChange={() => setHasChanges(true)}
-                        disabled={configMode === 'live'}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Scope
-                      </label>
-                      <Input
-                        type="text"
-                        defaultValue="openid profile email"
-                        placeholder="openid profile email"
-                        onChange={() => setHasChanges(true)}
-                        disabled={configMode === 'live'}
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Space-separated list of OAuth scopes
-                      </p>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Redirect URI (Callback URL) *
-                      </label>
-                      <div className="flex gap-2">
-                        <Input
-                          type="url"
-                          value={`https://wecelebrate.netlify.app/site/${currentSite.domain}/auth/callback`}
-                          readOnly
-                          className="bg-gray-50"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            navigator.clipboard.writeText(`https://wecelebrate.netlify.app/site/${currentSite.domain}/auth/callback`);
-                            toast.success('Copied to clipboard');
-                          }}
-                          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all text-sm font-medium"
-                        >
-                          Copy
-                        </button>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Add this URL to your provider's allowed redirect URIs
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* SAML Configuration */}
-                  <div className="space-y-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                    <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      SAML 2.0 Settings
-                    </h4>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        IdP Entry Point (SSO URL) *
-                      </label>
-                      <Input
-                        type="url"
-                        placeholder="https://sso.provider.com/saml/sso"
-                        onChange={() => setHasChanges(true)}
-                        disabled={configMode === 'live'}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Issuer / Entity ID *
-                      </label>
-                      <Input
-                        type="text"
-                        placeholder="urn:your-app:entity-id"
-                        onChange={() => setHasChanges(true)}
-                        disabled={configMode === 'live'}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        X.509 Certificate *
-                      </label>
-                      <textarea
-                        rows={4}
-                        placeholder="Paste your X.509 certificate here..."
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none font-mono text-xs disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
-                        onChange={() => setHasChanges(true)}
-                        disabled={configMode === 'live'}
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Public certificate from your identity provider
-                      </p>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Assertion Consumer Service URL *
-                      </label>
-                      <div className="flex gap-2">
-                        <Input
-                          type="url"
-                          value={`https://wecelebrate.netlify.app/site/${currentSite.domain}/auth/saml/callback`}
-                          readOnly
-                          className="bg-gray-50"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            navigator.clipboard.writeText(`https://wecelebrate.netlify.app/site/${currentSite.domain}/auth/saml/callback`);
-                            toast.success('Copied to clipboard');
-                          }}
-                          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all text-sm font-medium"
-                        >
-                          Copy
-                        </button>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Configure this URL in your IdP as the ACS URL
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Attribute Mapping */}
-                  <div className="space-y-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                    <h4 className="font-semibold text-gray-900">User Attribute Mapping</h4>
-                    <p className="text-sm text-gray-600">
-                      Map attributes from your SSO provider to user fields
-                    </p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Email Attribute
-                        </label>
-                        <Input
-                          type="text"
-                          defaultValue="email"
-                          placeholder="email"
-                          onChange={() => setHasChanges(true)}
-                          disabled={configMode === 'live'}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          First Name Attribute
-                        </label>
-                        <Input
-                          type="text"
-                          defaultValue="firstName"
-                          placeholder="firstName"
-                          onChange={() => setHasChanges(true)}
-                          disabled={configMode === 'live'}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Last Name Attribute
-                        </label>
-                        <Input
-                          type="text"
-                          defaultValue="lastName"
-                          placeholder="lastName"
-                          onChange={() => setHasChanges(true)}
-                          disabled={configMode === 'live'}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Employee ID Attribute
-                        </label>
-                        <Input
-                          type="text"
-                          defaultValue="employeeId"
-                          placeholder="employeeId"
-                          onChange={() => setHasChanges(true)}
-                          disabled={configMode === 'live'}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Additional Settings */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-semibold text-gray-900">Auto-Provision Users</p>
-                        <p className="text-sm text-gray-600">Automatically create accounts for new users</p>
-                      </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input 
-                          type="checkbox"
-                          defaultChecked
-                          onChange={() => setHasChanges(true)}
-                          disabled={configMode === 'live'}
-                          className="sr-only peer" 
-                        />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
-                      </label>
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-semibold text-gray-900">Require Multi-Factor Authentication</p>
-                        <p className="text-sm text-gray-600">Enforce MFA at the provider level</p>
-                      </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input 
-                          type="checkbox"
-                          onChange={() => setHasChanges(true)}
-                          disabled={configMode === 'live'}
-                          className="sr-only peer" 
-                        />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
-                      </label>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Session Timeout (minutes)
-                      </label>
-                      <Input
-                        type="number"
-                        defaultValue="60"
-                        min="5"
-                        max="480"
-                        onChange={() => setHasChanges(true)}
-                        disabled={configMode === 'live'}
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        How long users stay logged in (5-480 minutes)
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Test Connection */}
-                  <div className="pt-4 border-t border-gray-200">
-                    <button
-                      type="button"
-                      className="w-full py-3 px-4 bg-gradient-to-r from-[#D91C81] to-purple-600 text-white rounded-lg font-semibold hover:from-[#B71569] hover:to-purple-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                      disabled={configMode === 'live'}
-                    >
-                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      Test SSO Connection
-                    </button>
-                    <p className="text-xs text-center text-gray-500 mt-2">
-                      Verify your SSO configuration is working correctly
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
 
               {/* Employee Management for Advanced Auth */}
               <Card>
@@ -3576,7 +4157,10 @@ export function SiteConfiguration() {
                 </CardHeader>
                 <CardContent>
                   <Suspense fallback={<LoadingSpinner />}>
-                    <AccessManagement />
+                    <AccessManagement 
+                      mode="advanced"
+                      validationMethod="sso"
+                    />
                   </Suspense>
                 </CardContent>
               </Card>
@@ -3623,7 +4207,7 @@ export function SiteConfiguration() {
                       setSkipReviewPage(e.target.checked);
                       setHasChanges(true);
                     }}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -3659,7 +4243,7 @@ export function SiteConfiguration() {
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -3676,7 +4260,7 @@ export function SiteConfiguration() {
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -3693,7 +4277,7 @@ export function SiteConfiguration() {
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -3709,7 +4293,7 @@ export function SiteConfiguration() {
                   defaultValue="Review Your Order"
                   placeholder="Review Your Order"
                   onChange={() => setHasChanges(true)}
-                  disabled={configMode === 'live'}
+                  disabled={false}
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Heading displayed at the top of the review page
@@ -3726,7 +4310,7 @@ export function SiteConfiguration() {
                   placeholder="Please review your selections before submitting your order."
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
                   onChange={() => setHasChanges(true)}
-                  disabled={configMode === 'live'}
+                  disabled={false}
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Instructions or description shown to users
@@ -3742,7 +4326,7 @@ export function SiteConfiguration() {
                   defaultValue="Submit Order"
                   placeholder="Submit Order"
                   onChange={() => setHasChanges(true)}
-                  disabled={configMode === 'live'}
+                  disabled={false}
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Text displayed on the submit button
@@ -3770,7 +4354,7 @@ export function SiteConfiguration() {
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -3787,7 +4371,7 @@ export function SiteConfiguration() {
                   placeholder="Enter your terms and conditions..."
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 font-mono text-sm"
                   onChange={() => setHasChanges(true)}
-                  disabled={configMode === 'live'}
+                  disabled={false}
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Legal text that users must agree to
@@ -3802,7 +4386,7 @@ export function SiteConfiguration() {
                   type="url"
                   placeholder="https://example.com/terms"
                   onChange={() => setHasChanges(true)}
-                  disabled={configMode === 'live'}
+                  disabled={false}
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Link to full terms and conditions document
@@ -3844,7 +4428,7 @@ export function SiteConfiguration() {
                   defaultValue="Order Confirmed!"
                   placeholder="Order Confirmed!"
                   onChange={() => setHasChanges(true)}
-                  disabled={configMode === 'live'}
+                  disabled={false}
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Main heading on the confirmation page
@@ -3861,7 +4445,7 @@ export function SiteConfiguration() {
                   placeholder="Enter confirmation message..."
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
                   onChange={() => setHasChanges(true)}
-                  disabled={configMode === 'live'}
+                  disabled={false}
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Message displayed to users after successful order submission
@@ -3878,7 +4462,7 @@ export function SiteConfiguration() {
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -3895,7 +4479,7 @@ export function SiteConfiguration() {
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -3912,7 +4496,7 @@ export function SiteConfiguration() {
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -3928,7 +4512,7 @@ export function SiteConfiguration() {
                   defaultValue="Your order will arrive within 5-7 business days"
                   placeholder="Your order will arrive within 5-7 business days"
                   onChange={() => setHasChanges(true)}
-                  disabled={configMode === 'live'}
+                  disabled={false}
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Delivery timeframe message
@@ -3956,7 +4540,7 @@ export function SiteConfiguration() {
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -3972,7 +4556,7 @@ export function SiteConfiguration() {
                   defaultValue="Your Order Confirmation"
                   placeholder="Your Order Confirmation"
                   onChange={() => setHasChanges(true)}
-                  disabled={configMode === 'live'}
+                  disabled={false}
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Subject line for confirmation emails
@@ -3987,7 +4571,7 @@ export function SiteConfiguration() {
                   type="email"
                   placeholder="support@example.com"
                   onChange={() => setHasChanges(true)}
-                  disabled={configMode === 'live'}
+                  disabled={false}
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Email address for customer replies
@@ -4015,7 +4599,7 @@ export function SiteConfiguration() {
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -4032,7 +4616,7 @@ export function SiteConfiguration() {
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
-                    disabled={configMode === 'live'}
+                    disabled={false}
                     className="sr-only peer" 
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
@@ -4047,7 +4631,7 @@ export function SiteConfiguration() {
                   type="text"
                   placeholder="e.g., Return to Dashboard"
                   onChange={() => setHasChanges(true)}
-                  disabled={configMode === 'live'}
+                  disabled={false}
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Add a custom button with your own text
@@ -4062,7 +4646,7 @@ export function SiteConfiguration() {
                   type="url"
                   placeholder="https://example.com/dashboard"
                   onChange={() => setHasChanges(true)}
-                  disabled={configMode === 'live'}
+                  disabled={false}
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   URL for the custom action button
@@ -4073,6 +4657,37 @@ export function SiteConfiguration() {
         </TabsContent>
 
       </Tabs>
+
+      {/* Publish Confirmation Modal */}
+      <PublishConfirmationModal
+        isOpen={showPublishModal}
+        onClose={() => setShowPublishModal(false)}
+        onConfirm={handleConfirmPublish}
+        changes={originalSiteData ? detectSiteChanges(originalSiteData, buildCurrentStateForComparison()) : []}
+        isPublishing={isPublishing}
+        siteName={siteName}
+      />
+
+      {/* Discard Confirmation Modal */}
+      <DiscardConfirmationModal
+        isOpen={showDiscardModal}
+        onClose={() => setShowDiscardModal(false)}
+        onConfirm={handleConfirmDiscard}
+        isDiscarding={isDiscarding}
+        siteName={siteName}
+      />
+
+      {/* Unsaved Changes Modal */}
+      <UnsavedChangesModal
+        isOpen={showUnsavedChangesModal}
+        onClose={() => {
+          setShowUnsavedChangesModal(false);
+          setPendingModeSwitch(null);
+        }}
+        onSave={handleSaveUnsavedChanges}
+        onDiscard={handleDiscardUnsavedChanges}
+        isSaving={isAutoSaving}
+      />
     </div>
   );
 }

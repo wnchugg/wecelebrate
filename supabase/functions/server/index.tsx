@@ -417,7 +417,7 @@ app.use(
       return origin || allowedOrigins[0] || '*';
     },
     allowHeaders: ["Content-Type", "Authorization", "X-Access-Token", "X-CSRF-Token", "X-Environment-ID", "X-Session-Token"],
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     exposeHeaders: ["Content-Length", "X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset"],
     maxAge: 600,
     credentials: false,
@@ -9159,8 +9159,16 @@ app.post("/make-server-6fcaeea3/v2/sites", verifyAdmin, v2.createSiteV2);
 app.put("/make-server-6fcaeea3/v2/sites/:id", verifyAdmin, v2.updateSiteV2);
 app.delete("/make-server-6fcaeea3/v2/sites/:id", verifyAdmin, v2.deleteSiteV2);
 
+// DRAFT/LIVE WORKFLOW
+app.get("/make-server-6fcaeea3/v2/sites/:id/with-draft", verifyAdmin, v2.getSiteWithDraftV2);
+app.get("/make-server-6fcaeea3/v2/sites/:id/live", verifyAdmin, v2.getSiteLiveV2);
+app.patch("/make-server-6fcaeea3/v2/sites/:id/draft", verifyAdmin, v2.saveSiteDraftV2);
+app.post("/make-server-6fcaeea3/v2/sites/:id/publish", verifyAdmin, v2.publishSiteV2);
+app.delete("/make-server-6fcaeea3/v2/sites/:id/draft", verifyAdmin, v2.discardSiteDraftV2);
+
 // PUBLIC SITES (no auth required)
 app.get("/make-server-6fcaeea3/v2/public/sites", v2.getPublicSitesV2);
+app.get("/make-server-6fcaeea3/v2/public/sites/slug/:slug", v2.getSiteBySlugV2);
 
 // PRODUCTS
 app.get("/make-server-6fcaeea3/v2/products", verifyAdmin, v2.getProductsV2);
@@ -9175,6 +9183,13 @@ app.get("/make-server-6fcaeea3/v2/employees/:id", verifyAdmin, v2.getEmployeeByI
 app.post("/make-server-6fcaeea3/v2/employees", verifyAdmin, v2.createEmployeeV2);
 app.put("/make-server-6fcaeea3/v2/employees/:id", verifyAdmin, v2.updateEmployeeV2);
 app.delete("/make-server-6fcaeea3/v2/employees/:id", verifyAdmin, v2.deleteEmployeeV2);
+
+// SITE USERS (ADVANCED AUTH)
+app.get("/make-server-6fcaeea3/v2/site-users", verifyAdmin, v2.getSiteUsersV2);
+app.get("/make-server-6fcaeea3/v2/site-users/:id", verifyAdmin, v2.getSiteUserByIdV2);
+app.post("/make-server-6fcaeea3/v2/site-users", verifyAdmin, v2.createSiteUserV2);
+app.put("/make-server-6fcaeea3/v2/site-users/:id", verifyAdmin, v2.updateSiteUserV2);
+app.delete("/make-server-6fcaeea3/v2/site-users/:id", verifyAdmin, v2.deleteSiteUserV2);
 
 // ORDERS
 app.get("/make-server-6fcaeea3/v2/orders", verifyAdmin, v2.getOrdersV2);

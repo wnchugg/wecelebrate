@@ -743,6 +743,12 @@ export const publicSiteApi = {
     });
   },
   
+  async getSiteBySlug(slug: string) {
+    return apiRequest<{ success: boolean; data: PublicSite }>(`/v2/public/sites/slug/${slug}`, {
+      method: 'GET',
+    }).then(response => ({ site: response.data }));
+  },
+  
   async getSiteGifts(siteId: string) {
     return apiRequest<{ gifts: PublicGift[] }>(`/public/sites/${siteId}/gifts`, {
       method: 'GET',

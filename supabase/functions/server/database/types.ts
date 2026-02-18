@@ -320,6 +320,60 @@ export interface EmployeeFilters {
   offset?: number;
 }
 
+// ==================== Site Users (Advanced Auth) ====================
+
+export interface SiteUser {
+  id: string;
+  site_id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  employee_id?: string;
+  password_hash?: string;
+  force_password_reset: boolean;
+  last_login?: string;
+  role: 'admin' | 'manager' | 'employee' | 'viewer';
+  status: 'active' | 'inactive' | 'suspended' | 'pending';
+  metadata?: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateSiteUserInput {
+  site_id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  employee_id?: string;
+  password_hash?: string;
+  force_password_reset?: boolean;
+  role?: 'admin' | 'manager' | 'employee' | 'viewer';
+  status?: 'active' | 'inactive' | 'suspended' | 'pending';
+  metadata?: Record<string, any>;
+}
+
+export interface UpdateSiteUserInput {
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  employee_id?: string;
+  password_hash?: string;
+  force_password_reset?: boolean;
+  last_login?: string;
+  role?: 'admin' | 'manager' | 'employee' | 'viewer';
+  status?: 'active' | 'inactive' | 'suspended' | 'pending';
+  metadata?: Record<string, any>;
+}
+
+export interface SiteUserFilters {
+  site_id?: string;
+  status?: 'active' | 'inactive' | 'suspended' | 'pending';
+  role?: 'admin' | 'manager' | 'employee' | 'viewer';
+  search?: string;
+  limit?: number;
+  offset?: number;
+}
+
 // ==================== Orders ====================
 
 export interface Order {

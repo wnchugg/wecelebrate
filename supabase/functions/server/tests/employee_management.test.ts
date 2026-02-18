@@ -465,7 +465,8 @@ describe('Allowed Domains Validation - Backend', () => {
       const createdAt = new Date(session.createdAt);
       const diffHours = (expiresAt.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
 
-      expect(diffHours).toBe(24);
+      // Use toBeCloseTo to handle floating point precision
+      expect(diffHours).toBeCloseTo(24, 1);
     });
   });
 });

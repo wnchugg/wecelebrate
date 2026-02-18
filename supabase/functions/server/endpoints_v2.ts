@@ -174,6 +174,91 @@ export async function deleteSiteV2(c: Context) {
   }
 }
 
+// ==================== DRAFT/LIVE WORKFLOW ====================
+
+/**
+ * Get site with draft merged (for admin view)
+ * GET /v2/sites/:id/with-draft
+ */
+export async function getSiteWithDraftV2(c: Context) {
+  try {
+    const id = c.req.param('id');
+    const result = await crudDb.getSiteWithDraft(id);
+    return c.json(result);
+  } catch (error: any) {
+    return c.json({ success: false, error: error.message }, 500);
+  }
+}
+
+/**
+ * Get live site data only (for public view and comparison)
+ * GET /v2/sites/:id/live
+ */
+export async function getSiteLiveV2(c: Context) {
+  try {
+    const id = c.req.param('id');
+    const result = await crudDb.getSiteLive(id);
+    return c.json(result);
+  } catch (error: any) {
+    return c.json({ success: false, error: error.message }, 500);
+  }
+}
+
+/**
+ * Save changes to draft (not live)
+ * PATCH /v2/sites/:id/draft
+ */
+export async function saveSiteDraftV2(c: Context) {
+  try {
+    const id = c.req.param('id');
+    const input = await c.req.json();
+    const result = await crudDb.saveSiteDraft(id, input);
+    return c.json(result);
+  } catch (error: any) {
+    return c.json({ success: false, error: error.message }, 500);
+  }
+}
+
+/**
+ * Publish draft changes to live
+ * POST /v2/sites/:id/publish
+ */
+export async function publishSiteV2(c: Context) {
+  try {
+    const id = c.req.param('id');
+    const result = await crudDb.publishSite(id);
+    return c.json(result);
+  } catch (error: any) {
+    return c.json({ success: false, error: error.message }, 500);
+  }
+}
+
+/**
+ * Discard draft changes
+ * DELETE /v2/sites/:id/draft
+ */
+export async function discardSiteDraftV2(c: Context) {
+  try {
+    const id = c.req.param('id');
+    const result = await crudDb.discardSiteDraft(id);
+    
+    // Check if the operation failed
+    if (!result.success) {
+      // Return appropriate status code based on error type
+      const statusCode = result.error === 'Site not found' ? 404 : 500;
+      return c.json(result, statusCode);
+    }
+    
+    return c.json(result);
+  } catch (error: any) {
+    return c.json({ 
+      success: false, 
+      error: 'Internal server error',
+      message: error.message || 'Failed to discard draft changes'
+    }, 500);
+  }
+}
+
 // ==================== PRODUCTS ====================
 
 export async function getProductsV2(c: Context) {
@@ -293,6 +378,67 @@ export async function deleteEmployeeV2(c: Context) {
   try {
     const id = c.req.param('id');
     const result = await crudDb.deleteEmployee(id);
+    return c.json(result);
+  } catch (error: any) {
+    return c.json({ success: false, error: error.message }, 500);
+  }
+}
+
+// ==================== SITE USERS (ADVANCED AUTH) ====================
+
+export async function getSiteUsersV2(c: Context) {
+  try {
+    const filters = {
+      site_id: c.req.query('site_id'),
+      status: c.req.query('status'),
+      role: c.req.query('role'),
+      search: c.req.query('search'),
+      limit: parseInt(c.req.query('limit') || '50'),
+      offset: parseInt(c.req.query('offset') || '0'),
+    };
+    
+    const result = await crudDb.getSiteUsers(filters);
+    return c.json(result);
+  } catch (error: any) {
+    return c.json({ success: false, error: error.message }, 500);
+  }
+}
+
+export async function getSiteUserByIdV2(c: Context) {
+  try {
+    const id = c.req.param('id');
+    const result = await crudDb.getSiteUserById(id);
+    return c.json(result);
+  } catch (error: any) {
+    return c.json({ success: false, error: error.message }, 500);
+  }
+}
+
+export async function createSiteUserV2(c: Context) {
+  try {
+    const input = await c.req.json();
+    const result = await crudDb.createSiteUser(input);
+    return c.json(result, 201);
+  } catch (error: any) {
+    return c.json({ success: false, error: error.message }, 500);
+  }
+}
+
+export async function updateSiteUserV2(c: Context) {
+  try {
+    const id = c.req.param('id');
+    const input = await c.req.json();
+    const result = await crudDb.updateSiteUser(id, input);
+    return c.json(result);
+  } catch (error: any) {
+    return c.json({ success: false, error: error.message }, 500);
+  }
+}
+
+export async function deleteSiteUserV2(c: Context) {
+  try {
+    const id = c.req.param('id');
+    const result = await crudDb.deleteSiteUser(id);
     return c.json(result);
   } catch (error: any) {
     return c.json({ success: false, error: error.message }, 500);

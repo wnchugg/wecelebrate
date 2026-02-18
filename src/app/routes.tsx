@@ -112,7 +112,7 @@ const GlobalTemplateLibrary = lazy(() => import('./pages/admin/GlobalTemplateLib
 const EmailServiceTest = lazy(() => import('./pages/admin/EmailServiceTest').then(m => ({ default: m.EmailServiceTest })));
 const ShippingConfiguration = lazy(() => import('./pages/admin/ShippingConfiguration').then(m => ({ default: m.ShippingConfiguration })));
 const AccessManagement = lazy(() => import('./pages/admin/AccessManagement').then(m => ({ default: m.AccessManagement })));
-const HomePageEditor = lazy(() => import('./pages/admin/HomePageEditor'));
+const HomePageEditor = lazy(() => import('./pages/admin/HomePageEditorNew'));
 const AuthSync = lazy(() => import('./pages/admin/AuthSync'));
 
 // New UX Enhancement Pages
@@ -149,8 +149,8 @@ const ConnectionTest = lazy(() => import('./pages/admin/ConnectionTest').then(m 
 const DataDiagnostic = lazy(() => import('./pages/admin/DataDiagnostic').then(m => ({ default: m.DataDiagnostic })));
 const ApplicationDocumentation = lazy(() => import('./pages/admin/ApplicationDocumentation').then(m => ({ default: m.ApplicationDocumentation })));
 const DevelopmentDocumentation = lazy(() => import('./pages/admin/DevelopmentDocumentation').then(m => ({ default: m.DevelopmentDocumentation })));
-const LandingPageEditor = lazy(() => import('./pages/admin/LandingPageEditor').then(m => ({ default: m.LandingPageEditor })));
-const WelcomePageEditor = lazy(() => import('./pages/admin/WelcomePageEditor').then(m => ({ default: m.WelcomePageEditor })));
+const LandingPageEditor = lazy(() => import('./pages/admin/LandingPageEditorNew').then(m => ({ default: m.LandingPageEditorNew })));
+const WelcomePageEditor = lazy(() => import('./pages/admin/WelcomePageEditorNew').then(m => ({ default: m.WelcomePageEditorNew })));
 const PerformanceDashboard = lazy(() => import('./pages/admin/PerformanceDashboard').then(m => ({ default: m.PerformanceDashboard })));
 
 // Loading fallback component

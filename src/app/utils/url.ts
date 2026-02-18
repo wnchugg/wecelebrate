@@ -109,10 +109,76 @@ export function getPublicSiteOrigin(): string {
 
 /**
  * Constructs a public site URL for a given site ID
+ * @deprecated Use getPublicSiteUrlBySlug instead for slug-based URLs
  */
 export function getPublicSiteUrl(siteId: string): string {
   const origin = getPublicSiteOrigin();
   return `${origin}/site/${siteId}`;
+}
+
+/**
+ * Constructs an environment-aware public site URL using the site slug
+ * 
+ * Examples:
+ * - Development: https://development--wecelebrate.netlify.app/site/techcorpus
+ * - Production: https://wecelebrate.netlify.app/site/techcorpus
+ * - Local: http://localhost:5173/site/techcorpus
+ */
+export function getPublicSiteUrlBySlug(slug: string, environmentId?: string): string {
+  // Determine the environment
+  const env = environmentId || (typeof window !== 'undefined' && localStorage.getItem('deployment_environment')) || 'production';
+  
+  // Get the base URL based on environment
+  let baseUrl: string;
+  
+  // Check if we're running locally
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    baseUrl = `http://localhost:${window.location.port || 5173}`;
+  } else {
+    // Netlify deployment URLs
+    switch (env) {
+      case 'development':
+        baseUrl = 'https://development--wecelebrate.netlify.app';
+        break;
+      case 'test':
+        baseUrl = 'https://test--wecelebrate.netlify.app';
+        break;
+      case 'uat':
+        baseUrl = 'https://uat--wecelebrate.netlify.app';
+        break;
+      case 'production':
+      default:
+        baseUrl = 'https://wecelebrate.netlify.app';
+        break;
+    }
+  }
+  
+  return `${baseUrl}/site/${slug}`;
+}
+
+/**
+ * Gets the environment-aware base URL for the current deployment
+ */
+export function getEnvironmentBaseUrl(environmentId?: string): string {
+  const env = environmentId || (typeof window !== 'undefined' && localStorage.getItem('deployment_environment')) || 'production';
+  
+  // Check if we're running locally
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return `http://localhost:${window.location.port || 5173}`;
+  }
+  
+  // Netlify deployment URLs
+  switch (env) {
+    case 'development':
+      return 'https://development--wecelebrate.netlify.app';
+    case 'test':
+      return 'https://test--wecelebrate.netlify.app';
+    case 'uat':
+      return 'https://uat--wecelebrate.netlify.app';
+    case 'production':
+    default:
+      return 'https://wecelebrate.netlify.app';
+  }
 }
 
 /**

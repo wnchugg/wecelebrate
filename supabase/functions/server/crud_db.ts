@@ -12,6 +12,7 @@ import type {
   Site, CreateSiteInput, UpdateSiteInput,
   Product, CreateProductInput, UpdateProductInput,
   Employee, CreateEmployeeInput, UpdateEmployeeInput,
+  SiteUser, CreateSiteUserInput, UpdateSiteUserInput,
   Order, CreateOrderInput, UpdateOrderInput,
 } from './database/types.ts';
 
@@ -158,8 +159,77 @@ export async function getSites(filters?: {
     console.log('[CRUD DB] Getting sites with filters:', filters);
     const sites = await db.getSites(filters);
     
-    // Transform snake_case to camelCase for frontend
-    const transformedSites = sites.map(site => objectToCamelCase(site));
+    // Import helper
+    const { mergeDraftSettings } = await import('./helpers.ts');
+    
+    // Transform snake_case to camelCase for frontend and reconstruct settings
+    const transformedSites = sites.map(site => {
+      // First merge draft over live
+      const mergedSite = mergeDraftSettings(site);
+      
+      const transformedSite = objectToCamelCase(mergedSite);
+      
+      // Reconstruct settings object from database fields
+      if (!transformedSite.settings) {
+        transformedSite.settings = {};
+      }
+      
+      // Phase 1: Critical settings fields
+      if ('skipLandingPage' in transformedSite) {
+        transformedSite.settings.skipLandingPage = transformedSite.skipLandingPage;
+        delete transformedSite.skipLandingPage;
+      }
+      if ('giftsPerUser' in transformedSite) {
+        transformedSite.settings.giftsPerUser = transformedSite.giftsPerUser;
+        delete transformedSite.giftsPerUser;
+      }
+      if ('defaultLanguage' in transformedSite) {
+        transformedSite.settings.defaultLanguage = transformedSite.defaultLanguage;
+        delete transformedSite.defaultLanguage;
+      }
+      if ('defaultCurrency' in transformedSite) {
+        transformedSite.settings.defaultCurrency = transformedSite.defaultCurrency;
+        delete transformedSite.defaultCurrency;
+      }
+      if ('defaultCountry' in transformedSite) {
+        transformedSite.settings.defaultCountry = transformedSite.defaultCountry;
+        delete transformedSite.defaultCountry;
+      }
+      if ('allowQuantitySelection' in transformedSite) {
+        transformedSite.settings.allowQuantitySelection = transformedSite.allowQuantitySelection;
+        delete transformedSite.allowQuantitySelection;
+      }
+      if ('showPricing' in transformedSite) {
+        transformedSite.settings.showPricing = transformedSite.showPricing;
+        delete transformedSite.showPricing;
+      }
+      if ('defaultGiftId' in transformedSite) {
+        transformedSite.settings.defaultGiftId = transformedSite.defaultGiftId;
+        delete transformedSite.defaultGiftId;
+      }
+      if ('skipReviewPage' in transformedSite) {
+        transformedSite.settings.skipReviewPage = transformedSite.skipReviewPage;
+        delete transformedSite.skipReviewPage;
+      }
+      if ('expiredMessage' in transformedSite) {
+        transformedSite.settings.expiredMessage = transformedSite.expiredMessage;
+        delete transformedSite.expiredMessage;
+      }
+      if ('defaultGiftDaysAfterClose' in transformedSite) {
+        transformedSite.settings.defaultGiftDaysAfterClose = transformedSite.defaultGiftDaysAfterClose;
+        delete transformedSite.defaultGiftDaysAfterClose;
+      }
+      
+      // Map selection dates to availability dates for frontend compatibility
+      if ('selectionStartDate' in transformedSite) {
+        transformedSite.settings.availabilityStartDate = transformedSite.selectionStartDate;
+      }
+      if ('selectionEndDate' in transformedSite) {
+        transformedSite.settings.availabilityEndDate = transformedSite.selectionEndDate;
+      }
+      
+      return transformedSite;
+    });
     
     return {
       success: true,
@@ -187,8 +257,73 @@ export async function getSiteById(id: string) {
       };
     }
     
+    // Import helper
+    const { mergeDraftSettings } = await import('./helpers.ts');
+    
+    // Merge draft over live
+    const mergedSite = mergeDraftSettings(site);
+    
     // Transform snake_case to camelCase for frontend
-    const transformedSite = objectToCamelCase(site);
+    const transformedSite = objectToCamelCase(mergedSite);
+    
+    // Reconstruct settings object from database fields
+    if (!transformedSite.settings) {
+      transformedSite.settings = {};
+    }
+    
+    // Phase 1: Critical settings fields
+    if ('skipLandingPage' in transformedSite) {
+      transformedSite.settings.skipLandingPage = transformedSite.skipLandingPage;
+      delete transformedSite.skipLandingPage;
+    }
+    if ('giftsPerUser' in transformedSite) {
+      transformedSite.settings.giftsPerUser = transformedSite.giftsPerUser;
+      delete transformedSite.giftsPerUser;
+    }
+    if ('defaultLanguage' in transformedSite) {
+      transformedSite.settings.defaultLanguage = transformedSite.defaultLanguage;
+      delete transformedSite.defaultLanguage;
+    }
+    if ('defaultCurrency' in transformedSite) {
+      transformedSite.settings.defaultCurrency = transformedSite.defaultCurrency;
+      delete transformedSite.defaultCurrency;
+    }
+    if ('defaultCountry' in transformedSite) {
+      transformedSite.settings.defaultCountry = transformedSite.defaultCountry;
+      delete transformedSite.defaultCountry;
+    }
+    if ('allowQuantitySelection' in transformedSite) {
+      transformedSite.settings.allowQuantitySelection = transformedSite.allowQuantitySelection;
+      delete transformedSite.allowQuantitySelection;
+    }
+    if ('showPricing' in transformedSite) {
+      transformedSite.settings.showPricing = transformedSite.showPricing;
+      delete transformedSite.showPricing;
+    }
+    if ('defaultGiftId' in transformedSite) {
+      transformedSite.settings.defaultGiftId = transformedSite.defaultGiftId;
+      delete transformedSite.defaultGiftId;
+    }
+    if ('skipReviewPage' in transformedSite) {
+      transformedSite.settings.skipReviewPage = transformedSite.skipReviewPage;
+      delete transformedSite.skipReviewPage;
+    }
+    if ('expiredMessage' in transformedSite) {
+      transformedSite.settings.expiredMessage = transformedSite.expiredMessage;
+      delete transformedSite.expiredMessage;
+    }
+    if ('defaultGiftDaysAfterClose' in transformedSite) {
+      transformedSite.settings.defaultGiftDaysAfterClose = transformedSite.defaultGiftDaysAfterClose;
+      delete transformedSite.defaultGiftDaysAfterClose;
+    }
+    
+    // Map selection dates to availability dates for frontend compatibility
+    if ('selectionStartDate' in transformedSite) {
+      transformedSite.settings.availabilityStartDate = transformedSite.selectionStartDate;
+    }
+    if ('selectionEndDate' in transformedSite) {
+      transformedSite.settings.availabilityEndDate = transformedSite.selectionEndDate;
+    }
     
     return {
       success: true,
@@ -215,8 +350,73 @@ export async function getSiteBySlug(slug: string) {
       };
     }
     
+    // Import helper to extract live data only (no draft)
+    const { extractLiveData } = await import('./helpers.ts');
+    
+    // Remove draft_settings for public view
+    const liveOnlySite = extractLiveData(site);
+    
     // Transform snake_case to camelCase for frontend
-    const transformedSite = objectToCamelCase(site);
+    const transformedSite = objectToCamelCase(liveOnlySite);
+    
+    // Reconstruct settings object from database fields
+    if (!transformedSite.settings) {
+      transformedSite.settings = {};
+    }
+    
+    // Phase 1: Critical settings fields
+    if ('skipLandingPage' in transformedSite) {
+      transformedSite.settings.skipLandingPage = transformedSite.skipLandingPage;
+      delete transformedSite.skipLandingPage;
+    }
+    if ('giftsPerUser' in transformedSite) {
+      transformedSite.settings.giftsPerUser = transformedSite.giftsPerUser;
+      delete transformedSite.giftsPerUser;
+    }
+    if ('defaultLanguage' in transformedSite) {
+      transformedSite.settings.defaultLanguage = transformedSite.defaultLanguage;
+      delete transformedSite.defaultLanguage;
+    }
+    if ('defaultCurrency' in transformedSite) {
+      transformedSite.settings.defaultCurrency = transformedSite.defaultCurrency;
+      delete transformedSite.defaultCurrency;
+    }
+    if ('defaultCountry' in transformedSite) {
+      transformedSite.settings.defaultCountry = transformedSite.defaultCountry;
+      delete transformedSite.defaultCountry;
+    }
+    if ('allowQuantitySelection' in transformedSite) {
+      transformedSite.settings.allowQuantitySelection = transformedSite.allowQuantitySelection;
+      delete transformedSite.allowQuantitySelection;
+    }
+    if ('showPricing' in transformedSite) {
+      transformedSite.settings.showPricing = transformedSite.showPricing;
+      delete transformedSite.showPricing;
+    }
+    if ('defaultGiftId' in transformedSite) {
+      transformedSite.settings.defaultGiftId = transformedSite.defaultGiftId;
+      delete transformedSite.defaultGiftId;
+    }
+    if ('skipReviewPage' in transformedSite) {
+      transformedSite.settings.skipReviewPage = transformedSite.skipReviewPage;
+      delete transformedSite.skipReviewPage;
+    }
+    if ('expiredMessage' in transformedSite) {
+      transformedSite.settings.expiredMessage = transformedSite.expiredMessage;
+      delete transformedSite.expiredMessage;
+    }
+    if ('defaultGiftDaysAfterClose' in transformedSite) {
+      transformedSite.settings.defaultGiftDaysAfterClose = transformedSite.defaultGiftDaysAfterClose;
+      delete transformedSite.defaultGiftDaysAfterClose;
+    }
+    
+    // Map selection dates to availability dates for frontend compatibility
+    if ('selectionStartDate' in transformedSite) {
+      transformedSite.settings.availabilityStartDate = transformedSite.selectionStartDate;
+    }
+    if ('selectionEndDate' in transformedSite) {
+      transformedSite.settings.availabilityEndDate = transformedSite.selectionEndDate;
+    }
     
     return {
       success: true,
@@ -245,6 +445,65 @@ export async function createSite(input: Omit<CreateSiteInput, 'id'>) {
     // Convert snake_case back to camelCase for frontend
     const transformedSite = objectToCamelCase(site);
     
+    // Reconstruct settings object from database fields
+    if (!transformedSite.settings) {
+      transformedSite.settings = {};
+    }
+    
+    // Phase 1: Critical settings fields
+    if ('skipLandingPage' in transformedSite) {
+      transformedSite.settings.skipLandingPage = transformedSite.skipLandingPage;
+      delete transformedSite.skipLandingPage;
+    }
+    if ('giftsPerUser' in transformedSite) {
+      transformedSite.settings.giftsPerUser = transformedSite.giftsPerUser;
+      delete transformedSite.giftsPerUser;
+    }
+    if ('defaultLanguage' in transformedSite) {
+      transformedSite.settings.defaultLanguage = transformedSite.defaultLanguage;
+      delete transformedSite.defaultLanguage;
+    }
+    if ('defaultCurrency' in transformedSite) {
+      transformedSite.settings.defaultCurrency = transformedSite.defaultCurrency;
+      delete transformedSite.defaultCurrency;
+    }
+    if ('defaultCountry' in transformedSite) {
+      transformedSite.settings.defaultCountry = transformedSite.defaultCountry;
+      delete transformedSite.defaultCountry;
+    }
+    if ('allowQuantitySelection' in transformedSite) {
+      transformedSite.settings.allowQuantitySelection = transformedSite.allowQuantitySelection;
+      delete transformedSite.allowQuantitySelection;
+    }
+    if ('showPricing' in transformedSite) {
+      transformedSite.settings.showPricing = transformedSite.showPricing;
+      delete transformedSite.showPricing;
+    }
+    if ('defaultGiftId' in transformedSite) {
+      transformedSite.settings.defaultGiftId = transformedSite.defaultGiftId;
+      delete transformedSite.defaultGiftId;
+    }
+    if ('skipReviewPage' in transformedSite) {
+      transformedSite.settings.skipReviewPage = transformedSite.skipReviewPage;
+      delete transformedSite.skipReviewPage;
+    }
+    if ('expiredMessage' in transformedSite) {
+      transformedSite.settings.expiredMessage = transformedSite.expiredMessage;
+      delete transformedSite.expiredMessage;
+    }
+    if ('defaultGiftDaysAfterClose' in transformedSite) {
+      transformedSite.settings.defaultGiftDaysAfterClose = transformedSite.defaultGiftDaysAfterClose;
+      delete transformedSite.defaultGiftDaysAfterClose;
+    }
+    
+    // Map selection dates to availability dates for frontend compatibility
+    if ('selectionStartDate' in transformedSite) {
+      transformedSite.settings.availabilityStartDate = transformedSite.selectionStartDate;
+    }
+    if ('selectionEndDate' in transformedSite) {
+      transformedSite.settings.availabilityEndDate = transformedSite.selectionEndDate;
+    }
+    
     return {
       success: true,
       data: transformedSite,
@@ -272,6 +531,65 @@ export async function updateSite(id: string, input: UpdateSiteInput) {
     
     // Convert snake_case back to camelCase for frontend
     const transformedSite = objectToCamelCase(site);
+    
+    // Reconstruct settings object from database fields
+    if (!transformedSite.settings) {
+      transformedSite.settings = {};
+    }
+    
+    // Phase 1: Critical settings fields
+    if ('skipLandingPage' in transformedSite) {
+      transformedSite.settings.skipLandingPage = transformedSite.skipLandingPage;
+      delete transformedSite.skipLandingPage;
+    }
+    if ('giftsPerUser' in transformedSite) {
+      transformedSite.settings.giftsPerUser = transformedSite.giftsPerUser;
+      delete transformedSite.giftsPerUser;
+    }
+    if ('defaultLanguage' in transformedSite) {
+      transformedSite.settings.defaultLanguage = transformedSite.defaultLanguage;
+      delete transformedSite.defaultLanguage;
+    }
+    if ('defaultCurrency' in transformedSite) {
+      transformedSite.settings.defaultCurrency = transformedSite.defaultCurrency;
+      delete transformedSite.defaultCurrency;
+    }
+    if ('defaultCountry' in transformedSite) {
+      transformedSite.settings.defaultCountry = transformedSite.defaultCountry;
+      delete transformedSite.defaultCountry;
+    }
+    if ('allowQuantitySelection' in transformedSite) {
+      transformedSite.settings.allowQuantitySelection = transformedSite.allowQuantitySelection;
+      delete transformedSite.allowQuantitySelection;
+    }
+    if ('showPricing' in transformedSite) {
+      transformedSite.settings.showPricing = transformedSite.showPricing;
+      delete transformedSite.showPricing;
+    }
+    if ('defaultGiftId' in transformedSite) {
+      transformedSite.settings.defaultGiftId = transformedSite.defaultGiftId;
+      delete transformedSite.defaultGiftId;
+    }
+    if ('skipReviewPage' in transformedSite) {
+      transformedSite.settings.skipReviewPage = transformedSite.skipReviewPage;
+      delete transformedSite.skipReviewPage;
+    }
+    if ('expiredMessage' in transformedSite) {
+      transformedSite.settings.expiredMessage = transformedSite.expiredMessage;
+      delete transformedSite.expiredMessage;
+    }
+    if ('defaultGiftDaysAfterClose' in transformedSite) {
+      transformedSite.settings.defaultGiftDaysAfterClose = transformedSite.defaultGiftDaysAfterClose;
+      delete transformedSite.defaultGiftDaysAfterClose;
+    }
+    
+    // Map selection dates to availability dates for frontend compatibility
+    if ('selectionStartDate' in transformedSite) {
+      transformedSite.settings.availabilityStartDate = transformedSite.selectionStartDate;
+    }
+    if ('selectionEndDate' in transformedSite) {
+      transformedSite.settings.availabilityEndDate = transformedSite.selectionEndDate;
+    }
     
     return {
       success: true,
@@ -559,6 +877,135 @@ export async function deleteEmployee(id: string) {
     };
   } catch (error: any) {
     console.error('[CRUD DB] Error deleting employee:', error);
+    throw error;
+  }
+}
+
+// ==================== SITE USERS (ADVANCED AUTH) ====================
+
+/**
+ * Get all site users
+ */
+export async function getSiteUsers(filters?: {
+  site_id?: string;
+  status?: string;
+  role?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  try {
+    console.log('[CRUD DB] Getting site users with filters:', filters);
+    const users = await db.getSiteUsers(filters);
+    
+    // Transform snake_case to camelCase for frontend
+    const transformedUsers = users.map(user => objectToCamelCase(user));
+    
+    return {
+      success: true,
+      data: transformedUsers,
+      total: transformedUsers.length,
+    };
+  } catch (error: any) {
+    console.error('[CRUD DB] Error getting site users:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get site user by ID
+ */
+export async function getSiteUserById(id: string) {
+  try {
+    console.log('[CRUD DB] Getting site user:', id);
+    const user = await db.getSiteUserById(id);
+    
+    if (!user) {
+      return {
+        success: false,
+        error: 'Site user not found',
+      };
+    }
+    
+    // Transform snake_case to camelCase for frontend
+    const transformedUser = objectToCamelCase(user);
+    
+    return {
+      success: true,
+      data: transformedUser,
+    };
+  } catch (error: any) {
+    console.error('[CRUD DB] Error getting site user:', error);
+    throw error;
+  }
+}
+
+/**
+ * Create site user
+ */
+export async function createSiteUser(input: Omit<CreateSiteUserInput, 'id'>) {
+  try {
+    console.log('[CRUD DB] Creating site user:', input.email);
+    
+    // Convert camelCase to snake_case for database
+    const snakeCaseInput = objectToSnakeCase(input);
+    
+    const user = await db.createSiteUser(snakeCaseInput as CreateSiteUserInput);
+    
+    // Convert snake_case back to camelCase for frontend
+    const transformedUser = objectToCamelCase(user);
+    
+    return {
+      success: true,
+      data: transformedUser,
+      message: 'Site user created successfully',
+    };
+  } catch (error: any) {
+    console.error('[CRUD DB] Error creating site user:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update site user
+ */
+export async function updateSiteUser(id: string, input: UpdateSiteUserInput) {
+  try {
+    console.log('[CRUD DB] Updating site user:', id);
+    
+    // Convert camelCase to snake_case for database
+    const snakeCaseInput = objectToSnakeCase(input);
+    
+    const user = await db.updateSiteUser(id, snakeCaseInput as UpdateSiteUserInput);
+    
+    // Convert snake_case back to camelCase for frontend
+    const transformedUser = objectToCamelCase(user);
+    
+    return {
+      success: true,
+      data: transformedUser,
+      message: 'Site user updated successfully',
+    };
+  } catch (error: any) {
+    console.error('[CRUD DB] Error updating site user:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete site user
+ */
+export async function deleteSiteUser(id: string) {
+  try {
+    console.log('[CRUD DB] Deleting site user:', id);
+    await db.deleteSiteUser(id);
+    
+    return {
+      success: true,
+      message: 'Site user deleted successfully',
+    };
+  } catch (error: any) {
+    console.error('[CRUD DB] Error deleting site user:', error);
     throw error;
   }
 }
@@ -1439,5 +1886,529 @@ export async function getClientEffectiveBranding(clientId: string) {
   } catch (error: any) {
     console.error('[CRUD DB] Error getting effective branding:', error);
     throw error;
+  }
+}
+
+
+// ==================== DRAFT/LIVE WORKFLOW ====================
+
+/**
+ * Get site with draft merged (for admin view)
+ * Merges draft_settings over live columns
+ */
+export async function getSiteWithDraft(id: string) {
+  try {
+    console.log('[CRUD DB] Getting site with draft:', id);
+    const site = await db.getSiteById(id);
+    
+    if (!site) {
+      return {
+        success: false,
+        error: 'Site not found',
+      };
+    }
+    
+    // Import helper
+    const { mergeDraftSettings } = await import('./helpers.ts');
+    
+    // Merge draft over live
+    const mergedSite = mergeDraftSettings(site);
+    
+    // Transform snake_case to camelCase for frontend
+    const transformedSite = objectToCamelCase(mergedSite);
+    
+    // Reconstruct settings object from database fields
+    if (!transformedSite.settings) {
+      transformedSite.settings = {};
+    }
+    
+    // Phase 1: Critical settings fields
+    if ('skipLandingPage' in transformedSite) {
+      transformedSite.settings.skipLandingPage = transformedSite.skipLandingPage;
+      delete transformedSite.skipLandingPage;
+    }
+    if ('giftsPerUser' in transformedSite) {
+      transformedSite.settings.giftsPerUser = transformedSite.giftsPerUser;
+      delete transformedSite.giftsPerUser;
+    }
+    if ('defaultLanguage' in transformedSite) {
+      transformedSite.settings.defaultLanguage = transformedSite.defaultLanguage;
+      delete transformedSite.defaultLanguage;
+    }
+    if ('defaultCurrency' in transformedSite) {
+      transformedSite.settings.defaultCurrency = transformedSite.defaultCurrency;
+      delete transformedSite.defaultCurrency;
+    }
+    if ('defaultCountry' in transformedSite) {
+      transformedSite.settings.defaultCountry = transformedSite.defaultCountry;
+      delete transformedSite.defaultCountry;
+    }
+    if ('allowQuantitySelection' in transformedSite) {
+      transformedSite.settings.allowQuantitySelection = transformedSite.allowQuantitySelection;
+      delete transformedSite.allowQuantitySelection;
+    }
+    if ('showPricing' in transformedSite) {
+      transformedSite.settings.showPricing = transformedSite.showPricing;
+      delete transformedSite.showPricing;
+    }
+    if ('defaultGiftId' in transformedSite) {
+      transformedSite.settings.defaultGiftId = transformedSite.defaultGiftId;
+      delete transformedSite.defaultGiftId;
+    }
+    if ('skipReviewPage' in transformedSite) {
+      transformedSite.settings.skipReviewPage = transformedSite.skipReviewPage;
+      delete transformedSite.skipReviewPage;
+    }
+    if ('expiredMessage' in transformedSite) {
+      transformedSite.settings.expiredMessage = transformedSite.expiredMessage;
+      delete transformedSite.expiredMessage;
+    }
+    if ('defaultGiftDaysAfterClose' in transformedSite) {
+      transformedSite.settings.defaultGiftDaysAfterClose = transformedSite.defaultGiftDaysAfterClose;
+      delete transformedSite.defaultGiftDaysAfterClose;
+    }
+    
+    // Map selection dates to availability dates for frontend compatibility
+    if ('selectionStartDate' in transformedSite) {
+      transformedSite.settings.availabilityStartDate = transformedSite.selectionStartDate;
+    }
+    if ('selectionEndDate' in transformedSite) {
+      transformedSite.settings.availabilityEndDate = transformedSite.selectionEndDate;
+    }
+    
+    return {
+      success: true,
+      data: transformedSite,
+    };
+  } catch (error: any) {
+    console.error('[CRUD DB] Error getting site with draft:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get live site data only (for public view and comparison)
+ * Returns only live columns, excludes draft_settings
+ */
+export async function getSiteLive(id: string) {
+  try {
+    console.log('[CRUD DB] Getting live site data:', id);
+    const site = await db.getSiteById(id);
+    
+    if (!site) {
+      return {
+        success: false,
+        error: 'Site not found',
+      };
+    }
+    
+    // Import helper
+    const { extractLiveData } = await import('./helpers.ts');
+    
+    // Extract only live data (remove draft_settings)
+    const liveSite = extractLiveData(site);
+    
+    // Transform snake_case to camelCase for frontend
+    const transformedSite = objectToCamelCase(liveSite);
+    
+    // Reconstruct settings object from database fields
+    if (!transformedSite.settings) {
+      transformedSite.settings = {};
+    }
+    
+    // Phase 1: Critical settings fields
+    if ('skipLandingPage' in transformedSite) {
+      transformedSite.settings.skipLandingPage = transformedSite.skipLandingPage;
+      delete transformedSite.skipLandingPage;
+    }
+    if ('giftsPerUser' in transformedSite) {
+      transformedSite.settings.giftsPerUser = transformedSite.giftsPerUser;
+      delete transformedSite.giftsPerUser;
+    }
+    if ('defaultLanguage' in transformedSite) {
+      transformedSite.settings.defaultLanguage = transformedSite.defaultLanguage;
+      delete transformedSite.defaultLanguage;
+    }
+    if ('defaultCurrency' in transformedSite) {
+      transformedSite.settings.defaultCurrency = transformedSite.defaultCurrency;
+      delete transformedSite.defaultCurrency;
+    }
+    if ('defaultCountry' in transformedSite) {
+      transformedSite.settings.defaultCountry = transformedSite.defaultCountry;
+      delete transformedSite.defaultCountry;
+    }
+    if ('allowQuantitySelection' in transformedSite) {
+      transformedSite.settings.allowQuantitySelection = transformedSite.allowQuantitySelection;
+      delete transformedSite.allowQuantitySelection;
+    }
+    if ('showPricing' in transformedSite) {
+      transformedSite.settings.showPricing = transformedSite.showPricing;
+      delete transformedSite.showPricing;
+    }
+    if ('defaultGiftId' in transformedSite) {
+      transformedSite.settings.defaultGiftId = transformedSite.defaultGiftId;
+      delete transformedSite.defaultGiftId;
+    }
+    if ('skipReviewPage' in transformedSite) {
+      transformedSite.settings.skipReviewPage = transformedSite.skipReviewPage;
+      delete transformedSite.skipReviewPage;
+    }
+    if ('expiredMessage' in transformedSite) {
+      transformedSite.settings.expiredMessage = transformedSite.expiredMessage;
+      delete transformedSite.expiredMessage;
+    }
+    if ('defaultGiftDaysAfterClose' in transformedSite) {
+      transformedSite.settings.defaultGiftDaysAfterClose = transformedSite.defaultGiftDaysAfterClose;
+      delete transformedSite.defaultGiftDaysAfterClose;
+    }
+    
+    // Map selection dates to availability dates for frontend compatibility
+    if ('selectionStartDate' in transformedSite) {
+      transformedSite.settings.availabilityStartDate = transformedSite.selectionStartDate;
+    }
+    if ('selectionEndDate' in transformedSite) {
+      transformedSite.settings.availabilityEndDate = transformedSite.selectionEndDate;
+    }
+    
+    return {
+      success: true,
+      data: transformedSite,
+    };
+  } catch (error: any) {
+    console.error('[CRUD DB] Error getting live site:', error);
+    throw error;
+  }
+}
+
+/**
+ * Save changes to draft (not live)
+ * Stores changes in draft_settings column
+ */
+export async function saveSiteDraft(id: string, input: UpdateSiteInput) {
+  try {
+    console.log('[CRUD DB] Saving site draft:', id);
+    console.log('[CRUD DB] Draft input fields:', Object.keys(input));
+    
+    // Get current site to access existing draft
+    const currentSite = await db.getSiteById(id);
+    if (!currentSite) {
+      throw new Error('Site not found');
+    }
+    
+    // Import helper
+    const { buildDraftSettings } = await import('./helpers.ts');
+    
+    // Map frontend fields to database format
+    const mappedInput = mapSiteFieldsToDatabase(input as any);
+    
+    // Build new draft settings
+    const newDraft = buildDraftSettings(currentSite.draft_settings, mappedInput);
+    
+    console.log('[CRUD DB] New draft settings:', Object.keys(newDraft));
+    
+    // Update only draft_settings column
+    const updatedSite = await db.updateSite(id, {
+      draft_settings: newDraft,
+      updated_at: new Date()
+    } as UpdateSiteInput);
+    
+    // Import merge helper
+    const { mergeDraftSettings } = await import('./helpers.ts');
+    
+    // Merge draft over live for response
+    const mergedSite = mergeDraftSettings(updatedSite);
+    
+    // Transform snake_case to camelCase for frontend
+    const transformedSite = objectToCamelCase(mergedSite);
+    
+    // Reconstruct settings object
+    if (!transformedSite.settings) {
+      transformedSite.settings = {};
+    }
+    
+    // Phase 1: Critical settings fields
+    if ('skipLandingPage' in transformedSite) {
+      transformedSite.settings.skipLandingPage = transformedSite.skipLandingPage;
+      delete transformedSite.skipLandingPage;
+    }
+    if ('giftsPerUser' in transformedSite) {
+      transformedSite.settings.giftsPerUser = transformedSite.giftsPerUser;
+      delete transformedSite.giftsPerUser;
+    }
+    if ('defaultLanguage' in transformedSite) {
+      transformedSite.settings.defaultLanguage = transformedSite.defaultLanguage;
+      delete transformedSite.defaultLanguage;
+    }
+    if ('defaultCurrency' in transformedSite) {
+      transformedSite.settings.defaultCurrency = transformedSite.defaultCurrency;
+      delete transformedSite.defaultCurrency;
+    }
+    if ('defaultCountry' in transformedSite) {
+      transformedSite.settings.defaultCountry = transformedSite.defaultCountry;
+      delete transformedSite.defaultCountry;
+    }
+    if ('allowQuantitySelection' in transformedSite) {
+      transformedSite.settings.allowQuantitySelection = transformedSite.allowQuantitySelection;
+      delete transformedSite.allowQuantitySelection;
+    }
+    if ('showPricing' in transformedSite) {
+      transformedSite.settings.showPricing = transformedSite.showPricing;
+      delete transformedSite.showPricing;
+    }
+    if ('defaultGiftId' in transformedSite) {
+      transformedSite.settings.defaultGiftId = transformedSite.defaultGiftId;
+      delete transformedSite.defaultGiftId;
+    }
+    if ('skipReviewPage' in transformedSite) {
+      transformedSite.settings.skipReviewPage = transformedSite.skipReviewPage;
+      delete transformedSite.skipReviewPage;
+    }
+    if ('expiredMessage' in transformedSite) {
+      transformedSite.settings.expiredMessage = transformedSite.expiredMessage;
+      delete transformedSite.expiredMessage;
+    }
+    if ('defaultGiftDaysAfterClose' in transformedSite) {
+      transformedSite.settings.defaultGiftDaysAfterClose = transformedSite.defaultGiftDaysAfterClose;
+      delete transformedSite.defaultGiftDaysAfterClose;
+    }
+    
+    // Map selection dates
+    if ('selectionStartDate' in transformedSite) {
+      transformedSite.settings.availabilityStartDate = transformedSite.selectionStartDate;
+    }
+    if ('selectionEndDate' in transformedSite) {
+      transformedSite.settings.availabilityEndDate = transformedSite.selectionEndDate;
+    }
+    
+    return {
+      success: true,
+      data: transformedSite,
+      message: 'Draft saved successfully',
+    };
+  } catch (error: any) {
+    console.error('[CRUD DB] Error saving site draft:', error);
+    throw error;
+  }
+}
+
+/**
+ * Publish draft changes to live
+ * Merges draft_settings into live columns and clears draft
+ */
+export async function publishSite(id: string) {
+  try {
+    console.log('[CRUD DB] Publishing site:', id);
+    
+    // Get current site
+    const currentSite = await db.getSiteById(id);
+    if (!currentSite) {
+      throw new Error('Site not found');
+    }
+    
+    // If no draft changes, just update status
+    if (!currentSite.draft_settings) {
+      console.log('[CRUD DB] No draft changes, updating status only');
+      const updatedSite = await db.updateSite(id, {
+        status: 'active',
+        updated_at: new Date()
+      } as UpdateSiteInput);
+      
+      const transformedSite = objectToCamelCase(updatedSite);
+      
+      return {
+        success: true,
+        data: transformedSite,
+        message: 'Site published successfully (no changes)',
+      };
+    }
+    
+    // Merge draft settings into live columns
+    console.log('[CRUD DB] Merging draft settings into live columns');
+    const updates = {
+      ...currentSite.draft_settings,  // All draft changes
+      status: 'active',
+      draft_settings: null,  // Clear draft after publishing
+      updated_at: new Date()
+    };
+    
+    const updatedSite = await db.updateSite(id, updates as UpdateSiteInput);
+    
+    // Transform for frontend
+    const transformedSite = objectToCamelCase(updatedSite);
+    
+    // Reconstruct settings object
+    if (!transformedSite.settings) {
+      transformedSite.settings = {};
+    }
+    
+    // Phase 1: Critical settings fields
+    if ('skipLandingPage' in transformedSite) {
+      transformedSite.settings.skipLandingPage = transformedSite.skipLandingPage;
+      delete transformedSite.skipLandingPage;
+    }
+    if ('giftsPerUser' in transformedSite) {
+      transformedSite.settings.giftsPerUser = transformedSite.giftsPerUser;
+      delete transformedSite.giftsPerUser;
+    }
+    if ('defaultLanguage' in transformedSite) {
+      transformedSite.settings.defaultLanguage = transformedSite.defaultLanguage;
+      delete transformedSite.defaultLanguage;
+    }
+    if ('defaultCurrency' in transformedSite) {
+      transformedSite.settings.defaultCurrency = transformedSite.defaultCurrency;
+      delete transformedSite.defaultCurrency;
+    }
+    if ('defaultCountry' in transformedSite) {
+      transformedSite.settings.defaultCountry = transformedSite.defaultCountry;
+      delete transformedSite.defaultCountry;
+    }
+    if ('allowQuantitySelection' in transformedSite) {
+      transformedSite.settings.allowQuantitySelection = transformedSite.allowQuantitySelection;
+      delete transformedSite.allowQuantitySelection;
+    }
+    if ('showPricing' in transformedSite) {
+      transformedSite.settings.showPricing = transformedSite.showPricing;
+      delete transformedSite.showPricing;
+    }
+    if ('defaultGiftId' in transformedSite) {
+      transformedSite.settings.defaultGiftId = transformedSite.defaultGiftId;
+      delete transformedSite.defaultGiftId;
+    }
+    if ('skipReviewPage' in transformedSite) {
+      transformedSite.settings.skipReviewPage = transformedSite.skipReviewPage;
+      delete transformedSite.skipReviewPage;
+    }
+    if ('expiredMessage' in transformedSite) {
+      transformedSite.settings.expiredMessage = transformedSite.expiredMessage;
+      delete transformedSite.expiredMessage;
+    }
+    if ('defaultGiftDaysAfterClose' in transformedSite) {
+      transformedSite.settings.defaultGiftDaysAfterClose = transformedSite.defaultGiftDaysAfterClose;
+      delete transformedSite.defaultGiftDaysAfterClose;
+    }
+    
+    // Map selection dates
+    if ('selectionStartDate' in transformedSite) {
+      transformedSite.settings.availabilityStartDate = transformedSite.selectionStartDate;
+    }
+    if ('selectionEndDate' in transformedSite) {
+      transformedSite.settings.availabilityEndDate = transformedSite.selectionEndDate;
+    }
+    
+    return {
+      success: true,
+      data: transformedSite,
+      message: 'Site published successfully',
+    };
+  } catch (error: any) {
+    console.error('[CRUD DB] Error publishing site:', error);
+    throw error;
+  }
+}
+
+/**
+ * Discard draft changes
+ * Clears draft_settings column
+ */
+export async function discardSiteDraft(id: string) {
+  try {
+    console.log('[CRUD DB] Discarding site draft:', id);
+    
+    // First check if site exists
+    const existingSite = await db.getSiteById(id);
+    if (!existingSite) {
+      return {
+        success: false,
+        error: 'Site not found',
+        message: 'No site exists with the provided ID',
+      };
+    }
+    
+    const updatedSite = await db.updateSite(id, {
+      draft_settings: null,
+      updated_at: new Date()
+    } as UpdateSiteInput);
+    
+    // Import helper to set the flag
+    const { mergeDraftSettings } = await import('./helpers.ts');
+    
+    // Merge draft settings (which will set _hasUnpublishedChanges to false since draft_settings is null)
+    const mergedSite = mergeDraftSettings(updatedSite);
+    
+    const transformedSite = objectToCamelCase(mergedSite);
+    
+    // Reconstruct settings object
+    if (!transformedSite.settings) {
+      transformedSite.settings = {};
+    }
+    
+    // Phase 1: Critical settings fields
+    if ('skipLandingPage' in transformedSite) {
+      transformedSite.settings.skipLandingPage = transformedSite.skipLandingPage;
+      delete transformedSite.skipLandingPage;
+    }
+    if ('giftsPerUser' in transformedSite) {
+      transformedSite.settings.giftsPerUser = transformedSite.giftsPerUser;
+      delete transformedSite.giftsPerUser;
+    }
+    if ('defaultLanguage' in transformedSite) {
+      transformedSite.settings.defaultLanguage = transformedSite.defaultLanguage;
+      delete transformedSite.defaultLanguage;
+    }
+    if ('defaultCurrency' in transformedSite) {
+      transformedSite.settings.defaultCurrency = transformedSite.defaultCurrency;
+      delete transformedSite.defaultCurrency;
+    }
+    if ('defaultCountry' in transformedSite) {
+      transformedSite.settings.defaultCountry = transformedSite.defaultCountry;
+      delete transformedSite.defaultCountry;
+    }
+    if ('allowQuantitySelection' in transformedSite) {
+      transformedSite.settings.allowQuantitySelection = transformedSite.allowQuantitySelection;
+      delete transformedSite.allowQuantitySelection;
+    }
+    if ('showPricing' in transformedSite) {
+      transformedSite.settings.showPricing = transformedSite.showPricing;
+      delete transformedSite.showPricing;
+    }
+    if ('defaultGiftId' in transformedSite) {
+      transformedSite.settings.defaultGiftId = transformedSite.defaultGiftId;
+      delete transformedSite.defaultGiftId;
+    }
+    if ('skipReviewPage' in transformedSite) {
+      transformedSite.settings.skipReviewPage = transformedSite.skipReviewPage;
+      delete transformedSite.skipReviewPage;
+    }
+    if ('expiredMessage' in transformedSite) {
+      transformedSite.settings.expiredMessage = transformedSite.expiredMessage;
+      delete transformedSite.expiredMessage;
+    }
+    if ('defaultGiftDaysAfterClose' in transformedSite) {
+      transformedSite.settings.defaultGiftDaysAfterClose = transformedSite.defaultGiftDaysAfterClose;
+      delete transformedSite.defaultGiftDaysAfterClose;
+    }
+    
+    // Map selection dates
+    if ('selectionStartDate' in transformedSite) {
+      transformedSite.settings.availabilityStartDate = transformedSite.selectionStartDate;
+    }
+    if ('selectionEndDate' in transformedSite) {
+      transformedSite.settings.availabilityEndDate = transformedSite.selectionEndDate;
+    }
+    
+    return {
+      success: true,
+      data: transformedSite,
+      message: 'Draft discarded successfully',
+    };
+  } catch (error: any) {
+    console.error('[CRUD DB] Error discarding site draft:', error);
+    
+    // Return structured error response
+    return {
+      success: false,
+      error: 'Internal server error',
+      message: error.message || 'Failed to discard draft changes',
+    };
   }
 }

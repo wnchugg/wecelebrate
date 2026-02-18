@@ -187,8 +187,13 @@ export function camelToSnake(str: string): string {
 
 /**
  * Converts snake_case to camelCase for API responses
+ * Preserves properties starting with underscore (e.g., _hasUnpublishedChanges)
  */
 export function snakeToCamel(str: string): string {
+  // If the string starts with underscore, preserve it
+  if (str.startsWith('_')) {
+    return str;
+  }
   return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
 }
 
@@ -219,14 +224,14 @@ export function mapSiteFieldsToDatabase(input: Record<string, any>): Record<stri
     'branding': 'branding',
     'selectionStartDate': 'selection_start_date',
     'selectionEndDate': 'selection_end_date',
-    
+
     // ERP Integration Fields
     'siteCode': 'site_code',
     'siteErpIntegration': 'site_erp_integration',
     'siteErpInstance': 'site_erp_instance',
     'siteShipFromCountry': 'site_ship_from_country',
     'siteHrisSystem': 'site_hris_system',
-    
+
     // Site Management Fields
     'siteDropDownName': 'site_drop_down_name',
     'siteCustomDomainUrl': 'site_custom_domain_url',
@@ -235,26 +240,25 @@ export function mapSiteFieldsToDatabase(input: Record<string, any>): Record<stri
     'siteCelebrationsEnabled': 'site_celebrations_enabled',
     'allowSessionTimeoutExtend': 'allow_session_timeout_extend',
     'enableEmployeeLogReport': 'enable_employee_log_report',
-    
+
     // Regional Client Info
     'regionalClientInfo': 'regional_client_info',
-    
+
     // Advanced Authentication
     'disableDirectAccessAuth': 'disable_direct_access_auth',
     'ssoProvider': 'sso_provider',
     'ssoClientOfficeName': 'sso_client_office_name',
-    
+
     // Timestamps
     'createdAt': 'created_at',
     'updatedAt': 'updated_at',
   };
-  
+
   // Fields that should be ignored (don't exist in database)
   const ignoredFields = new Set([
     'id', // Never update ID
     'domain', // Doesn't exist - use siteCustomDomainUrl instead
     'isActive', // Computed from status
-    'settings', // Not in current schema
     'type', // Not in current schema
     'headerFooterConfig', // UX customization - not in schema yet
     'brandingAssets', // UX customization - not in schema yet
@@ -262,20 +266,80 @@ export function mapSiteFieldsToDatabase(input: Record<string, any>): Record<stri
     'reviewScreenConfig', // UX customization - not in schema yet
     'orderTrackingConfig', // UX customization - not in schema yet
   ]);
-  
+
   const result: Record<string, any> = {};
-  
+
+  console.log('[mapSiteFieldsToDatabase] Input settings:', input.settings);
+
+  // Extract settings fields that have dedicated database columns
+  if (input.settings && typeof input.settings === 'object') {
+    // Phase 1: Critical fields with database columns
+    if ('skipLandingPage' in input.settings) {
+      result.skip_landing_page = input.settings.skipLandingPage;
+    }
+    if ('giftsPerUser' in input.settings) {
+      result.gifts_per_user = input.settings.giftsPerUser;
+    }
+    if ('defaultLanguage' in input.settings) {
+      result.default_language = input.settings.defaultLanguage;
+    }
+    if ('defaultCurrency' in input.settings) {
+      result.default_currency = input.settings.defaultCurrency;
+    }
+    if ('defaultCountry' in input.settings) {
+      result.default_country = input.settings.defaultCountry;
+    }
+    if ('allowQuantitySelection' in input.settings) {
+      result.allow_quantity_selection = input.settings.allowQuantitySelection;
+    }
+    if ('showPricing' in input.settings) {
+      result.show_pricing = input.settings.showPricing;
+    }
+    if ('defaultGiftId' in input.settings) {
+      result.default_gift_id = input.settings.defaultGiftId;
+    }
+    if ('skipReviewPage' in input.settings) {
+      result.skip_review_page = input.settings.skipReviewPage;
+    }
+    if ('expiredMessage' in input.settings) {
+      result.expired_message = input.settings.expiredMessage;
+    }
+    if ('defaultGiftDaysAfterClose' in input.settings) {
+      result.default_gift_days_after_close = input.settings.defaultGiftDaysAfterClose;
+    }
+
+    // Map availability dates to selection dates (database columns already exist!)
+    if ('availabilityStartDate' in input.settings) {
+      result.selection_start_date = input.settings.availabilityStartDate;
+    }
+    if ('availabilityEndDate' in input.settings) {
+      result.selection_end_date = input.settings.availabilityEndDate;
+    }
+
+    console.log('[mapSiteFieldsToDatabase] Extracted settings fields:', {
+      skip_landing_page: result.skip_landing_page,
+      gifts_per_user: result.gifts_per_user,
+      default_language: result.default_language,
+      default_currency: result.default_currency,
+      default_country: result.default_country,
+      selection_start_date: result.selection_start_date,
+      selection_end_date: result.selection_end_date,
+    });
+  }
+
   for (const [key, value] of Object.entries(input)) {
-    // Skip ignored fields
-    if (ignoredFields.has(key)) {
+    // Skip ignored fields and settings object (we extract what we need above)
+    if (ignoredFields.has(key) || key === 'settings') {
       continue;
     }
-    
+
     // Use mapping if available, otherwise convert to snake_case
     const dbColumn = fieldMapping[key] || camelToSnake(key);
     result[dbColumn] = value;
   }
-  
+
+  console.log('[mapSiteFieldsToDatabase] Final mapped fields count:', Object.keys(result).length);
+
   return result;
 }
 
@@ -334,4 +398,60 @@ export function getSupabaseConfig(environmentId: string): SupabaseConfig {
     url: Deno.env.get('SUPABASE_URL') ?? '',
     key: Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
   };
+}
+
+
+/**
+ * Merge draft settings over live site data for admin view
+ * When draft_settings exists, it contains unpublished changes
+ */
+export function mergeDraftSettings(site: any): any {
+  if (!site.draft_settings) {
+    // No draft changes, return site as-is with flag
+    return {
+      ...site,
+      _hasUnpublishedChanges: false
+    };
+  }
+  
+  // Merge draft settings over live data
+  const merged = {
+    ...site,
+    ...site.draft_settings,  // Draft values override live values
+    _hasUnpublishedChanges: true,
+    _draftSettings: site.draft_settings  // Keep original for reference
+  };
+  
+  return merged;
+}
+
+/**
+ * Extract live-only data (remove draft_settings for public view)
+ */
+export function extractLiveData(site: any): any {
+  const { draft_settings, _hasUnpublishedChanges, _draftSettings, ...liveData } = site;
+  return liveData;
+}
+
+/**
+ * Build draft settings object from update input
+ * This stores changes in draft_settings column instead of live columns
+ */
+export function buildDraftSettings(currentDraft: any, updates: any): any {
+  // Start with current draft (or empty object)
+  const draft = currentDraft || {};
+  
+  // Merge new updates into draft
+  const newDraft = {
+    ...draft,
+    ...updates
+  };
+  
+  // Remove status field from draft (status is always live)
+  delete newDraft.status;
+  delete newDraft.draft_settings;
+  delete newDraft._hasUnpublishedChanges;
+  delete newDraft._draftSettings;
+  
+  return newDraft;
 }

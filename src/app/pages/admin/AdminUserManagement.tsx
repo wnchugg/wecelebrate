@@ -3,6 +3,7 @@ import { Plus, Search, Shield, Edit, Trash2, Mail, CheckCircle, XCircle, Key, Al
 import { useAdmin } from '../../context/AdminContext';
 import { projectId, publicAnonKey } from '../../../../utils/supabase/info';
 import { logger } from '../../utils/logger';
+import { useDateFormat } from '../../hooks/useDateFormat';
 
 // Admin roles with different permission levels
 export type AdminRole = 'super_admin' | 'site_manager' | 'content_editor' | 'viewer';
@@ -78,6 +79,7 @@ const roleDefinitions = {
 
 export function AdminUserManagement() {
   const { adminUser, accessToken } = useAdmin();
+  const { formatDate } = useDateFormat();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<AdminRole | ''>('');
   const [filterStatus, setFilterStatus] = useState<'active' | 'inactive' | ''>('');
@@ -438,8 +440,8 @@ export function AdminUserManagement() {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+  const formatDateDisplay = (dateString: string) => {
+    return formatDate(dateString, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -679,7 +681,7 @@ export function AdminUserManagement() {
                         </td>
                         <td className="px-6 py-4">
                           <span className="text-sm text-gray-600">
-                            {user.lastLogin ? formatDate(user.lastLogin) : 'Never'}
+                            {user.lastLogin ? formatDateDisplay(user.lastLogin) : 'Never'}
                           </span>
                         </td>
                         <td className="px-6 py-4">

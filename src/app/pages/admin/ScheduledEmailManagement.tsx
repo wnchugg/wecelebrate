@@ -5,6 +5,8 @@ import { toast } from 'sonner';
 import { projectId, publicAnonKey } from '../../../../utils/supabase/info';
 import { getAccessToken } from '../../lib/apiClient';
 import { getCurrentEnvironment } from '../../config/deploymentEnvironments';
+import { useLanguage } from '../../context/LanguageContext';
+import { translateWithParams } from '../../utils/translationHelpers';
 
 const API_BASE = `https://${projectId}.supabase.co/functions/v1/make-server-6fcaeea3`;
 
@@ -33,6 +35,7 @@ interface ScheduledEmailStats {
 
 export function ScheduledEmailManagement() {
   const { currentSite } = useSite();
+  const { t } = useLanguage();
   const [emails, setEmails] = useState<ScheduledEmail[]>([]);
   const [stats, setStats] = useState<ScheduledEmailStats | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -76,7 +79,7 @@ export function ScheduledEmailManagement() {
       const data = await response.json();
       setEmails(data.emails || []);
     } catch (error: unknown) {
-      toast.error('Failed to load scheduled emails');
+      toast.error(t('notification.error.failedToLoadEmails'));
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -107,11 +110,11 @@ export function ScheduledEmailManagement() {
       
       if (!response.ok) throw new Error('Failed to cancel email');
       
-      toast.success('Email cancelled successfully');
+      toast.success(t('notification.success.emailCancelled'));
       loadScheduledEmails();
       loadStats();
     } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : 'Unknown error');
+      toast.error(error instanceof Error ? error.message : t('notification.error.unknownError'));
     }
   };
 
@@ -124,11 +127,11 @@ export function ScheduledEmailManagement() {
       
       if (!response.ok) throw new Error('Failed to retry email');
       
-      toast.success('Email will be retried');
+      toast.success(t('notification.success.emailRetry'));
       loadScheduledEmails();
       loadStats();
     } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : 'Unknown error');
+      toast.error(error instanceof Error ? error.message : t('notification.error.unknownError'));
     }
   };
 
@@ -145,11 +148,11 @@ export function ScheduledEmailManagement() {
       
       if (!response.ok) throw new Error('Failed to delete email');
       
-      toast.success('Email deleted successfully');
+      toast.success(t('notification.success.emailDeleted'));
       loadScheduledEmails();
       loadStats();
     } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : 'Unknown error');
+      toast.error(error instanceof Error ? error.message : t('notification.error.unknownError'));
     }
   };
 
@@ -164,12 +167,12 @@ export function ScheduledEmailManagement() {
 
       const data = await response.json();
       toast.success(
-        `Processed ${data.processed} emails: ${data.sent} sent, ${data.failed} failed`
+        translateWithParams(t, 'notification.success.emailsProcessed', { processed: data.processed, sent: data.sent, failed: data.failed })
       );
       loadScheduledEmails();
       loadStats();
     } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : 'Unknown error');
+      toast.error(error instanceof Error ? error.message : t('notification.error.unknownError'));
     }
   };
 
@@ -186,12 +189,12 @@ export function ScheduledEmailManagement() {
 
       if (!response.ok) throw new Error('Failed to schedule email');
 
-      toast.success('Email scheduled successfully');
+      toast.success(t('notification.success.emailScheduled'));
       setShowForm(false);
       loadScheduledEmails();
       loadStats();
     } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : 'Unknown error');
+      toast.error(error instanceof Error ? error.message : t('notification.error.unknownError'));
     }
   };
 

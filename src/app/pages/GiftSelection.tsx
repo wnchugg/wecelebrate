@@ -79,7 +79,7 @@ export function GiftSelection() {
         const effectiveSiteId = siteId || sessionSiteId || publicSite?.id;
         
         if (!effectiveSiteId) {
-          toast.error('No site specified. Please navigate from a valid site link.');
+          toast.error(t('notification.error.noSiteSpecified'));
           navigate('/access');
           return;
         }
@@ -91,7 +91,7 @@ export function GiftSelection() {
         
         // Verify session site matches requested site (if session exists)
         if (sessionToken && sessionSiteId && sessionSiteId !== effectiveSiteId) {
-          toast.error('Invalid site access. Please validate for the correct site.');
+          toast.error(t('notification.error.invalidSiteAccess'));
           navigate(`/access?site=${effectiveSiteId}`);
           return;
         }
@@ -133,7 +133,7 @@ export function GiftSelection() {
       } catch (error: unknown) {
         logger.error('Failed to load gifts:', error);
         setError(config.messages.error);
-        toast.error(error instanceof Error ? error.message : config.messages.error);
+        toast.error(error instanceof Error ? error.message : t('notification.error.failedToLoadGifts'));
       } finally {
         setIsLoading(false);
       }

@@ -2291,7 +2291,7 @@ export function SiteConfiguration() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <option value="">Select ERP System</option>
-                    <option value="NAJ">NAJ</option>
+                    <option value="NXJ">NXJ</option>
                     <option value="Fourgen">Fourgen</option>
                     <option value="Netsuite">Netsuite</option>
                     <option value="GRS">GRS</option>
@@ -2312,7 +2312,7 @@ export function SiteConfiguration() {
                       setSiteErpInstance(e.target.value);
                       setHasChanges(true);
                     }}
-                    placeholder="e.g., NAJ, Fourgen"
+                    placeholder="e.g., NXJ, Fourgen"
                     disabled={false}
                   />
                   <p className="text-xs text-gray-500 mt-1">Specific ERP instance</p>

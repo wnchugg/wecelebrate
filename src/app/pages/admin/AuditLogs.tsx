@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Search, Filter, Download, Shield, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { useDateFormat } from '../../hooks/useDateFormat';
 
 const logs = [
   { id: 1, timestamp: '2026-02-05 14:23:15', action: 'admin_login_success', user: 'admin', status: 'success', ip: '192.168.1.100', details: 'Super admin logged in' },
@@ -39,6 +40,7 @@ const getStatusBadge = (status: string) => {
 };
 
 export function AuditLogs() {
+  const { formatDate, formatTime } = useDateFormat();
   const [searchTerm, setSearchTerm] = useState('');
 
   return (
@@ -158,7 +160,9 @@ export function AuditLogs() {
                     </div>
                   </td>
                   <td className="px-4 py-4">
-                    <span className="text-sm text-gray-600 font-mono">{log.timestamp}</span>
+                    <span className="text-sm text-gray-600 font-mono">
+                      {formatDate(new Date(log.timestamp))} {formatTime(new Date(log.timestamp))}
+                    </span>
                   </td>
                   <td className="px-4 py-4">
                     <span className="text-sm font-medium text-gray-900">{log.action}</span>

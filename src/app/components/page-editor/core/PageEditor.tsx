@@ -201,9 +201,27 @@ export const PageEditor: React.FC<PageEditorProps> = ({
    */
   const switchMode = useCallback(
     (mode: EditorMode) => {
-      updateConfiguration({ mode });
+      setState((prev) => {
+        const newConfig = { ...prev.config, mode };
+
+        // Add to history
+        historyManager.push(newConfig);
+
+        // Notify parent
+        if (onChange) {
+          onChange(newConfig);
+        }
+
+        return {
+          ...prev,
+          config: newConfig,
+          mode, // Update both config.mode and state.mode
+          hasChanges: true,
+          history: historyManager.getHistory(),
+        };
+      });
     },
-    [updateConfiguration]
+    [onChange, historyManager]
   );
 
   /**
@@ -317,7 +335,7 @@ export const PageEditor: React.FC<PageEditorProps> = ({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-full min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading page editor...</p>
@@ -328,7 +346,7 @@ export const PageEditor: React.FC<PageEditorProps> = ({
 
   return (
     <PageEditorErrorBoundary>
-      <div className="page-editor h-screen flex flex-col">
+      <div className="page-editor h-full flex flex-col">
         <EditorHeader
           hasChanges={state.hasChanges}
           saveStatus={state.saveStatus}
@@ -390,6 +408,7 @@ export const PageEditor: React.FC<PageEditorProps> = ({
               onDeviceChange={changePreviewDevice}
               showDeviceControls={true}
               showExternalLink={false}
+              pageType={pageType}
             />
           </div>
         </div>

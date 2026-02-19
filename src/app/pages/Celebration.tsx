@@ -7,6 +7,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';
+import { useDateFormat } from '../hooks/useDateFormat';
 
 // Role color mapping
 const roleColors = {
@@ -54,6 +55,7 @@ export function Celebration() {
   const [loading, setLoading] = useState<boolean>(true);
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { formatDate } = useDateFormat();
 
   useEffect(() => {
     const fetchMilestones = async () => {
@@ -66,7 +68,7 @@ export function Celebration() {
         const data: Milestone[] = await response.json();
         setMilestones(data);
       } catch (error) {
-        toast.error('Failed to load milestones');
+        toast.error(t('notification.error.failedToLoadMilestones'));
       } finally {
         setLoading(false);
       }
@@ -265,11 +267,7 @@ export function Celebration() {
                             </span>
                           </div>
                           <p className="text-sm text-gray-500">
-                            {new Date(msg.createdAt).toLocaleDateString('en-US', {
-                              month: 'long',
-                              day: 'numeric',
-                              year: 'numeric',
-                            })}
+                            {formatDate(msg.createdAt)}
                           </p>
                         </div>
                       </div>

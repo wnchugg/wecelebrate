@@ -285,7 +285,7 @@ export function validateSiteConfiguration(data: SiteConfigData): ValidationResul
   }
   
   // ERP Integration validation
-  const validErpSystems = ['NAJ', 'Fourgen', 'Netsuite', 'GRS', 'SAP', 'Oracle', 'Manual'];
+  const validErpSystems = ['NXJ', 'Fourgen', 'Netsuite', 'GRS', 'SAP', 'Oracle', 'Manual'];
   if (data.siteErpIntegration && !validErpSystems.includes(data.siteErpIntegration)) {
     errors.push('Invalid ERP system selected');
     fieldErrors.siteErpIntegration = `Must be one of: ${validErpSystems.join(', ')}`;

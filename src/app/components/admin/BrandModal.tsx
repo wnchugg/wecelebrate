@@ -5,8 +5,10 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Switch } from '../ui/switch';
 import { Textarea } from '../ui/textarea';
+import { PhoneInput } from '../ui/phone-input';
 import { Building2, Palette } from 'lucide-react';
 import { Brand } from '../../context/SiteContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface BrandModalProps {
   open: boolean;
@@ -16,6 +18,7 @@ interface BrandModalProps {
 }
 
 export function BrandModal({ open, onClose, brand, onSave }: BrandModalProps) {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState<Brand>({
     id: '',
     name: '',
@@ -150,12 +153,12 @@ export function BrandModal({ open, onClose, brand, onSave }: BrandModalProps) {
 
               <div>
                 <Label htmlFor="contactPhone">Contact Phone</Label>
-                <Input
+                <PhoneInput
                   id="contactPhone"
-                  type="tel"
                   value={formData.contactPhone}
-                  onChange={(e) => handleChange('contactPhone', e.target.value)}
-                  placeholder="(555) 123-4567"
+                  onChange={(value) => handleChange('contactPhone', value)}
+                  defaultCountry="US"
+                  placeholder={t('form.enterPhone')}
                 />
               </div>
             </div>

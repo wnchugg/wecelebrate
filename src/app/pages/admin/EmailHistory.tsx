@@ -4,10 +4,12 @@ import { useSite } from '../../context/SiteContext';
 import { EmailHistory, fetchEmailHistory } from '../../services/automationApi';
 import { useEmailTemplate } from '../../context/EmailTemplateContext';
 import { toast } from 'sonner';
+import { useDateFormat } from '../../hooks/useDateFormat';
 
 export function EmailHistoryPage() {
   const { currentSite } = useSite();
   const { siteTemplates } = useEmailTemplate();
+  const { formatDate } = useDateFormat();
   const [history, setHistory] = useState<EmailHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<'all' | 'sent' | 'failed' | 'bounced'>('all');
@@ -84,15 +86,14 @@ export function EmailHistoryPage() {
     return template?.name || 'Unknown Template';
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
+  const formatEmailDate = (dateString: string) => {
+    return formatDate(dateString, {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
       hour: 'numeric',
       minute: 'numeric',
-    }).format(date);
+    });
   };
 
   const getTriggerLabel = (trigger: string) => {
@@ -238,7 +239,7 @@ export function EmailHistoryPage() {
                         </div>
                         <div className="flex items-center gap-1">
                           <Clock className="w-4 h-4" />
-                          <span>{formatDate(entry.sentAt)}</span>
+                          <span>{formatEmailDate(entry.sentAt)}</span>
                         </div>
                         <div>
                           <span className="text-gray-500">Template:</span>{' '}

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Edit, Key, UserCheck, Search, Loader2, User } from 'lucide-react';
 import { Button } from '../ui/button';
 import { AdvancedAuthUser } from '../../../types/advancedAuth';
+import { useNameFormat } from '../../hooks/useNameFormat';
 
 interface AdvancedUserListProps {
   users: AdvancedAuthUser[];
@@ -21,6 +22,7 @@ export function AdvancedUserList({
   hasProxyPermission
 }: AdvancedUserListProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const { formatFullName } = useNameFormat();
 
   const filteredUsers = users.filter(user => {
     const query = searchQuery.toLowerCase();
@@ -95,7 +97,7 @@ export function AdvancedUserList({
                 {/* User Info */}
                 <div className="flex-1">
                   <p className="font-semibold text-gray-900">
-                    {user.firstName} {user.lastName}
+                    {formatFullName(user.firstName, user.lastName)}
                   </p>
                   <p className="text-sm text-gray-600">{user.email}</p>
                   

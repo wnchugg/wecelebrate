@@ -31,8 +31,9 @@ export async function getClients(filters?: {
     console.log('[CRUD DB] Getting clients with filters:', filters);
     const clients = await db.getClients(filters);
     
-    // Transform snake_case to camelCase for frontend
-    const transformedClients = clients.map(client => objectToCamelCase(client));
+    // Use mapClientFieldsFromDatabase for response transformation
+    const { mapClientFieldsFromDatabase } = await import('./helpers.ts');
+    const transformedClients = clients.map(client => mapClientFieldsFromDatabase(client));
     
     return {
       success: true,
@@ -60,8 +61,9 @@ export async function getClientById(id: string) {
       };
     }
     
-    // Transform snake_case to camelCase for frontend
-    const transformedClient = objectToCamelCase(client);
+    // Use mapClientFieldsFromDatabase for response transformation
+    const { mapClientFieldsFromDatabase } = await import('./helpers.ts');
+    const transformedClient = mapClientFieldsFromDatabase(client);
     
     return {
       success: true,
@@ -80,13 +82,14 @@ export async function createClient(input: Omit<CreateClientInput, 'id'>) {
   try {
     console.log('[CRUD DB] Creating client:', input.name);
     
-    // Convert camelCase to snake_case for database
-    const snakeCaseInput = objectToSnakeCase(input);
+    // Use mapClientFieldsToDatabase for field transformation
+    const { mapClientFieldsToDatabase, mapClientFieldsFromDatabase } = await import('./helpers.ts');
+    const dbInput = mapClientFieldsToDatabase(input);
     
-    const client = await db.insertClient(snakeCaseInput as CreateClientInput);
+    const client = await db.insertClient(dbInput as CreateClientInput);
     
-    // Convert snake_case back to camelCase for frontend
-    const transformedClient = objectToCamelCase(client);
+    // Use mapClientFieldsFromDatabase for response transformation
+    const transformedClient = mapClientFieldsFromDatabase(client);
     
     return {
       success: true,
@@ -106,13 +109,14 @@ export async function updateClient(id: string, input: UpdateClientInput) {
   try {
     console.log('[CRUD DB] Updating client:', id);
     
-    // Convert camelCase to snake_case for database
-    const snakeCaseInput = objectToSnakeCase(input);
+    // Use mapClientFieldsToDatabase for field transformation
+    const { mapClientFieldsToDatabase, mapClientFieldsFromDatabase } = await import('./helpers.ts');
+    const dbInput = mapClientFieldsToDatabase(input);
     
-    const client = await db.updateClient(id, snakeCaseInput as UpdateClientInput);
+    const client = await db.updateClient(id, dbInput as UpdateClientInput);
     
-    // Convert snake_case back to camelCase for frontend
-    const transformedClient = objectToCamelCase(client);
+    // Use mapClientFieldsFromDatabase for response transformation
+    const transformedClient = mapClientFieldsFromDatabase(client);
     
     return {
       success: true,

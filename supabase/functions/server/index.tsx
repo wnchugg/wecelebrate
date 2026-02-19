@@ -48,6 +48,8 @@ import { setupCleanupRoutes } from './database_cleanup.ts';
 // Phase 4: Security Middleware (Production Readiness)
 import { authMiddleware, optionalAuthMiddleware } from './middleware/auth.ts';
 import { tenantIsolationMiddleware } from './middleware/tenant.ts';
+// Internationalization: Address Autocomplete Service
+import { setupAddressAutocompleteRoutes } from './address_autocomplete.ts';
 import { errorHandler } from './middleware/errorHandler.ts';
 import { ipRateLimit, userRateLimit } from './middleware/rateLimit.ts';
 
@@ -9555,6 +9557,10 @@ app.post("/make-server-6fcaeea3/upload-image", async (c) => {
 // ===== DATABASE CLEANUP ROUTES =====
 console.log('🧹 Setting up database cleanup routes...');
 setupCleanupRoutes(app);
+
+// ===== ADDRESS AUTOCOMPLETE ROUTES =====
+console.log('🌍 Setting up address autocomplete routes...');
+setupAddressAutocompleteRoutes(app);
 
 // Server startup complete
 console.log('✅ Server initialization complete - ready to accept requests');

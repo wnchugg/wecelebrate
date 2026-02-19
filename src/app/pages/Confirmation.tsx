@@ -8,6 +8,8 @@ import Logo from '../../imports/Logo';
 import { getCurrentEnvironment, buildApiUrl } from '../config/deploymentEnvironments';
 import { toast } from 'sonner';
 import { logger } from '../utils/logger';
+import { useDateFormat } from '../hooks/useDateFormat';
+import { translateWithParams } from '../utils/translationHelpers';
 
 interface Order {
   id: string;
@@ -46,10 +48,10 @@ export function Confirmation() {
   const navigate = useNavigate();
   const { clearOrder } = useOrder();
   const { t } = useLanguage();
+  const { formatDate } = useDateFormat();
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [estimatedDelivery, setEstimatedDelivery] = useState('');
 
   const allowQuantity = companyConfig.allowQuantitySelection;
 
@@ -93,16 +95,6 @@ export function Confirmation() {
         
         setOrder(data.order);
         
-        // Calculate estimated delivery (7-10 business days from order date)
-        const orderDate = new Date(data.order.createdAt);
-        const deliveryDate = new Date(orderDate);
-        deliveryDate.setDate(deliveryDate.getDate() + 7);
-        setEstimatedDelivery(deliveryDate.toLocaleDateString('en-US', {
-          month: 'long',
-          day: 'numeric',
-          year: 'numeric'
-        }));
-        
         // Clear order context since order is now placed
         clearOrder();
       } catch (error: unknown) {
@@ -116,6 +108,14 @@ export function Confirmation() {
     
     loadOrder();
   }, [orderId, navigate, clearOrder]);
+
+  // Calculate estimated delivery date (7 business days from order date)
+  const getEstimatedDelivery = (createdAt: string) => {
+    const orderDate = new Date(createdAt);
+    const deliveryDate = new Date(orderDate);
+    deliveryDate.setDate(deliveryDate.getDate() + 7);
+    return formatDate(deliveryDate);
+  };
 
   if (isLoading) {
     return (
@@ -180,8 +180,7 @@ export function Confirmation() {
             <div className="inline-flex items-center gap-3 bg-gradient-to-r from-[#00B4CC] to-[#00E5A0] text-white px-6 py-3 rounded-full shadow-lg">
               <Calendar className="w-5 h-5" />
               <div className="text-left">
-                <p className="text-xs font-medium opacity-90">Estimated Delivery</p>
-                <p className="text-sm font-bold">{estimatedDelivery}</p>
+                <p className="text-sm font-bold">{translateWithParams(t, 'shipping.estimatedDelivery', { date: getEstimatedDelivery(order.createdAt) })}</p>
               </div>
             </div>
           </div>

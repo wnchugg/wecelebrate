@@ -3,6 +3,7 @@ import { X, AlertCircle, RefreshCw, Eye, EyeOff } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Alert, AlertDescription } from '../ui/alert';
 import { AdvancedAuthUser } from '../../../types/advancedAuth';
+import { useNameFormat } from '../../hooks/useNameFormat';
 
 interface SetPasswordModalProps {
   open: boolean;
@@ -16,6 +17,7 @@ export function SetPasswordModal({ open, user, onClose, onSetPassword }: SetPass
   const [forceReset, setForceReset] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [saving, setSaving] = useState(false);
+  const { formatFullName } = useNameFormat();
 
   useEffect(() => {
     if (open) {
@@ -82,7 +84,7 @@ export function SetPasswordModal({ open, user, onClose, onSetPassword }: SetPass
           <div>
             <h3 className="text-lg font-bold text-gray-900">Set Temporary Password</h3>
             <p className="text-sm text-gray-600 mt-1">
-              For {user.firstName} {user.lastName}
+              For {formatFullName(user.firstName, user.lastName)}
             </p>
           </div>
           <button

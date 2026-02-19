@@ -88,7 +88,6 @@ const ERPConnectionManagement = lazy(() => import('./pages/admin/ERPConnectionMa
 const ClientSiteERPAssignment = lazy(() => import('./pages/admin/ClientSiteERPAssignment').then(m => ({ default: m.ClientSiteERPAssignment })));
 const CatalogManagement = lazy(() => import('./pages/admin/CatalogManagement').then(m => ({ default: m.default })));
 const CatalogEdit = lazy(() => import('./pages/admin/CatalogEdit').then(m => ({ default: m.default })));
-const CatalogMigration = lazy(() => import('./pages/admin/CatalogMigration').then(m => ({ default: m.default })));
 const SiteCatalogConfiguration = lazy(() => import('./pages/admin/SiteCatalogConfiguration').then(m => ({ default: m.default })));
 const ImportExportSettings = lazy(() => import('./pages/admin/ImportExportSettings').then(m => ({ default: m.ImportExportSettings })));
 const Analytics = lazy(() => import('./pages/admin/Analytics').then(m => ({ default: m.Analytics })));
@@ -128,7 +127,6 @@ const SecurityDashboard = lazy(() => import('./pages/admin/SecurityDashboard').t
 const AdminUserManagement = lazy(() => import('./pages/admin/AdminUserManagement').then(m => ({ default: m.AdminUserManagement })));
 const RoleManagement = lazy(() => import('./pages/admin/RoleManagement').then(m => ({ default: m.RoleManagement })));
 const AccessGroupManagement = lazy(() => import('./pages/admin/AccessGroupManagement').then(m => ({ default: m.AccessGroupManagement })));
-const RBACOverview = lazy(() => import('./pages/admin/RBACOverview').then(m => ({ default: m.RBACOverview })));
 const SessionExpired = lazy(() => import('./pages/admin/SessionExpired').then(m => ({ default: m.SessionExpired })));
 const DeveloperTools = lazy(() => import('./pages/admin/DeveloperTools').then(m => ({ default: m.DeveloperTools })));
 const TestingDashboard = lazy(() => import('./pages/admin/TestingDashboard').then(m => ({ default: m.TestingDashboard })));
@@ -318,7 +316,6 @@ export const router = createBrowserRouter([
           { path: "catalogs", Component: CatalogManagement, HydrateFallback: LoadingFallback },
           { path: "catalogs/create", Component: CatalogEdit, HydrateFallback: LoadingFallback },
           { path: "catalogs/:catalogId", Component: CatalogEdit, HydrateFallback: LoadingFallback },
-          { path: "catalogs/migrate", Component: CatalogMigration, HydrateFallback: LoadingFallback },
           { path: "site-catalog-configuration", Component: SiteCatalogConfiguration, HydrateFallback: LoadingFallback },
           { path: "import-export-settings", Component: ImportExportSettings, HydrateFallback: LoadingFallback },
           { path: "orders", Component: OrderManagement, HydrateFallback: LoadingFallback },

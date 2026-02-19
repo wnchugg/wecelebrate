@@ -331,13 +331,26 @@ export const validate = {
   },
   
   /**
-   * Validate phone number (basic international format)
+   * Validate phone number (international format with country code)
+   * Accepts formats like: +1 (555) 123-4567, +44 7700 900123, etc.
    */
   phone(phone: string): boolean {
-    // Remove all non-digit characters
-    const digits = phone.replace(/\D/g, ''); // FIXED: was /\\D/
-    // Should be between 10 and 15 digits
-    return digits.length >= 10 && digits.length <= 15;
+    if (!phone || phone.trim() === '') {
+      return true; // Empty is valid (optional field)
+    }
+    
+    // Must start with + for international format
+    if (!phone.startsWith('+')) {
+      return false;
+    }
+    
+    // Remove all non-digit characters except the leading +
+    const cleaned = phone.replace(/[^\d+]/g, '');
+    
+    // Should have + followed by 7-15 digits (country code + number)
+    // Most phone numbers are 10-15 digits total including country code
+    const digits = cleaned.substring(1); // Remove the +
+    return digits.length >= 7 && digits.length <= 15;
   },
   
   /**

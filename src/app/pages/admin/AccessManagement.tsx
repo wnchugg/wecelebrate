@@ -12,6 +12,7 @@ import { EditUserModal } from '../../components/admin/EditUserModal';
 import { SetPasswordModal } from '../../components/admin/SetPasswordModal';
 import { getUsers, updateUser, setUserPassword } from '../../services/userApi';
 import { AdvancedAuthUser } from '../../../types/advancedAuth';
+import { useNameFormat } from '../../hooks/useNameFormat';
 
 // SECURITY NOTE: This file only exports data to Excel (ExcelJS.writeBuffer).
 // It does NOT import/parse external Excel files, so there are no security concerns.
@@ -27,6 +28,7 @@ export function AccessManagement({
   validationMethod = 'email' 
 }: AccessManagementProps) {
   const { currentSite, currentClient, updateSite } = useSite();
+  const { formatFullName } = useNameFormat();
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
@@ -220,7 +222,7 @@ export function AccessManagement({
 
   const handleProxyLogin = (user: AdvancedAuthUser) => {
     // TODO: Implement proxy login
-    toast.info(`Proxy login for ${user.firstName} ${user.lastName} - Coming soon`);
+    toast.info(`Proxy login for ${formatFullName(user.firstName, user.lastName)} - Coming soon`);
   };
 
   const handleSaveUser = async (userId: string, updates: Partial<AdvancedAuthUser>) => {

@@ -46,6 +46,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { apiRequest } from '../../utils/api';
 import { showErrorToast, showSuccessToast } from '../../utils/errorHandling';
 import { logger } from '../../utils/logger';
+import { useDateFormat } from '../../hooks/useDateFormat';
 
 interface Order {
   id: string;
@@ -149,6 +150,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export function ReportsAnalytics() {
+  const { formatShortDate, formatDate } = useDateFormat();
   const [orders, setOrders] = useState<Order[]>([]);
   const [gifts, setGifts] = useState<Gift[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -336,7 +338,7 @@ export function ReportsAnalytics() {
     const dailyRevenue: Record<string, number> = {};
     
     filteredOrders.forEach(order => {
-      const date = new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const date = formatShortDate(order.createdAt);
       dailyOrders[date] = (dailyOrders[date] || 0) + 1;
       dailyRevenue[date] = (dailyRevenue[date] || 0) + (order.totalAmount || 0);
     });
@@ -349,7 +351,7 @@ export function ReportsAnalytics() {
       }))
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .slice(-14); // Last 14 days
-  }, [filteredOrders]);
+  }, [filteredOrders, formatShortDate]);
 
   // Top Gifts by Orders
   const topGiftsByOrders = useMemo(() => {
@@ -400,7 +402,8 @@ export function ReportsAnalytics() {
     const monthlyEmployees: Record<string, number> = {};
     
     employees.forEach(emp => {
-      const month = new Date(emp.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+      const date = new Date(emp.createdAt);
+      const month = formatDate(date, { year: 'numeric', month: 'short' });
       monthlyEmployees[month] = (monthlyEmployees[month] || 0) + 1;
     });
 
@@ -408,7 +411,7 @@ export function ReportsAnalytics() {
       .map(([month, count]) => ({ month, employees: count }))
       .sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime())
       .slice(-6); // Last 6 months
-  }, [employees]);
+  }, [employees, formatDate]);
 
   // Department Distribution
   const departmentDistribution = useMemo(() => {

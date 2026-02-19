@@ -3,9 +3,12 @@ import { Plus, Edit, Trash2, GripVertical, Package, Settings, AlertCircle, Chevr
 import { useSite } from '../../context/SiteContext';
 import { useShippingConfig } from '../../context/ShippingConfigContext';
 import { CustomShippingField, CustomFieldType, StoreLocation, CompanyAddress, AddressValidationService } from '../../types/shippingConfig';
+import { PhoneInput } from '../../components/ui/phone-input';
+import { AddressInput, AddressData } from '../../components/ui/address-input';
 import { toast } from 'sonner';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { useLanguage } from '../../context/LanguageContext';
 
 const fieldTypeOptions: { value: CustomFieldType; label: string }[] = [
   { value: 'text', label: 'Text Input' },
@@ -132,6 +135,7 @@ const DraggableField = ({ field, index, moveField, onEdit, onDelete, onToggle, g
 export function ShippingConfiguration() {
   const { currentSite } = useSite();
   const { getConfigBySiteId, updateConfig, addCustomField, updateCustomField, deleteCustomField, reorderCustomFields, addStoreCustomField, updateStoreCustomField, deleteStoreCustomField, reorderStoreCustomFields, addStore, updateStore, deleteStore, updateCompanyAddress, initializeConfig } = useShippingConfig();
+  const { t } = useLanguage();
   
   const [isAddFieldOpen, setIsAddFieldOpen] = useState(false);
   const [editingField, setEditingField] = useState<CustomShippingField | null>(null);
@@ -141,6 +145,15 @@ export function ShippingConfiguration() {
   // Store management
   const [isAddStoreOpen, setIsAddStoreOpen] = useState(false);
   const [editingStore, setEditingStore] = useState<StoreLocation | null>(null);
+  const [editingStoreAddress, setEditingStoreAddress] = useState<AddressData>({
+    line1: '',
+    line2: '',
+    line3: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    country: 'United States',
+  });
   const [filterState, setFilterState] = useState<string>('');
   
   // Store custom fields management
@@ -189,15 +202,9 @@ export function ShippingConfiguration() {
     options: [],
   });
 
-  const [newStore, setNewStore] = useState<Partial<StoreLocation>>({
+  const [newStore, setNewStore] = useState({
     storeName: '',
     storeCode: '',
-    addressLine1: '',
-    addressLine2: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: 'USA',
     phoneNumber: '',
     email: '',
     storeHours: '',
@@ -205,23 +212,53 @@ export function ShippingConfiguration() {
     enabled: true,
   });
 
-  const [companyAddress, setCompanyAddress] = useState<CompanyAddress>({
-    companyName: '',
-    addressLine1: '',
-    addressLine2: '',
+  const [newStoreAddress, setNewStoreAddress] = useState<AddressData>({
+    line1: '',
+    line2: '',
+    line3: '',
     city: '',
     state: '',
-    zipCode: '',
-    country: 'USA',
+    postalCode: '',
+    country: 'United States',
+  });
+
+  const [companyAddress, setCompanyAddress] = useState({
+    companyName: '',
     phoneNumber: '',
     contactPerson: '',
     contactEmail: '',
     deliveryInstructions: '',
   });
 
+  const [companyAddressData, setCompanyAddressData] = useState<AddressData>({
+    line1: '',
+    line2: '',
+    line3: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    country: 'United States',
+  });
+
   useEffect(() => {
     if (config?.shippingModes.company.address) {
-      setCompanyAddress(config.shippingModes.company.address);
+      const addr = config.shippingModes.company.address;
+      setCompanyAddress({
+        companyName: addr.companyName || '',
+        phoneNumber: addr.phoneNumber || '',
+        contactPerson: addr.contactPerson || '',
+        contactEmail: addr.contactEmail || '',
+        deliveryInstructions: addr.deliveryInstructions || '',
+      });
+      setCompanyAddressData({
+        line1: addr.addressLine1 || '',
+        line2: addr.addressLine2 || '',
+        line3: '',
+        city: addr.city || '',
+        state: addr.state || '',
+        postalCode: addr.zipCode || '',
+        country: addr.country || 'United States',
+      });
     }
   }, [config]);
 
@@ -303,27 +340,46 @@ export function ShippingConfiguration() {
   };
 
   const handleAddStore = () => {
-    if (!currentSite || !newStore.storeName || !newStore.state) {
+    if (!currentSite || !newStore.storeName || !newStoreAddress.state) {
       toast.error('Please fill in store name and state');
       return;
     }
 
-    addStore(currentSite.id, newStore as Omit<StoreLocation, 'id'>);
+    const storeData: Omit<StoreLocation, 'id'> = {
+      storeName: newStore.storeName,
+      storeCode: newStore.storeCode || '',
+      addressLine1: newStoreAddress.line1,
+      addressLine2: newStoreAddress.line2 || '',
+      city: newStoreAddress.city,
+      state: newStoreAddress.state || '',
+      zipCode: newStoreAddress.postalCode,
+      country: newStoreAddress.country,
+      phoneNumber: newStore.phoneNumber || '',
+      email: newStore.email || '',
+      storeHours: newStore.storeHours || '',
+      specialInstructions: newStore.specialInstructions || '',
+      enabled: newStore.enabled,
+    };
+
+    addStore(currentSite.id, storeData);
     setIsAddStoreOpen(false);
     setNewStore({
       storeName: '',
       storeCode: '',
-      addressLine1: '',
-      addressLine2: '',
-      city: '',
-      state: '',
-      zipCode: '',
-      country: 'USA',
       phoneNumber: '',
       email: '',
       storeHours: '',
       specialInstructions: '',
       enabled: true,
+    });
+    setNewStoreAddress({
+      line1: '',
+      line2: '',
+      line3: '',
+      city: '',
+      state: '',
+      postalCode: '',
+      country: 'United States',
     });
     toast.success('Store added successfully');
   };
@@ -331,7 +387,17 @@ export function ShippingConfiguration() {
   const handleUpdateStore = () => {
     if (!currentSite || !editingStore) return;
 
-    updateStore(currentSite.id, editingStore.id, editingStore);
+    const updatedStore: StoreLocation = {
+      ...editingStore,
+      addressLine1: editingStoreAddress.line1,
+      addressLine2: editingStoreAddress.line2 || '',
+      city: editingStoreAddress.city,
+      state: editingStoreAddress.state || '',
+      zipCode: editingStoreAddress.postalCode,
+      country: editingStoreAddress.country,
+    };
+
+    updateStore(currentSite.id, editingStore.id, updatedStore);
     setEditingStore(null);
     toast.success('Store updated successfully');
   };
@@ -348,7 +414,21 @@ export function ShippingConfiguration() {
   const handleSaveCompanyAddress = () => {
     if (!currentSite) return;
 
-    updateCompanyAddress(currentSite.id, companyAddress);
+    const addressToSave: CompanyAddress = {
+      companyName: companyAddress.companyName,
+      addressLine1: companyAddressData.line1,
+      addressLine2: companyAddressData.line2 || '',
+      city: companyAddressData.city,
+      state: companyAddressData.state || '',
+      zipCode: companyAddressData.postalCode,
+      country: companyAddressData.country,
+      phoneNumber: companyAddress.phoneNumber,
+      contactPerson: companyAddress.contactPerson,
+      contactEmail: companyAddress.contactEmail,
+      deliveryInstructions: companyAddress.deliveryInstructions,
+    };
+
+    updateCompanyAddress(currentSite.id, addressToSave);
     toast.success('Company address saved successfully');
   };
 
@@ -772,6 +852,36 @@ export function ShippingConfiguration() {
                           Allow Users to Override Suggestions
                         </label>
                       </div>
+
+                      {/* Address Autocomplete Toggle */}
+                      <div className="pt-4 border-t border-gray-200">
+                        <label className="flex items-start gap-3 text-sm text-gray-700">
+                          <input
+                            type="checkbox"
+                            checked={config.addressValidation?.enableAutocomplete !== false} // Default to true
+                            onChange={(e) =>
+                              updateConfig(currentSite.id, {
+                                addressValidation: {
+                                  ...config.addressValidation,
+                                  enabled: config.addressValidation?.enabled || false,
+                                  service: config.addressValidation?.service || 'none',
+                                  requireValidation: config.addressValidation?.requireValidation || false,
+                                  allowOverride: config.addressValidation?.allowOverride || false,
+                                  enableAutocomplete: e.target.checked,
+                                },
+                              })
+                            }
+                            className="mt-0.5 rounded border-gray-300 text-[#D91C81] focus:ring-[#D91C81]"
+                          />
+                          <div>
+                            <div className="font-medium">Enable Address Autocomplete</div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              Show address suggestions as users type (powered by Geoapify or Google Places).
+                              Helps users enter addresses quickly and accurately.
+                            </div>
+                          </div>
+                        </label>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -993,84 +1103,22 @@ export function ShippingConfiguration() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Address Line 1</label>
-                    <input
-                      type="text"
-                      value={companyAddress.addressLine1}
-                      onChange={(e) => setCompanyAddress({ ...companyAddress, addressLine1: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                      placeholder="123 Main Street"
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Company Address</label>
+                    <AddressInput
+                      value={companyAddressData}
+                      onChange={setCompanyAddressData}
+                      defaultCountry="US"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Address Line 2 (Optional)</label>
-                    <input
-                      type="text"
-                      value={companyAddress.addressLine2}
-                      onChange={(e) => setCompanyAddress({ ...companyAddress, addressLine2: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                      placeholder="Suite 100"
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                    <PhoneInput
+                      value={companyAddress.phoneNumber}
+                      onChange={(value) => setCompanyAddress({ ...companyAddress, phoneNumber: value })}
+                      defaultCountry="US"
+                      placeholder={t('form.enterPhone')}
                     />
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
-                      <input
-                        type="text"
-                        value={companyAddress.city}
-                        onChange={(e) => setCompanyAddress({ ...companyAddress, city: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                        placeholder="San Francisco"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
-                      <select
-                        value={companyAddress.state}
-                        onChange={(e) => setCompanyAddress({ ...companyAddress, state: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                      >
-                        <option value="">Select State</option>
-                        {US_STATES.map(state => (
-                          <option key={state} value={state}>{state}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">ZIP Code</label>
-                      <input
-                        type="text"
-                        value={companyAddress.zipCode}
-                        onChange={(e) => setCompanyAddress({ ...companyAddress, zipCode: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                        placeholder="94102"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                      <input
-                        type="tel"
-                        value={companyAddress.phoneNumber}
-                        onChange={(e) => setCompanyAddress({ ...companyAddress, phoneNumber: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                        placeholder="(555) 123-4567"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
-                      <input
-                        type="text"
-                        value={companyAddress.country}
-                        onChange={(e) => setCompanyAddress({ ...companyAddress, country: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                        placeholder="USA"
-                      />
-                    </div>
                   </div>
 
                   <div>
@@ -1315,7 +1363,18 @@ export function ShippingConfiguration() {
                                   </label>
 
                                   <button
-                                    onClick={() => setEditingStore(store)}
+                                    onClick={() => {
+                                      setEditingStore(store);
+                                      setEditingStoreAddress({
+                                        line1: store.addressLine1 || '',
+                                        line2: store.addressLine2 || '',
+                                        line3: '',
+                                        city: store.city || '',
+                                        state: store.state || '',
+                                        postalCode: store.zipCode || '',
+                                        country: store.country || 'United States',
+                                      });
+                                    }}
                                     className="p-2 text-gray-600 hover:text-[#D91C81] hover:bg-pink-50 rounded-lg transition-colors"
                                   >
                                     <Edit className="w-4 h-4" />
@@ -1642,72 +1701,22 @@ export function ShippingConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Address Line 1</label>
-                  <input
-                    type="text"
-                    value={newStore.addressLine1}
-                    onChange={(e) => setNewStore({ ...newStore, addressLine1: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                    placeholder="123 Main Street"
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Store Address</label>
+                  <AddressInput
+                    value={newStoreAddress}
+                    onChange={setNewStoreAddress}
+                    defaultCountry="US"
                   />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Address Line 2</label>
-                  <input
-                    type="text"
-                    value={newStore.addressLine2}
-                    onChange={(e) => setNewStore({ ...newStore, addressLine2: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                    placeholder="Suite 100"
-                  />
-                </div>
-
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
-                    <input
-                      type="text"
-                      value={newStore.city}
-                      onChange={(e) => setNewStore({ ...newStore, city: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                      placeholder="San Francisco"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
-                    <select
-                      value={newStore.state}
-                      onChange={(e) => setNewStore({ ...newStore, state: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                    >
-                      <option value="">Select State</option>
-                      {US_STATES.map(state => (
-                        <option key={state} value={state}>{state}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">ZIP Code</label>
-                    <input
-                      type="text"
-                      value={newStore.zipCode}
-                      onChange={(e) => setNewStore({ ...newStore, zipCode: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                      placeholder="94102"
-                    />
-                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                    <input
-                      type="tel"
+                    <PhoneInput
                       value={newStore.phoneNumber}
-                      onChange={(e) => setNewStore({ ...newStore, phoneNumber: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                      placeholder="(555) 123-4567"
+                      onChange={(value) => setNewStore({ ...newStore, phoneNumber: value })}
+                      defaultCountry="US"
+                      placeholder={t('form.enterPhone')}
                     />
                   </div>
                   <div>
@@ -1762,17 +1771,20 @@ export function ShippingConfiguration() {
                     setNewStore({
                       storeName: '',
                       storeCode: '',
-                      addressLine1: '',
-                      addressLine2: '',
-                      city: '',
-                      state: '',
-                      zipCode: '',
-                      country: 'USA',
                       phoneNumber: '',
                       email: '',
                       storeHours: '',
                       specialInstructions: '',
                       enabled: true,
+                    });
+                    setNewStoreAddress({
+                      line1: '',
+                      line2: '',
+                      line3: '',
+                      city: '',
+                      state: '',
+                      postalCode: '',
+                      country: 'United States',
                     });
                   }}
                   className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all"
@@ -1819,67 +1831,22 @@ export function ShippingConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Address Line 1</label>
-                  <input
-                    type="text"
-                    value={editingStore.addressLine1}
-                    onChange={(e) => setEditingStore({ ...editingStore, addressLine1: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Store Address</label>
+                  <AddressInput
+                    value={editingStoreAddress}
+                    onChange={setEditingStoreAddress}
+                    defaultCountry="US"
                   />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Address Line 2</label>
-                  <input
-                    type="text"
-                    value={editingStore.addressLine2}
-                    onChange={(e) => setEditingStore({ ...editingStore, addressLine2: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                  />
-                </div>
-
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
-                    <input
-                      type="text"
-                      value={editingStore.city}
-                      onChange={(e) => setEditingStore({ ...editingStore, city: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
-                    <select
-                      value={editingStore.state}
-                      onChange={(e) => setEditingStore({ ...editingStore, state: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                    >
-                      <option value="">Select State</option>
-                      {US_STATES.map(state => (
-                        <option key={state} value={state}>{state}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">ZIP Code</label>
-                    <input
-                      type="text"
-                      value={editingStore.zipCode}
-                      onChange={(e) => setEditingStore({ ...editingStore, zipCode: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
-                    />
-                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                    <input
-                      type="tel"
+                    <PhoneInput
                       value={editingStore.phoneNumber}
-                      onChange={(e) => setEditingStore({ ...editingStore, phoneNumber: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
+                      onChange={(value) => setEditingStore({ ...editingStore, phoneNumber: value })}
+                      defaultCountry="US"
+                      placeholder={t('form.enterPhone')}
                     />
                   </div>
                   <div>

@@ -8,6 +8,12 @@ export interface Product {
   category: string;
   inStock: boolean;
   features?: string[];
+  weight?: number; // Weight in grams
+  dimensions?: {
+    length: number; // Length in centimeters
+    width: number;  // Width in centimeters
+    height: number; // Height in centimeters
+  };
 }
 
 export const products: Product[] = [
@@ -25,7 +31,13 @@ export const products: Product[] = [
       "40-hour battery life",
       "Premium sound quality",
       "Comfortable fit"
-    ]
+    ],
+    weight: 250,
+    dimensions: {
+      length: 20,
+      width: 18,
+      height: 8
+    }
   },
   {
     id: "GWAMTR0002",
@@ -41,7 +53,13 @@ export const products: Product[] = [
       "Heart rate monitor",
       "Water resistant",
       "7-day battery life"
-    ]
+    ],
+    weight: 45,
+    dimensions: {
+      length: 4.5,
+      width: 4,
+      height: 1.2
+    }
   },
   {
     id: "GWAMTR0003",
@@ -105,7 +123,13 @@ export const products: Product[] = [
       "All-day battery",
       "Fast processor",
       "Premium design"
-    ]
+    ],
+    weight: 470,
+    dimensions: {
+      length: 28,
+      width: 21.5,
+      height: 0.6
+    }
   },
   {
     id: "GWAMTR0007",

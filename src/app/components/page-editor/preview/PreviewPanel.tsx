@@ -15,6 +15,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
   showDeviceControls = true,
   showExternalLink = false,
   externalUrl,
+  pageType,
 }) => {
   const deviceIcons: Record<DeviceMode, React.ComponentType<any>> = {
     desktop: Monitor,
@@ -74,7 +75,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
           }}
         >
           <div className="p-8">
-            <PreviewRenderer config={config} device={device} interactive={false} />
+            <PreviewRenderer config={config} device={device} interactive={false} pageType={pageType} />
           </div>
         </div>
       </div>

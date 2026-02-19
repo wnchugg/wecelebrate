@@ -253,7 +253,7 @@ export const LandingPageEditorNew: React.FC = () => {
       pageId={currentSite.id}
       defaultConfig={defaultConfig}
       visualConfig={visualConfig}
-      allowedModes={['visual', 'custom']} // Blocks mode disabled for landing page
+      allowedModes={['visual', 'blocks', 'custom']} // All modes enabled
       storageAdapter={storageAdapter}
       storageKey="landingPageConfig"
       onSave={async (config) => {

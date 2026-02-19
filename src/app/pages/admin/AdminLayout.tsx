@@ -53,14 +53,12 @@ const clientNavigation = [
 const globalNavigation = [
   { name: 'Gift Catalog', href: '/admin/gifts', icon: Gift },
   { name: 'Catalog Management', href: '/admin/catalogs', icon: FolderOpen },
-  { name: 'Catalog Migration', href: '/admin/catalogs/migrate', icon: GitBranch },
   { name: 'Home Page Editor', href: '/admin/home-editor', icon: Layout },
   { name: 'Global Template Library', href: '/admin/global-template-library', icon: Mail },
   { name: 'Email Service Test', href: '/admin/email-service-test', icon: Mail },
   { name: 'ERP Integrations', href: '/admin/erp', icon: Database },
   { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
   { name: 'Admin Users', href: '/admin/user-management', icon: Shield },
-  { name: 'RBAC Overview', href: '/admin/rbac-overview', icon: Shield },
   { name: 'Roles', href: '/admin/roles', icon: Shield },
   { name: 'Access Groups', href: '/admin/access-groups', icon: Users },
   { name: 'Import/Export Settings', href: '/admin/import-export-settings', icon: ArrowDownToLine },
@@ -243,7 +241,7 @@ export function AdminLayout() {
                     siteSettingsOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
                   }`}
                 >
-                  <nav className="px-2 space-y-1 mb-4">
+                  <nav className="px-2 pt-1 space-y-1 mb-4">
                     {siteSpecificNavigation.map((item) => {
                       const isActive = isActivePath(item.href);
                       return (
@@ -305,11 +303,11 @@ export function AdminLayout() {
                 clientSettingsOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
               }`}
             >
-              <nav className="px-2 space-y-1 mb-4">
+              <nav className="px-2 pt-1 space-y-1 mb-4">
                 {clientNavigation.map((item) => {
                   // For "Client Settings", link to current client's detail page if available
                   const href = item.name === 'Client Settings' && currentClient 
-                    ? `/admin/clients/${currentClient.id}` 
+                    ? `/admin/clients/${currentClient.clientCode || currentClient.id}` 
                     : item.href;
                   
                   // Special handling for "All Clients" to only be active on exact /admin/clients path
@@ -364,7 +362,7 @@ export function AdminLayout() {
                 globalSettingsOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
               }`}
             >
-              <nav className="px-2 space-y-1 mb-4">
+              <nav className="px-2 pt-1 space-y-1 mb-4">
                 {globalNavigation.map((item) => {
                   const isActive = isActivePath(item.href);
                   return (
@@ -409,7 +407,7 @@ export function AdminLayout() {
                 developerToolsOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
               }`}
             >
-              <nav className="px-2 space-y-1 mb-4">
+              <nav className="px-2 pt-1 space-y-1 mb-4">
                 {developerToolsNavigation.map((item) => {
                   const isActive = isActivePath(item.href);
                   return (

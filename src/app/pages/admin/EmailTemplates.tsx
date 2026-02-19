@@ -68,7 +68,7 @@ const COMMON_VARIABLES: TemplateVariable[] = [
   { key: 'companyName', label: 'Company Name', example: 'TechCorp Inc.', required: false },
   { key: 'siteName', label: 'Site Name', example: 'Holiday Gifts 2026', required: false },
   { key: 'orderNumber', label: 'Order Number', example: 'ORD-2026-001', required: false },
-  { key: 'orderTotal', label: 'Order Total', example: '$149.99', required: false },
+  { key: 'orderTotal', label: 'Order Total', example: '149.99', required: false },
   { key: 'giftName', label: 'Gift Name', example: 'Wireless Headphones', required: false },
   { key: 'trackingNumber', label: 'Tracking Number', example: '1Z999AA10123456784', required: false },
   { key: 'magicLink', label: 'Magic Link', example: 'https://app.jala2.com/access/magic-link?token=...', required: false },

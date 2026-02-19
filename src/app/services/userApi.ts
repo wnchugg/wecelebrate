@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { AdvancedAuthUser, EditUserRequest, SetPasswordRequest } from '../types/advancedAuth';
+import { AdvancedAuthUser, EditUserRequest, SetPasswordRequest } from '../../types/advancedAuth';
 
 /**
  * Get all users for a site

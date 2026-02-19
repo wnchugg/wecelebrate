@@ -4,6 +4,12 @@ import { products } from '../data/products';
 import { useCart } from '../context/CartContext';
 import { toast } from 'sonner';
 import { ArrowLeft, Check, ShoppingCart, Truck, Package, Shield } from 'lucide-react';
+import { CurrencyDisplay } from '../components/CurrencyDisplay';
+import { useLanguage } from '../context/LanguageContext';
+import { useCurrencyFormat } from '../hooks/useCurrencyFormat';
+import { useNumberFormat } from '../hooks/useNumberFormat';
+import { useUnits } from '../hooks/useUnits';
+import { translateWithParams } from '../utils/translationHelpers';
 
 /**
  * ProductDetail Component
@@ -13,6 +19,10 @@ export function ProductDetail() {
   const { productId } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { t } = useLanguage();
+  const { formatPrice } = useCurrencyFormat();
+  const { formatInteger } = useNumberFormat();
+  const { formatWeight, formatLength } = useUnits();
 
   const product = products.find(p => p.id === productId);
 
@@ -31,9 +41,7 @@ export function ProductDetail() {
 
   const handleAddToCart = () => {
     addToCart(product);
-    toast.success('Added to cart!', {
-      description: `${product.name} has been added to your cart.`,
-    });
+    toast.success(t('notification.success.addedToCart'));
   };
 
   return (
@@ -82,12 +90,37 @@ export function ProductDetail() {
             </div>
           )}
 
+          {/* Specifications */}
+          {(product.weight || product.dimensions) && (
+            <div className="mb-6">
+              <h3 className="font-semibold text-lg mb-3">Specifications:</h3>
+              <div className="space-y-2">
+                {product.weight && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-600">Weight:</span>
+                    <span className="text-gray-900 font-medium">{formatWeight(product.weight)}</span>
+                  </div>
+                )}
+                {product.dimensions && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-600">Dimensions:</span>
+                    <span className="text-gray-900 font-medium">
+                      {formatLength(product.dimensions.length)} × {formatLength(product.dimensions.width)} × {formatLength(product.dimensions.height)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Pricing */}
           <div className="bg-gray-50 rounded-xl p-6 mb-6">
             <div className="flex items-baseline gap-3 mb-2">
-              <span className="text-4xl font-bold text-gray-900">${product.price}</span>
+              <span className="text-4xl font-bold text-gray-900">
+                <CurrencyDisplay amount={product.price} />
+              </span>
               {product.points && (
-                <span className="text-lg text-gray-600">or {product.points.toLocaleString()} points</span>
+                <span className="text-lg text-gray-600">or {formatInteger(product.points)} points</span>
               )}
             </div>
             <p className={`text-sm ${product.inStock ? 'text-green-600' : 'text-red-600'}`}>
@@ -121,7 +154,7 @@ export function ProductDetail() {
           <div className="space-y-3 border-t border-gray-200 pt-6">
             <div className="flex items-center gap-3 text-gray-700">
               <Truck className="w-5 h-5 text-blue-600" />
-              <span>Free shipping on orders over $100</span>
+              <span>{translateWithParams(t, 'shipping.freeShippingThreshold', { amount: formatPrice(100) })}</span>
             </div>
             <div className="flex items-center gap-3 text-gray-700">
               <Package className="w-5 h-5 text-blue-600" />

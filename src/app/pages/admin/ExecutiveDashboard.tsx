@@ -18,6 +18,7 @@ import { apiRequest } from '../../utils/api';
 import { showErrorToast } from '../../utils/errorHandling';
 import { logger } from '../../utils/logger';
 import { useNavigate } from 'react-router';
+import { useDateFormat } from '../../hooks/useDateFormat';
 
 interface DashboardData {
   orders: any[];
@@ -38,6 +39,7 @@ const CHART_COLORS = {
 
 export function ExecutiveDashboard() {
   const navigate = useNavigate();
+  const { formatShortDate } = useDateFormat();
   const [data, setData] = useState<DashboardData>({
     orders: [],
     clients: [],
@@ -155,7 +157,7 @@ export function ExecutiveDashboard() {
     data.orders
       .filter(o => new Date(o.createdAt) >= thirtyDaysAgo)
       .forEach(order => {
-        const date = new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const date = formatShortDate(order.createdAt);
         last30Days[date] = (last30Days[date] || 0) + (order.totalAmount || 0);
       });
 
@@ -163,7 +165,7 @@ export function ExecutiveDashboard() {
       .map(([date, revenue]) => ({ date, revenue }))
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .slice(-14);
-  }, [data.orders]);
+  }, [data.orders, formatShortDate]);
 
   const ordersByStatus = useMemo(() => {
     const statusCounts: Record<string, number> = {};

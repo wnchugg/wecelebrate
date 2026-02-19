@@ -9,10 +9,13 @@ import { companyConfig } from '../data/config';
 import { usePublicSite } from '../context/PublicSiteContext';
 import { LanguageSelector } from '../components/LanguageSelector';
 import Logo from '../../imports/Logo';
+import { useLanguage } from '../context/LanguageContext';
+import { translateWithParams } from '../utils/translationHelpers';
 
 export function MagicLinkRequest() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [linkSent, setLinkSent] = useState(false);
@@ -36,7 +39,7 @@ export function MagicLinkRequest() {
     const clientId = `magic_link_${sanitizedEmail}`;
     const rateLimitCheck = checkRateLimit(clientId, 3, 900000);
     if (!rateLimitCheck.allowed) {
-      toast.error('Too many magic link requests. Please try again in 15 minutes.');
+      toast.error(t('notification.error.tooManyMagicLinkRequests'));
       setIsSending(false);
       logSecurityEvent({
         action: 'magic_link_rate_limit',
@@ -48,7 +51,7 @@ export function MagicLinkRequest() {
 
     // Validate email format
     if (!validateEmailFormat(sanitizedEmail)) {
-      toast.error('Please enter a valid email address.');
+      toast.error(t('notification.error.invalidEmail'));
       setIsSending(false);
       return;
     }
@@ -57,7 +60,7 @@ export function MagicLinkRequest() {
     if (companyConfig.allowedDomains && companyConfig.allowedDomains.length > 0) {
       const domain = sanitizedEmail.split('@')[1];
       if (!companyConfig.allowedDomains.includes(domain)) {
-        toast.error(`Email must be from an authorized domain: ${companyConfig.allowedDomains.join(', ')}`);
+        toast.error(translateWithParams(t, 'notification.error.unauthorizedDomain', { domains: companyConfig.allowedDomains.join(', ') }));
         setIsSending(false);
         logSecurityEvent({
           action: 'magic_link_unauthorized_domain',
@@ -101,10 +104,10 @@ export function MagicLinkRequest() {
 
       setIsSending(false);
       setLinkSent(true);
-      toast.success('Magic link sent! Check your email.');
+      toast.success(t('notification.success.magicLinkSent'));
     } catch (error: any) {
       logger.error('Magic link request error:', error);
-      toast.error(error.message || 'Failed to send magic link. Please try again.');
+      toast.error(error.message || t('notification.error.failedToSendMagicLink'));
       setIsSending(false);
       
       logSecurityEvent({

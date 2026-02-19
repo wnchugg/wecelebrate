@@ -36,8 +36,8 @@ export function ReviewOrder() {
 
   const handleSubmitOrder = async () => {
     if (!selectedGift || !shippingAddress) {
-      setError('Missing required information');
-      toast.error('Missing required information');
+      setError(t('notification.error.missingInformation'));
+      toast.error(t('notification.error.missingInformation'));
       return;
     }
 
@@ -49,7 +49,7 @@ export function ReviewOrder() {
       const sessionToken = sessionStorage.getItem('employee_session');
       
       if (!sessionToken) {
-        toast.error('Session expired. Please log in again.');
+        toast.error(t('notification.error.sessionExpired'));
         navigate('../access');
         return;
       }
@@ -93,7 +93,7 @@ export function ReviewOrder() {
       }
       
       // Order created successfully!
-      toast.success('Order placed successfully! 🎉');
+      toast.success(t('notification.success.orderPlaced'));
       
       setIsSubmitting(false);
       
@@ -101,8 +101,8 @@ export function ReviewOrder() {
       navigate(`/confirmation/${data.order.id}`);
     } catch (error: unknown) {
       logger.error('Failed to submit order:', error);
-      setError(error instanceof Error ? error.message : 'Failed to submit order. Please try again.');
-      toast.error(error instanceof Error ? error.message : 'Failed to submit order');
+      setError(error instanceof Error ? error.message : t('notification.error.failedToSubmitOrder'));
+      toast.error(error instanceof Error ? error.message : t('notification.error.failedToSubmitOrder'));
       setIsSubmitting(false);
     }
   };

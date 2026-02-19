@@ -29,6 +29,7 @@ export interface PreviewPanelProps {
   showDeviceControls?: boolean;
   showExternalLink?: boolean;
   externalUrl?: string;
+  pageType?: string; // Type of page being previewed
 }
 
 /**
@@ -38,6 +39,7 @@ export interface PreviewRendererProps {
   config: PageConfiguration;
   device: DeviceMode;
   interactive?: boolean;
+  pageType?: string; // Type of page being previewed (landing-page, welcome-page, home-page)
 }
 
 /**

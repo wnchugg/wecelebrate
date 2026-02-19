@@ -38,6 +38,10 @@ export { useUpdateEffect } from './useUpdateEffect';
 export { useMounted } from './useMounted';
 export { useCopyToClipboard } from './useCopyToClipboard';
 
+// Internationalization Hooks
+export { useCurrencyFormat } from './useCurrencyFormat';
+export { useDateFormat } from './useDateFormat';
+
 // Context Hooks (re-export for convenience)
 export { useAuth } from '../context/AuthContext';
 export { useAdmin } from '../context/AdminContext';

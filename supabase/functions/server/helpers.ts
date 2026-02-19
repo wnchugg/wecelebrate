@@ -6,6 +6,74 @@
 import type { Context } from 'npm:hono@4.0.2';
 import type { SupabaseClient } from 'jsr:@supabase/supabase-js@2';
 import type { ErrorResponse, SuccessResponse, AuditLogEntry } from './types.ts';
+
+// ===== Client Field Error Codes =====
+
+export enum ClientErrorCode {
+  VALIDATION_ERROR = 'VALIDATION_ERROR',
+  MISSING_REQUIRED_FIELD = 'MISSING_REQUIRED_FIELD',
+  INVALID_FIELD_FORMAT = 'INVALID_FIELD_FORMAT',
+  DUPLICATE_CLIENT_CODE = 'DUPLICATE_CLIENT_CODE',
+  CLIENT_NOT_FOUND = 'CLIENT_NOT_FOUND',
+  DATABASE_ERROR = 'DATABASE_ERROR',
+  TRANSFORMATION_ERROR = 'TRANSFORMATION_ERROR',
+}
+
+export interface ClientErrorResponse {
+  success: false;
+  error: {
+    code: ClientErrorCode;
+    message: string;
+    field?: string;
+    details?: any;
+  };
+}
+
+/**
+ * Creates a structured error response for client operations
+ * Requirements: 5.4
+ */
+export function clientErrorResponse(
+  c: Context,
+  code: ClientErrorCode,
+  message: string,
+  field?: string,
+  details?: any
+): Response {
+  const status = getStatusForErrorCode(code);
+  const response: ClientErrorResponse = {
+    success: false,
+    error: {
+      code,
+      message,
+      ...(field && { field }),
+      ...(details && { details }),
+    },
+  };
+  return c.json(response, status);
+}
+
+/**
+ * Maps error codes to HTTP status codes
+ */
+function getStatusForErrorCode(code: ClientErrorCode): number {
+  switch (code) {
+    case ClientErrorCode.VALIDATION_ERROR:
+    case ClientErrorCode.MISSING_REQUIRED_FIELD:
+    case ClientErrorCode.INVALID_FIELD_FORMAT:
+      return 400;
+    case ClientErrorCode.DUPLICATE_CLIENT_CODE:
+      return 409;
+    case ClientErrorCode.CLIENT_NOT_FOUND:
+      return 404;
+    case ClientErrorCode.DATABASE_ERROR:
+    case ClientErrorCode.TRANSFORMATION_ERROR:
+      return 500;
+    default:
+      return 500;
+  }
+}
+
 import { auditLog } from './security.ts';
 
 // ===== Response Helpers =====
@@ -205,6 +273,177 @@ export function objectToSnakeCase(obj: Record<string, any>): Record<string, any>
   for (const [key, value] of Object.entries(obj)) {
     result[camelToSnake(key)] = value;
   }
+  return result;
+}
+
+/**
+ * Maps frontend Client fields to database column names
+ * Handles the "client_" prefix and special cases
+ * Requirements: 5.4
+ */
+export function mapClientFieldsToDatabase(input: Record<string, any>): Record<string, any> {
+  const fieldMapping: Record<string, string> = {
+    // Special cases (no client_ prefix)
+    'id': 'id',
+    'name': 'name',
+    'contactEmail': 'contact_email',
+    'status': 'status',
+    'technologyOwner': 'technology_owner',
+    'technologyOwnerEmail': 'technology_owner_email',
+    'createdAt': 'created_at',
+    'updatedAt': 'updated_at',
+    
+    // Standard fields (with client_ prefix)
+    'clientCode': 'client_code',
+    'clientRegion': 'client_region',
+    'clientSourceCode': 'client_source_code',
+    'clientContactName': 'client_contact_name',
+    'clientContactPhone': 'client_contact_phone',
+    'clientTaxId': 'client_tax_id',
+    'clientAddressLine1': 'client_address_line_1',
+    'clientAddressLine2': 'client_address_line_2',
+    'clientAddressLine3': 'client_address_line_3',
+    'clientCity': 'client_city',
+    'clientPostalCode': 'client_postal_code',
+    'clientCountryState': 'client_country_state',
+    'clientCountry': 'client_country',
+    'clientAccountManager': 'client_account_manager',
+    'clientAccountManagerEmail': 'client_account_manager_email',
+    'clientImplementationManager': 'client_implementation_manager',
+    'clientImplementationManagerEmail': 'client_implementation_manager_email',
+    'clientUrl': 'client_url',
+    'clientAllowSessionTimeoutExtend': 'client_allow_session_timeout_extend',
+    'clientAuthenticationMethod': 'client_authentication_method',
+    'clientCustomUrl': 'client_custom_url',
+    'clientHasEmployeeData': 'client_has_employee_data',
+    'clientInvoiceType': 'client_invoice_type',
+    'clientInvoiceTemplateType': 'client_invoice_template_type',
+    'clientPoType': 'client_po_type',
+    'clientPoNumber': 'client_po_number',
+    'clientErpSystem': 'client_erp_system',
+    'clientSso': 'client_sso',
+    'clientHrisSystem': 'client_hris_system',
+  };
+
+  const result: Record<string, any> = {};
+  const unknownFields: string[] = [];
+  
+  try {
+    for (const [key, value] of Object.entries(input)) {
+      const dbColumn = fieldMapping[key];
+      if (dbColumn) {
+        result[dbColumn] = value;
+      } else {
+        unknownFields.push(key);
+        console.warn(
+          `[mapClientFieldsToDatabase] Unknown field encountered\n` +
+          `  Timestamp: ${new Date().toISOString()}\n` +
+          `  Field: ${key}\n` +
+          `  Value: ${JSON.stringify(value)}\n` +
+          `  Operation: toDatabase`
+        );
+      }
+    }
+    
+    if (unknownFields.length > 0) {
+      console.warn(
+        `[mapClientFieldsToDatabase] Summary: ${unknownFields.length} unknown field(s) ignored: ${unknownFields.join(', ')}`
+      );
+    }
+  } catch (error) {
+    console.error(
+      `[mapClientFieldsToDatabase] Transformation error\n` +
+      `  Timestamp: ${new Date().toISOString()}\n` +
+      `  Input: ${JSON.stringify(input)}\n` +
+      `  Error: ${error instanceof Error ? error.message : String(error)}`
+    );
+    throw error;
+  }
+  
+  return result;
+}
+
+/**
+ * Maps database Client columns to frontend field names
+ * Handles the "client_" prefix and special cases
+ * Requirements: 5.4
+ */
+export function mapClientFieldsFromDatabase(dbRow: Record<string, any>): Record<string, any> {
+  const reverseMapping: Record<string, string> = {
+    // Special cases (no client_ prefix)
+    'id': 'id',
+    'name': 'name',
+    'contact_email': 'contactEmail',
+    'status': 'status',
+    'technology_owner': 'technologyOwner',
+    'technology_owner_email': 'technologyOwnerEmail',
+    'created_at': 'createdAt',
+    'updated_at': 'updatedAt',
+    
+    // Standard fields (with client_ prefix)
+    'client_code': 'clientCode',
+    'client_region': 'clientRegion',
+    'client_source_code': 'clientSourceCode',
+    'client_contact_name': 'clientContactName',
+    'client_contact_phone': 'clientContactPhone',
+    'client_tax_id': 'clientTaxId',
+    'client_address_line_1': 'clientAddressLine1',
+    'client_address_line_2': 'clientAddressLine2',
+    'client_address_line_3': 'clientAddressLine3',
+    'client_city': 'clientCity',
+    'client_postal_code': 'clientPostalCode',
+    'client_country_state': 'clientCountryState',
+    'client_country': 'clientCountry',
+    'client_account_manager': 'clientAccountManager',
+    'client_account_manager_email': 'clientAccountManagerEmail',
+    'client_implementation_manager': 'clientImplementationManager',
+    'client_implementation_manager_email': 'clientImplementationManagerEmail',
+    'client_url': 'clientUrl',
+    'client_allow_session_timeout_extend': 'clientAllowSessionTimeoutExtend',
+    'client_authentication_method': 'clientAuthenticationMethod',
+    'client_custom_url': 'clientCustomUrl',
+    'client_has_employee_data': 'clientHasEmployeeData',
+    'client_invoice_type': 'clientInvoiceType',
+    'client_invoice_template_type': 'clientInvoiceTemplateType',
+    'client_po_type': 'clientPoType',
+    'client_po_number': 'clientPoNumber',
+    'client_erp_system': 'clientErpSystem',
+    'client_sso': 'clientSso',
+    'client_hris_system': 'clientHrisSystem',
+  };
+
+  const result: Record<string, any> = {};
+  const unmappedFields: string[] = [];
+  
+  try {
+    for (const [key, value] of Object.entries(dbRow)) {
+      const frontendField = reverseMapping[key];
+      if (frontendField) {
+        result[frontendField] = value;
+      } else {
+        unmappedFields.push(key);
+        // Only log if it's not a system field we expect to ignore
+        if (!['isActive', 'description', 'contactPhone', 'address'].includes(key)) {
+          console.warn(
+            `[mapClientFieldsFromDatabase] Unmapped database field\n` +
+            `  Timestamp: ${new Date().toISOString()}\n` +
+            `  Field: ${key}\n` +
+            `  Value: ${JSON.stringify(value)}\n` +
+            `  Operation: fromDatabase`
+          );
+        }
+      }
+    }
+  } catch (error) {
+    console.error(
+      `[mapClientFieldsFromDatabase] Transformation error\n` +
+      `  Timestamp: ${new Date().toISOString()}\n` +
+      `  Input: ${JSON.stringify(dbRow)}\n` +
+      `  Error: ${error instanceof Error ? error.message : String(error)}`
+    );
+    throw error;
+  }
+  
   return result;
 }
 

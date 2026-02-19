@@ -64,15 +64,102 @@ export interface LoginResponse {
 // ===== Client Types =====
 
 export interface Client {
+  // System fields
+  /** Unique identifier for the client */
   id: string;
-  name: string;
-  contactEmail: string;
-  status: 'active' | 'inactive';
+  /** Timestamp when the client was created */
   createdAt: string;
+  /** Timestamp when the client was last updated */
   updatedAt: string;
   
-  // NEW: UX Customization
+  // Basic Information (Required)
+  /** Client organization name */
+  name: string;
+  /** Primary contact email address for the client */
+  contactEmail: string;
+  /** Current status of the client account */
+  status: 'active' | 'inactive';
+  
+  // Client Identification
+  /** Unique code identifying the client in external systems */
+  clientCode?: string;
+  /** Geographic region where the client operates (e.g., US/CA, EMEA, APAC, LATAM, Global) */
+  clientRegion?: string;
+  /** Source code indicating how the client was acquired or originated */
+  clientSourceCode?: string;
+  
+  // Contact Information
+  /** Name of the primary contact person at the client organization */
+  clientContactName?: string;
+  /** Phone number for the primary contact person */
+  clientContactPhone?: string;
+  /** Tax identification number for the client organization */
+  clientTaxId?: string;
+  
+  // Address
+  /** First line of the client's physical address */
+  clientAddressLine1?: string;
+  /** Second line of the client's physical address */
+  clientAddressLine2?: string;
+  /** Third line of the client's physical address */
+  clientAddressLine3?: string;
+  /** City where the client is located */
+  clientCity?: string;
+  /** Postal or ZIP code for the client's address */
+  clientPostalCode?: string;
+  /** State, province, or country subdivision */
+  clientCountryState?: string;
+  /** Country where the client is located */
+  clientCountry?: string;
+  
+  // Account Management
+  /** Name of the HALO account manager assigned to this client */
+  clientAccountManager?: string;
+  /** Email address of the account manager */
+  clientAccountManagerEmail?: string;
+  /** Name of the implementation manager for this client */
+  clientImplementationManager?: string;
+  /** Email address of the implementation manager */
+  clientImplementationManagerEmail?: string;
+  /** Name of the technology owner responsible for technical aspects */
+  technologyOwner?: string;
+  /** Email address of the technology owner */
+  technologyOwnerEmail?: string;
+  
+  // Application Settings
+  /** Primary URL for accessing the client's application */
+  clientUrl?: string;
+  /** Custom branded URL for the client's application */
+  clientCustomUrl?: string;
+  /** Whether to allow users to extend session timeout (4-hour sessions) */
+  clientAllowSessionTimeoutExtend?: boolean;
+  /** Authentication method used by the client (e.g., SSO, Basic, OAuth) */
+  clientAuthenticationMethod?: string;
+  /** Whether the client has employee data integrated */
+  clientHasEmployeeData?: boolean;
+  
+  // Billing Settings
+  /** Type of invoice used for billing this client */
+  clientInvoiceType?: string;
+  /** Template type used for generating invoices */
+  clientInvoiceTemplateType?: string;
+  /** Type of purchase order used by the client */
+  clientPoType?: string;
+  /** Purchase order number for billing reference */
+  clientPoNumber?: string;
+  
+  // Integration Settings
+  /** ERP system integrated with the client (e.g., NXJ, Fourgen, Netsuite, GRS) */
+  clientErpSystem?: string;
+  /** SSO provider configuration for the client */
+  clientSso?: string;
+  /** HRIS system integrated with the client */
+  clientHrisSystem?: string;
+  
+  // UX Customization
+  /** Header and footer configuration for client branding */
   headerFooterConfig?: HeaderFooterConfig;
+  /** Branding assets including logos and colors */
   brandingAssets?: BrandingAssets;
 }
 

@@ -16,11 +16,13 @@ import {
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import type { TooltipProps } from 'recharts';
 import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
+import { CurrencyDisplay } from '../../components/CurrencyDisplay';
+import { useNumberFormat } from '../../hooks/useNumberFormat';
 
 // Types
 interface MetricCard {
   title: string;
-  value: string | number;
+  value: string | number | React.ReactNode;
   change: number;
   trend: 'up' | 'down';
   icon: React.ReactNode;
@@ -34,6 +36,7 @@ interface ChartData {
 export default function AnalyticsDashboard() {
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
   const [loading, setLoading] = useState(true);
+  const { formatNumber } = useNumberFormat();
   
   // Mock data - replace with real API calls
   useEffect(() => {
@@ -66,14 +69,14 @@ export default function AnalyticsDashboard() {
     },
     {
       title: 'Total Revenue',
-      value: '$284,592',
+      value: <CurrencyDisplay amount={284592} />,
       change: -3.2,
       trend: 'down',
       icon: <DollarSign className="w-6 h-6" />
     },
     {
       title: 'Avg Order Value',
-      value: '$142.35',
+      value: <CurrencyDisplay amount={142.35} />,
       change: 5.7,
       trend: 'up',
       icon: <TrendingUp className="w-6 h-6" />
@@ -267,7 +270,7 @@ export default function AnalyticsDashboard() {
                   border: '1px solid #e5e7eb',
                   borderRadius: '0.5rem'
                 }}
-                {...({ formatter: (value: number) => `$${value.toLocaleString()}` } as any)}
+                {...({ formatter: (value: number) => formatNumber(value) } as any)}
               />
               <Line 
                 type="monotone" 

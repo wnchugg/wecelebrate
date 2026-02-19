@@ -79,6 +79,49 @@ VITE_SUPABASE_ANON_KEY=your_production_anon_key
 
 ## Deployment Steps
 
+### Prerequisites
+
+Before deploying, ensure:
+- [ ] All tests passing (385/385)
+- [ ] Build successful (`npm run build`)
+- [ ] Environment variables configured
+- [ ] Backend deployed (if not already)
+
+### Git Deployment Process
+
+For detailed Git instructions, see **[GIT_DEPLOYMENT_GUIDE.md](GIT_DEPLOYMENT_GUIDE.md)**
+
+#### Quick Git Deployment
+
+```bash
+# 1. Commit your changes
+git commit -m "feat: Deploy internationalization improvements"
+
+# 2. Push to development branch
+git push origin development
+
+# 3. (Optional) Deploy to production
+git checkout main
+git merge development
+git push origin main
+```
+
+#### Common Git Issues
+
+**Authentication Error?**
+- Use Personal Access Token instead of password
+- See [GIT_DEPLOYMENT_GUIDE.md](GIT_DEPLOYMENT_GUIDE.md) for setup instructions
+
+**Push Rejected?**
+```bash
+git pull origin development
+# Resolve any conflicts
+git push origin development
+```
+
+**Need Help?**
+- See [GIT_DEPLOYMENT_GUIDE.md](GIT_DEPLOYMENT_GUIDE.md) for detailed troubleshooting
+
 ### Step 1: Verify Backend Configuration
 
 Ensure the backend address autocomplete service is configured:

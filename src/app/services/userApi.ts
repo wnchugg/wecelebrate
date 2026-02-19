@@ -1,8 +1,11 @@
 import { supabase } from '../lib/supabase';
 import { AdvancedAuthUser, EditUserRequest, SetPasswordRequest } from '../../types/advancedAuth';
+import { hasPermission } from './permissionService';
+import { logUserEdit, logUserPasswordSet, logUserCreation, logUserDeletion } from './auditLogService';
 
 /**
  * Get all users for a site
+ * No permission check needed - viewing users is allowed for admins
  */
 export async function getUsers(siteId: string): Promise<AdvancedAuthUser[]> {
   const { data, error } = await supabase
@@ -35,8 +38,17 @@ export async function getUsers(siteId: string): Promise<AdvancedAuthUser[]> {
 
 /**
  * Update user information
+ * Requires 'user_edit' or 'user_management' permission
  */
 export async function updateUser(request: EditUserRequest): Promise<void> {
+  // Check permissions
+  const hasEditPermission = await hasPermission('user_edit');
+  const hasManagementPermission = await hasPermission('user_management');
+  
+  if (!hasEditPermission && !hasManagementPermission) {
+    throw new Error('Insufficient permissions: user_edit or user_management permission required');
+  }
+  
   const updates: Record<string, unknown> = {
     updated_at: new Date().toISOString(),
   };
@@ -57,44 +69,66 @@ export async function updateUser(request: EditUserRequest): Promise<void> {
     console.error('Error updating user:', error);
     throw new Error('Failed to update user');
   }
+
+  // Log audit event
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user && request.siteId) {
+    await logUserEdit(
+      user.id,
+      request.userId,
+      request.siteId,
+      updates
+    );
+  }
 }
 
 /**
  * Set temporary password for a user
+ * Requires 'user_password_set' or 'user_management' permission
  */
 export async function setUserPassword(request: SetPasswordRequest): Promise<void> {
-  // In a real implementation, this would:
-  // 1. Hash the password
-  // 2. Store it in the database
-  // 3. Send an email to the user
-  // 4. Set force_password_reset flag if requested
+  // Check permissions
+  const hasPasswordPermission = await hasPermission('user_password_set');
+  const hasManagementPermission = await hasPermission('user_management');
   
-  const updates: Record<string, unknown> = {
-    force_password_reset: request.forcePasswordReset,
-    updated_at: new Date().toISOString(),
-  };
-
-  // Note: In production, password hashing should be done server-side
-  // This is a placeholder for the client-side API call
-  const { error } = await supabase
-    .from('site_users')
-    .update(updates)
-    .eq('id', request.userId);
-
-  if (error) {
-    console.error('Error setting password:', error);
-    throw new Error('Failed to set password');
+  if (!hasPasswordPermission && !hasManagementPermission) {
+    throw new Error('Insufficient permissions: user_password_set or user_management permission required');
   }
-
-  // Send email notification (would be handled by backend)
-  if (request.sendEmail) {
-    // Call backend endpoint to send password email
-    console.log('Sending password email to user:', request.userId);
+  
+  // Call backend API to set password (includes hashing and validation)
+  const { data: { session } } = await supabase.auth.getSession();
+  
+  if (!session) {
+    throw new Error('Not authenticated');
   }
+  
+  const response = await fetch(`${supabase.supabaseUrl}/functions/v1/make-server-6fcaeea3/password-management/set`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify({
+      userId: request.userId,
+      siteId: request.siteId,
+      temporaryPassword: request.temporaryPassword,
+      forcePasswordReset: request.forcePasswordReset,
+      sendEmail: request.sendEmail,
+      expiresInHours: 48, // Default 48 hours
+    }),
+  });
+  
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Failed to set password');
+  }
+  
+  // Audit logging is handled by the backend
 }
 
 /**
  * Create a new user
+ * Requires 'user_management' permission
  */
 export async function createUser(
   siteId: string,
@@ -107,6 +141,13 @@ export async function createUser(
     status: string;
   }
 ): Promise<AdvancedAuthUser> {
+  // Check permissions
+  const hasManagementPermission = await hasPermission('user_management');
+  
+  if (!hasManagementPermission) {
+    throw new Error('Insufficient permissions: user_management permission required');
+  }
+  
   const { data, error } = await supabase
     .from('site_users')
     .insert({
@@ -129,6 +170,23 @@ export async function createUser(
     throw new Error('Failed to create user');
   }
 
+  // Log audit event
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    await logUserCreation(
+      user.id,
+      data.id as string,
+      siteId,
+      {
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        role: userData.role,
+        status: userData.status,
+      }
+    );
+  }
+
   return {
     id: data.id as string,
     email: data.email as string,
@@ -146,8 +204,17 @@ export async function createUser(
 
 /**
  * Delete (deactivate) a user
+ * Requires 'user_delete' or 'user_management' permission
  */
 export async function deleteUser(userId: string): Promise<void> {
+  // Check permissions
+  const hasDeletePermission = await hasPermission('user_delete');
+  const hasManagementPermission = await hasPermission('user_management');
+  
+  if (!hasDeletePermission && !hasManagementPermission) {
+    throw new Error('Insufficient permissions: user_delete or user_management permission required');
+  }
+  
   const { error } = await supabase
     .from('site_users')
     .update({
@@ -159,5 +226,24 @@ export async function deleteUser(userId: string): Promise<void> {
   if (error) {
     console.error('Error deleting user:', error);
     throw new Error('Failed to delete user');
+  }
+
+  // Log audit event
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    // Get site_id from the user being deleted
+    const { data: deletedUser } = await supabase
+      .from('site_users')
+      .select('site_id')
+      .eq('id', userId)
+      .single();
+    
+    if (deletedUser) {
+      await logUserDeletion(
+        user.id,
+        userId,
+        deletedUser.site_id as string
+      );
+    }
   }
 }

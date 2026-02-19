@@ -440,6 +440,17 @@ export async function createSite(input: Omit<CreateSiteInput, 'id'>) {
     console.log('[CRUD DB] Creating site:', input.name);
     console.log('[CRUD DB] Input fields:', Object.keys(input));
     
+    // Validate language codes if provided
+    if (input.available_languages) {
+      const { sanitizeLanguages } = await import('./helpers.ts');
+      input.available_languages = sanitizeLanguages(input.available_languages);
+    }
+    
+    if (input.draft_available_languages) {
+      const { sanitizeLanguages } = await import('./helpers.ts');
+      input.draft_available_languages = sanitizeLanguages(input.draft_available_languages);
+    }
+    
     // Map frontend fields to database columns and filter out non-existent fields
     const mappedInput = mapSiteFieldsToDatabase(input as any);
     console.log('[CRUD DB] Mapped fields:', Object.keys(mappedInput));
@@ -526,6 +537,17 @@ export async function updateSite(id: string, input: UpdateSiteInput) {
   try {
     console.log('[CRUD DB] Updating site:', id);
     console.log('[CRUD DB] Input fields:', Object.keys(input));
+    
+    // Validate language codes if provided
+    if (input.available_languages) {
+      const { sanitizeLanguages } = await import('./helpers.ts');
+      input.available_languages = sanitizeLanguages(input.available_languages);
+    }
+    
+    if (input.draft_available_languages) {
+      const { sanitizeLanguages } = await import('./helpers.ts');
+      input.draft_available_languages = sanitizeLanguages(input.draft_available_languages);
+    }
     
     // Map frontend fields to database columns and filter out non-existent fields
     const mappedInput = mapSiteFieldsToDatabase(input as any);
@@ -2228,12 +2250,18 @@ export async function publishSite(id: string) {
     
     // Merge draft settings into live columns
     console.log('[CRUD DB] Merging draft settings into live columns');
-    const updates = {
+    const updates: any = {
       ...currentSite.draft_settings,  // All draft changes
       status: 'active',
-      draft_settings: null,  // Clear draft after publishing
+      draft_settings: undefined,  // Clear draft after publishing
       updated_at: new Date()
     };
+    
+    // Copy draft_available_languages to available_languages on publish
+    if (currentSite.draft_settings.draft_available_languages) {
+      updates.available_languages = currentSite.draft_settings.draft_available_languages;
+      updates.draft_available_languages = undefined;  // Clear draft_available_languages
+    }
     
     const updatedSite = await db.updateSite(id, updates as UpdateSiteInput);
     
@@ -2329,7 +2357,7 @@ export async function discardSiteDraft(id: string) {
     }
     
     const updatedSite = await db.updateSite(id, {
-      draft_settings: null,
+      draft_settings: undefined,
       updated_at: new Date()
     } as UpdateSiteInput);
     

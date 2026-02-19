@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router';
 import { usePublicSite } from '../context/PublicSiteContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
+import { useSiteContent } from '../hooks/useSiteContent';
 import { ArrowRight, Play, Heart, MessageCircle } from 'lucide-react';
 import { CelebrationMessage, ECARD_TEMPLATES } from '../types/celebration';
 import { ECard } from '../components/ECard';
@@ -17,6 +18,7 @@ export function Welcome() {
   const { currentSite } = usePublicSite();
   const { t } = useLanguage();
   const { user } = useAuth();
+  const { getTranslatedContent } = useSiteContent();
   const [videoPlaying, setVideoPlaying] = useState(false);
   const [celebrationMessages, setCelebrationMessages] = useState<CelebrationMessage[]>([]);
   const [loading, setLoading] = useState(false);
@@ -167,6 +169,11 @@ export function Welcome() {
 As a token of our appreciation for your continued service, we invite you to select a special gift. Thank you for being such an important part of our success.`;
   const defaultCtaText = t('welcome.defaultCta') || 'Choose Your Gift';
 
+  // Get translated content with fallbacks
+  const title = getTranslatedContent('welcomePage.title', welcomeContent?.title || defaultTitle);
+  const message = getTranslatedContent('welcomePage.message', welcomeContent?.message || defaultMessage);
+  const buttonText = getTranslatedContent('welcomePage.buttonText', welcomeContent?.ctaText || defaultCtaText);
+
   // Early return if currentSite is null - prevents rendering before redirect
   if (!currentSite) {
     return (
@@ -260,13 +267,13 @@ As a token of our appreciation for your continued service, we invite you to sele
                   className="text-3xl md:text-4xl font-bold mb-6"
                   style={{ color: primaryColor }}
                 >
-                  {welcomeContent?.title || defaultTitle}
+                  {title}
                 </h1>
 
                 {/* Letter Message */}
                 <div className="prose prose-lg max-w-none mb-8">
                   <p className="text-gray-700 text-base md:text-lg leading-relaxed whitespace-pre-wrap">
-                    {welcomeContent?.message || defaultMessage}
+                    {message}
                   </p>
                 </div>
 
@@ -398,7 +405,7 @@ As a token of our appreciation for your continued service, we invite you to sele
               boxShadow: `0 4px 14px ${primaryColor}40`
             }}
           >
-            <span className="text-white">{welcomeContent?.ctaText || defaultCtaText}</span>
+            <span className="text-white">{buttonText}</span>
             <ArrowRight className="w-5 h-5 text-white transition-transform group-hover:translate-x-1" />
           </button>
         </div>

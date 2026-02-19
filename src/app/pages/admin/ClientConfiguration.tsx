@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router';
 import { toast } from 'sonner';
 import { 
   Save, Settings, Globe, Mail, Building2, Package, CreditCard, 
-  Link2, Users, MapPin, Check, AlertCircle, ArrowLeft, Loader2, Clock, ExternalLink
+  Link2, Users, MapPin, Check, AlertCircle, ArrowLeft, Loader2, Clock, ExternalLink, Server
 } from 'lucide-react';
 import { Alert, AlertDescription } from '../../components/ui/alert';
 import { Button } from '../../components/ui/button';
@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/ta
 import { Badge } from '../../components/ui/badge';
 import { PhoneInput } from '../../components/ui/phone-input';
 import { AddressInput, AddressData } from '../../components/ui/address-input';
+import { SFTPConfiguration } from '../../components/admin/SFTPConfiguration';
 import { apiRequest } from '../../utils/api';
 import { showErrorToast, showSuccessToast } from '../../utils/errorHandling';
 import { validateClientConfiguration } from '../../utils/clientConfigValidation';
@@ -523,6 +524,10 @@ export function ClientConfiguration({
             <TabsTrigger value="integrations">
               <Link2 className="w-4 h-4 mr-2" />
               Integrations
+            </TabsTrigger>
+            <TabsTrigger value="sftp">
+              <Server className="w-4 h-4 mr-2" />
+              SFTP
             </TabsTrigger>
           </TabsList>
         )}
@@ -1403,6 +1408,28 @@ export function ClientConfiguration({
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* SFTP Tab */}
+        <TabsContent value="sftp" className="space-y-6">
+          <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-xl p-4 border border-cyan-100">
+            <div className="flex items-start gap-3">
+              <Server className="w-5 h-5 text-cyan-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-1">SFTP Employee Data Import</h3>
+                <p className="text-sm text-gray-700">
+                  Configure automated employee data imports from your SFTP server. This setting applies to all sites under this client.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <SFTPConfiguration 
+            client={{ id: clientId || '', name: clientName }}
+            onConfigUpdated={() => {
+              toast.success('SFTP configuration updated');
+            }}
+          />
         </TabsContent>
       </Tabs>
 

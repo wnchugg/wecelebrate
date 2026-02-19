@@ -4,6 +4,8 @@ import { Button } from '../ui/button';
 import { Alert, AlertDescription } from '../ui/alert';
 import { AdvancedAuthUser } from '../../../types/advancedAuth';
 import { useNameFormat } from '../../hooks/useNameFormat';
+import { PasswordStrengthIndicator } from './PasswordStrengthIndicator';
+import { generateSecurePassword, validatePassword } from '../../utils/passwordValidation';
 
 interface SetPasswordModalProps {
   open: boolean;
@@ -22,39 +24,14 @@ export function SetPasswordModal({ open, user, onClose, onSetPassword }: SetPass
   useEffect(() => {
     if (open) {
       // Generate initial password when modal opens
-      setPassword(generateRandomPassword());
+      setPassword(generateSecurePassword(16));
       setForceReset(true);
       setShowPassword(false);
     }
   }, [open]);
 
-  const generateRandomPassword = (): string => {
-    const length = 16;
-    const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const lowercase = 'abcdefghijklmnopqrstuvwxyz';
-    const numbers = '0123456789';
-    const symbols = '!@#$%^&*';
-    const allChars = uppercase + lowercase + numbers + symbols;
-    
-    let password = '';
-    
-    // Ensure at least one of each type
-    password += uppercase[Math.floor(Math.random() * uppercase.length)];
-    password += lowercase[Math.floor(Math.random() * lowercase.length)];
-    password += numbers[Math.floor(Math.random() * numbers.length)];
-    password += symbols[Math.floor(Math.random() * symbols.length)];
-    
-    // Fill the rest randomly
-    for (let i = password.length; i < length; i++) {
-      password += allChars[Math.floor(Math.random() * allChars.length)];
-    }
-    
-    // Shuffle the password
-    return password.split('').sort(() => Math.random() - 0.5).join('');
-  };
-
   const handleGeneratePassword = () => {
-    setPassword(generateRandomPassword());
+    setPassword(generateSecurePassword(16));
     setShowPassword(true);
   };
 
@@ -72,7 +49,8 @@ export function SetPasswordModal({ open, user, onClose, onSetPassword }: SetPass
     }
   };
 
-  const isPasswordValid = password.length >= 8;
+  const validation = validatePassword(password);
+  const isPasswordValid = validation.valid;
 
   if (!open || !user) return null;
 
@@ -121,10 +99,12 @@ export function SetPasswordModal({ open, user, onClose, onSetPassword }: SetPass
                 )}
               </button>
             </div>
-            {!isPasswordValid && password && (
-              <p className="text-xs text-red-600 mt-1">
-                Password must be at least 8 characters
-              </p>
+            
+            {/* Password strength indicator */}
+            {password && (
+              <div className="mt-3">
+                <PasswordStrengthIndicator password={password} showErrors={true} />
+              </div>
             )}
           </div>
 

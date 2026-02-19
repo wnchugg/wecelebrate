@@ -225,6 +225,12 @@ export interface Site {
   selection_start_date?: string;
   selection_end_date?: string;
   
+  // Multi-language content management
+  available_languages?: string[];
+  translations?: Record<string, any>;
+  draft_available_languages?: string[];
+  draft_settings?: Record<string, any>;
+  
   // Phase 1: ERP Integration Fields (CRITICAL)
   site_code?: string;
   site_erp_integration?: string;

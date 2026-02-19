@@ -188,7 +188,7 @@ export interface SiteSettings {
   requireShipping: boolean;
   supportEmail: string;
   languages: string[];
-  defaultLanguage: string;
+  defaultLanguage: string;                // Primary language for the site (required for all translatable fields)
   enableLanguageSelector?: boolean;
   allowQuantitySelection?: boolean;
   showPricing?: boolean;
@@ -300,6 +300,11 @@ export interface Site {
   createdAt: string;
   updatedAt: string;
   
+  // Multi-language content support
+  availableLanguages?: string[];          // Languages enabled for this site (default: ['en'])
+  translations?: Record<string, any>;     // JSONB column storing all translations
+  draftAvailableLanguages?: string[];     // Draft languages (before publish)
+  
   // NEW: UX Customization (can override client defaults)
   headerFooterConfig?: HeaderFooterConfig;
   brandingAssets?: BrandingAssets;
@@ -361,6 +366,11 @@ export interface CreateSiteRequest {
   reviewScreenConfig?: ReviewScreenConfig;
   orderTrackingConfig?: OrderTrackingConfig;
   
+  // Multi-language content support
+  availableLanguages?: string[];          // Languages enabled for this site (default: ['en'])
+  translations?: Record<string, any>;     // JSONB column storing all translations
+  draftAvailableLanguages?: string[];     // Draft languages (before publish)
+  
   // Phase 1: ERP Integration Fields (CRITICAL for ERP sync)
   siteCode?: string;                      // Unique code for ERP sync
   siteErpIntegration?: string;            // ERP system: NAJ, Fourgen, Netsuite, GRS
@@ -413,6 +423,11 @@ export interface UpdateSiteRequest {
   giftSelectionConfig?: GiftSelectionConfig;
   reviewScreenConfig?: ReviewScreenConfig;
   orderTrackingConfig?: OrderTrackingConfig;
+  
+  // Multi-language content support
+  availableLanguages?: string[];          // Languages enabled for this site (default: ['en'])
+  translations?: Record<string, any>;     // JSONB column storing all translations
+  draftAvailableLanguages?: string[];     // Draft languages (before publish)
   
   // Phase 1: ERP Integration Fields (CRITICAL for ERP sync)
   siteCode?: string;                      // Unique code for ERP sync

@@ -24,6 +24,7 @@ export type UserStatus = 'active' | 'inactive' | 'suspended' | 'pending';
 
 export interface SetPasswordRequest {
   userId: string;
+  siteId: string;
   temporaryPassword: string;
   forcePasswordReset: boolean;
   sendEmail?: boolean;
@@ -31,6 +32,7 @@ export interface SetPasswordRequest {
 
 export interface EditUserRequest {
   userId: string;
+  siteId: string;
   firstName?: string;
   lastName?: string;
   email?: string;

@@ -91,6 +91,10 @@ export interface Site {
   settings?: Record<string, any>;
   brand_id?: string;
   branding_overrides?: Record<string, any>;
+  available_languages?: string[];  // Languages enabled for this site (default: ['en'])
+  translations?: Record<string, any>;  // JSONB column storing all translations
+  draft_available_languages?: string[];  // Draft languages (before publish)
+  draft_settings?: Record<string, any>;  // Draft settings (before publish)
   created_at: string;
   updated_at: string;
   created_by?: string;
@@ -109,6 +113,10 @@ export interface CreateSiteInput {
   font_family?: string;
   custom_css?: string;
   settings?: Record<string, any>;
+  available_languages?: string[];  // Languages enabled for this site (default: ['en'])
+  translations?: Record<string, any>;  // JSONB column storing all translations
+  draft_available_languages?: string[];  // Draft languages (before publish)
+  draft_settings?: Record<string, any>;  // Draft settings (before publish)
   created_by?: string;
 }
 
@@ -124,6 +132,10 @@ export interface UpdateSiteInput {
   font_family?: string;
   custom_css?: string;
   settings?: Record<string, any>;
+  available_languages?: string[];  // Languages enabled for this site (default: ['en'])
+  translations?: Record<string, any>;  // JSONB column storing all translations
+  draft_available_languages?: string[];  // Draft languages (before publish)
+  draft_settings?: Record<string, any>;  // Draft settings (before publish)
   updated_by?: string;
 }
 

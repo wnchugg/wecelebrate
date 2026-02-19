@@ -13,6 +13,7 @@ import { SetPasswordModal } from '../../components/admin/SetPasswordModal';
 import { getUsers, updateUser, setUserPassword } from '../../services/userApi';
 import { AdvancedAuthUser } from '../../../types/advancedAuth';
 import { useNameFormat } from '../../hooks/useNameFormat';
+import { hasPermission } from '../../services/permissionService';
 
 // SECURITY NOTE: This file only exports data to Excel (ExcelJS.writeBuffer).
 // It does NOT import/parse external Excel files, so there are no security concerns.
@@ -52,7 +53,17 @@ export function AccessManagement({
   const [selectedUser, setSelectedUser] = useState<AdvancedAuthUser | null>(null);
   const [showEditUserModal, setShowEditUserModal] = useState(false);
   const [showSetPasswordModal, setShowSetPasswordModal] = useState(false);
-  const [hasProxyPermission] = useState(true); // TODO: Get from actual permissions
+  const [hasProxyPermission, setHasProxyPermission] = useState(false);
+
+  // Check permissions on mount
+  useEffect(() => {
+    const checkPermissions = async () => {
+      const proxyPermission = await hasPermission('proxy_login');
+      setHasProxyPermission(proxyPermission);
+    };
+    
+    void checkPermissions();
+  }, []);
 
   // Load employees when site changes
   useEffect(() => {
@@ -220,15 +231,44 @@ export function AccessManagement({
     setShowSetPasswordModal(true);
   };
 
-  const handleProxyLogin = (user: AdvancedAuthUser) => {
-    // TODO: Implement proxy login
-    toast.info(`Proxy login for ${formatFullName(user.firstName, user.lastName)} - Coming soon`);
+  const handleProxyLogin = async (user: AdvancedAuthUser) => {
+    if (!currentSite?.id) return;
+    
+    try {
+      setLoading(true);
+      
+      // Create proxy session
+      const { createProxySession } = await import('../../services/proxyLoginApi');
+      const session = await createProxySession({
+        adminId: '', // Will be set by backend from auth token
+        employeeId: user.id,
+        siteId: currentSite.id,
+        durationMinutes: 30,
+      });
+      
+      // Store token in localStorage
+      localStorage.setItem('proxy_session_token', session.token);
+      
+      // Open site in new tab with proxy session
+      const siteUrl = `${window.location.origin}/site/${currentSite.slug}`;
+      window.open(siteUrl, '_blank');
+      
+      toast.success(`Proxy session created for ${formatFullName(user.firstName, user.lastName)}`);
+    } catch (error) {
+      console.error('Failed to create proxy session:', error);
+      toast.error('Failed to create proxy session');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSaveUser = async (userId: string, updates: Partial<AdvancedAuthUser>) => {
+    if (!currentSite?.id) return;
+    
     try {
       await updateUser({
         userId,
+        siteId: currentSite.id,
         firstName: updates.firstName,
         lastName: updates.lastName,
         email: updates.email,
@@ -246,9 +286,12 @@ export function AccessManagement({
   };
 
   const handleSavePassword = async (userId: string, password: string, forceReset: boolean) => {
+    if (!currentSite?.id) return;
+    
     try {
       await setUserPassword({
         userId,
+        siteId: currentSite.id,
         temporaryPassword: password,
         forcePasswordReset: forceReset,
         sendEmail: true,

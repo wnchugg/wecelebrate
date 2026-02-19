@@ -41,6 +41,7 @@ const validationServiceOptions: { value: AddressValidationService; label: string
   { value: 'usps', label: 'USPS Address Validation', description: 'Validate US addresses using USPS service' },
   { value: 'smarty', label: 'SmartyStreets', description: 'International and US address validation' },
   { value: 'google', label: 'Google Address Validation', description: 'Google Maps API address validation' },
+  { value: 'geoapify', label: 'Geoapify', description: 'International address validation and geocoding' },
 ];
 
 interface DraggableFieldProps {

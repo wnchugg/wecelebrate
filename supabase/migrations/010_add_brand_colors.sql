@@ -2,10 +2,10 @@
 -- Adds body text colors and accent colors to brands table
 
 ALTER TABLE brands
-ADD COLUMN body_text_color_dark VARCHAR(7) DEFAULT '#1F2937',
-ADD COLUMN body_text_color_light VARCHAR(7) DEFAULT '#F9FAFB',
-ADD COLUMN accent_color_1 VARCHAR(7),
-ADD COLUMN accent_color_2 VARCHAR(7);
+ADD COLUMN IF NOT EXISTS body_text_color_dark VARCHAR(7) DEFAULT '#1F2937',
+ADD COLUMN IF NOT EXISTS body_text_color_light VARCHAR(7) DEFAULT '#F9FAFB',
+ADD COLUMN IF NOT EXISTS accent_color_1 VARCHAR(7),
+ADD COLUMN IF NOT EXISTS accent_color_2 VARCHAR(7);
 
 -- Add comments for documentation
 COMMENT ON COLUMN brands.body_text_color_dark IS 'Body text color for light backgrounds';

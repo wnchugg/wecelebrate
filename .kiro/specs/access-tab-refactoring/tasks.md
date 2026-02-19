@@ -47,21 +47,21 @@
   - [x] 6.4 Update type definitions if needed
   - [x] 6.5 Create user guide for Access tab configuration
 
-- [ ] 7. SFTP Configuration Migration (Future)
-  - [ ] 7.1 Create SFTP configuration section in ClientConfiguration
-  - [ ] 7.2 Move SFTP-related components to client-level
-  - [ ] 7.3 Update documentation for SFTP configuration location
-  - [ ] 7.4 Remove SFTP references from site-level documentation
+- [x] 7. SFTP Configuration Migration (Future)
+  - [x] 7.1 Create SFTP configuration section in ClientConfiguration
+  - [x] 7.2 Move SFTP-related components to client-level
+  - [x] 7.3 Update documentation for SFTP configuration location
+  - [x] 7.4 Remove SFTP references from site-level documentation
 
-- [-] 8. Implement Admin Bypass for SSO
+- [x] 8. Implement Admin Bypass for SSO
   - [x] 8.1 Add Admin Bypass toggle to SSO configuration card
   - [x] 8.2 Add bypass URL display and copy functionality
   - [x] 8.3 Add 2FA requirement toggle for bypass
   - [x] 8.4 Add IP whitelist configuration for bypass
-  - [~] 8.5 Create bypass login page component
-  - [~] 8.6 Implement bypass authentication API endpoint
-  - [~] 8.7 Add bypass login audit logging
-  - [~] 8.8 Test bypass login flow with and without 2FA
+  - [x] 8.5 Create bypass login page component
+  - [x] 8.6 Implement bypass authentication API endpoint
+  - [x] 8.7 Add bypass login audit logging
+  - [x] 8.8 Test bypass login flow with and without 2FA
 
 - [x] 9. Implement User Management for Advanced Auth
   - [x] 9.1 Create AdvancedAuthUser interface and types
@@ -73,25 +73,25 @@
   - [x] 9.7 Create API endpoints for user management
   - [x] 9.8 Test user editing and password setting
 
-- [ ] 10. Implement Proxy Login Feature
-  - [ ] 10.1 Add "Login As" button to user list
-  - [ ] 10.2 Create proxy session API endpoint
-  - [ ] 10.3 Implement proxy session token generation
-  - [ ] 10.4 Create proxy login banner component
-  - [ ] 10.5 Add session expiry countdown timer
-  - [ ] 10.6 Implement "End Session" functionality
-  - [ ] 10.7 Add read-only mode enforcement for proxy sessions
-  - [ ] 10.8 Add proxy login audit logging
-  - [ ] 10.9 Test proxy login flow and session expiry
-  - [ ] 10.10 Test read-only restrictions in proxy mode
+- [x] 10. Implement Proxy Login Feature
+  - [x] 10.1 Add "Login As" button to user list
+  - [x] 10.2 Create proxy session API endpoint
+  - [x] 10.3 Implement proxy session token generation
+  - [x] 10.4 Create proxy login banner component
+  - [x] 10.5 Add session expiry countdown timer
+  - [x] 10.6 Implement "End Session" functionality
+  - [x] 10.7 Add read-only mode enforcement for proxy sessions
+  - [x] 10.8 Add proxy login audit logging
+  - [x] 10.9 Test proxy login flow and session expiry
+  - [x] 10.10 Test read-only restrictions in proxy mode
 
-- [ ] 11. Security and Permissions
-  - [ ] 11.1 Create `proxy_login` permission
-  - [ ] 11.2 Add permission checks for proxy login
-  - [ ] 11.3 Add permission checks for user management
-  - [ ] 11.4 Implement audit logging for all sensitive actions
-  - [ ] 11.5 Test permission enforcement
-  - [ ] 11.6 Review security of temporary password handling
+- [x] 11. Security and Permissions
+  - [x] 11.1 Create `proxy_login` permission
+  - [x] 11.2 Add permission checks for proxy login
+  - [x] 11.3 Add permission checks for user management
+  - [x] 11.4 Implement audit logging for all sensitive actions
+  - [x] 11.5 Test permission enforcement
+  - [x] 11.6 Review security of temporary password handling
 
 ## Task Details
 

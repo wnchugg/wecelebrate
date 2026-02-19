@@ -2,7 +2,7 @@ export type CustomFieldType = 'text' | 'textarea' | 'number' | 'email' | 'phone'
 
 export type ShippingMode = 'employee' | 'company' | 'store';
 
-export type AddressValidationService = 'none' | 'usps' | 'smarty' | 'google';
+export type AddressValidationService = 'none' | 'usps' | 'smarty' | 'google' | 'geoapify';
 
 export interface CustomShippingField {
   id: string;

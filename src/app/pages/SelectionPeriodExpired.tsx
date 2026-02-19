@@ -2,14 +2,24 @@ import { AlertCircle, Mail, ArrowLeft } from 'lucide-react';
 import { companyConfig } from '../data/config';
 import { Link } from 'react-router';
 import { usePublicSite } from '../context/PublicSiteContext';
+import { useSiteContent } from '../hooks/useSiteContent';
+import { useLanguage } from '../context/LanguageContext';
 
 export function SelectionPeriodExpired() {
   // For now, we'll use companyConfig instead of site data from API
   // In a production app, you might have a public API endpoint for site config
   const { currentSite } = usePublicSite();
+  const { getTranslatedContent } = useSiteContent();
+  const { t } = useLanguage();
 
   const defaultMessage = 'Thank you for your interest. The gift selection period for this program has ended. If you have questions, please contact your program administrator.';
   const expiredMessage = defaultMessage; // In production, this would come from site settings
+
+  // Get translated content
+  const title = getTranslatedContent('expiredPage.title', t('expired.title') || 'Selection Period Ended');
+  const message = getTranslatedContent('expiredPage.message', t('expired.message') || expiredMessage);
+  const contactMessage = getTranslatedContent('expiredPage.contactMessage', t('expired.contactMessage') || 'Contact your program administrator for more information');
+  const returnHomeButton = getTranslatedContent('expiredPage.returnHomeButton', t('expired.returnHomeButton') || 'Return to Home');
 
   // Determine home link based on landing page setting
   const isLandingPageEnabled = !currentSite?.settings?.skipLandingPage;
@@ -29,13 +39,13 @@ export function SelectionPeriodExpired() {
 
           {/* Title */}
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-4">
-            Selection Period Ended
+            {title}
           </h1>
 
           {/* Message */}
           <div className="text-center mb-8">
             <p className="text-lg text-gray-700 leading-relaxed whitespace-pre-line">
-              {expiredMessage}
+              {message}
             </p>
           </div>
 
@@ -48,7 +58,7 @@ export function SelectionPeriodExpired() {
             <div className="space-y-3">
               <div className="flex items-center justify-center gap-2 text-gray-700">
                 <Mail className="w-5 h-5 text-[#D91C81]" />
-                <span>Contact your program administrator for more information</span>
+                <span>{contactMessage}</span>
               </div>
             </div>
           </div>
@@ -60,7 +70,7 @@ export function SelectionPeriodExpired() {
               className="inline-flex items-center gap-2 bg-[#D91C81] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#B71569] transition-all focus:outline-none focus:ring-4 focus:ring-pink-200"
             >
               <ArrowLeft className="w-5 h-5" />
-              Return to Home
+              {returnHomeButton}
             </Link>
           </div>
         </div>

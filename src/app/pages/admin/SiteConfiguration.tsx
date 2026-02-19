@@ -5,7 +5,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { 
   Save, Settings, Globe, Mail, Truck, Gift, Lock, 
   Check, AlertCircle, ChevronDown, Building2, ExternalLink,
-  Layout, Package, Users, Clock, Calendar, CheckCircle, Palette, Shield, Loader2, Eye, FileEdit, Rocket, History, Edit3, Zap
+  Layout, Package, Users, Clock, Calendar, CheckCircle, Palette, Shield, Loader2, Eye, FileEdit, Rocket, History, Edit3, Zap,
+  ShoppingBag, CreditCard, ShoppingCart, FileText
 } from 'lucide-react';
 import { useSite } from '../../context/SiteContext';
 import { useGift } from '../../context/GiftContext';
@@ -36,6 +37,12 @@ import { OAuthFields } from '../../components/admin/OAuthFields';
 import { SAMLFields } from '../../components/admin/SAMLFields';
 import { ConfiguredStateSummary } from '../../components/admin/ConfiguredStateSummary';
 import { SSOConfigCard } from '../../components/admin/SSOConfigCard';
+
+// Import Multi-Language components
+import { MultiLanguageSelector } from '../../components/admin/MultiLanguageSelector';
+import { TranslationProgress } from '../../components/admin/TranslationProgress';
+import { TranslatableInput } from '../../components/admin/TranslatableInput';
+import { TranslatableTextarea } from '../../components/admin/TranslatableTextarea';
 
 function LoadingSpinner() {
   return (
@@ -156,6 +163,14 @@ export function SiteConfiguration() {
   const [defaultLanguage, setDefaultLanguage] = useState(currentSite?.settings?.defaultLanguage || 'en');
   const [defaultCurrency, setDefaultCurrency] = useState(currentSite?.settings?.defaultCurrency || 'USD');
   const [defaultCountry, setDefaultCountry] = useState(currentSite?.settings?.defaultCountry || 'US');
+  
+  // Multi-language state
+  const [availableLanguages, setAvailableLanguages] = useState<string[]>(currentSite?.availableLanguages || ['en']);
+  const [draftAvailableLanguages, setDraftAvailableLanguages] = useState<string[]>(currentSite?.draftAvailableLanguages || currentSite?.availableLanguages || ['en']);
+  
+  // Translation state
+  const [translations, setTranslations] = useState<Record<string, any>>(currentSite?.translations || {});
+  
   const [availabilityStartDate, setAvailabilityStartDate] = useState(currentSite?.settings?.availabilityStartDate || '');
   const [availabilityEndDate, setAvailabilityEndDate] = useState(currentSite?.settings?.availabilityEndDate || '');
   const [expiredMessage, setExpiredMessage] = useState(
@@ -268,6 +283,11 @@ export function SiteConfiguration() {
       setDefaultLanguage(currentSite.settings?.defaultLanguage || 'en');
       setDefaultCurrency(currentSite.settings?.defaultCurrency || 'USD');
       setDefaultCountry(currentSite.settings?.defaultCountry || 'US');
+      
+      // Multi-language settings
+      setAvailableLanguages(currentSite.availableLanguages || ['en']);
+      setDraftAvailableLanguages(currentSite.draftAvailableLanguages || currentSite.availableLanguages || ['en']);
+      setTranslations(currentSite.translations || {});
       
       // Convert ISO 8601 to datetime-local format for inputs
       const formatDateForInput = (isoDate: string) => {
@@ -652,6 +672,33 @@ export function SiteConfiguration() {
     }
   }, [configMode, isUserInitiatedChange]);
 
+  // Helper function to update translations
+  const updateTranslation = (path: string, language: string, value: string) => {
+    setTranslations(prev => {
+      const newTranslations = { ...prev };
+      const pathParts = path.split('.');
+      
+      // Navigate to the correct nested object
+      let current: any = newTranslations;
+      for (let i = 0; i < pathParts.length - 1; i++) {
+        if (!current[pathParts[i]]) {
+          current[pathParts[i]] = {};
+        }
+        current = current[pathParts[i]];
+      }
+      
+      // Set the language value
+      const lastPart = pathParts[pathParts.length - 1];
+      if (!current[lastPart]) {
+        current[lastPart] = {};
+      }
+      current[lastPart][language] = value;
+      
+      return newTranslations;
+    });
+    setHasChanges(true);
+  };
+
   // Handle mode toggle - fetch appropriate data
   const handleModeToggle = async (newMode: 'live' | 'draft') => {
     if (newMode === configMode) return; // Already in this mode
@@ -933,6 +980,9 @@ export function SiteConfiguration() {
         disableDirectAccessAuth,
         ssoProvider,
         ssoClientOfficeName,
+        // Multi-language settings
+        draftAvailableLanguages: draftAvailableLanguages,
+        translations: translations,
       });
       
       setLastAutoSave(new Date());
@@ -967,6 +1017,7 @@ export function SiteConfiguration() {
     
     // Import validation
     const { validateSiteConfiguration } = await import('../../utils/siteConfigValidation');
+    const { validateTranslations } = await import('../../utils/translationValidation');
     
     // Validate before saving
     const validation = validateSiteConfiguration({
@@ -1003,6 +1054,37 @@ export function SiteConfiguration() {
     if (validation.warnings.length > 0) {
       validation.warnings.forEach(warning => {
         toast.warning(warning, { duration: 4000 });
+      });
+    }
+    
+    // Validate translations (informational only, doesn't block save)
+    const requiredFields = [
+      'header.logoAlt',
+      'header.homeLink',
+      'welcomePage.title',
+      'welcomePage.message',
+      'landingPage.heroTitle',
+      'catalogPage.title',
+      'footer.text'
+    ];
+    
+    const translationValidation = validateTranslations(
+      translations,
+      requiredFields,
+      draftAvailableLanguages
+    );
+    
+    // Display translation validation results
+    if (!translationValidation.isComplete) {
+      const missingCount = translationValidation.missingTranslations.length;
+      toast.info('Translation status', {
+        description: `${translationValidation.completionPercentage}% complete. ${missingCount} translation${missingCount > 1 ? 's' : ''} missing. You can continue editing and save with incomplete translations.`,
+        duration: 5000
+      });
+    } else {
+      toast.success('All translations complete! 🎉', {
+        description: 'All required fields are translated for all languages.',
+        duration: 3000
       });
     }
     
@@ -1097,6 +1179,9 @@ export function SiteConfiguration() {
         disableDirectAccessAuth,
         ssoProvider,
         ssoClientOfficeName,
+        // Multi-language settings
+        draftAvailableLanguages: draftAvailableLanguages,
+        translations: translations,
         // Regional Client Info
         regionalClientInfo: {
           officeName: regionalOfficeName,
@@ -1202,6 +1287,54 @@ export function SiteConfiguration() {
         duration: 6000
       });
       return;
+    }
+    
+    // Import validation utilities
+    const { canPublishTranslations, validateTranslations } = await import('../../utils/translationValidation');
+    
+    // Define required fields for translation validation
+    const requiredFields = [
+      'header.logoAlt',
+      'header.homeLink',
+      'welcomePage.title',
+      'welcomePage.message',
+      'landingPage.heroTitle',
+      'catalogPage.title',
+      'footer.text'
+    ];
+    
+    // Validate default language translations
+    const publishValidation = canPublishTranslations(
+      translations,
+      requiredFields,
+      defaultLanguage
+    );
+    
+    if (!publishValidation.canPublish) {
+      toast.error('Cannot publish: Missing required translations', {
+        description: publishValidation.reason,
+        duration: 8000
+      });
+      return;
+    }
+    
+    // Check for incomplete non-default language translations
+    const completionValidation = validateTranslations(
+      translations,
+      requiredFields,
+      draftAvailableLanguages
+    );
+    
+    if (!completionValidation.isComplete) {
+      const incompleteLanguages = new Set(
+        completionValidation.missingTranslations.map(m => m.language)
+      );
+      const languageList = Array.from(incompleteLanguages).join(', ');
+      
+      toast.warning('Incomplete translations detected', {
+        description: `Some translations are missing for: ${languageList}. You can still publish, but users may see fallback content.`,
+        duration: 8000
+      });
     }
     
     // Show publish confirmation modal
@@ -1996,6 +2129,13 @@ export function SiteConfiguration() {
               <CheckCircle className="w-4 h-4 flex-shrink-0" />
               <span>Order Confirmation</span>
             </TabsTrigger>
+            <TabsTrigger 
+              value="page-content" 
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap data-[state=active]:bg-[#D91C81] data-[state=active]:text-white data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:bg-gray-100"
+            >
+              <Globe className="w-4 h-4 flex-shrink-0" />
+              <span>Page Content</span>
+            </TabsTrigger>
           </TabsList>
         </div>
 
@@ -2605,6 +2745,44 @@ export function SiteConfiguration() {
                 </div>
               </div>
 
+              {/* Language Configuration */}
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="text-sm font-semibold text-gray-700 mb-4">Language Configuration</h3>
+                <MultiLanguageSelector
+                  selectedLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                  onChange={(languages) => {
+                    if (configMode === 'draft') {
+                      setDraftAvailableLanguages(languages);
+                    } else {
+                      setAvailableLanguages(languages);
+                    }
+                    setHasChanges(true);
+                  }}
+                  defaultLanguage={defaultLanguage}
+                  onDefaultChange={(language) => {
+                    setDefaultLanguage(language);
+                    setHasChanges(true);
+                  }}
+                />
+              </div>
+
+              {/* Translation Progress */}
+              <div className="border-t border-gray-200 pt-6">
+                <TranslationProgress
+                  translations={currentSite?.translations || {}}
+                  availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                  requiredFields={[
+                    'header.logoAlt',
+                    'header.homeLink',
+                    'welcomePage.title',
+                    'welcomePage.message',
+                    'landingPage.heroTitle',
+                    'catalogPage.title',
+                    'footer.text'
+                  ]}
+                />
+              </div>
+
               {/* Allowed Countries */}
               <div className="border-t border-gray-200 pt-6">
                 <h3 className="text-sm font-semibold text-gray-700 mb-4">Regional Restrictions</h3>
@@ -2913,6 +3091,69 @@ export function SiteConfiguration() {
                   Displayed next to the logo in the header
                 </p>
               </div>
+
+              {/* Header Translatable Content */}
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="text-sm font-semibold text-gray-700 mb-4">Header Content (Multi-Language)</h3>
+                
+                <div className="space-y-4">
+                  <TranslatableInput
+                    label="Logo Alt Text"
+                    value={translations?.header?.logoAlt || {}}
+                    onChange={(language, value) => updateTranslation('header.logoAlt', language, value)}
+                    availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                    defaultLanguage={defaultLanguage}
+                    required={true}
+                    placeholder="Company Logo"
+                  />
+
+                  <TranslatableInput
+                    label="Home Link Text"
+                    value={translations?.header?.homeLink || {}}
+                    onChange={(language, value) => updateTranslation('header.homeLink', language, value)}
+                    availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                    defaultLanguage={defaultLanguage}
+                    required={true}
+                    placeholder="Home"
+                  />
+
+                  <TranslatableInput
+                    label="Products Link Text"
+                    value={translations?.header?.productsLink || {}}
+                    onChange={(language, value) => updateTranslation('header.productsLink', language, value)}
+                    availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                    defaultLanguage={defaultLanguage}
+                    placeholder="Products"
+                  />
+
+                  <TranslatableInput
+                    label="About Link Text"
+                    value={translations?.header?.aboutLink || {}}
+                    onChange={(language, value) => updateTranslation('header.aboutLink', language, value)}
+                    availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                    defaultLanguage={defaultLanguage}
+                    placeholder="About"
+                  />
+
+                  <TranslatableInput
+                    label="Contact Link Text"
+                    value={translations?.header?.contactLink || {}}
+                    onChange={(language, value) => updateTranslation('header.contactLink', language, value)}
+                    availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                    defaultLanguage={defaultLanguage}
+                    placeholder="Contact"
+                  />
+
+                  <TranslatableInput
+                    label="CTA Button Text"
+                    value={translations?.header?.ctaButton || {}}
+                    onChange={(language, value) => updateTranslation('header.ctaButton', language, value)}
+                    availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                    defaultLanguage={defaultLanguage}
+                    placeholder="Get Started"
+                  />
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -2963,6 +3204,50 @@ export function SiteConfiguration() {
                 <p className="text-xs text-gray-500 mt-1">
                   Copyright or legal text displayed in footer
                 </p>
+              </div>
+
+              {/* Footer Translatable Content */}
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="text-sm font-semibold text-gray-700 mb-4">Footer Content (Multi-Language)</h3>
+                
+                <div className="space-y-4">
+                  <TranslatableTextarea
+                    label="Footer Text"
+                    value={translations?.footer?.text || {}}
+                    onChange={(language, value) => updateTranslation('footer.text', language, value)}
+                    availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                    defaultLanguage={defaultLanguage}
+                    rows={2}
+                    placeholder="© 2026 All rights reserved."
+                  />
+
+                  <TranslatableInput
+                    label="Privacy Link Text"
+                    value={translations?.footer?.privacyLink || {}}
+                    onChange={(language, value) => updateTranslation('footer.privacyLink', language, value)}
+                    availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                    defaultLanguage={defaultLanguage}
+                    placeholder="Privacy Policy"
+                  />
+
+                  <TranslatableInput
+                    label="Terms Link Text"
+                    value={translations?.footer?.termsLink || {}}
+                    onChange={(language, value) => updateTranslation('footer.termsLink', language, value)}
+                    availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                    defaultLanguage={defaultLanguage}
+                    placeholder="Terms of Service"
+                  />
+
+                  <TranslatableInput
+                    label="Contact Link Text"
+                    value={translations?.footer?.contactLink || {}}
+                    onChange={(language, value) => updateTranslation('footer.contactLink', language, value)}
+                    availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                    defaultLanguage={defaultLanguage}
+                    placeholder="Contact Us"
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -3733,9 +4018,54 @@ export function SiteConfiguration() {
           </Card>
 
           {enableLandingPage && (
-            <Suspense fallback={<LoadingSpinner />}>
-              <LandingPageEditor />
-            </Suspense>
+            <>
+              {/* Landing Page Translatable Content */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Globe className="w-5 h-5 text-[#D91C81]" />
+                    Landing Page Content (Multi-Language)
+                  </CardTitle>
+                  <CardDescription>
+                    Configure hero section text in multiple languages
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <TranslatableInput
+                    label="Hero Title"
+                    value={translations?.landingPage?.heroTitle || {}}
+                    onChange={(language, value) => updateTranslation('landingPage.heroTitle', language, value)}
+                    availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                    defaultLanguage={defaultLanguage}
+                    required={true}
+                    placeholder="Welcome to Our Gift Program"
+                  />
+
+                  <TranslatableInput
+                    label="Hero Subtitle"
+                    value={translations?.landingPage?.heroSubtitle || {}}
+                    onChange={(language, value) => updateTranslation('landingPage.heroSubtitle', language, value)}
+                    availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                    defaultLanguage={defaultLanguage}
+                    placeholder="Select your perfect gift"
+                  />
+
+                  <TranslatableInput
+                    label="Hero CTA Button"
+                    value={translations?.landingPage?.heroCTA || {}}
+                    onChange={(language, value) => updateTranslation('landingPage.heroCTA', language, value)}
+                    availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                    defaultLanguage={defaultLanguage}
+                    required={true}
+                    placeholder="Get Started"
+                  />
+                </CardContent>
+              </Card>
+
+              <Suspense fallback={<LoadingSpinner />}>
+                <LandingPageEditor />
+              </Suspense>
+            </>
           )}
         </TabsContent>
 
@@ -3775,100 +4105,94 @@ export function SiteConfiguration() {
 
               {enableWelcomePage && (
                 <>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Welcome Message <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                    </label>
-                    <Input
-                      value={welcomeMessage}
-                      onChange={(e) => {
-                        setWelcomeMessage(e.target.value);
-                        setHasChanges(true);
-                      }}
-                      disabled={false}
-                      placeholder="Welcome to our gift selection program!"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Short welcome message</p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Page Title <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                      </label>
-                      <Input
-                        value={welcomePageTitle}
-                        onChange={(e) => {
-                          setWelcomePageTitle(e.target.value);
-                          setHasChanges(true);
-                        }}
-                        disabled={false}
+                  {/* Welcome Page Translatable Content */}
+                  <div className="border-t border-gray-200 pt-4">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-4">Welcome Page Content (Multi-Language)</h3>
+                    
+                    <div className="space-y-4">
+                      <TranslatableInput
+                        label="Page Title"
+                        value={translations?.welcomePage?.title || {}}
+                        onChange={(language, value) => updateTranslation('welcomePage.title', language, value)}
+                        availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                        defaultLanguage={defaultLanguage}
+                        required={true}
                         placeholder="Welcome!"
                       />
-                    </div>
 
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Image URL <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                      </label>
-                      <Input
-                        value={welcomePageImageUrl}
-                        onChange={(e) => {
-                          setWelcomePageImageUrl(e.target.value);
-                          setHasChanges(true);
-                        }}
-                        disabled={false}
-                        placeholder="https://..."
+                      <TranslatableTextarea
+                        label="Welcome Message"
+                        value={translations?.welcomePage?.message || {}}
+                        onChange={(language, value) => updateTranslation('welcomePage.message', language, value)}
+                        availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                        defaultLanguage={defaultLanguage}
+                        rows={4}
+                        placeholder="Thank you for your dedication and hard work..."
+                      />
+
+                      <TranslatableInput
+                        label="Button Text"
+                        value={translations?.welcomePage?.buttonText || {}}
+                        onChange={(language, value) => updateTranslation('welcomePage.buttonText', language, value)}
+                        availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                        defaultLanguage={defaultLanguage}
+                        required={true}
+                        placeholder="Continue"
                       />
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Detailed Message <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                    </label>
-                    <textarea
-                      value={welcomePageMessage}
-                      onChange={(e) => {
-                        setWelcomePageMessage(e.target.value);
-                        setHasChanges(true);
-                      }}
-                      disabled={false}
-                      rows={3}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
-                      placeholder="Thank you for your dedication and hard work..."
-                    />
-                  </div>
+                  {/* Non-translatable fields */}
+                  <div className="border-t border-gray-200 pt-4">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-4">Additional Settings</h3>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Image URL <span className="text-gray-400 font-normal ml-1">(Optional)</span>
+                        </label>
+                        <Input
+                          value={welcomePageImageUrl}
+                          onChange={(e) => {
+                            setWelcomePageImageUrl(e.target.value);
+                            setHasChanges(true);
+                          }}
+                          disabled={false}
+                          placeholder="https://..."
+                        />
+                      </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Author Name <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                      </label>
-                      <Input
-                        value={welcomePageAuthorName}
-                        onChange={(e) => {
-                          setWelcomePageAuthorName(e.target.value);
-                          setHasChanges(true);
-                        }}
-                        disabled={false}
-                        placeholder="CEO John Smith"
-                      />
-                    </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Author Name <span className="text-gray-400 font-normal ml-1">(Optional)</span>
+                          </label>
+                          <Input
+                            value={welcomePageAuthorName}
+                            onChange={(e) => {
+                              setWelcomePageAuthorName(e.target.value);
+                              setHasChanges(true);
+                            }}
+                            disabled={false}
+                            placeholder="CEO John Smith"
+                          />
+                        </div>
 
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Author Title <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                      </label>
-                      <Input
-                        value={welcomePageAuthorTitle}
-                        onChange={(e) => {
-                          setWelcomePageAuthorTitle(e.target.value);
-                          setHasChanges(true);
-                        }}
-                        disabled={false}
-                        placeholder="Chief Executive Officer"
-                      />
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Author Title <span className="text-gray-400 font-normal ml-1">(Optional)</span>
+                          </label>
+                          <Input
+                            value={welcomePageAuthorTitle}
+                            onChange={(e) => {
+                              setWelcomePageAuthorTitle(e.target.value);
+                              setHasChanges(true);
+                            }}
+                            disabled={false}
+                            placeholder="Chief Executive Officer"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </>
@@ -4013,6 +4337,70 @@ export function SiteConfiguration() {
                   </div>
                 </button>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Access Validation Page Content */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Globe className="w-5 h-5 text-[#D91C81]" />
+                Access Validation Page Content (Multi-Language)
+              </CardTitle>
+              <CardDescription>
+                Configure the text displayed on the access validation page
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <TranslatableInput
+                label="Page Title"
+                value={translations?.accessPage?.title || {}}
+                onChange={(language, value) => updateTranslation('accessPage.title', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                required={true}
+                placeholder="Verify Your Access"
+              />
+
+              <TranslatableTextarea
+                label="Description"
+                value={translations?.accessPage?.description || {}}
+                onChange={(language, value) => updateTranslation('accessPage.description', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                rows={3}
+                placeholder="Please enter your information to access the gift selection portal."
+              />
+
+              <TranslatableInput
+                label="Button Text"
+                value={translations?.accessPage?.buttonText || {}}
+                onChange={(language, value) => updateTranslation('accessPage.buttonText', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                required={true}
+                placeholder="Continue"
+              />
+
+              <TranslatableInput
+                label="Error Message"
+                value={translations?.accessPage?.errorMessage || {}}
+                onChange={(language, value) => updateTranslation('accessPage.errorMessage', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                required={true}
+                placeholder="Invalid credentials. Please try again."
+              />
+
+              <TranslatableInput
+                label="Success Message"
+                value={translations?.accessPage?.successMessage || {}}
+                onChange={(language, value) => updateTranslation('accessPage.successMessage', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                required={true}
+                placeholder="Access granted! Redirecting..."
+              />
             </CardContent>
           </Card>
 
@@ -4335,6 +4723,77 @@ export function SiteConfiguration() {
             </CardContent>
           </Card>
 
+          {/* Review Order Page Content (Multi-Language) */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Globe className="w-5 h-5 text-[#D91C81]" />
+                Review Order Page Content (Multi-Language)
+              </CardTitle>
+              <CardDescription>
+                Configure the text displayed on the review order page
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <TranslatableInput
+                label="Page Title"
+                value={translations?.reviewOrder?.title || {}}
+                onChange={(language, value) => updateTranslation('reviewOrder.title', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                required={true}
+                placeholder="Review Your Order"
+              />
+
+              <TranslatableTextarea
+                label="Instructions"
+                value={translations?.reviewOrder?.instructions || {}}
+                onChange={(language, value) => updateTranslation('reviewOrder.instructions', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                rows={3}
+                placeholder="Please review your selections before submitting your order."
+              />
+
+              <TranslatableInput
+                label="Confirm Button Text"
+                value={translations?.reviewOrder?.confirmButton || {}}
+                onChange={(language, value) => updateTranslation('reviewOrder.confirmButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                required={true}
+                placeholder="Submit Order"
+              />
+
+              <TranslatableInput
+                label="Edit Button Text"
+                value={translations?.reviewOrder?.editButton || {}}
+                onChange={(language, value) => updateTranslation('reviewOrder.editButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Edit"
+              />
+
+              <TranslatableInput
+                label="Shipping Label"
+                value={translations?.reviewOrder?.shippingLabel || {}}
+                onChange={(language, value) => updateTranslation('reviewOrder.shippingLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Shipping Address"
+              />
+
+              <TranslatableInput
+                label="Items Label"
+                value={translations?.reviewOrder?.itemsLabel || {}}
+                onChange={(language, value) => updateTranslation('reviewOrder.itemsLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Order Items"
+              />
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -4580,6 +5039,77 @@ export function SiteConfiguration() {
             </CardContent>
           </Card>
 
+          {/* Confirmation Page Content (Multi-Language) */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Globe className="w-5 h-5 text-[#D91C81]" />
+                Confirmation Page Content (Multi-Language)
+              </CardTitle>
+              <CardDescription>
+                Configure the text displayed on the order confirmation page
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <TranslatableInput
+                label="Page Title"
+                value={translations?.confirmation?.title || {}}
+                onChange={(language, value) => updateTranslation('confirmation.title', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                required={true}
+                placeholder="Order Confirmed!"
+              />
+
+              <TranslatableTextarea
+                label="Confirmation Message"
+                value={translations?.confirmation?.message || {}}
+                onChange={(language, value) => updateTranslation('confirmation.message', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                rows={4}
+                placeholder="Thank you for your order! We've received your selection..."
+              />
+
+              <TranslatableInput
+                label="Order Number Label"
+                value={translations?.confirmation?.orderNumberLabel || {}}
+                onChange={(language, value) => updateTranslation('confirmation.orderNumberLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Order Number"
+              />
+
+              <TranslatableInput
+                label="Tracking Label"
+                value={translations?.confirmation?.trackingLabel || {}}
+                onChange={(language, value) => updateTranslation('confirmation.trackingLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Tracking Number"
+              />
+
+              <TranslatableTextarea
+                label="Next Steps"
+                value={translations?.confirmation?.nextSteps || {}}
+                onChange={(language, value) => updateTranslation('confirmation.nextSteps', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                rows={3}
+                placeholder="What happens next..."
+              />
+
+              <TranslatableInput
+                label="Continue Button Text"
+                value={translations?.confirmation?.continueButton || {}}
+                onChange={(language, value) => updateTranslation('confirmation.continueButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Return to Home"
+              />
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -4652,6 +5182,857 @@ export function SiteConfiguration() {
                   URL for the custom action button
                 </p>
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Page Content Tab */}
+        <TabsContent value="page-content" className="space-y-6">
+          {/* Catalog/Products Page */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShoppingBag className="w-5 h-5 text-[#D91C81]" />
+                Catalog/Products Page
+              </CardTitle>
+              <CardDescription>Configure translatable content for the products catalog page</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <TranslatableInput
+                label="Page Title"
+                value={translations?.catalogPage?.title || {}}
+                onChange={(language, value) => updateTranslation('catalogPage.title', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                required
+                placeholder="Our Products"
+              />
+
+              <TranslatableTextarea
+                label="Page Description"
+                value={translations?.catalogPage?.description || {}}
+                onChange={(language, value) => updateTranslation('catalogPage.description', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Browse our selection of products"
+                rows={3}
+              />
+
+              <TranslatableInput
+                label="Empty Catalog Message"
+                value={translations?.catalogPage?.emptyMessage || {}}
+                onChange={(language, value) => updateTranslation('catalogPage.emptyMessage', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="No products available"
+              />
+
+              <TranslatableInput
+                label="Filter All Text"
+                value={translations?.catalogPage?.filterAllText || {}}
+                onChange={(language, value) => updateTranslation('catalogPage.filterAllText', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="All"
+              />
+
+              <TranslatableInput
+                label="Search Placeholder"
+                value={translations?.catalogPage?.searchPlaceholder || {}}
+                onChange={(language, value) => updateTranslation('catalogPage.searchPlaceholder', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Search products..."
+              />
+            </CardContent>
+          </Card>
+
+          {/* Product Detail Page */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Package className="w-5 h-5 text-[#D91C81]" />
+                Product Detail Page
+              </CardTitle>
+              <CardDescription>Configure translatable content for individual product pages</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <TranslatableInput
+                label="Back Button Text"
+                value={translations?.productDetail?.backButton || {}}
+                onChange={(language, value) => updateTranslation('productDetail.backButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Back to Products"
+              />
+
+              <TranslatableInput
+                label="Add to Cart Button"
+                value={translations?.productDetail?.addToCart || {}}
+                onChange={(language, value) => updateTranslation('productDetail.addToCart', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Add to Cart"
+              />
+
+              <TranslatableInput
+                label="Buy Now Button"
+                value={translations?.productDetail?.buyNow || {}}
+                onChange={(language, value) => updateTranslation('productDetail.buyNow', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Buy Now"
+              />
+
+              <TranslatableInput
+                label="Out of Stock Message"
+                value={translations?.productDetail?.outOfStock || {}}
+                onChange={(language, value) => updateTranslation('productDetail.outOfStock', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Out of Stock"
+              />
+
+              <TranslatableInput
+                label="Specifications Label"
+                value={translations?.productDetail?.specifications || {}}
+                onChange={(language, value) => updateTranslation('productDetail.specifications', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Specifications"
+              />
+
+              <TranslatableInput
+                label="Description Label"
+                value={translations?.productDetail?.description || {}}
+                onChange={(language, value) => updateTranslation('productDetail.description', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Description"
+              />
+            </CardContent>
+          </Card>
+
+          {/* Checkout Page */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="w-5 h-5 text-[#D91C81]" />
+                Checkout Page
+              </CardTitle>
+              <CardDescription>Configure translatable content for the checkout process</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <TranslatableInput
+                label="Page Title"
+                value={translations?.checkoutPage?.title || {}}
+                onChange={(language, value) => updateTranslation('checkoutPage.title', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                required
+                placeholder="Checkout"
+              />
+
+              <TranslatableInput
+                label="Shipping Section Title"
+                value={translations?.checkoutPage?.shippingTitle || {}}
+                onChange={(language, value) => updateTranslation('checkoutPage.shippingTitle', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Shipping Information"
+              />
+
+              <TranslatableInput
+                label="Payment Section Title"
+                value={translations?.checkoutPage?.paymentTitle || {}}
+                onChange={(language, value) => updateTranslation('checkoutPage.paymentTitle', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Payment Information"
+              />
+
+              <TranslatableInput
+                label="Order Summary Title"
+                value={translations?.checkoutPage?.orderSummary || {}}
+                onChange={(language, value) => updateTranslation('checkoutPage.orderSummary', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Order Summary"
+              />
+
+              <TranslatableInput
+                label="Place Order Button"
+                value={translations?.checkoutPage?.placeOrderButton || {}}
+                onChange={(language, value) => updateTranslation('checkoutPage.placeOrderButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Place Order"
+              />
+
+              <TranslatableInput
+                label="Free Shipping Message"
+                value={translations?.checkoutPage?.freeShippingMessage || {}}
+                onChange={(language, value) => updateTranslation('checkoutPage.freeShippingMessage', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Free shipping on orders over $50"
+              />
+            </CardContent>
+          </Card>
+
+          {/* Cart Page */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShoppingCart className="w-5 h-5 text-[#D91C81]" />
+                Cart Page
+              </CardTitle>
+              <CardDescription>Configure translatable content for the shopping cart</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <TranslatableInput
+                label="Page Title"
+                value={translations?.cartPage?.title || {}}
+                onChange={(language, value) => updateTranslation('cartPage.title', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                required
+                placeholder="Shopping Cart"
+              />
+
+              <TranslatableInput
+                label="Empty Cart Message"
+                value={translations?.cartPage?.emptyMessage || {}}
+                onChange={(language, value) => updateTranslation('cartPage.emptyMessage', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Your cart is empty"
+              />
+
+              <TranslatableTextarea
+                label="Empty Cart Description"
+                value={translations?.cartPage?.emptyDescription || {}}
+                onChange={(language, value) => updateTranslation('cartPage.emptyDescription', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Start shopping to add items to your cart"
+                rows={2}
+              />
+
+              <TranslatableInput
+                label="Browse Button"
+                value={translations?.cartPage?.browseButton || {}}
+                onChange={(language, value) => updateTranslation('cartPage.browseButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Browse Products"
+              />
+
+              <TranslatableInput
+                label="Remove Button"
+                value={translations?.cartPage?.removeButton || {}}
+                onChange={(language, value) => updateTranslation('cartPage.removeButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Remove"
+              />
+
+              <TranslatableInput
+                label="Clear Cart Button"
+                value={translations?.cartPage?.clearCartButton || {}}
+                onChange={(language, value) => updateTranslation('cartPage.clearCartButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Clear Cart"
+              />
+
+              <TranslatableInput
+                label="Clear Cart Confirmation"
+                value={translations?.cartPage?.clearCartConfirm || {}}
+                onChange={(language, value) => updateTranslation('cartPage.clearCartConfirm', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Are you sure you want to clear your cart?"
+              />
+
+              <TranslatableInput
+                label="Subtotal Label"
+                value={translations?.cartPage?.subtotalLabel || {}}
+                onChange={(language, value) => updateTranslation('cartPage.subtotalLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Subtotal"
+              />
+
+              <TranslatableInput
+                label="Shipping Label"
+                value={translations?.cartPage?.shippingLabel || {}}
+                onChange={(language, value) => updateTranslation('cartPage.shippingLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Shipping"
+              />
+
+              <TranslatableInput
+                label="Tax Label"
+                value={translations?.cartPage?.taxLabel || {}}
+                onChange={(language, value) => updateTranslation('cartPage.taxLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Tax"
+              />
+
+              <TranslatableInput
+                label="Total Label"
+                value={translations?.cartPage?.totalLabel || {}}
+                onChange={(language, value) => updateTranslation('cartPage.totalLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Total"
+              />
+
+              <TranslatableInput
+                label="Checkout Button"
+                value={translations?.cartPage?.checkoutButton || {}}
+                onChange={(language, value) => updateTranslation('cartPage.checkoutButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Proceed to Checkout"
+              />
+
+              <TranslatableInput
+                label="Continue Shopping Button"
+                value={translations?.cartPage?.continueShoppingButton || {}}
+                onChange={(language, value) => updateTranslation('cartPage.continueShoppingButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Continue Shopping"
+              />
+
+              <TranslatableInput
+                label="Security Notice"
+                value={translations?.cartPage?.securityNotice || {}}
+                onChange={(language, value) => updateTranslation('cartPage.securityNotice', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Secure checkout"
+              />
+            </CardContent>
+          </Card>
+
+          {/* Order History Page */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-[#D91C81]" />
+                Order History Page
+              </CardTitle>
+              <CardDescription>Configure translatable content for the order history page</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <TranslatableInput
+                label="Page Title"
+                value={translations?.orderHistory?.title || {}}
+                onChange={(language, value) => updateTranslation('orderHistory.title', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                required
+                placeholder="Order History"
+              />
+
+              <TranslatableTextarea
+                label="Page Description"
+                value={translations?.orderHistory?.description || {}}
+                onChange={(language, value) => updateTranslation('orderHistory.description', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="View your past orders"
+                rows={2}
+              />
+
+              <TranslatableInput
+                label="Empty State Title"
+                value={translations?.orderHistory?.emptyTitle || {}}
+                onChange={(language, value) => updateTranslation('orderHistory.emptyTitle', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="No Orders Yet"
+              />
+
+              <TranslatableTextarea
+                label="Empty State Message"
+                value={translations?.orderHistory?.emptyMessage || {}}
+                onChange={(language, value) => updateTranslation('orderHistory.emptyMessage', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="You haven't placed any orders yet"
+                rows={2}
+              />
+
+              <TranslatableInput
+                label="Browse Button"
+                value={translations?.orderHistory?.browseButton || {}}
+                onChange={(language, value) => updateTranslation('orderHistory.browseButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Browse Products"
+              />
+
+              <TranslatableInput
+                label="View Details Button"
+                value={translations?.orderHistory?.viewDetailsButton || {}}
+                onChange={(language, value) => updateTranslation('orderHistory.viewDetailsButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="View Details"
+              />
+
+              <TranslatableInput
+                label="Status: Pending"
+                value={translations?.orderHistory?.statusPending || {}}
+                onChange={(language, value) => updateTranslation('orderHistory.statusPending', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Pending"
+              />
+
+              <TranslatableInput
+                label="Status: Confirmed"
+                value={translations?.orderHistory?.statusConfirmed || {}}
+                onChange={(language, value) => updateTranslation('orderHistory.statusConfirmed', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Confirmed"
+              />
+
+              <TranslatableInput
+                label="Status: Shipped"
+                value={translations?.orderHistory?.statusShipped || {}}
+                onChange={(language, value) => updateTranslation('orderHistory.statusShipped', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Shipped"
+              />
+
+              <TranslatableInput
+                label="Status: Delivered"
+                value={translations?.orderHistory?.statusDelivered || {}}
+                onChange={(language, value) => updateTranslation('orderHistory.statusDelivered', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Delivered"
+              />
+
+              <TranslatableInput
+                label="Status: Cancelled"
+                value={translations?.orderHistory?.statusCancelled || {}}
+                onChange={(language, value) => updateTranslation('orderHistory.statusCancelled', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Cancelled"
+              />
+            </CardContent>
+          </Card>
+
+          {/* Order Tracking Page */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Truck className="w-5 h-5 text-[#D91C81]" />
+                Order Tracking Page
+              </CardTitle>
+              <CardDescription>Configure translatable content for order tracking</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <TranslatableInput
+                label="Page Title"
+                value={translations?.orderTracking?.title || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.title', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                required
+                placeholder="Track Your Order"
+              />
+
+              <TranslatableInput
+                label="Order Number Label"
+                value={translations?.orderTracking?.orderNumberLabel || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.orderNumberLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Order Number"
+              />
+
+              <TranslatableInput
+                label="Placed On Label"
+                value={translations?.orderTracking?.placedOnLabel || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.placedOnLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Placed On"
+              />
+
+              <TranslatableInput
+                label="Status Label"
+                value={translations?.orderTracking?.statusLabel || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.statusLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Status"
+              />
+
+              <TranslatableInput
+                label="Order Placed Label"
+                value={translations?.orderTracking?.orderPlacedLabel || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.orderPlacedLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Order Placed"
+              />
+
+              <TranslatableTextarea
+                label="Order Placed Description"
+                value={translations?.orderTracking?.orderPlacedDesc || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.orderPlacedDesc', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Your order has been received"
+                rows={2}
+              />
+
+              <TranslatableInput
+                label="Order Confirmed Label"
+                value={translations?.orderTracking?.orderConfirmedLabel || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.orderConfirmedLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Order Confirmed"
+              />
+
+              <TranslatableTextarea
+                label="Order Confirmed Description"
+                value={translations?.orderTracking?.orderConfirmedDesc || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.orderConfirmedDesc', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Your order has been confirmed"
+                rows={2}
+              />
+
+              <TranslatableInput
+                label="Shipped Label"
+                value={translations?.orderTracking?.shippedLabel || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.shippedLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Shipped"
+              />
+
+              <TranslatableTextarea
+                label="Shipped Description"
+                value={translations?.orderTracking?.shippedDesc || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.shippedDesc', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Your order is on its way"
+                rows={2}
+              />
+
+              <TranslatableInput
+                label="Delivered Label"
+                value={translations?.orderTracking?.deliveredLabel || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.deliveredLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Delivered"
+              />
+
+              <TranslatableTextarea
+                label="Delivered Description"
+                value={translations?.orderTracking?.deliveredDesc || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.deliveredDesc', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Your order has been delivered"
+                rows={2}
+              />
+
+              <TranslatableInput
+                label="Tracking Number Label"
+                value={translations?.orderTracking?.trackingNumberLabel || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.trackingNumberLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Tracking Number"
+              />
+
+              <TranslatableInput
+                label="Estimated Delivery Label"
+                value={translations?.orderTracking?.estimatedDeliveryLabel || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.estimatedDeliveryLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Estimated Delivery"
+              />
+
+              <TranslatableInput
+                label="Gift Details Label"
+                value={translations?.orderTracking?.giftDetailsLabel || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.giftDetailsLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Gift Details"
+              />
+
+              <TranslatableInput
+                label="Shipping Address Label"
+                value={translations?.orderTracking?.shippingAddressLabel || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.shippingAddressLabel', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Shipping Address"
+              />
+
+              <TranslatableInput
+                label="Return Home Button"
+                value={translations?.orderTracking?.returnHomeButton || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.returnHomeButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Return to Home"
+              />
+
+              <TranslatableInput
+                label="Print Button"
+                value={translations?.orderTracking?.printButton || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.printButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Print"
+              />
+
+              <TranslatableInput
+                label="Support Message"
+                value={translations?.orderTracking?.supportMessage || {}}
+                onChange={(language, value) => updateTranslation('orderTracking.supportMessage', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Need help? Contact support"
+              />
+            </CardContent>
+          </Card>
+
+          {/* Not Found Page */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-[#D91C81]" />
+                404 Not Found Page
+              </CardTitle>
+              <CardDescription>Configure translatable content for the 404 error page</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <TranslatableInput
+                label="Page Title"
+                value={translations?.notFoundPage?.title || {}}
+                onChange={(language, value) => updateTranslation('notFoundPage.title', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                required
+                placeholder="Page Not Found"
+              />
+
+              <TranslatableTextarea
+                label="Error Message"
+                value={translations?.notFoundPage?.message || {}}
+                onChange={(language, value) => updateTranslation('notFoundPage.message', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="The page you're looking for doesn't exist"
+                rows={2}
+              />
+
+              <TranslatableInput
+                label="Home Button"
+                value={translations?.notFoundPage?.homeButton || {}}
+                onChange={(language, value) => updateTranslation('notFoundPage.homeButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Go Home"
+              />
+
+              <TranslatableInput
+                label="Admin Login Button"
+                value={translations?.notFoundPage?.adminLoginButton || {}}
+                onChange={(language, value) => updateTranslation('notFoundPage.adminLoginButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Admin Login"
+              />
+
+              <TranslatableInput
+                label="Client Portal Button"
+                value={translations?.notFoundPage?.clientPortalButton || {}}
+                onChange={(language, value) => updateTranslation('notFoundPage.clientPortalButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Client Portal"
+              />
+            </CardContent>
+          </Card>
+
+          {/* Privacy Policy Page */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="w-5 h-5 text-[#D91C81]" />
+                Privacy Policy Page
+              </CardTitle>
+              <CardDescription>Configure translatable content for the privacy policy</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <TranslatableInput
+                label="Page Title"
+                value={translations?.privacyPolicy?.title || {}}
+                onChange={(language, value) => updateTranslation('privacyPolicy.title', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                required
+                placeholder="Privacy Policy"
+              />
+
+              <TranslatableInput
+                label="Last Updated Label"
+                value={translations?.privacyPolicy?.lastUpdated || {}}
+                onChange={(language, value) => updateTranslation('privacyPolicy.lastUpdated', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Last Updated"
+              />
+
+              <TranslatableInput
+                label="Introduction Section Title"
+                value={translations?.privacyPolicy?.introductionTitle || {}}
+                onChange={(language, value) => updateTranslation('privacyPolicy.introductionTitle', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Introduction"
+              />
+
+              <TranslatableTextarea
+                label="Introduction Text"
+                value={translations?.privacyPolicy?.introductionText || {}}
+                onChange={(language, value) => updateTranslation('privacyPolicy.introductionText', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="We value your privacy..."
+                rows={4}
+              />
+
+              <TranslatableInput
+                label="Information Collected Section Title"
+                value={translations?.privacyPolicy?.informationCollectedTitle || {}}
+                onChange={(language, value) => updateTranslation('privacyPolicy.informationCollectedTitle', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Information We Collect"
+              />
+
+              <TranslatableInput
+                label="How We Use Section Title"
+                value={translations?.privacyPolicy?.howWeUseTitle || {}}
+                onChange={(language, value) => updateTranslation('privacyPolicy.howWeUseTitle', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="How We Use Your Information"
+              />
+
+              <TranslatableInput
+                label="Your Rights Section Title"
+                value={translations?.privacyPolicy?.yourRightsTitle || {}}
+                onChange={(language, value) => updateTranslation('privacyPolicy.yourRightsTitle', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Your Rights"
+              />
+
+              <TranslatableInput
+                label="Data Security Section Title"
+                value={translations?.privacyPolicy?.dataSecurityTitle || {}}
+                onChange={(language, value) => updateTranslation('privacyPolicy.dataSecurityTitle', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Data Security"
+              />
+
+              <TranslatableInput
+                label="Contact Section Title"
+                value={translations?.privacyPolicy?.contactTitle || {}}
+                onChange={(language, value) => updateTranslation('privacyPolicy.contactTitle', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Contact Us"
+              />
+
+              <TranslatableInput
+                label="Privacy Settings Button"
+                value={translations?.privacyPolicy?.privacySettingsButton || {}}
+                onChange={(language, value) => updateTranslation('privacyPolicy.privacySettingsButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Privacy Settings"
+              />
+            </CardContent>
+          </Card>
+
+          {/* Selection Period Expired Page */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="w-5 h-5 text-[#D91C81]" />
+                Selection Period Expired Page
+              </CardTitle>
+              <CardDescription>Configure translatable content for expired selection periods</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <TranslatableInput
+                label="Page Title"
+                value={translations?.expiredPage?.title || {}}
+                onChange={(language, value) => updateTranslation('expiredPage.title', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                required
+                placeholder="Selection Period Expired"
+              />
+
+              <TranslatableTextarea
+                label="Expiration Message"
+                value={translations?.expiredPage?.message || {}}
+                onChange={(language, value) => updateTranslation('expiredPage.message', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="The selection period for this site has ended"
+                rows={2}
+              />
+
+              <TranslatableTextarea
+                label="Contact Message"
+                value={translations?.expiredPage?.contactMessage || {}}
+                onChange={(language, value) => updateTranslation('expiredPage.contactMessage', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Please contact the administrator for assistance"
+                rows={2}
+              />
+
+              <TranslatableInput
+                label="Return Home Button"
+                value={translations?.expiredPage?.returnHomeButton || {}}
+                onChange={(language, value) => updateTranslation('expiredPage.returnHomeButton', language, value)}
+                availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
+                defaultLanguage={defaultLanguage}
+                placeholder="Return to Home"
+              />
             </CardContent>
           </Card>
         </TabsContent>

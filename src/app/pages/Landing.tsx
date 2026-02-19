@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { usePublicSite } from '../context/PublicSiteContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useSiteContent } from '../hooks/useSiteContent';
 import { CatalogInitializer } from '../components/CatalogInitializer';
 
 export function Landing() {
@@ -43,6 +44,12 @@ export function Landing() {
 // Default Landing Page Component
 function DefaultLandingPage() {
   const { t } = useLanguage();
+  const { getTranslatedContent } = useSiteContent();
+  
+  // Get translated content with fallbacks to system translations
+  const heroTitle = getTranslatedContent('landingPage.heroTitle', t('landing.hero.title'));
+  const heroSubtitle = getTranslatedContent('landingPage.heroSubtitle', t('landing.hero.subtitle'));
+  const heroCTA = getTranslatedContent('landingPage.heroCTA', t('landing.hero.cta'));
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#00E5A0] via-[#0066CC] via-[#D91C81] to-[#1B2A5E]">
@@ -63,10 +70,10 @@ function DefaultLandingPage() {
       <div className="px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 relative z-10">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 sm:mb-6 leading-tight">
-            {t('landing.hero.title')}
+            {heroTitle}
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-white/90 mb-8 sm:mb-10 max-w-3xl mx-auto px-4">
-            {t('landing.hero.subtitle')}
+            {heroSubtitle}
           </p>
 
           <Link
@@ -74,7 +81,7 @@ function DefaultLandingPage() {
             className="inline-flex items-center gap-2 sm:gap-3 bg-white text-[#D91C81] px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:bg-white/95 transition-all hover:gap-4 focus:outline-none focus:ring-4 focus:ring-white focus:ring-offset-4 focus:ring-offset-[#D91C81]"
             style={{ boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)' }}
           >
-            {t('landing.hero.cta')}
+            {heroCTA}
             <Gift className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
           </Link>
         </div>

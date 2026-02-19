@@ -464,6 +464,11 @@ export function mapSiteFieldsToDatabase(input: Record<string, any>): Record<stri
     'selectionStartDate': 'selection_start_date',
     'selectionEndDate': 'selection_end_date',
 
+    // Multi-language content support
+    'availableLanguages': 'available_languages',
+    'translations': 'translations',
+    'draftAvailableLanguages': 'draft_available_languages',
+
     // ERP Integration Fields
     'siteCode': 'site_code',
     'siteErpIntegration': 'site_erp_integration',
@@ -693,4 +698,82 @@ export function buildDraftSettings(currentDraft: any, updates: any): any {
   delete newDraft._draftSettings;
   
   return newDraft;
+}
+
+/**
+ * Supported language codes (ISO 639-1)
+ * These are the 20 languages supported by the system
+ */
+export const SUPPORTED_LANGUAGES = [
+  'en', // English
+  'es', // Spanish
+  'fr', // French
+  'de', // German
+  'it', // Italian
+  'pt', // Portuguese
+  'nl', // Dutch
+  'pl', // Polish
+  'ru', // Russian
+  'ja', // Japanese
+  'zh', // Chinese
+  'ko', // Korean
+  'ar', // Arabic
+  'he', // Hebrew
+  'hi', // Hindi
+  'tr', // Turkish
+  'sv', // Swedish
+  'da', // Danish
+  'no', // Norwegian
+  'fi', // Finnish
+] as const;
+
+/**
+ * Validates language codes against the supported languages list
+ * Requirements: 1.4, 3.1, 9.2
+ * 
+ * @param languages - Array of language codes to validate
+ * @returns Object with isValid flag and array of invalid codes
+ */
+export function validateLanguageCodes(languages: string[]): {
+  isValid: boolean;
+  invalidCodes: string[];
+} {
+  if (!Array.isArray(languages)) {
+    return { isValid: false, invalidCodes: [] };
+  }
+
+  const invalidCodes = languages.filter(
+    (lang) => !SUPPORTED_LANGUAGES.includes(lang as any)
+  );
+
+  return {
+    isValid: invalidCodes.length === 0,
+    invalidCodes,
+  };
+}
+
+/**
+ * Validates and sanitizes language array for database storage
+ * Ensures all codes are valid and removes duplicates
+ * 
+ * @param languages - Array of language codes
+ * @returns Sanitized array of valid language codes
+ * @throws Error if any invalid language codes are found
+ */
+export function sanitizeLanguages(languages: string[]): string[] {
+  if (!Array.isArray(languages) || languages.length === 0) {
+    return ['en']; // Default to English
+  }
+
+  const validation = validateLanguageCodes(languages);
+  
+  if (!validation.isValid) {
+    throw new Error(
+      `Invalid language codes: ${validation.invalidCodes.join(', ')}. ` +
+      `Supported languages: ${SUPPORTED_LANGUAGES.join(', ')}`
+    );
+  }
+
+  // Remove duplicates and return
+  return [...new Set(languages)];
 }

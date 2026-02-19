@@ -2,7 +2,7 @@ import { Hono } from "npm:hono@4.0.2";
 import { cors } from "npm:hono/cors";
 import { logger } from "npm:hono/logger";
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { SignJWT, jwtVerify } from "npm:jose@5.2.0";
+import { SignJWT, jwtVerify, importJWK } from "npm:jose@5.2.0";
 import { seedDatabase } from "./seed.ts";
 import { seedDemoUseCaseSites } from "./seed-demo-sites.tsx";
 import { 
@@ -37,6 +37,7 @@ import * as celebrations from "./celebrations.ts";
 import hrisRoutes from "./hris.tsx";
 import * as adminUsers from "./admin_users.ts";
 import { setupTestCrudRoutes, verifyCrudFactorySetup } from './crud_factory_test.ts';
+import proxySessionsApi from './proxy_sessions.ts';
 // Phase 3.2: Migrated CRUD resources using factory pattern (consolidated file)
 import { setupMigratedResources } from './migrated_resources.ts';
 // Phase 2: Multi-Catalog Architecture APIs (UPDATED: Using V2 database versions)
@@ -51,17 +52,16 @@ import { tenantIsolationMiddleware } from './middleware/tenant.ts';
 // Internationalization: Address Autocomplete Service
 import { setupAddressAutocompleteRoutes } from './address_autocomplete.ts';
 import { errorHandler } from './middleware/errorHandler.ts';
-import { ipRateLimit, userRateLimit } from './middleware/rateLimit.ts';
+import { rateLimitByIP, rateLimitPresets } from './middleware/rateLimit.ts';
+// Password Management with Security (using Web Crypto API for Deno compatibility)
+import { setupPasswordRoutes } from './setup_password_routes_simple.ts';
 
 const app = new Hono();
 
 // ==================== ED25519 JWT CONFIGURATION ====================
-// JWT using Ed25519 asymmetric keys (best practice)
+// JWT using Ed25519 asymmetric keys (best practice) with HS256 fallback
 // Migration date: 2026-02-15
-// Security: HS256 fallback REMOVED on 2026-02-15 to close security vulnerability
-// All tokens must now use Ed25519 - no exceptions
-
-import { importJWK } from "npm:jose@5.2.0";
+// Security: Ed25519 recommended, HS256 fallback for compatibility
 
 // Load Ed25519 keys from environment variables
 const JWT_PRIVATE_KEY_B64 = Deno.env.get('JWT_PRIVATE_KEY');
@@ -69,65 +69,102 @@ const JWT_PUBLIC_KEY_B64 = Deno.env.get('JWT_PUBLIC_KEY');
 
 let privateKey: any = null;
 let publicKey: any = null;
+let useEd25519 = false;
 
-// Initialize Ed25519 keys
+// Fallback JWT secret for HS256 (if Ed25519 keys not configured)
+const JWT_SUPABASE_URL = Deno.env.get('SUPABASE_URL') || 'https://wjfcqqrlhwdvvjmefxky.supabase.co';
+const JWT_projectIdMatch = JWT_SUPABASE_URL.match(/https:\/\/([^.]+)\.supabase\.co/);
+const JWT_projectId = JWT_projectIdMatch ? JWT_projectIdMatch[1] : 'wjfcqqrlhwdvvjmefxky';
+const FALLBACK_JWT_SECRET = `jala2-jwt-secret-stable-${JWT_projectId}-do-not-change-this-string-or-tokens-become-invalid`;
+
+let cryptoKey: CryptoKey | null = null;
+
+// Initialize Ed25519 keys (optional - falls back to HS256 if not configured)
 async function initializeJWTKeys() {
   try {
-    if (!JWT_PRIVATE_KEY_B64) {
-      throw new Error('JWT_PRIVATE_KEY environment variable is required');
+    if (JWT_PRIVATE_KEY_B64 && JWT_PUBLIC_KEY_B64) {
+      const privateJWK = JSON.parse(atob(JWT_PRIVATE_KEY_B64));
+      privateKey = await importJWK(privateJWK, 'EdDSA');
+      console.log('✅ JWT Ed25519 private key loaded');
+      
+      const publicJWK = JSON.parse(atob(JWT_PUBLIC_KEY_B64));
+      publicKey = await importJWK(publicJWK, 'EdDSA');
+      console.log('✅ JWT Ed25519 public key loaded');
+      
+      useEd25519 = true;
+      console.log('🔒 Security: Ed25519 mode enabled');
+    } else {
+      console.warn('⚠️  Ed25519 keys not configured, falling back to HS256');
+      console.warn('⚠️  Run generate_ed25519_keys.ts and set JWT_PRIVATE_KEY and JWT_PUBLIC_KEY');
+      
+      // Initialize HS256 fallback
+      const encoder = new TextEncoder();
+      const keyData = encoder.encode(FALLBACK_JWT_SECRET);
+      cryptoKey = await crypto.subtle.importKey(
+        'raw',
+        keyData,
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign', 'verify']
+      );
+      console.log('✅ HS256 fallback initialized');
     }
-    
-    if (!JWT_PUBLIC_KEY_B64) {
-      throw new Error('JWT_PUBLIC_KEY environment variable is required');
-    }
-    
-    const privateJWK = JSON.parse(atob(JWT_PRIVATE_KEY_B64));
-    privateKey = await importJWK(privateJWK, 'EdDSA');
-    console.log('✅ JWT Ed25519 private key loaded');
-    
-    const publicJWK = JSON.parse(atob(JWT_PUBLIC_KEY_B64));
-    publicKey = await importJWK(publicJWK, 'EdDSA');
-    console.log('✅ JWT Ed25519 public key loaded');
-    
-    console.log('🔒 Security: Ed25519-only mode (HS256 fallback removed)');
   } catch (error) {
-    console.error('❌ CRITICAL: Failed to initialize Ed25519 JWT keys:', error);
-    console.error('❌ Backend cannot start without Ed25519 keys');
-    throw error; // Fail fast - don't start without proper keys
+    console.error('❌ Error initializing JWT keys:', error);
+    console.warn('⚠️  Falling back to HS256');
+    
+    // Initialize HS256 fallback
+    const encoder = new TextEncoder();
+    const keyData = encoder.encode(FALLBACK_JWT_SECRET);
+    cryptoKey = await crypto.subtle.importKey(
+      'raw',
+      keyData,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign', 'verify']
+    );
+    console.log('✅ HS256 fallback initialized');
   }
 }
 
 // Initialize keys on startup
 await initializeJWTKeys();
 
-// Helper to generate JWT (Ed25519 only - no fallback)
+// Helper to generate JWT (Ed25519 or HS256 fallback)
 async function generateCustomJWT(payload: any): Promise<string> {
-  if (!privateKey) {
-    throw new Error('Ed25519 private key not initialized');
+  if (useEd25519 && privateKey) {
+    const jwt = await new SignJWT(payload)
+      .setProtectedHeader({ alg: 'EdDSA', typ: 'JWT' })
+      .setIssuedAt()
+      .setExpirationTime('24h')
+      .sign(privateKey);
+    return jwt;
+  } else if (cryptoKey) {
+    const jwt = await new SignJWT(payload)
+      .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
+      .setIssuedAt()
+      .setExpirationTime('24h')
+      .sign(cryptoKey);
+    return jwt;
+  } else {
+    throw new Error('No JWT signing key available');
   }
-  
-  const jwt = await new SignJWT(payload)
-    .setProtectedHeader({ alg: 'EdDSA', typ: 'JWT' })
-    .setIssuedAt()
-    .setExpirationTime('24h')
-    .sign(privateKey);
-  
-  return jwt;
 }
 
-// Helper to verify JWT (Ed25519 only - no fallback)
+// Helper to verify JWT (Ed25519 or HS256 fallback)
 async function verifyCustomJWT(token: string): Promise<any> {
-  if (!publicKey) {
-    throw new Error('Ed25519 public key not initialized');
-  }
-  
   try {
-    const { payload } = await jwtVerify(token, publicKey);
-    return payload;
-  } catch (error: any) {
-    if (isDevelopment) {
-      console.error('[JWT] Ed25519 verification failed:', error.message);
+    if (useEd25519 && publicKey) {
+      const { payload } = await jwtVerify(token, publicKey);
+      return payload;
+    } else if (cryptoKey) {
+      const { payload } = await jwtVerify(token, cryptoKey);
+      return payload;
+    } else {
+      throw new Error('No JWT verification key available');
     }
+  } catch (error: any) {
+    console.error('[JWT] Verification failed:', error.message);
     throw new Error('Invalid or expired token');
   }
 }
@@ -429,7 +466,7 @@ app.use(
 // ==================== PHASE 4: SECURITY MIDDLEWARE ====================
 // Rate limiting to prevent abuse and DoS attacks
 console.log('🔒 Applying rate limiting middleware...');
-app.use('*', ipRateLimit);
+app.use('*', rateLimitByIP(rateLimitPresets.api));
 console.log('✅ Rate limiting active: 100 requests per 15 minutes per IP');
 
 // Global error handler
@@ -871,24 +908,22 @@ app.get("/make-server-6fcaeea3/debug-jwt-config", async (c) => {
     const projectIdMatch = supabaseUrl.match(/https:\/\/([^.]+)\.supabase\.co/);
     const projectId = projectIdMatch ? projectIdMatch[1] : 'NOT_FOUND';
     
-    // Check if JWT_SECRET is set explicitly or derived
-    const hasExplicitSecret = !!Deno.env.get('JWT_SECRET');
-    
     return c.json({
       status: 'success',
       jwtConfig: {
-        hasExplicitSecret,
-        secretSource: hasExplicitSecret ? 'environment_variable' : 'derived_from_project_id',
-        secretLength: JWT_SECRET.length,
-        secretPreview: JWT_SECRET.substring(0, 50) + '...',
+        algorithm: useEd25519 ? 'EdDSA (Ed25519)' : 'HS256',
+        hasPrivateKey: !!privateKey,
+        hasPublicKey: !!publicKey,
+        hasCryptoKey: !!cryptoKey,
         projectId: projectId,
         expectedProjectId: 'wjfcqqrlhwdvvjmefxky',
         projectIdMatches: projectId === 'wjfcqqrlhwdvvjmefxky',
         supabaseUrl: supabaseUrl,
-        cryptoKeyAvailable: !!cryptoKey,
       },
       timestamp: new Date().toISOString(),
-      note: 'This endpoint helps diagnose JWT authentication issues. If projectIdMatches is false, tokens will fail.'
+      note: useEd25519 
+        ? 'Using Ed25519 asymmetric keys for JWT (recommended)' 
+        : 'Using HS256 fallback. Set JWT_PRIVATE_KEY and JWT_PUBLIC_KEY for better security.'
     });
   } catch (error: any) {
     return c.json({ 
@@ -1182,22 +1217,21 @@ app.get("/make-server-6fcaeea3/debug/jwt-config", async (c) => {
   const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
   const projectIdMatch = supabaseUrl.match(/https:\/\/([^.]+)\.supabase\.co/);
   const projectId = projectIdMatch ? projectIdMatch[1] : 'NOT_FOUND';
-  const expectedSecret = `jala2-jwt-secret-stable-${projectId}-do-not-change-this-string-or-tokens-become-invalid`;
   
   return c.json({
     message: 'JWT Configuration Debug',
     timestamp: new Date().toISOString(),
-    jwtSecretSource: JWT_SECRET.startsWith('jala2-jwt-secret-stable-') ? 'DERIVED_FROM_PROJECT_ID' : 
-                     JWT_SECRET === 'jala2-dev-local-secret-change-in-production' ? 'FALLBACK_DEV' : 'ENV_VAR',
-    jwtSecretLength: JWT_SECRET.length,
+    jwtAlgorithm: useEd25519 ? 'EdDSA (Ed25519)' : 'HS256',
+    hasPrivateKey: !!privateKey,
+    hasPublicKey: !!publicKey,
+    hasCryptoKey: !!cryptoKey,
     projectId: projectId,
-    expectedSecretLength: expectedSecret.length,
-    secretMatches: JWT_SECRET === expectedSecret,
     supabaseUrl: supabaseUrl,
-    cryptoKeyInitialized: !!cryptoKey,
-    recommendation: projectId === 'wjfcqqrlhwdvvjmefxky' && JWT_SECRET === expectedSecret
-      ? '✅ Configuration is CORRECT - JWT secret is stable and derived from project ID' 
-      : '⚠️ JWT secret may not be stable - tokens could become invalid after restart'
+    recommendation: useEd25519 && projectId === 'wjfcqqrlhwdvvjmefxky' && privateKey && publicKey
+      ? '✅ Configuration is CORRECT - Ed25519 keys are loaded' 
+      : projectId === 'wjfcqqrlhwdvvjmefxky' && cryptoKey
+      ? '⚠️ Using HS256 fallback. Set JWT_PRIVATE_KEY and JWT_PUBLIC_KEY for better security.'
+      : '⚠️ JWT keys may not be properly initialized'
   });
 });
 
@@ -1216,18 +1250,16 @@ app.post("/make-server-6fcaeea3/debug/verify-jwt", async (c) => {
     console.log('[JWT Debug] Verifying token...');
     console.log('[JWT Debug] Token preview:', token.substring(0, 50) + '...');
     console.log('[JWT Debug] Environment:', environmentId);
-    console.log('[JWT Debug] JWT_SECRET (first 50 chars):', JWT_SECRET.substring(0, 50) + '...');
-    console.log('[JWT Debug] JWT_SECRET length:', JWT_SECRET.length);
+    console.log('[JWT Debug] Using', useEd25519 ? 'Ed25519' : 'HS256', 'for verification');
     
     const result: any = {
       timestamp: new Date().toISOString(),
       environment: environmentId,
       tokenReceived: true,
       tokenPreview: token.substring(0, 50) + '...',
-      jwtSecretInfo: {
-        length: JWT_SECRET.length,
-        preview: JWT_SECRET.substring(0, 50) + '...',
-      }
+      jwtAlgorithm: useEd25519 ? 'EdDSA (Ed25519)' : 'HS256',
+      hasPublicKey: !!publicKey,
+      hasCryptoKey: !!cryptoKey
     };
     
     // Try to decode without verification
@@ -9400,6 +9432,13 @@ app.delete("/make-server-6fcaeea3/public/celebrations/:id", async (c) => {
 
 // ===== HRIS INTEGRATION ROUTES =====
 app.route("/make-server-6fcaeea3/hris", hrisRoutes);
+
+// ===== PROXY SESSION ROUTES =====
+app.route("/make-server-6fcaeea3/api", proxySessionsApi);
+
+// ===== PASSWORD MANAGEMENT ROUTES =====
+console.log('🔒 Setting up password management routes with rate limiting...');
+setupPasswordRoutes(app);
 
 // ===== PHASE 2: MULTI-CATALOG ARCHITECTURE ROUTES =====
 console.log('📦 Setting up multi-catalog architecture routes...');

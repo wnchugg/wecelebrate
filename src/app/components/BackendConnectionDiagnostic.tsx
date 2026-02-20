@@ -78,12 +78,12 @@ export function BackendConnectionDiagnostic() {
       let testDbData = null;
       try {
         healthData = JSON.parse(healthText);
-      } catch (e) {
+      } catch {
         logger.warn('[Backend Diagnostic] Could not parse health response as JSON');
       }
       try {
         testDbData = JSON.parse(testDbText);
-      } catch (e) {
+      } catch {
         logger.warn('[Backend Diagnostic] Could not parse test-db response as JSON');
       }
 

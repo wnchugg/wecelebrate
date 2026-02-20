@@ -51,7 +51,7 @@ export function BackendConnectionStatus({ showQuickFix = true }: BackendConnecti
         
         try {
           data = JSON.parse(text);
-        } catch (e) {
+        } catch {
           // If parsing fails, treat as plain text response
           data = { message: text };
         }

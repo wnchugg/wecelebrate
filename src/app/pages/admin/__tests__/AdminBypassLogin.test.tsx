@@ -402,7 +402,7 @@ describe('Admin Bypass Login Component', () => {
         expect(screen.getByLabelText('Two-Factor Authentication Code')).toBeInTheDocument();
       });
 
-      const twoFactorInput = screen.getByLabelText('Two-Factor Authentication Code') as HTMLInputElement;
+      const twoFactorInput = screen.getByLabelText('Two-Factor Authentication Code');
 
       await user.type(twoFactorInput, 'abc123def');
 
@@ -419,7 +419,7 @@ describe('Admin Bypass Login Component', () => {
         </TestWrapper>
       );
 
-      const passwordInput = screen.getByLabelText('Password') as HTMLInputElement;
+      const passwordInput = screen.getByLabelText('Password');
       const toggleButton = screen.getByLabelText('Show password');
 
       expect(passwordInput.type).toBe('password');
@@ -496,8 +496,8 @@ describe('Admin Bypass Login Component', () => {
         </TestWrapper>
       );
 
-      const emailInput = screen.getByLabelText('Email Address') as HTMLInputElement;
-      const passwordInput = screen.getByLabelText('Password') as HTMLInputElement;
+      const emailInput = screen.getByLabelText('Email Address');
+      const passwordInput = screen.getByLabelText('Password');
       const submitButton = screen.getByRole('button', { name: /sign in/i });
 
       await user.type(emailInput, 'admin@example.com');

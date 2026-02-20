@@ -170,10 +170,10 @@ export const WelcomePageEditorNew: React.FC = () => {
       enableDragDrop={false} // Can be enabled later
       enableLayouts={false} // Can be enabled later
       onSave={async (config) => {
-        console.log('[WelcomePageEditor] Configuration saved:', config);
+        // Configuration saved
       }}
       onChange={(config) => {
-        console.log('[WelcomePageEditor] Configuration changed:', config);
+        // Configuration changed
       }}
     />
   );

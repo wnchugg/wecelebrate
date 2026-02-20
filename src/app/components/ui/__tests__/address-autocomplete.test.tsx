@@ -56,7 +56,7 @@ describe('AddressAutocomplete Component', () => {
         <AddressAutocomplete onSelect={onSelect} debounceMs={0} />
       );
 
-      const input = container.querySelector('input') as HTMLInputElement;
+      const input = container.querySelector('input');
       await user.type(input, 'test');
 
       await waitFor(() => {
@@ -78,7 +78,7 @@ describe('AddressAutocomplete Component', () => {
         <AddressAutocomplete onSelect={onSelect} minQueryLength={3} debounceMs={0} />
       );
 
-      const input = container.querySelector('input') as HTMLInputElement;
+      const input = container.querySelector('input');
       await user.type(input, 'ab');
 
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -103,7 +103,7 @@ describe('AddressAutocomplete Component', () => {
         <AddressAutocomplete onSelect={onSelect} debounceMs={0} />
       );
 
-      const input = container.querySelector('input') as HTMLInputElement;
+      const input = container.querySelector('input');
       await user.type(input, 'test');
 
       // Check for loading spinner
@@ -138,7 +138,7 @@ describe('AddressAutocomplete Component', () => {
         <AddressAutocomplete onSelect={onSelect} debounceMs={0} />
       );
 
-      const input = container.querySelector('input') as HTMLInputElement;
+      const input = container.querySelector('input');
       await user.type(input, 'test');
 
       await waitFor(() => {
@@ -193,7 +193,7 @@ describe('AddressAutocomplete Component', () => {
         <AddressAutocomplete onSelect={onSelect} debounceMs={0} />
       );
 
-      const input = container.querySelector('input') as HTMLInputElement;
+      const input = container.querySelector('input');
       await user.type(input, 'test');
 
       await waitFor(() => {
@@ -243,7 +243,7 @@ describe('AddressAutocomplete Component', () => {
         <AddressAutocomplete onSelect={onSelect} debounceMs={0} />
       );
 
-      const input = container.querySelector('input') as HTMLInputElement;
+      const input = container.querySelector('input');
       await user.type(input, 'test');
 
       await waitFor(() => {
@@ -273,7 +273,7 @@ describe('AddressAutocomplete Component', () => {
         <AddressAutocomplete onSelect={onSelect} debounceMs={0} />
       );
 
-      const input = container.querySelector('input') as HTMLInputElement;
+      const input = container.querySelector('input');
       await user.type(input, 'test');
 
       await waitFor(() => {
@@ -303,7 +303,7 @@ describe('AddressAutocomplete Component', () => {
         <AddressAutocomplete onSelect={onSelect} debounceMs={0} />
       );
 
-      const input = container.querySelector('input') as HTMLInputElement;
+      const input = container.querySelector('input');
       await user.type(input, 'test');
 
       await waitFor(() => {
@@ -329,7 +329,7 @@ describe('AddressAutocomplete Component', () => {
         <AddressAutocomplete onSelect={onSelect} debounceMs={0} />
       );
 
-      const input = container.querySelector('input') as HTMLInputElement;
+      const input = container.querySelector('input');
       await user.type(input, 'test');
 
       await waitFor(() => {
@@ -364,7 +364,7 @@ describe('AddressAutocomplete Component', () => {
         <AddressAutocomplete onSelect={onSelect} disabled={true} />
       );
 
-      const input = container.querySelector('input') as HTMLInputElement;
+      const input = container.querySelector('input');
       expect(input.disabled).toBe(true);
 
       // Should not allow typing
@@ -386,7 +386,7 @@ describe('AddressAutocomplete Component', () => {
         />
       );
 
-      const input = container.querySelector('input') as HTMLInputElement;
+      const input = container.querySelector('input');
       
       // Type 4 characters (below minimum)
       await user.type(input, 'test');
@@ -428,7 +428,7 @@ describe('AddressAutocomplete Component', () => {
         <AddressAutocomplete onSelect={onSelect} debounceMs={300} />
       );
 
-      const input = container.querySelector('input') as HTMLInputElement;
+      const input = container.querySelector('input');
       
       // Type multiple characters quickly
       await user.type(input, 'test');

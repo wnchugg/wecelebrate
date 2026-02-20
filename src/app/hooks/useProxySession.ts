@@ -49,7 +49,7 @@ export function useProxySession() {
     if (!state.session) return undefined;
 
     const checkExpiry = () => {
-      if (new Date(state.session!.expiresAt) < new Date()) {
+      if (new Date(state.session.expiresAt) < new Date()) {
         toast.warning('Proxy session has expired');
         setState(prev => ({ ...prev, session: null }));
         localStorage.removeItem('proxy_session_token');

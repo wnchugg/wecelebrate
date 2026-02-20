@@ -504,7 +504,7 @@ describe('Draft Isolation Property-Based Tests', () => {
           // Simulate multiple draft saves by updating draft_settings
           for (let i = 0; i < draftVersions.length; i++) {
             mockSite.draft_settings = {
-              ...mockSite.draft_settings!,
+              ...mockSite.draft_settings,
               translations: buildTranslations(draftVersions[i]),
             };
 

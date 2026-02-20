@@ -520,7 +520,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           // Set corresponding client
           if (clientsResponse.data) {
-            const siteClient = clientsResponse.data.find((c: Client) => c.id === siteToSelect!.clientId);
+            const siteClient = clientsResponse.data.find((c: Client) => c.id === siteToSelect.clientId);
             console.warn('[SiteContext] Looking for client:', {
               lookingForClientId: siteToSelect.clientId,
               foundClient: siteClient ? { id: siteClient.id, name: siteClient.name } : null,

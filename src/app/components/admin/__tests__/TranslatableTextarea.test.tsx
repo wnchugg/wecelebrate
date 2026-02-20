@@ -55,21 +55,21 @@ describe('TranslatableTextarea Component', () => {
     it('should use default rows value of 4', () => {
       renderWithRouter(<TranslatableTextarea {...defaultProps} />);
       
-      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const textarea = screen.getByRole('textbox');
       expect(textarea.rows).toBe(4);
     });
 
     it('should apply custom rows value', () => {
       renderWithRouter(<TranslatableTextarea {...defaultProps} rows={8} />);
       
-      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const textarea = screen.getByRole('textbox');
       expect(textarea.rows).toBe(8);
     });
 
     it('should apply rows value of 2', () => {
       renderWithRouter(<TranslatableTextarea {...defaultProps} rows={2} />);
       
-      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const textarea = screen.getByRole('textbox');
       expect(textarea.rows).toBe(2);
     });
   });
@@ -78,14 +78,14 @@ describe('TranslatableTextarea Component', () => {
     it('should apply maxLength attribute when specified', () => {
       renderWithRouter(<TranslatableTextarea {...defaultProps} maxLength={500} />);
       
-      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const textarea = screen.getByRole('textbox');
       expect(textarea.maxLength).toBe(500);
     });
 
     it('should not apply maxLength attribute when not specified', () => {
       renderWithRouter(<TranslatableTextarea {...defaultProps} />);
       
-      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const textarea = screen.getByRole('textbox');
       expect(textarea.maxLength).toBe(-1); // -1 is the default when maxLength is not set
     });
 
@@ -138,7 +138,7 @@ describe('TranslatableTextarea Component', () => {
       const tabs = screen.getAllByRole('button');
       const defaultTab = tabs.find((tab) => tab.textContent?.includes('English (US)'));
       
-      expect(within(defaultTab!).getByText('Default')).toBeInTheDocument();
+      expect(within(defaultTab).getByText('Default')).toBeInTheDocument();
     });
 
     it('should activate default language tab by default', () => {
@@ -153,7 +153,7 @@ describe('TranslatableTextarea Component', () => {
     it('should show default language value in textarea', () => {
       renderWithRouter(<TranslatableTextarea {...defaultProps} />);
       
-      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const textarea = screen.getByRole('textbox');
       expect(textarea.value).toBe('Hello World');
     });
   });
@@ -165,7 +165,7 @@ describe('TranslatableTextarea Component', () => {
       const tabs = screen.getAllByRole('button');
       const englishTab = tabs.find((tab) => tab.textContent?.includes('English (US)'));
       
-      expect(within(englishTab!).getByText('Done')).toBeInTheDocument();
+      expect(within(englishTab).getByText('Done')).toBeInTheDocument();
     });
 
     it('should show "Empty" status for untranslated fields', () => {
@@ -174,7 +174,7 @@ describe('TranslatableTextarea Component', () => {
       const tabs = screen.getAllByRole('button');
       const frenchTab = tabs.find((tab) => tab.textContent?.includes('Français'));
       
-      expect(within(frenchTab!).getByText('Empty')).toBeInTheDocument();
+      expect(within(frenchTab).getByText('Empty')).toBeInTheDocument();
     });
 
     it('should show "Required" status for empty default language field', () => {
@@ -188,7 +188,7 @@ describe('TranslatableTextarea Component', () => {
       const tabs = screen.getAllByRole('button');
       const englishTab = tabs.find((tab) => tab.textContent?.includes('English (US)'));
       
-      expect(within(englishTab!).getByText('Required')).toBeInTheDocument();
+      expect(within(englishTab).getByText('Required')).toBeInTheDocument();
     });
 
     it('should show green color for translated status', () => {
@@ -231,7 +231,7 @@ describe('TranslatableTextarea Component', () => {
       const tabs = screen.getAllByRole('button');
       const spanishTab = tabs.find((tab) => tab.textContent?.includes('Español'));
       
-      await user.click(spanishTab!);
+      await user.click(spanishTab);
       
       expect(spanishTab).toHaveClass('border-blue-500');
     });
@@ -240,13 +240,13 @@ describe('TranslatableTextarea Component', () => {
       const user = userEvent.setup();
       renderWithRouter(<TranslatableTextarea {...defaultProps} />);
       
-      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const textarea = screen.getByRole('textbox');
       expect(textarea.value).toBe('Hello World');
       
       const tabs = screen.getAllByRole('button');
       const spanishTab = tabs.find((tab) => tab.textContent?.includes('Español'));
       
-      await user.click(spanishTab!);
+      await user.click(spanishTab);
       
       expect(textarea.value).toBe('Hola Mundo');
     });
@@ -258,9 +258,9 @@ describe('TranslatableTextarea Component', () => {
       const tabs = screen.getAllByRole('button');
       const frenchTab = tabs.find((tab) => tab.textContent?.includes('Français'));
       
-      await user.click(frenchTab!);
+      await user.click(frenchTab);
       
-      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const textarea = screen.getByRole('textbox');
       expect(textarea.value).toBe('');
     });
   });
@@ -293,7 +293,7 @@ describe('TranslatableTextarea Component', () => {
       // Switch to Spanish tab
       const tabs = screen.getAllByRole('button');
       const spanishTab = tabs.find((tab) => tab.textContent?.includes('Español'));
-      await user.click(spanishTab!);
+      await user.click(spanishTab);
       
       const textarea = screen.getByRole('textbox');
       await user.clear(textarea);
@@ -312,7 +312,7 @@ describe('TranslatableTextarea Component', () => {
       
       const tabs = screen.getAllByRole('button');
       const spanishTab = tabs.find((tab) => tab.textContent?.includes('Español'));
-      await user.click(spanishTab!);
+      await user.click(spanishTab);
       
       expect(screen.getByText('Copy from default')).toBeInTheDocument();
     });
@@ -334,7 +334,7 @@ describe('TranslatableTextarea Component', () => {
       // Switch to French tab
       const tabs = screen.getAllByRole('button');
       const frenchTab = tabs.find((tab) => tab.textContent?.includes('Français'));
-      await user.click(frenchTab!);
+      await user.click(frenchTab);
       
       const copyButton = screen.getByText('Copy from default');
       await user.click(copyButton);
@@ -350,7 +350,7 @@ describe('TranslatableTextarea Component', () => {
       // Switch to French tab
       const tabs = screen.getAllByRole('button');
       const frenchTab = tabs.find((tab) => tab.textContent?.includes('Français'));
-      await user.click(frenchTab!);
+      await user.click(frenchTab);
       
       const copyButton = screen.getByText('Copy from default');
       await user.click(copyButton);
@@ -371,7 +371,7 @@ describe('TranslatableTextarea Component', () => {
       // Switch to French tab
       const tabs = screen.getAllByRole('button');
       const frenchTab = tabs.find((tab) => tab.textContent?.includes('Français'));
-      await user.click(frenchTab!);
+      await user.click(frenchTab);
       
       const copyButton = screen.getByText('Copy from default');
       expect(copyButton).toBeDisabled();
@@ -462,7 +462,7 @@ describe('TranslatableTextarea Component', () => {
       // Switch to French tab
       const tabs = screen.getAllByRole('button');
       const frenchTab = tabs.find((tab) => tab.textContent?.includes('Français'));
-      await user.click(frenchTab!);
+      await user.click(frenchTab);
       
       expect(screen.queryByText(/This field is required/)).not.toBeInTheDocument();
     });

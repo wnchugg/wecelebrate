@@ -363,8 +363,8 @@ describe('Draft/Publish Workflow Integration Tests', () => {
       const publishSite = vi.fn().mockImplementation(async () => {
         currentSite = {
           ...currentSite,
-          translations: currentSite.draft_settings!.translations!,
-          available_languages: currentSite.draft_available_languages!,
+          translations: currentSite.draft_settings.translations!,
+          available_languages: currentSite.draft_available_languages,
           draft_settings: undefined,
           draft_available_languages: undefined,
         };
@@ -651,7 +651,7 @@ describe('Draft/Publish Workflow Integration Tests', () => {
           currentSite = {
             ...currentSite,
             translations: currentSite.draft_settings.translations!,
-            available_languages: currentSite.draft_available_languages!,
+            available_languages: currentSite.draft_available_languages,
             settings: {
               ...currentSite.settings,
               ...currentSite.draft_settings,

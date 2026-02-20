@@ -135,7 +135,7 @@ export function BrandsManagement() {
       const data = await apiRequest('/v2/brands/extract-colors', {
         method: 'POST',
         body: JSON.stringify({ url: extractUrl }),
-      }) as { success: boolean; colors?: Array<{ color: string; count: number; usage: string }>; error?: string };
+      });
       
       if (!data.success) {
         throw new Error(data.error || 'Failed to extract colors from website');

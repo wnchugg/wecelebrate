@@ -308,10 +308,10 @@ export const HomePageEditorNew: React.FC = () => {
       storageAdapter={storageAdapter}
       storageKey="home-page"
       onSave={async (config) => {
-        console.log('[HomePageEditor] Configuration saved:', config);
+        // Configuration saved
       }}
       onChange={(config) => {
-        console.log('[HomePageEditor] Configuration changed:', config);
+        // Configuration changed
       }}
     />
   );

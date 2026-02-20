@@ -304,7 +304,7 @@ export async function getAuditLogs(
       throw new Error('Failed to fetch audit logs');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+     
     return data.map(log => ({
       id: log.id as string,
       eventType: log.event_type as string,

@@ -52,7 +52,7 @@ export const SimplePageEditorExample: React.FC = () => {
   const storageAdapter = new SiteSettingsAdapter(
     'example-site-id',
     async (id, updates) => {
-      console.log('Mock save:', id, updates);
+      // Mock save
     },
     () => ({ settings: {} })
   );
@@ -66,10 +66,10 @@ export const SimplePageEditorExample: React.FC = () => {
       storageAdapter={storageAdapter}
       storageKey="examplePageConfig"
       onSave={async (config) => {
-        console.log('Page saved:', config);
+        // Page saved
       }}
       onChange={(config) => {
-        console.log('Page changed:', config);
+        // Page changed
       }}
     />
   );

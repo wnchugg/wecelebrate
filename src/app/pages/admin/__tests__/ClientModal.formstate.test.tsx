@@ -157,14 +157,14 @@ describe('Client Modal Form State Preservation', () => {
             });
 
             // Verify Basic Info fields are preserved
-            const nameInputAfter = screen.getByLabelText(/Client Name/i) as HTMLInputElement;
-            const emailInputAfter = screen.getByLabelText(/Contact Email/i) as HTMLInputElement;
+            const nameInputAfter = screen.getByLabelText(/Client Name/i);
+            const emailInputAfter = screen.getByLabelText(/Contact Email/i);
             
             expect(nameInputAfter.value).toBe(formData.name);
             expect(emailInputAfter.value).toBe(formData.contactEmail);
             
             if (formData.clientCode) {
-              const codeInputAfter = screen.getByLabelText(/Client Code/i) as HTMLInputElement;
+              const codeInputAfter = screen.getByLabelText(/Client Code/i);
               expect(codeInputAfter.value).toBe(formData.clientCode);
             }
 
@@ -176,12 +176,12 @@ describe('Client Modal Form State Preservation', () => {
             });
 
             if (formData.clientContactName) {
-              const contactNameInputAfter = screen.getByLabelText(/Contact Name/i) as HTMLInputElement;
+              const contactNameInputAfter = screen.getByLabelText(/Contact Name/i);
               expect(contactNameInputAfter.value).toBe(formData.clientContactName);
             }
             
             if (formData.clientContactPhone) {
-              const phoneInputAfter = screen.getByLabelText(/Contact Phone/i) as HTMLInputElement;
+              const phoneInputAfter = screen.getByLabelText(/Contact Phone/i);
               expect(phoneInputAfter.value).toBe(formData.clientContactPhone);
             }
 
@@ -193,12 +193,12 @@ describe('Client Modal Form State Preservation', () => {
             });
 
             if (formData.clientAddressLine1) {
-              const addressInputAfter = screen.getByLabelText(/Address Line 1/i) as HTMLInputElement;
+              const addressInputAfter = screen.getByLabelText(/Address Line 1/i);
               expect(addressInputAfter.value).toBe(formData.clientAddressLine1);
             }
             
             if (formData.clientCity) {
-              const cityInputAfter = screen.getByLabelText(/City/i) as HTMLInputElement;
+              const cityInputAfter = screen.getByLabelText(/City/i);
               expect(cityInputAfter.value).toBe(formData.clientCity);
             }
 
@@ -210,7 +210,7 @@ describe('Client Modal Form State Preservation', () => {
             });
 
             if (formData.clientAccountManager) {
-              const accountManagerInputAfter = screen.getByLabelText(/^Account Manager$/i) as HTMLInputElement;
+              const accountManagerInputAfter = screen.getByLabelText(/^Account Manager$/i);
               expect(accountManagerInputAfter.value).toBe(formData.clientAccountManager);
             }
 
@@ -222,7 +222,7 @@ describe('Client Modal Form State Preservation', () => {
             });
 
             if (formData.clientUrl) {
-              const urlInputAfter = screen.getByLabelText(/Client URL/i) as HTMLInputElement;
+              const urlInputAfter = screen.getByLabelText(/Client URL/i);
               expect(urlInputAfter.value).toBe(formData.clientUrl);
             }
 
@@ -234,7 +234,7 @@ describe('Client Modal Form State Preservation', () => {
             });
 
             if (formData.clientInvoiceType) {
-              const invoiceTypeInputAfter = screen.getByLabelText(/Invoice Type/i) as HTMLInputElement;
+              const invoiceTypeInputAfter = screen.getByLabelText(/Invoice Type/i);
               expect(invoiceTypeInputAfter.value).toBe(formData.clientInvoiceType);
             }
           }
@@ -281,8 +281,8 @@ describe('Client Modal Form State Preservation', () => {
       });
 
       // Verify values are preserved
-      const nameInputAfter = screen.getByLabelText(/Client Name/i) as HTMLInputElement;
-      const emailInputAfter = screen.getByLabelText(/Contact Email/i) as HTMLInputElement;
+      const nameInputAfter = screen.getByLabelText(/Client Name/i);
+      const emailInputAfter = screen.getByLabelText(/Contact Email/i);
       
       expect(nameInputAfter.value).toBe('Test Client');
       expect(emailInputAfter.value).toBe('test@example.com');
@@ -329,8 +329,8 @@ describe('Client Modal Form State Preservation', () => {
       });
 
       // Verify values are preserved
-      const addressInputAfter = screen.getByLabelText(/Address Line 1/i) as HTMLInputElement;
-      const cityInputAfter = screen.getByLabelText(/City/i) as HTMLInputElement;
+      const addressInputAfter = screen.getByLabelText(/Address Line 1/i);
+      const cityInputAfter = screen.getByLabelText(/City/i);
       
       expect(addressInputAfter.value).toBe('123 Main St');
       expect(cityInputAfter.value).toBe('New York');
@@ -380,7 +380,7 @@ describe('Client Modal Form State Preservation', () => {
         expect(screen.getByLabelText(/Client Name/i)).toBeInTheDocument();
       });
       
-      const nameInputAfter = screen.getByLabelText(/Client Name/i) as HTMLInputElement;
+      const nameInputAfter = screen.getByLabelText(/Client Name/i);
       expect(nameInputAfter.value).toBe('Acme Corp');
 
       // Navigate back to Contact and verify
@@ -390,7 +390,7 @@ describe('Client Modal Form State Preservation', () => {
         expect(screen.getByLabelText(/Contact Name/i)).toBeInTheDocument();
       });
       
-      const contactNameInputAfter = screen.getByLabelText(/Contact Name/i) as HTMLInputElement;
+      const contactNameInputAfter = screen.getByLabelText(/Contact Name/i);
       expect(contactNameInputAfter.value).toBe('John Doe');
 
       // Navigate back to App Settings and verify
@@ -400,7 +400,7 @@ describe('Client Modal Form State Preservation', () => {
         expect(screen.getByLabelText(/Client URL/i)).toBeInTheDocument();
       });
       
-      const urlInputAfter = screen.getByLabelText(/Client URL/i) as HTMLInputElement;
+      const urlInputAfter = screen.getByLabelText(/Client URL/i);
       expect(urlInputAfter.value).toBe('https://acme.com');
     });
   });

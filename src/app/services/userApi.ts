@@ -20,7 +20,7 @@ export async function getUsers(siteId: string): Promise<AdvancedAuthUser[]> {
     throw new Error('Failed to fetch users');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+   
   return data.map(user => ({
     id: user.id as string,
     email: user.email as string,

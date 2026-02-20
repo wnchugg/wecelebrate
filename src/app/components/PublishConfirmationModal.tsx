@@ -27,8 +27,6 @@ export function PublishConfirmationModal({
   isPublishing,
   siteName
 }: PublishConfirmationModalProps) {
-  if (!isOpen) return null;
-
   const groupedChanges = useMemo(() => {
     const groups: Record<string, Change[]> = {};
     changes.forEach(change => {
@@ -48,7 +46,7 @@ export function PublishConfirmationModal({
     return String(value);
   };
 
-  return (
+  if (!isOpen) return null;  return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] flex flex-col">
         {/* Header */}

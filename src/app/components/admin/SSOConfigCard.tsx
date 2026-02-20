@@ -156,7 +156,7 @@ export function SSOConfigCard(props: SSOConfigCardProps) {
         {uiState === 'configured' && (
           <ConfiguredStateSummary
             providerName={getProviderDisplayName(ssoProvider)}
-            providerCategory={providerCategory!}
+            providerCategory={providerCategory}
             clientId={ssoClientId}
             entityId={ssoEntityId}
             redirectUri={`https://wecelebrate.netlify.app/site/${currentSiteDomain}/auth/callback`}

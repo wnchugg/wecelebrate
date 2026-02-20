@@ -78,7 +78,7 @@ describe('Property 25: Country filter limits results', () => {
             />
           );
 
-          const input = container.querySelector('input[placeholder="Search address"]') as HTMLInputElement;
+          const input = container.querySelector('input[placeholder="Search address"]');
           expect(input).toBeTruthy();
           
           await user.type(input, query);
@@ -142,7 +142,7 @@ describe('Property 25: Country filter limits results', () => {
             />
           );
 
-          const input = container.querySelector('input') as HTMLInputElement;
+          const input = container.querySelector('input');
           expect(input).toBeTruthy();
           
           await user.type(input, query);
@@ -186,7 +186,7 @@ describe('Property 25: Country filter limits results', () => {
             <AddressAutocomplete onSelect={onSelect} debounceMs={0} />
           );
 
-          const input = container.querySelector('input') as HTMLInputElement;
+          const input = container.querySelector('input');
           expect(input).toBeTruthy();
           
           await user.type(input, query);
@@ -254,7 +254,7 @@ describe('Property 26: Suggestion selection parses address', () => {
             />
           );
 
-          const input = container.querySelector('input') as HTMLInputElement;
+          const input = container.querySelector('input');
           await user.type(input, 'test');
 
           // Wait for suggestions to appear
@@ -334,7 +334,7 @@ describe('Property 26: Suggestion selection parses address', () => {
             <AddressAutocomplete onSelect={onSelect} debounceMs={0} />
           );
 
-          const input = container.querySelector('input') as HTMLInputElement;
+          const input = container.querySelector('input');
           await user.type(input, 'test');
 
           await waitFor(
@@ -411,7 +411,7 @@ describe('Property 27: Suggestion selection invokes callback', () => {
             <AddressAutocomplete onSelect={onSelect} debounceMs={0} />
           );
 
-          const input = container.querySelector('input') as HTMLInputElement;
+          const input = container.querySelector('input');
           await user.type(input, 'test');
 
           await waitFor(
@@ -480,7 +480,7 @@ describe('Property 27: Suggestion selection invokes callback', () => {
             <AddressAutocomplete onSelect={onSelect} debounceMs={0} />
           );
 
-          const input = container.querySelector('input') as HTMLInputElement;
+          const input = container.querySelector('input');
           await user.type(input, 'test');
 
           await waitFor(
@@ -537,7 +537,7 @@ describe('Property 27: Suggestion selection invokes callback', () => {
             <AddressAutocomplete onSelect={onSelect} debounceMs={0} />
           );
 
-          const input = container.querySelector('input') as HTMLInputElement;
+          const input = container.querySelector('input');
           await user.type(input, query);
 
           await waitFor(

@@ -197,7 +197,7 @@ describe('useCurrencyFormat Property-Based Tests', () => {
           const symbolRegex = new RegExp(symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
           const symbolMatches = range.match(symbolRegex);
           expect(symbolMatches).toBeTruthy();
-          expect(symbolMatches!.length).toBe(2); // Symbol should appear exactly twice
+          expect(symbolMatches.length).toBe(2); // Symbol should appear exactly twice
 
           // Property 5: Both amounts should follow the same formatting rules
           // Extract numeric parts from both formatted amounts
@@ -595,26 +595,29 @@ describe('useCurrencyFormat Property-Based Tests', () => {
           
           // Verify the display format is consistent in the range
           switch (displayFormat) {
-            case 'symbol':
+            case 'symbol': {
               // Symbol should appear twice (once for min, once for max)
               const symbolMatches = formattedRange.match(new RegExp(metadata.symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'));
               expect(symbolMatches).toBeTruthy();
-              expect(symbolMatches!.length).toBe(2);
+              expect(symbolMatches.length).toBe(2);
               break;
+            }
             
-            case 'code':
+            case 'code': {
               // Code should appear twice
               const codeMatches = formattedRange.match(new RegExp(`\\b${metadata.code}\\b`, 'g'));
               expect(codeMatches).toBeTruthy();
-              expect(codeMatches!.length).toBe(2);
+              expect(codeMatches.length).toBe(2);
               break;
+            }
             
-            case 'name':
+            case 'name': {
               // Name should appear twice
               const nameMatches = formattedRange.match(new RegExp(metadata.name, 'g'));
               expect(nameMatches).toBeTruthy();
-              expect(nameMatches!.length).toBe(2);
+              expect(nameMatches.length).toBe(2);
               break;
+            }
           }
         }
       ),

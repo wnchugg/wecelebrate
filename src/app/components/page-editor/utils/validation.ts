@@ -183,7 +183,7 @@ export class ConfigurationValidator {
               });
             } else {
               // Regular block in children array
-              const childErrors = this.validateBlock(child as Block, depth + 1, maxDepth);
+              const childErrors = this.validateBlock(child, depth + 1, maxDepth);
               childErrors.errors.forEach((error) => {
                 errors.push({
                   field: `children[${index}].${error.field}`,
@@ -195,7 +195,7 @@ export class ConfigurationValidator {
         } else {
           // Regular blocks
           block.children.forEach((child, index) => {
-            const childErrors = this.validateBlock(child as Block, depth + 1, maxDepth);
+            const childErrors = this.validateBlock(child, depth + 1, maxDepth);
             childErrors.errors.forEach((error) => {
               errors.push({
                 field: `children[${index}].${error.field}`,

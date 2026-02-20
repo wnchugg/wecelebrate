@@ -257,10 +257,10 @@ export const LandingPageEditorNew: React.FC = () => {
       storageAdapter={storageAdapter}
       storageKey="landingPageConfig"
       onSave={async (config) => {
-        console.log('[LandingPageEditor] Configuration saved:', config);
+        // Configuration saved
       }}
       onChange={(config) => {
-        console.log('[LandingPageEditor] Configuration changed:', config);
+        // Configuration changed
       }}
     />
   );

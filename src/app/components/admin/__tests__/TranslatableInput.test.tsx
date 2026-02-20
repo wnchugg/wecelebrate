@@ -70,7 +70,7 @@ describe('TranslatableInput Component', () => {
       const tabs = screen.getAllByRole('button');
       const defaultTab = tabs.find((tab) => tab.textContent?.includes('English (US)'));
       
-      expect(within(defaultTab!).getByText('Default')).toBeInTheDocument();
+      expect(within(defaultTab).getByText('Default')).toBeInTheDocument();
     });
 
     it('should activate default language tab by default', () => {
@@ -85,7 +85,7 @@ describe('TranslatableInput Component', () => {
     it('should show default language value in input', () => {
       renderWithRouter(<TranslatableInput {...defaultProps} />);
       
-      const input = screen.getByRole('textbox') as HTMLInputElement;
+      const input = screen.getByRole('textbox');
       expect(input.value).toBe('Hello');
     });
   });
@@ -97,7 +97,7 @@ describe('TranslatableInput Component', () => {
       const tabs = screen.getAllByRole('button');
       const englishTab = tabs.find((tab) => tab.textContent?.includes('English (US)'));
       
-      expect(within(englishTab!).getByText('Done')).toBeInTheDocument();
+      expect(within(englishTab).getByText('Done')).toBeInTheDocument();
     });
 
     it('should show "Empty" status for untranslated fields', () => {
@@ -106,7 +106,7 @@ describe('TranslatableInput Component', () => {
       const tabs = screen.getAllByRole('button');
       const frenchTab = tabs.find((tab) => tab.textContent?.includes('Français'));
       
-      expect(within(frenchTab!).getByText('Empty')).toBeInTheDocument();
+      expect(within(frenchTab).getByText('Empty')).toBeInTheDocument();
     });
 
     it('should show "Required" status for empty required default language field', () => {
@@ -121,7 +121,7 @@ describe('TranslatableInput Component', () => {
       const tabs = screen.getAllByRole('button');
       const englishTab = tabs.find((tab) => tab.textContent?.includes('English (US)'));
       
-      expect(within(englishTab!).getByText('Required')).toBeInTheDocument();
+      expect(within(englishTab).getByText('Required')).toBeInTheDocument();
     });
 
     it('should show green color for translated status', () => {
@@ -165,7 +165,7 @@ describe('TranslatableInput Component', () => {
       const tabs = screen.getAllByRole('button');
       const spanishTab = tabs.find((tab) => tab.textContent?.includes('Español'));
       
-      await user.click(spanishTab!);
+      await user.click(spanishTab);
       
       expect(spanishTab).toHaveClass('border-blue-500');
     });
@@ -174,13 +174,13 @@ describe('TranslatableInput Component', () => {
       const user = userEvent.setup();
       renderWithRouter(<TranslatableInput {...defaultProps} />);
       
-      const input = screen.getByRole('textbox') as HTMLInputElement;
+      const input = screen.getByRole('textbox');
       expect(input.value).toBe('Hello');
       
       const tabs = screen.getAllByRole('button');
       const spanishTab = tabs.find((tab) => tab.textContent?.includes('Español'));
       
-      await user.click(spanishTab!);
+      await user.click(spanishTab);
       
       expect(input.value).toBe('Hola');
     });
@@ -192,9 +192,9 @@ describe('TranslatableInput Component', () => {
       const tabs = screen.getAllByRole('button');
       const frenchTab = tabs.find((tab) => tab.textContent?.includes('Français'));
       
-      await user.click(frenchTab!);
+      await user.click(frenchTab);
       
-      const input = screen.getByRole('textbox') as HTMLInputElement;
+      const input = screen.getByRole('textbox');
       expect(input.value).toBe('');
     });
   });
@@ -229,7 +229,7 @@ describe('TranslatableInput Component', () => {
       // Switch to Spanish tab
       const tabs = screen.getAllByRole('button');
       const spanishTab = tabs.find((tab) => tab.textContent?.includes('Español'));
-      await user.click(spanishTab!);
+      await user.click(spanishTab);
       
       const input = screen.getByRole('textbox');
       await user.clear(input);
@@ -253,10 +253,10 @@ describe('TranslatableInput Component', () => {
       // Switch to French tab
       const tabs = screen.getAllByRole('button');
       const frenchTab = tabs.find((tab) => tab.textContent?.includes('Français'));
-      await user.click(frenchTab!);
+      await user.click(frenchTab);
       
       // Initially should show Empty
-      expect(within(frenchTab!).getByText('Empty')).toBeInTheDocument();
+      expect(within(frenchTab).getByText('Empty')).toBeInTheDocument();
     });
   });
 
@@ -267,7 +267,7 @@ describe('TranslatableInput Component', () => {
       
       const tabs = screen.getAllByRole('button');
       const spanishTab = tabs.find((tab) => tab.textContent?.includes('Español'));
-      await user.click(spanishTab!);
+      await user.click(spanishTab);
       
       expect(screen.getByText('Copy from default')).toBeInTheDocument();
     });
@@ -289,7 +289,7 @@ describe('TranslatableInput Component', () => {
       // Switch to French tab
       const tabs = screen.getAllByRole('button');
       const frenchTab = tabs.find((tab) => tab.textContent?.includes('Français'));
-      await user.click(frenchTab!);
+      await user.click(frenchTab);
       
       const copyButton = screen.getByText('Copy from default');
       await user.click(copyButton);
@@ -305,7 +305,7 @@ describe('TranslatableInput Component', () => {
       // Switch to French tab
       const tabs = screen.getAllByRole('button');
       const frenchTab = tabs.find((tab) => tab.textContent?.includes('Français'));
-      await user.click(frenchTab!);
+      await user.click(frenchTab);
       
       const copyButton = screen.getByText('Copy from default');
       await user.click(copyButton);
@@ -326,7 +326,7 @@ describe('TranslatableInput Component', () => {
       // Switch to French tab
       const tabs = screen.getAllByRole('button');
       const frenchTab = tabs.find((tab) => tab.textContent?.includes('Français'));
-      await user.click(frenchTab!);
+      await user.click(frenchTab);
       
       const copyButton = screen.getByText('Copy from default');
       expect(copyButton).toBeDisabled();
@@ -425,7 +425,7 @@ describe('TranslatableInput Component', () => {
       // Switch to French tab
       const tabs = screen.getAllByRole('button');
       const frenchTab = tabs.find((tab) => tab.textContent?.includes('Français'));
-      await user.click(frenchTab!);
+      await user.click(frenchTab);
       
       expect(screen.queryByText(/This field is required/)).not.toBeInTheDocument();
     });

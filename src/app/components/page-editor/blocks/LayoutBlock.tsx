@@ -27,7 +27,7 @@ export const LayoutBlock: React.FC<LayoutBlockProps> = ({
   renderBlock,
   deviceMode,
 }) => {
-  const content = block.content as LayoutBlockContent;
+  const content = block.content;
   const { columnCount, columnRatios, gap, stackOnMobile, verticalAlign } = content;
 
   // Calculate column widths based on ratios

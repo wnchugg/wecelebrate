@@ -52,7 +52,7 @@ export class HistoryManager {
     this.history.future.unshift(this.history.present);
 
     // Get previous state
-    const previous = this.history.past.pop()!;
+    const previous = this.history.past.pop();
     this.history.present = previous;
 
     return previous;
@@ -71,7 +71,7 @@ export class HistoryManager {
     this.history.past.push(this.history.present);
 
     // Get next state
-    const next = this.history.future.shift()!;
+    const next = this.history.future.shift();
     this.history.present = next;
 
     return next;

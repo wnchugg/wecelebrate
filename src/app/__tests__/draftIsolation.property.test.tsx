@@ -329,16 +329,21 @@ describe('Draft Isolation Property-Based Tests', () => {
       fc.property(
         // Generate live languages
         fc.uniqueArray(fc.constantFrom('en', 'es', 'fr'), { minLength: 1, maxLength: 3 }),
-        // Generate draft languages (different from live)
-        fc.uniqueArray(fc.constantFrom('en', 'es', 'fr', 'de', 'it'), {
+        // Generate draft languages (only use supported languages)
+        fc.uniqueArray(fc.constantFrom('en', 'es', 'fr'), {
           minLength: 2,
-          maxLength: 5,
+          maxLength: 3,
         }),
         (liveLanguages, draftLanguages) => {
           // Ensure draft has at least one language not in live
           const hasNewLanguage = draftLanguages.some((lang) => !liveLanguages.includes(lang));
-          if (!hasNewLanguage && draftLanguages.length < 5) {
-            draftLanguages.push('de');
+          if (!hasNewLanguage && draftLanguages.length < 3) {
+            // Only use languages that are in the type: 'fr', 'en', 'es'
+            const availableLanguages = ['fr', 'en', 'es'] as const;
+            const unusedLanguage = availableLanguages.find(lang => !draftLanguages.includes(lang));
+            if (unusedLanguage) {
+              draftLanguages.push(unusedLanguage);
+            }
           }
 
           const mockSite: Site = {

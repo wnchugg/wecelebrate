@@ -400,6 +400,25 @@ export const translations = {
     // Notification Messages - Warning
     'notification.warning.productsImportedWithFailures': 'Imported {successful} products, {failed} failed.',
     'notification.warning.validationWarning': '{message}',
+    
+    // Footer
+    'footer.text': '© {year} WeCelebrate. All rights reserved.',
+    'footer.privacyLink': 'Privacy Policy',
+    'footer.termsLink': 'Terms of Service',
+    'footer.contactLink': 'Contact Us',
+    
+    // Not Found Page
+    'notFound.title': 'Page Not Found',
+    'notFound.message': 'The page you are looking for does not exist.',
+    'notFound.homeButton': 'Go Home',
+    'notFound.adminLoginButton': 'Admin Login',
+    'notFound.clientPortalButton': 'Client Portal',
+    
+    // Expired Page
+    'expired.title': 'Selection Period Expired',
+    'expired.message': 'The selection period for this event has ended.',
+    'expired.contactMessage': 'Please contact your administrator for assistance.',
+    'expired.returnHomeButton': 'Return Home',
   },
 
   es: {
@@ -766,6 +785,25 @@ export const translations = {
     // Notification Messages - Warning
     'notification.warning.productsImportedWithFailures': '{successful} productos importados, {failed} fallidos.',
     'notification.warning.validationWarning': '{message}',
+    
+    // Footer
+    'footer.text': '© {year} WeCelebrate. Todos los derechos reservados.',
+    'footer.privacyLink': 'Política de Privacidad',
+    'footer.termsLink': 'Términos de Servicio',
+    'footer.contactLink': 'Contáctenos',
+    
+    // Not Found Page
+    'notFound.title': 'Página No Encontrada',
+    'notFound.message': 'La página que busca no existe.',
+    'notFound.homeButton': 'Ir al Inicio',
+    'notFound.adminLoginButton': 'Inicio de Sesión de Administrador',
+    'notFound.clientPortalButton': 'Portal del Cliente',
+    
+    // Expired Page
+    'expired.title': 'Período de Selección Expirado',
+    'expired.message': 'El período de selección para este evento ha finalizado.',
+    'expired.contactMessage': 'Por favor contacte a su administrador para asistencia.',
+    'expired.returnHomeButton': 'Volver al Inicio',
   },
   
   fr: {
@@ -1132,6 +1170,25 @@ export const translations = {
     // Notification Messages - Warning
     'notification.warning.productsImportedWithFailures': '{successful} produits importés, {failed} échoués.',
     'notification.warning.validationWarning': '{message}',
+    
+    // Footer
+    'footer.text': '© {year} WeCelebrate. Tous droits réservés.',
+    'footer.privacyLink': 'Politique de Confidentialité',
+    'footer.termsLink': 'Conditions de Service',
+    'footer.contactLink': 'Nous Contacter',
+    
+    // Not Found Page
+    'notFound.title': 'Page Non Trouvée',
+    'notFound.message': 'La page que vous recherchez n\'existe pas.',
+    'notFound.homeButton': 'Accueil',
+    'notFound.adminLoginButton': 'Connexion Administrateur',
+    'notFound.clientPortalButton': 'Portail Client',
+    
+    // Expired Page
+    'expired.title': 'Période de Sélection Expirée',
+    'expired.message': 'La période de sélection pour cet événement est terminée.',
+    'expired.contactMessage': 'Veuillez contacter votre administrateur pour obtenir de l\'aide.',
+    'expired.returnHomeButton': 'Retour à l\'Accueil',
   },
   
   de: {
@@ -1498,6 +1555,24 @@ export const translations = {
     // Notification Messages - Warning
     'notification.warning.productsImportedWithFailures': '{successful} Produkte importiert, {failed} fehlgeschlagen.',
     'notification.warning.validationWarning': '{message}',
+    // Footer
+    'footer.text': '© {year} WeCelebrate. All rights reserved.',
+    'footer.privacyLink': 'Privacy Policy',
+    'footer.termsLink': 'Terms of Service',
+    'footer.contactLink': 'Contact Us',
+    
+    // Not Found Page
+    'notFound.title': 'Page Not Found',
+    'notFound.message': 'The page you are looking for does not exist.',
+    'notFound.homeButton': 'Go Home',
+    'notFound.adminLoginButton': 'Admin Login',
+    'notFound.clientPortalButton': 'Client Portal',
+    
+    // Expired Page
+    'expired.title': 'Selection Period Expired',
+    'expired.message': 'The selection period for this event has ended.',
+    'expired.contactMessage': 'Please contact your administrator for assistance.',
+    'expired.returnHomeButton': 'Return Home',
   },
   
   'pt-BR': {
@@ -1864,6 +1939,24 @@ export const translations = {
     // Notification Messages - Warning
     'notification.warning.productsImportedWithFailures': '{successful} produtos importados, {failed} falharam.',
     'notification.warning.validationWarning': '{message}',
+    // Footer
+    'footer.text': '© {year} WeCelebrate. All rights reserved.',
+    'footer.privacyLink': 'Privacy Policy',
+    'footer.termsLink': 'Terms of Service',
+    'footer.contactLink': 'Contact Us',
+    
+    // Not Found Page
+    'notFound.title': 'Page Not Found',
+    'notFound.message': 'The page you are looking for does not exist.',
+    'notFound.homeButton': 'Go Home',
+    'notFound.adminLoginButton': 'Admin Login',
+    'notFound.clientPortalButton': 'Client Portal',
+    
+    // Expired Page
+    'expired.title': 'Selection Period Expired',
+    'expired.message': 'The selection period for this event has ended.',
+    'expired.contactMessage': 'Please contact your administrator for assistance.',
+    'expired.returnHomeButton': 'Return Home',
   },
   
   it: {
@@ -2230,6 +2323,24 @@ export const translations = {
     // Notification Messages - Warning
     'notification.warning.productsImportedWithFailures': '{successful} prodotti importati, {failed} falliti.',
     'notification.warning.validationWarning': '{message}',
+    // Footer
+    'footer.text': '© {year} WeCelebrate. All rights reserved.',
+    'footer.privacyLink': 'Privacy Policy',
+    'footer.termsLink': 'Terms of Service',
+    'footer.contactLink': 'Contact Us',
+    
+    // Not Found Page
+    'notFound.title': 'Page Not Found',
+    'notFound.message': 'The page you are looking for does not exist.',
+    'notFound.homeButton': 'Go Home',
+    'notFound.adminLoginButton': 'Admin Login',
+    'notFound.clientPortalButton': 'Client Portal',
+    
+    // Expired Page
+    'expired.title': 'Selection Period Expired',
+    'expired.message': 'The selection period for this event has ended.',
+    'expired.contactMessage': 'Please contact your administrator for assistance.',
+    'expired.returnHomeButton': 'Return Home',
   },
   
   ja: {
@@ -2592,6 +2703,24 @@ export const translations = {
     // Notification Messages - Warning
     'notification.warning.productsImportedWithFailures': '{successful}個の製品がインポートされ、{failed}個が失敗しました。',
     'notification.warning.validationWarning': '{message}',
+    // Footer
+    'footer.text': '© {year} WeCelebrate. All rights reserved.',
+    'footer.privacyLink': 'Privacy Policy',
+    'footer.termsLink': 'Terms of Service',
+    'footer.contactLink': 'Contact Us',
+    
+    // Not Found Page
+    'notFound.title': 'Page Not Found',
+    'notFound.message': 'The page you are looking for does not exist.',
+    'notFound.homeButton': 'Go Home',
+    'notFound.adminLoginButton': 'Admin Login',
+    'notFound.clientPortalButton': 'Client Portal',
+    
+    // Expired Page
+    'expired.title': 'Selection Period Expired',
+    'expired.message': 'The selection period for this event has ended.',
+    'expired.contactMessage': 'Please contact your administrator for assistance.',
+    'expired.returnHomeButton': 'Return Home',
   },
   
   zh: {
@@ -2954,6 +3083,24 @@ export const translations = {
     // Notification Messages - Warning
     'notification.warning.productsImportedWithFailures': '导入了{successful}个产品，{failed}个失败。',
     'notification.warning.validationWarning': '{message}',
+    // Footer
+    'footer.text': '© {year} WeCelebrate. All rights reserved.',
+    'footer.privacyLink': 'Privacy Policy',
+    'footer.termsLink': 'Terms of Service',
+    'footer.contactLink': 'Contact Us',
+    
+    // Not Found Page
+    'notFound.title': 'Page Not Found',
+    'notFound.message': 'The page you are looking for does not exist.',
+    'notFound.homeButton': 'Go Home',
+    'notFound.adminLoginButton': 'Admin Login',
+    'notFound.clientPortalButton': 'Client Portal',
+    
+    // Expired Page
+    'expired.title': 'Selection Period Expired',
+    'expired.message': 'The selection period for this event has ended.',
+    'expired.contactMessage': 'Please contact your administrator for assistance.',
+    'expired.returnHomeButton': 'Return Home',
   },
   
   hi: {
@@ -3316,6 +3463,24 @@ export const translations = {
     // Notification Messages - Warning
     'notification.warning.productsImportedWithFailures': '{successful} उत्पाद आयात किए गए, {failed} विफल।',
     'notification.warning.validationWarning': '{message}',
+    // Footer
+    'footer.text': '© {year} WeCelebrate. All rights reserved.',
+    'footer.privacyLink': 'Privacy Policy',
+    'footer.termsLink': 'Terms of Service',
+    'footer.contactLink': 'Contact Us',
+    
+    // Not Found Page
+    'notFound.title': 'Page Not Found',
+    'notFound.message': 'The page you are looking for does not exist.',
+    'notFound.homeButton': 'Go Home',
+    'notFound.adminLoginButton': 'Admin Login',
+    'notFound.clientPortalButton': 'Client Portal',
+    
+    // Expired Page
+    'expired.title': 'Selection Period Expired',
+    'expired.message': 'The selection period for this event has ended.',
+    'expired.contactMessage': 'Please contact your administrator for assistance.',
+    'expired.returnHomeButton': 'Return Home',
   },
   
   ko: {
@@ -3678,6 +3843,24 @@ export const translations = {
     // Notification Messages - Warning
     'notification.warning.productsImportedWithFailures': '{successful}개의 제품을 가져왔고, {failed}개가 실패했습니다.',
     'notification.warning.validationWarning': '{message}',
+    // Footer
+    'footer.text': '© {year} WeCelebrate. All rights reserved.',
+    'footer.privacyLink': 'Privacy Policy',
+    'footer.termsLink': 'Terms of Service',
+    'footer.contactLink': 'Contact Us',
+    
+    // Not Found Page
+    'notFound.title': 'Page Not Found',
+    'notFound.message': 'The page you are looking for does not exist.',
+    'notFound.homeButton': 'Go Home',
+    'notFound.adminLoginButton': 'Admin Login',
+    'notFound.clientPortalButton': 'Client Portal',
+    
+    // Expired Page
+    'expired.title': 'Selection Period Expired',
+    'expired.message': 'The selection period for this event has ended.',
+    'expired.contactMessage': 'Please contact your administrator for assistance.',
+    'expired.returnHomeButton': 'Return Home',
   },
   
   pl: {
@@ -4045,6 +4228,24 @@ export const translations = {
     // Notification Messages - Warning
     'notification.warning.productsImportedWithFailures': 'Zaimportowano {successful} produktów, {failed} nie powiodło się.',
     'notification.warning.validationWarning': '{message}',
+    // Footer
+    'footer.text': '© {year} WeCelebrate. All rights reserved.',
+    'footer.privacyLink': 'Privacy Policy',
+    'footer.termsLink': 'Terms of Service',
+    'footer.contactLink': 'Contact Us',
+    
+    // Not Found Page
+    'notFound.title': 'Page Not Found',
+    'notFound.message': 'The page you are looking for does not exist.',
+    'notFound.homeButton': 'Go Home',
+    'notFound.adminLoginButton': 'Admin Login',
+    'notFound.clientPortalButton': 'Client Portal',
+    
+    // Expired Page
+    'expired.title': 'Selection Period Expired',
+    'expired.message': 'The selection period for this event has ended.',
+    'expired.contactMessage': 'Please contact your administrator for assistance.',
+    'expired.returnHomeButton': 'Return Home',
   },
   
   ru: {
@@ -4408,6 +4609,24 @@ export const translations = {
     // Notification Messages - Warning
     'notification.warning.productsImportedWithFailures': 'Импортировано {successful} товаров, {failed} не удалось.',
     'notification.warning.validationWarning': '{message}',
+    // Footer
+    'footer.text': '© {year} WeCelebrate. All rights reserved.',
+    'footer.privacyLink': 'Privacy Policy',
+    'footer.termsLink': 'Terms of Service',
+    'footer.contactLink': 'Contact Us',
+    
+    // Not Found Page
+    'notFound.title': 'Page Not Found',
+    'notFound.message': 'The page you are looking for does not exist.',
+    'notFound.homeButton': 'Go Home',
+    'notFound.adminLoginButton': 'Admin Login',
+    'notFound.clientPortalButton': 'Client Portal',
+    
+    // Expired Page
+    'expired.title': 'Selection Period Expired',
+    'expired.message': 'The selection period for this event has ended.',
+    'expired.contactMessage': 'Please contact your administrator for assistance.',
+    'expired.returnHomeButton': 'Return Home',
   },
   
   ar: {
@@ -4771,6 +4990,24 @@ export const translations = {
     // Notification Messages - Warning
     'notification.warning.productsImportedWithFailures': 'تم استيراد {successful} منتج، {failed} فشل.',
     'notification.warning.validationWarning': '{message}',
+    // Footer
+    'footer.text': '© {year} WeCelebrate. All rights reserved.',
+    'footer.privacyLink': 'Privacy Policy',
+    'footer.termsLink': 'Terms of Service',
+    'footer.contactLink': 'Contact Us',
+    
+    // Not Found Page
+    'notFound.title': 'Page Not Found',
+    'notFound.message': 'The page you are looking for does not exist.',
+    'notFound.homeButton': 'Go Home',
+    'notFound.adminLoginButton': 'Admin Login',
+    'notFound.clientPortalButton': 'Client Portal',
+    
+    // Expired Page
+    'expired.title': 'Selection Period Expired',
+    'expired.message': 'The selection period for this event has ended.',
+    'expired.contactMessage': 'Please contact your administrator for assistance.',
+    'expired.returnHomeButton': 'Return Home',
   },
   
   he: {
@@ -5134,6 +5371,24 @@ export const translations = {
     // Notification Messages - Warning
     'notification.warning.productsImportedWithFailures': '{successful} מוצרים יובאו, {failed} נכשלו.',
     'notification.warning.validationWarning': '{message}',
+    // Footer
+    'footer.text': '© {year} WeCelebrate. All rights reserved.',
+    'footer.privacyLink': 'Privacy Policy',
+    'footer.termsLink': 'Terms of Service',
+    'footer.contactLink': 'Contact Us',
+    
+    // Not Found Page
+    'notFound.title': 'Page Not Found',
+    'notFound.message': 'The page you are looking for does not exist.',
+    'notFound.homeButton': 'Go Home',
+    'notFound.adminLoginButton': 'Admin Login',
+    'notFound.clientPortalButton': 'Client Portal',
+    
+    // Expired Page
+    'expired.title': 'Selection Period Expired',
+    'expired.message': 'The selection period for this event has ended.',
+    'expired.contactMessage': 'Please contact your administrator for assistance.',
+    'expired.returnHomeButton': 'Return Home',
   },
   
   ta: {
@@ -5497,6 +5752,24 @@ export const translations = {
     // Notification Messages - Warning
     'notification.warning.productsImportedWithFailures': '{successful} தயாரிப்புகள் இறக்குமதி செய்யப்பட்டன, {failed} தோல்வியுற்றன.',
     'notification.warning.validationWarning': '{message}',
+    // Footer
+    'footer.text': '© {year} WeCelebrate. All rights reserved.',
+    'footer.privacyLink': 'Privacy Policy',
+    'footer.termsLink': 'Terms of Service',
+    'footer.contactLink': 'Contact Us',
+    
+    // Not Found Page
+    'notFound.title': 'Page Not Found',
+    'notFound.message': 'The page you are looking for does not exist.',
+    'notFound.homeButton': 'Go Home',
+    'notFound.adminLoginButton': 'Admin Login',
+    'notFound.clientPortalButton': 'Client Portal',
+    
+    // Expired Page
+    'expired.title': 'Selection Period Expired',
+    'expired.message': 'The selection period for this event has ended.',
+    'expired.contactMessage': 'Please contact your administrator for assistance.',
+    'expired.returnHomeButton': 'Return Home',
   },
 };
 

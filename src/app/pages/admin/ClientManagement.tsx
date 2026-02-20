@@ -87,8 +87,7 @@ export function validateRequired(value: string | undefined | null, fieldName: st
 
 // Use the API Client type with additional UI fields
 interface Client extends ApiClient {
-  isActive?: boolean; // Legacy field for backward compatibility
-  status?: 'active' | 'inactive'; // New field
+  isActive?: boolean; // Legacy field for backward compatibility (optional)
   description?: string;
   contactPhone?: string;
   address?: string;

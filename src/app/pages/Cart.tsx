@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { LanguageSelector } from '../components/LanguageSelector';
-import logoSvg from '../../imports/Logo';
+import Logo from '../../imports/Logo';
 import { 
   ShoppingCart, 
   Trash2, 
@@ -91,7 +91,7 @@ export function Cart() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
-              <svg className="h-8 w-auto" dangerouslySetInnerHTML={{ __html: logoSvg }} />
+              <Logo />
               <span className="text-xl font-bold text-[#1B2A5E]">
                 RecHUB Gifting
               </span>

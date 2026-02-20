@@ -2,6 +2,7 @@ import { supabase } from '../lib/supabase';
 import { AdvancedAuthUser, EditUserRequest, SetPasswordRequest } from '../../types/advancedAuth';
 import { hasPermission } from './permissionService';
 import { logUserEdit, logUserPasswordSet, logUserCreation, logUserDeletion } from './auditLogService';
+import { getCurrentEnvironment } from '../config/deploymentEnvironments';
 
 /**
  * Get all users for a site
@@ -102,7 +103,11 @@ export async function setUserPassword(request: SetPasswordRequest): Promise<void
     throw new Error('Not authenticated');
   }
   
-  const response = await fetch(`${supabase.supabaseUrl}/functions/v1/make-server-6fcaeea3/password-management/set`, {
+  // Get Supabase URL from environment
+  const env = getCurrentEnvironment();
+  const apiUrl = `${env.supabaseUrl}/functions/v1/make-server-6fcaeea3`;
+  
+  const response = await fetch(`${apiUrl}/password-management/set`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

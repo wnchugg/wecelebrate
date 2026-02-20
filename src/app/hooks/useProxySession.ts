@@ -46,7 +46,7 @@ export function useProxySession() {
 
   // Check if session is expired
   useEffect(() => {
-    if (!state.session) return;
+    if (!state.session) return undefined;
 
     const checkExpiry = () => {
       if (new Date(state.session!.expiresAt) < new Date()) {

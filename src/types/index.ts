@@ -72,6 +72,7 @@ export interface GiftCategory {
 export interface Site {
   id: string;
   name: string;
+  slug?: string;
   clientId: string;
   status: 'active' | 'inactive' | 'pending' | 'draft';
   domain?: string;
@@ -87,6 +88,17 @@ export interface Site {
   settings?: Record<string, unknown>;
   createdAt?: string;
   updatedAt?: string;
+  
+  // Multi-language content support (camelCase)
+  availableLanguages?: string[];
+  translations?: Record<string, any>;
+  draftAvailableLanguages?: string[];
+  _draftSettings?: Record<string, unknown>;
+  
+  // Multi-language content support (snake_case for backward compatibility)
+  available_languages?: string[];
+  draft_available_languages?: string[];
+  draft_settings?: Record<string, unknown>;
 }
 
 export interface SiteWithDetails extends Site {
@@ -176,6 +188,8 @@ export interface Client {
   settings?: Record<string, unknown>;
   createdAt?: string;
   updatedAt?: string;
+  clientCode?: string;
+  isActive?: boolean;
 }
 
 export interface ClientWithDetails extends Client {

@@ -233,22 +233,23 @@ export function SiteConfiguration() {
   const [ssoEditMode, setSsoEditMode] = useState(false);
   
   // SSO Field State Variables
-  const [ssoClientId, setSsoClientId] = useState(currentSite?.settings?.ssoConfig?.clientId || '');
-  const [ssoClientSecret, setSsoClientSecret] = useState(currentSite?.settings?.ssoConfig?.clientSecret || '');
-  const [ssoAuthUrl, setSsoAuthUrl] = useState(currentSite?.settings?.ssoConfig?.authUrl || '');
-  const [ssoTokenUrl, setSsoTokenUrl] = useState(currentSite?.settings?.ssoConfig?.tokenUrl || '');
-  const [ssoUserInfoUrl, setSsoUserInfoUrl] = useState(currentSite?.settings?.ssoConfig?.userInfoUrl || '');
-  const [ssoScope, setSsoScope] = useState(currentSite?.settings?.ssoConfig?.scope || 'openid profile email');
-  const [ssoIdpEntryPoint, setSsoIdpEntryPoint] = useState(currentSite?.settings?.ssoConfig?.idpEntryPoint || '');
-  const [ssoEntityId, setSsoEntityId] = useState(currentSite?.settings?.ssoConfig?.entityId || '');
-  const [ssoCertificate, setSsoCertificate] = useState(currentSite?.settings?.ssoConfig?.certificate || '');
-  const [ssoAutoProvision, setSsoAutoProvision] = useState(currentSite?.settings?.ssoConfig?.autoProvision ?? true);
+  const ssoConfig = currentSite?.settings?.ssoConfig as any;
+  const [ssoClientId, setSsoClientId] = useState(ssoConfig?.clientId || '');
+  const [ssoClientSecret, setSsoClientSecret] = useState(ssoConfig?.clientSecret || '');
+  const [ssoAuthUrl, setSsoAuthUrl] = useState(ssoConfig?.authUrl || '');
+  const [ssoTokenUrl, setSsoTokenUrl] = useState(ssoConfig?.tokenUrl || '');
+  const [ssoUserInfoUrl, setSsoUserInfoUrl] = useState(ssoConfig?.userInfoUrl || '');
+  const [ssoScope, setSsoScope] = useState(ssoConfig?.scope || 'openid profile email');
+  const [ssoIdpEntryPoint, setSsoIdpEntryPoint] = useState(ssoConfig?.idpEntryPoint || '');
+  const [ssoEntityId, setSsoEntityId] = useState(ssoConfig?.entityId || '');
+  const [ssoCertificate, setSsoCertificate] = useState(ssoConfig?.certificate || '');
+  const [ssoAutoProvision, setSsoAutoProvision] = useState(ssoConfig?.autoProvision ?? true);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   
   // Admin Bypass for SSO
-  const [allowAdminBypass, setAllowAdminBypass] = useState(currentSite?.settings?.ssoConfig?.allowAdminBypass ?? false);
-  const [bypassRequires2FA, setBypassRequires2FA] = useState(currentSite?.settings?.ssoConfig?.bypassRequires2FA ?? true);
-  const [bypassAllowedIPs, setBypassAllowedIPs] = useState(currentSite?.settings?.ssoConfig?.bypassAllowedIPs?.join('\n') || '');
+  const [allowAdminBypass, setAllowAdminBypass] = useState(ssoConfig?.allowAdminBypass ?? false);
+  const [bypassRequires2FA, setBypassRequires2FA] = useState(ssoConfig?.bypassRequires2FA ?? true);
+  const [bypassAllowedIPs, setBypassAllowedIPs] = useState(ssoConfig?.bypassAllowedIPs?.join('\n') || '');
 
   // Phase 5: Additional Optional Fields
   const [shippingMode, setShippingMode] = useState<'company' | 'employee' | 'store'>(currentSite?.settings?.shippingMode || 'employee');
@@ -352,20 +353,21 @@ export function SiteConfiguration() {
       setSsoClientOfficeName((currentSite as any).ssoClientOfficeName || '');
       
       // SSO Configuration State
+      const ssoConfigData = currentSite.settings?.ssoConfig as any;
       setSsoConfigured(!!(currentSite as any).ssoProvider);
-      setSsoClientId(currentSite.settings?.ssoConfig?.clientId || '');
-      setSsoClientSecret(currentSite.settings?.ssoConfig?.clientSecret || '');
-      setSsoAuthUrl(currentSite.settings?.ssoConfig?.authUrl || '');
-      setSsoTokenUrl(currentSite.settings?.ssoConfig?.tokenUrl || '');
-      setSsoUserInfoUrl(currentSite.settings?.ssoConfig?.userInfoUrl || '');
-      setSsoScope(currentSite.settings?.ssoConfig?.scope || 'openid profile email');
-      setSsoIdpEntryPoint(currentSite.settings?.ssoConfig?.idpEntryPoint || '');
-      setSsoEntityId(currentSite.settings?.ssoConfig?.entityId || '');
-      setSsoCertificate(currentSite.settings?.ssoConfig?.certificate || '');
-      setSsoAutoProvision(currentSite.settings?.ssoConfig?.autoProvision ?? true);
-      setAllowAdminBypass(currentSite.settings?.ssoConfig?.allowAdminBypass ?? false);
-      setBypassRequires2FA(currentSite.settings?.ssoConfig?.bypassRequires2FA ?? true);
-      setBypassAllowedIPs(currentSite.settings?.ssoConfig?.bypassAllowedIPs?.join('\n') || '');
+      setSsoClientId(ssoConfigData?.clientId || '');
+      setSsoClientSecret(ssoConfigData?.clientSecret || '');
+      setSsoAuthUrl(ssoConfigData?.authUrl || '');
+      setSsoTokenUrl(ssoConfigData?.tokenUrl || '');
+      setSsoUserInfoUrl(ssoConfigData?.userInfoUrl || '');
+      setSsoScope(ssoConfigData?.scope || 'openid profile email');
+      setSsoIdpEntryPoint(ssoConfigData?.idpEntryPoint || '');
+      setSsoEntityId(ssoConfigData?.entityId || '');
+      setSsoCertificate(ssoConfigData?.certificate || '');
+      setSsoAutoProvision(ssoConfigData?.autoProvision ?? true);
+      setAllowAdminBypass(ssoConfigData?.allowAdminBypass ?? false);
+      setBypassRequires2FA(ssoConfigData?.bypassRequires2FA ?? true);
+      setBypassAllowedIPs(ssoConfigData?.bypassAllowedIPs?.join('\n') || '');
       
       // Additional Optional Fields
       setShippingMode(currentSite.settings?.shippingMode || 'employee');
@@ -670,6 +672,7 @@ export function SiteConfiguration() {
       }, 0);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [configMode, isUserInitiatedChange]);
 
   // Helper function to update translations
@@ -1704,7 +1707,7 @@ export function SiteConfiguration() {
           autoProvision: ssoAutoProvision,
           allowAdminBypass,
           bypassRequires2FA,
-          bypassAllowedIPs: bypassAllowedIPs ? bypassAllowedIPs.split('\n').filter(ip => ip.trim()) : []
+          bypassAllowedIPs: bypassAllowedIPs ? bypassAllowedIPs.split('\n').filter((ip: string) => ip.trim()) : []
         }
       },
       siteCode,

@@ -113,6 +113,7 @@ export function PhoneInput({
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
+    return undefined;
   }, [isDropdownOpen]);
 
   // Format phone number based on country pattern

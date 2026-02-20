@@ -39,12 +39,12 @@ describe('permissionService', () => {
 
   describe('hasPermission', () => {
     it('should return true when user has the permission', async () => {
-      mockSupabase.auth.getUser.mockResolvedValue({
+      (supabase.auth.getUser as any).mockResolvedValue({
         data: { user: { id: 'user-1', email: 'test@example.com' } },
         error: null,
       } as any);
 
-      mockSupabase.rpc.mockResolvedValue({
+      (supabase.rpc as any).mockResolvedValue({
         data: true,
         error: null,
       } as any);

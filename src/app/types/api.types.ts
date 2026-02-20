@@ -238,6 +238,22 @@ export interface SiteSettings {
   ssoConfig?: {
     enabled: boolean;
     provider: 'saml' | 'oauth2' | 'openid' | 'azure' | 'okta' | 'google' | 'custom';
+    // OAuth/OpenID fields (top-level for backward compatibility)
+    clientId?: string;
+    clientSecret?: string;
+    authUrl?: string;
+    tokenUrl?: string;
+    userInfoUrl?: string;
+    scope?: string;
+    // SAML fields (top-level for backward compatibility)
+    idpEntryPoint?: string;
+    entityId?: string;
+    certificate?: string;
+    // Admin bypass fields
+    allowAdminBypass?: boolean;
+    bypassRequires2FA?: boolean;
+    bypassAllowedIPs?: string[];
+    // Nested structures
     saml?: {
       entryPoint: string;
       issuer: string;

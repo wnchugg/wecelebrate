@@ -30,6 +30,7 @@ type UpdateScheduleRequest = Partial<Omit<SyncSchedule, 'id'>>;
 export interface PublicSite {
   id: string;
   name: string;
+  slug?: string;
   clientId: string;
   domain: string;
   status: 'active' | 'inactive';

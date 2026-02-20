@@ -292,7 +292,6 @@ export function DeveloperTools() {
         // Clear localStorage to remove stale site/client selections
         try {
           localStorage.removeItem('admin_selected_site_id');
-          console.log('Cleared stale site selection from localStorage');
         } catch (e) {
           console.warn('Failed to clear localStorage:', e);
         }
@@ -363,7 +362,6 @@ export function DeveloperTools() {
 
           if (response.ok && data.success) {
             totalDeleted += data.deleted || 0;
-            console.log(`Deleted ${data.deleted} records with prefix: ${prefix}`);
           }
         } catch (error) {
           console.error(`Failed to delete prefix ${prefix}:`, error);

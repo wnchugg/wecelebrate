@@ -61,7 +61,6 @@ export function ClientDetail() {
       // If it's not a UUID, treat it as a slug and resolve it to an ID
       if (!isUUID) {
         try {
-          console.log('Resolving client slug to ID:', clientId);
           // Fetch all clients to find the one with matching slug
           const allClientsRes = await apiRequest<{ success: boolean; data: Client[] }>('/v2/clients');
           
@@ -71,7 +70,6 @@ export function ClientDetail() {
           );
           
           if (matchingClient) {
-            console.log('Found client by slug:', matchingClient.name, matchingClient.id);
             actualClientId = matchingClient.id;
           } else {
             // No match found - this will cause the API call to fail with proper error

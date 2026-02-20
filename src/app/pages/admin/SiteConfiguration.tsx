@@ -100,14 +100,9 @@ export function SiteConfiguration() {
       hasCurrentSite: !!currentSite
     });
     
-    // Debug: Log currentSite to check _hasUnpublishedChanges flag
+    // Check currentSite for unpublished changes
     if (currentSite) {
-      console.log('[SiteConfiguration] currentSite:', {
-        id: currentSite.id,
-        name: currentSite.name,
-        _hasUnpublishedChanges: currentSite._hasUnpublishedChanges,
-        _draftSettings: currentSite._draftSettings
-      });
+      // Site data loaded with draft changes flag
     }
   }, [currentSite, currentClient]);
   const [activeTab, setActiveTab] = useState('general');

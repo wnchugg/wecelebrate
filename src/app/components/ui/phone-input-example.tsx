@@ -152,7 +152,7 @@ export function PhoneInputExamples() {
           onSubmit={(e) => {
             e.preventDefault();
             const formData = new FormData(e.currentTarget);
-            alert(`Phone: ${formData.get('phone')}`);
+            alert(`Phone: ${String(formData.get('phone') || '')}`);
           }}
           className="space-y-4"
         >

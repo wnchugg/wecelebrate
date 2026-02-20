@@ -125,31 +125,36 @@ export function ClientModal({ open, onClose, client, onSave }: ClientModalProps)
 
   const validateField = (name: string, value: any): string | undefined => {
     switch (name) {
-      case 'name':
+      case 'name': {
         const nameValidation = validateRequired(value, 'Client name');
         return nameValidation.valid ? undefined : nameValidation.error;
+      }
       
-      case 'contactEmail':
+      case 'contactEmail': {
         const emailValidation = validateRequired(value, 'Contact email');
         if (!emailValidation.valid) return emailValidation.error;
         const emailFormatValidation = validateEmail(value);
         return emailFormatValidation.valid ? undefined : emailFormatValidation.error;
+      }
       
-      case 'clientContactPhone':
+      case 'clientContactPhone': {
         if (!value) return undefined; // Optional field
         const phoneError = validatePhoneNumber(value);
         return phoneError || undefined;
+      }
       
       case 'clientAccountManagerEmail':
       case 'clientImplementationManagerEmail':
-      case 'technologyOwnerEmail':
+      case 'technologyOwnerEmail': {
         const optionalEmailValidation = validateEmail(value || '');
         return optionalEmailValidation.valid ? undefined : optionalEmailValidation.error;
+      }
       
       case 'clientUrl':
-      case 'clientCustomUrl':
+      case 'clientCustomUrl': {
         const urlValidation = validateUrl(value || '');
         return urlValidation.valid ? undefined : urlValidation.error;
+      }
       
       default:
         return undefined;

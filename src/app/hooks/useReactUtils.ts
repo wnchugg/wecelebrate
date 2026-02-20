@@ -3,7 +3,7 @@
  * Provides custom hooks for common React patterns
  */
 
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 // Re-export hooks from dedicated files
 export { usePrevious } from './usePrevious';

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Users, 
-  Shield, 
   Plus, 
   Edit2, 
   Trash2, 
@@ -9,8 +8,6 @@ import {
   Eye, 
   Settings, 
   Loader2,
-  ChevronDown,
-  ChevronRight,
   AlertCircle,
   CheckCircle,
   XCircle

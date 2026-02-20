@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Trash2, AlertTriangle, CheckCircle, RefreshCw, ArrowRight } from 'lucide-react';
 import { forceClearTokens } from '../../utils/api';
-import { logger } from '../../utils/logger';
-import { toast } from 'sonner';
 
 export function ClearTokens() {
   const navigate = useNavigate();

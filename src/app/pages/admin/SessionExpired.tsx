@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { AlertTriangle, LogOut, Shield } from 'lucide-react';
 import { clearAccessToken } from '../../lib/apiClient';
-import { logger } from '../../utils/logger';
 
 export function SessionExpired() {
   const navigate = useNavigate();

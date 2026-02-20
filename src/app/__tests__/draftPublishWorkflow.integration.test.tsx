@@ -12,10 +12,8 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { LanguageProvider, useLanguage } from '../context/LanguageContext';
-import { SiteContext, SiteProvider } from '../context/SiteContext';
+import { SiteContext } from '../context/SiteContext';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { canPublishTranslations } from '../utils/translationValidation';
 import type { Site, SiteContextType } from '../context/SiteContext';

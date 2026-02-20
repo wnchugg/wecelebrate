@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router';
 import { 
   Package, 
@@ -8,7 +8,6 @@ import {
   DollarSign, 
   XCircle, 
   CheckSquare,
-  Tag,
   Grid,
   AlertCircle,
   Plus,
@@ -25,7 +24,7 @@ import { Badge } from '../../components/ui/badge';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Checkbox } from '../../components/ui/checkbox';
-import { apiRequest, siteApi, giftApi } from '../../utils/api';
+import { siteApi, giftApi } from '../../utils/api';
 import { showErrorToast, showSuccessToast } from '../../utils/errorHandling';
 import { GIFT_CATEGORIES } from '../../context/GiftContext';
 import { DraggableGiftCard } from '../../components/DraggableGiftCard';

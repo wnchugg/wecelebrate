@@ -5,7 +5,7 @@
  * across all valid inputs using fast-check for property-based testing.
  */
 
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
 import * as fc from 'fast-check';
 import { OAuthFields } from '../OAuthFields';

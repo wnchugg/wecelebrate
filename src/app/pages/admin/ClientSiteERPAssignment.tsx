@@ -2,14 +2,10 @@ import { useState, useEffect } from 'react';
 import { 
   Building2,
   MapPin,
-  Database,
-  Settings,
   CheckCircle,
-  XCircle,
   Save,
   RefreshCw,
-  AlertCircle,
-  Package
+  AlertCircle
 } from 'lucide-react';
 import {
   erpIntegrationService,

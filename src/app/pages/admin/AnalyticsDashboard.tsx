@@ -14,8 +14,6 @@ import {
   PieChart as PieChartIcon
 } from 'lucide-react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
-import type { TooltipProps } from 'recharts';
-import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
 import { CurrencyDisplay } from '../../components/CurrencyDisplay';
 import { useNumberFormat } from '../../hooks/useNumberFormat';
 

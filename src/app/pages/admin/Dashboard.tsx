@@ -3,7 +3,7 @@ import { useSite } from '../../context/SiteContext';
 import { Link } from 'react-router';
 import { PublicSitePreview } from '../../components/admin/PublicSitePreview';
 import { DeployedDomainBanner } from '../../components/admin/DeployedDomainBanner';
-import { Package, Users, ShoppingCart, TrendingUp, TrendingDown, Calendar, MapPin, Globe, Building2, ArrowRight, Clock, Settings, AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
+import { Package, Users, ShoppingCart, TrendingUp, TrendingDown, Building2, Clock, Settings, AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
 import { dashboardService, type TimeRange, type DashboardStats, type RecentOrder, type PopularGift } from '../../services/dashboardService';
 import { getCurrentEnvironment } from '../../config/deploymentEnvironments';
 import { parseError } from '../../utils/apiErrors';

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, Upload, Trash2, Eye, RefreshCw, Image as ImageIcon, Video, Palette } from 'lucide-react';
+import { Save, Trash2, RefreshCw, Image as ImageIcon, Video, Palette } from 'lucide-react';
 import { useSite } from '../../context/SiteContext';
 import { BrandingAssets, MediaAsset } from '../../types/siteCustomization';
 import { toast } from 'sonner';

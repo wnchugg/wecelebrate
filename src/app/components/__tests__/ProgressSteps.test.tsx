@@ -14,7 +14,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import ProgressSteps from '../ProgressSteps';
-import { useLanguage } from '../../context/LanguageContext';
 
 vi.mock('../../context/LanguageContext', () => ({
   useLanguage: vi.fn(() => ({

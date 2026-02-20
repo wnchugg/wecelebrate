@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Shield, Lock, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { sanitizeInput } from '../../utils/security';
-import { showErrorToast, showSuccessToast } from '../../utils/errorHandling';
+import { showSuccessToast } from '../../utils/errorHandling';
 import { projectId, publicAnonKey } from '../../../../utils/supabase/info';
 
 export function BootstrapAdmin() {

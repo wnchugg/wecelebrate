@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
 import { products } from '../data/products';
 import { useCart } from '../context/CartContext';

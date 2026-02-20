@@ -11,7 +11,6 @@ import {
   XCircle,
   AlertCircle,
   Clock,
-  ExternalLink,
   ChevronDown,
   ChevronRight,
   Activity,

@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { projectId, publicAnonKey } from '../../../../utils/supabase/info';
 import { getCurrentEnvironment } from '../../config/deploymentEnvironments';
 import { logger } from '../../utils/logger';
 import { toast } from 'sonner';

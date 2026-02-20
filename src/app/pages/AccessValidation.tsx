@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router';
 import { Mail, CreditCard, Link as LinkIcon, CheckCircle, AlertCircle, IdCard } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Label } from '../components/ui/label';
 import { useAuth } from '../context/AuthContext';
 import { usePublicSite } from '../context/PublicSiteContext';
-import { toast } from 'sonner';
 import { logger } from '../utils/logger';
 import { sanitizeInput, checkRateLimit, logSecurityEvent, validateEmailFormat } from '../utils/security';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';

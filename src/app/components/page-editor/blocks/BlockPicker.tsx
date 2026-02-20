@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import { BlockType, BlockDefinition } from './types';
+import { BlockType } from './types';
 import { blockRegistry } from './BlockRegistry';
 
 export interface BlockPickerProps {

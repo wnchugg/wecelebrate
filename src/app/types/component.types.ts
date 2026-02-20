@@ -4,7 +4,7 @@
  */
 
 import type { ReactNode, HTMLAttributes, ButtonHTMLAttributes, InputHTMLAttributes } from 'react';
-import type { Client, Site, Gift, Employee, Order, Event } from './index';
+import type { Client, Site, Gift, Employee, Event } from './index';
 
 /**
  * Base component props

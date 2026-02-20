@@ -6,14 +6,12 @@
  * UPDATED: February 12, 2026 - Migrated from xlsx to exceljs
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   detectFieldMapping,
   validateProductData,
   generateSampleCSV,
   FIELD_MAPPINGS,
-  type ProductData,
-  type ImportResult,
 } from '../bulkImport';
 
 // Mock Papa and ExcelJS

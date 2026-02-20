@@ -6,23 +6,16 @@ import {
   Users, 
   Upload, 
   Download, 
-  Trash2, 
-  Filter, 
-  Search, 
-  UserPlus,
-  AlertCircle,
+  Search,
   MapPin,
   Server,
   Database,
-  FileText,
   Building2,
   RefreshCw
 } from 'lucide-react';
-import { toast } from 'sonner';
 import { useSite } from '../../context/SiteContext';
 import { apiRequest } from '../../utils/api';
 import { showSuccessToast, showErrorToast } from '../../utils/errorHandling';
-import { logger } from '../../utils/logger';
 import { ManualEmployeeUpload } from '../../components/admin/ManualEmployeeUpload';
 import { SFTPConfiguration } from '../../components/admin/SFTPConfiguration';
 import { HRISIntegrationTab } from '../../components/admin/HRISIntegrationTab';

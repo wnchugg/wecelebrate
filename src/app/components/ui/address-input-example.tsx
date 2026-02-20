@@ -6,7 +6,6 @@
 
 import { useState } from 'react';
 import { AddressInput, AddressData } from './address-input';
-import { Label } from './label';
 import { validateAddress, formatAddressForDisplay } from '../../utils/addressValidation';
 
 export function AddressInputExamples() {

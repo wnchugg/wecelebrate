@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams, Link } from 'react-router';
 import { Shield, Lock, Eye, EyeOff, CheckCircle, Loader2, AlertCircle, XCircle } from 'lucide-react';
 import { EnvironmentBadge } from '../../components/EnvironmentBadge';
 import { BackendConnectionStatus } from '../../components/BackendConnectionStatus';
-import { sanitizeString, logSecurityEvent } from '../../utils/frontendSecurity';
+import { logSecurityEvent } from '../../utils/frontendSecurity';
 import { showErrorToast, showSuccessToast } from '../../utils/errorHandling';
 import { Alert } from '../../components/Alert';
 import { logger } from '../../utils/logger';

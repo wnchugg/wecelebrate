@@ -4,12 +4,11 @@ import { usePublicSite } from '../context/PublicSiteContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useSiteContent } from '../hooks/useSiteContent';
-import { ArrowRight, Play, Heart, MessageCircle } from 'lucide-react';
+import { ArrowRight, Play, MessageCircle } from 'lucide-react';
 import { CelebrationMessage, ECARD_TEMPLATES } from '../types/celebration';
 import { ECard } from '../components/ECard';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';
 import { publicAnonKey } from '../../../utils/supabase/info';
-import { toast } from 'sonner';
 import { logger } from '../utils/logger';
 
 export function Welcome() {

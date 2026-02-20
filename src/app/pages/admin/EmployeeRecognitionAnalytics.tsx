@@ -2,14 +2,11 @@ import { useState, useEffect } from 'react';
 import {
   Award,
   Users,
-  TrendingUp,
   Calendar,
-  Gift,
   Heart,
   Star,
   Trophy,
   Target,
-  ArrowLeft,
   Download,
   ArrowUpRight,
   DollarSign,
@@ -23,7 +20,6 @@ import {
 import {
   BarChart,
   Bar,
-  LineChart,
   Line,
   PieChart,
   Pie,
@@ -34,8 +30,6 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  AreaChart,
-  Area,
   RadarChart,
   PolarGrid,
   PolarAngleAxis,
@@ -44,11 +38,6 @@ import {
 } from 'recharts';
 import * as RechartsAll from 'recharts';
 const ComposedChart = (RechartsAll as Record<string, unknown>).ComposedChart as typeof BarChart;
-import type { TooltipProps } from 'recharts';
-import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Badge } from '../../components/ui/badge';
 
 interface RecognitionMetrics {
   totalEmployees: number;

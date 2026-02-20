@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Upload, Image as ImageIcon, DollarSign, Tag, Package, Plus } from 'lucide-react';
+import { X, Package, Plus } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';

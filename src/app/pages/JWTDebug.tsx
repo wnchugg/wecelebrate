@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';
-import { projectId, publicAnonKey } from '../../../utils/supabase/info';
+import { projectId } from '../../../utils/supabase/info';
 
 export function JWTDebug() {
   const [jwtConfig, setJwtConfig] = useState<any>(null);

@@ -1,4 +1,4 @@
-import { X, Edit, Package, DollarSign, Tag, Info } from 'lucide-react';
+import { X, Edit, Package, Tag, Info } from 'lucide-react';
 import { useGift } from '../../context/GiftContext';
 
 interface GiftDetailModalProps {

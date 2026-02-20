@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { ArrowLeft, Save, Database, ExternalLink, FileText, Package } from 'lucide-react';
 import { fetchCatalogById, createCatalog, updateCatalog } from '../../services/catalogApi';
-import type { Catalog, CatalogType, SourceType, SyncFrequency } from '../../types/catalog';
+import type { CatalogType, SourceType, SyncFrequency } from '../../types/catalog';
 
 export default function CatalogEdit() {
   const navigate = useNavigate();

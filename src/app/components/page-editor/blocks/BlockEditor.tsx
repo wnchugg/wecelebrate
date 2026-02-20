@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Block, BlockDefinition } from './types';
+import { Block } from './types';
 import { blockRegistry } from './BlockRegistry';
 
 export interface BlockEditorProps {

@@ -7,8 +7,6 @@ import {
   LayoutDashboard,
   Settings,
   Mail,
-  Package,
-  Truck,
   Users,
   ShoppingCart,
   X,
@@ -19,28 +17,20 @@ import {
   Building2,
   Globe,
   Shield,
-  AlertTriangle,
-  Sliders,
   BarChart3,
-  Tag,
   Layout,
   Database,
-  Server,
   Activity,
-  Stethoscope,
   Wrench,
   Gift,
   FileText,
   ArrowDownToLine,
-  ArrowUpFromLine,
   Bell,
   FolderOpen,
-  GitBranch,
   TestTube2,
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import haloLogo from 'figma:asset/212120daf4ca7893a2036877eb5d3cdd4c0ad83f.png';
-import { EnvironmentBadge } from '../../components/EnvironmentBadge';
 
 const clientNavigation = [
   { name: 'Dashboard', href: '/admin/client-dashboard', icon: LayoutDashboard },

@@ -1,4 +1,4 @@
-import { Terminal, Copy, CheckCircle, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
+import { Terminal, Copy, CheckCircle, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';
 import { copyToClipboard as copyToClipboardUtil, selectTextInElement as selectTextUtil } from '../utils/clipboard';

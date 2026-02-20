@@ -1,4 +1,4 @@
-import { ExternalLink, Eye, RefreshCw } from 'lucide-react';
+import { ExternalLink, Eye } from 'lucide-react';
 import { useSite } from '../../context/SiteContext';
 import { Button } from '../ui/button';
 import { getPublicSiteUrl } from '../../utils/url';

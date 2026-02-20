@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Activity, Zap, TrendingUp, Database, Image, Code, RefreshCw, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
+import { Activity, Zap, TrendingUp, Database, Code, RefreshCw, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
 import { performanceMonitor } from '../../utils/performanceMonitor';
 import { getCacheStats, clearAllCaches } from '../../utils/apiCache';
 import { toast } from 'sonner';

@@ -1,11 +1,6 @@
 import * as Sentry from '@sentry/react';
-import { useEffect } from 'react';
-import { 
-  createRoutesFromChildren, 
-  matchRoutes, 
-  useLocation, 
-  useNavigationType 
-} from 'react-router';
+
+
 
 // Initialize Sentry
 if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_DSN) {

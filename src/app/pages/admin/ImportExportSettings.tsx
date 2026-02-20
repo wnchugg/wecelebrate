@@ -30,12 +30,9 @@ import { Textarea } from '../../components/ui/textarea';
 import { Switch } from '../../components/ui/switch';
 import { useSite } from '../../context/SiteContext';
 import { 
-  getGlobalConfig, 
-  updateGlobalConfig,
+  getGlobalConfig,
   resetGlobalConfig,
-  exportGlobalConfig,
   importGlobalConfig,
-  GlobalConfig,
 } from '../../config/globalConfig';
 import {
   exportGlobalConfiguration,

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { usePrivacy } from '../context/PrivacyContext';
-import { Shield, Cookie, Settings, X } from 'lucide-react';
+import { Cookie, Settings } from 'lucide-react';
 
 export function CookieConsent() {
   const { showConsentBanner, acceptAll, rejectAll, updateConsent, preferences } = usePrivacy();

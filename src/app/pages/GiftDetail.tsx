@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams, Link } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useLanguage } from '../context/LanguageContext';
 import { useOrder } from '../context/OrderContext';
 import { Gift } from '../context/GiftContext';
-import { ArrowLeft, ShoppingCart, Package, Loader2, Check, Minus, Plus, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Check, Minus, Plus, ArrowRight } from 'lucide-react';
 import { ConfigurableHeader } from '../components/layout/ConfigurableHeader';
 import { getCurrentEnvironment, buildApiUrl } from '../config/deploymentEnvironments';
 import { toast } from 'sonner';

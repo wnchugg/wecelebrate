@@ -11,7 +11,6 @@ import {
   EmailTemplateType,
   GlobalTemplate,
   SiteTemplate,
-  EmailTemplateVariable,
   inviteVariables,
   orderConfirmationVariables,
 } from '../emailTemplates';

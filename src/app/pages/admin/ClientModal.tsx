@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Checkbox } from '../../components/ui/checkbox';
 import { PhoneInput } from '../../components/ui/phone-input';
 import { AddressInput, AddressData } from '../../components/ui/address-input';
-import { validateEmail, validatePhone, validateUrl, validateRequired } from './ClientManagement';
+import { validateEmail, validateUrl, validateRequired } from './ClientManagement';
 import { validatePhoneNumber } from '../../utils/phoneValidation';
 import type { Client as ApiClient } from '../../types/api.types';
 import { useLanguage } from '../../context/LanguageContext';

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Search, Edit, Trash2, Mail, CheckCircle, XCircle, Eye, Copy } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Mail, Eye, Copy } from 'lucide-react';
 import { useEmailTemplates } from '../../hooks/usePhase5A';
 import { showErrorToast, showSuccessToast } from '../../utils/errorHandling';
 import { Button } from '../../components/ui/button';

@@ -6,18 +6,12 @@ import { Label } from '../ui/label';
 import { Switch } from '../ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Alert, AlertDescription } from '../ui/alert';
-import { Badge } from '../ui/badge';
 import { 
   Server, 
   Key, 
   Folder, 
-  User, 
-  Lock, 
   CheckCircle, 
   XCircle,
-  AlertTriangle,
-  RefreshCw,
-  FileText,
   Eye,
   EyeOff,
   Clock,

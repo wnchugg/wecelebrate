@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { Sparkles, Gift, Heart, Star, Calendar, MapPin, Users, ArrowRight, Award, Loader2, Filter, MessageCircle, Send } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Card } from '../components/ui/card';
+import { Heart, Calendar, ArrowRight, Award, Loader2, Filter, MessageCircle, Send } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';

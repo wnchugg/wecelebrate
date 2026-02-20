@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router';
 import { useLanguage } from '../context/LanguageContext';
 import { useOrder } from '../context/OrderContext';
-import { CheckCircle, Package, MapPin, Calendar, Home, Sparkles, Loader2 } from 'lucide-react';
+import { CheckCircle, Package, Calendar, Home, Sparkles, Loader2 } from 'lucide-react';
 import { LanguageSelector } from '../components/LanguageSelector';
 import Logo from '../../imports/Logo';
 import { getCurrentEnvironment, buildApiUrl } from '../config/deploymentEnvironments';

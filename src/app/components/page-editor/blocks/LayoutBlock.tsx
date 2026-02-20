@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { Block, LayoutBlock as LayoutBlockType, LayoutBlockContent } from './types';
+import { Block, LayoutBlock as LayoutBlockType } from './types';
 import { Plus, Trash2, Settings } from 'lucide-react';
 
 interface LayoutBlockProps {

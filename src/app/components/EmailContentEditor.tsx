@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { RichTextEditor } from './RichTextEditor';
 import { Code, Eye } from 'lucide-react';
-import { Button } from './ui/button';
 
 interface EmailContentEditorProps {
   content: string;

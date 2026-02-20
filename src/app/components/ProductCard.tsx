@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { ShoppingCart, Package } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { Product } from '../data/products';
 import { useCart } from '../context/CartContext';
 import { CurrencyDisplay } from './CurrencyDisplay';

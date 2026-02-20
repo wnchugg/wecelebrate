@@ -8,9 +8,6 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter, Routes, Route } from 'react-router';
-import { LanguageProvider } from '../../context/LanguageContext';
 
 // Mock modules
 vi.mock('../../utils/logger', () => ({

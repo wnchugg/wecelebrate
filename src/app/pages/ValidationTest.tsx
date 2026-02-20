@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, AlertCircle, Play, RotateCcw, Loader2, FileText } from 'lucide-react';
+import { useState } from 'react';
+import { CheckCircle, XCircle, Play, Loader2, FileText } from 'lucide-react';
 import { ValidationTester, TestResult } from '../utils/testValidation';
 
 export function ValidationTest() {

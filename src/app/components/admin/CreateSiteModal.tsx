@@ -2,21 +2,13 @@ import { useState } from 'react';
 import { 
   X, 
   Building2, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Globe, 
-  FileText,
+  Globe,
   Sparkles,
   Check,
   ArrowRight,
   Palette,
   Link as LinkIcon
 } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Textarea } from '../ui/textarea';
 import { showSuccessToast, showErrorToast } from '../../utils/errorHandling';
 import { apiRequest } from '../../utils/api';
 import { getErrorMessage } from '../../utils/errorUtils';

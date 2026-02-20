@@ -52,14 +52,12 @@ import type {
   MagicLinkResponse,
   PaginationParams,
   PaginatedResponse,
-  ApiResponse,
   ErrorResponse,
 } from '../types/api.types';
 
 import { isErrorResponse } from '../types/api.types';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';
 import { projectId, publicAnonKey } from '../../../utils/supabase/info';
-import type { SupabaseClient } from '@supabase/supabase-js';
 import { isAuthOrErrorPage, isPublicRoute } from '../utils/routeUtils';
 
 /**

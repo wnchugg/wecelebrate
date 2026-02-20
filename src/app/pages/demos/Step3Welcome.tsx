@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { ArrowLeft, PartyPopper, Globe, ArrowRight, Award, Video, Mail, MessageCircle } from 'lucide-react';
+import { ArrowLeft, PartyPopper, Globe, ArrowRight, Video, MessageCircle } from 'lucide-react';
 
 export function Step3Welcome() {
   const [selectedVariation, setSelectedVariation] = useState<'letter' | 'video' | 'celebration' | 'skip'>('letter');

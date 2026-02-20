@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Activity, TrendingUp, AlertCircle, CheckCircle, XCircle, RefreshCw, Download, Database, Zap, Image as ImageIcon } from 'lucide-react';
+import { Activity, TrendingUp, RefreshCw, Download, Database, Zap, Image as ImageIcon } from 'lucide-react';
 import { performanceMonitor } from '../utils/performanceMonitor';
 import { getCacheStats, clearAllCaches } from '../utils/apiCache';
 

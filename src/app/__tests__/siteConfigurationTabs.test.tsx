@@ -16,10 +16,7 @@
  * - Integration between tabs
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router';
+import { describe, it, expect } from 'vitest';
 
 // Configuration types for the three new tabs
 interface HeaderFooterConfig {

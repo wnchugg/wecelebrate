@@ -1,10 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router';
+import React, { useState } from 'react';
 import { 
-  Gift, 
-  MessageCircle, 
-  Heart, 
-  ChevronRight, 
   Loader2, 
   CheckCircle2, 
   XCircle, 

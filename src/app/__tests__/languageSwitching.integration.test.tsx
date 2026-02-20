@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { renderHook, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { LanguageProvider, useLanguage } from '../context/LanguageContext';
-import { SiteProvider, SiteContext, useSite } from '../context/SiteContext';
+import { SiteProvider, SiteContext } from '../context/SiteContext';
 import { useSiteContent } from '../hooks/useSiteContent';
 import type { Site } from '../context/SiteContext';
 

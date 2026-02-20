@@ -10,7 +10,6 @@ import {
   giftApi,
   siteApi,
   clientApi,
-  adminAuthApi,
   setAccessToken,
   getAccessToken,
   clearAccessToken

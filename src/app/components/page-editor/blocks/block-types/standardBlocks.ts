@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { BlockDefinition, BlockContent, BlockStyles } from '../types';
+import { BlockDefinition } from '../types';
 import { sanitizeHtml, sanitizeText } from '../../utils/security';
 import {
   HeroIcon,

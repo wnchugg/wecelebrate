@@ -18,11 +18,7 @@
  * - Welcome page setup
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
-import { SiteProvider } from '../context/SiteContext';
-import { LanguageProvider } from '../context/LanguageContext';
+import { describe, it, expect } from 'vitest';
 
 // Mock demo site data based on seed-demo-sites.tsx
 const demoSites = {

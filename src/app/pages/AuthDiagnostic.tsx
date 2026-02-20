@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import { Card, CardContent } from '../components/ui/card';
 import { projectId, publicAnonKey } from '../../../utils/supabase/info';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';
 

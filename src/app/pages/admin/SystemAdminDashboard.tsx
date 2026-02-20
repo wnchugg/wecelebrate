@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { Database, Server, Settings, Shield, Key, AlertCircle, CheckCircle, RefreshCw, TrendingUp, TrendingDown, Clock, Globe, Users, Activity, XCircle, ExternalLink, Edit2, Trash2 } from 'lucide-react';
 import { BackendConnectionDiagnostic } from '../../components/BackendConnectionDiagnostic';
-import { getCurrentEnvironment } from '../../config/deploymentEnvironments';
 import { useAdmin } from '../../context/AdminContext';
 import { useSite } from '../../context/SiteContext';
 import { logger } from '../../utils/logger';

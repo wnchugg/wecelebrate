@@ -8,8 +8,6 @@ import {
   userHasPermission,
   grantPermission,
   revokePermission,
-  getAllPermissions,
-  getUserPermissions,
   hasAnyPermission,
   hasAllPermissions
 } from '../permissionService';

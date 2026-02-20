@@ -10,7 +10,7 @@ import {
   ChevronDown, 
   AlertCircle 
 } from 'lucide-react';
-import { projectId, publicAnonKey } from '../../../utils/supabase/info';
+import { publicAnonKey } from '../../../utils/supabase/info';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';
 import { logger } from '../utils/logger';
 

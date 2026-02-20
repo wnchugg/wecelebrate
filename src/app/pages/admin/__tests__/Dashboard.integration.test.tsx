@@ -12,7 +12,6 @@ import { BrowserRouter } from 'react-router';
 import { Dashboard } from '../Dashboard';
 
 // Real imports (not mocked for integration testing)
-import { dashboardService } from '../../../services/dashboardService';
 
 // Mock only the contexts and external dependencies
 vi.mock('../../../context/SiteContext', () => ({

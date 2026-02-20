@@ -1,22 +1,17 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router';
 import {
-  UserPlus,
   Mail,
   Lock,
   User,
   Shield,
-  Eye,
-  EyeOff,
   AlertCircle,
-  CheckCircle,
-  Loader2
+  CheckCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { logger } from '../../utils/logger';
 import { sanitizeString, checkRateLimit, logSecurityEvent } from '../../utils/frontendSecurity';
 import { projectId, publicAnonKey } from '../../../../utils/supabase/info';
-import { createClient } from '@supabase/supabase-js';
 import { getCurrentEnvironment } from '../../config/deploymentEnvironments';
 import { BackendConnectionStatus } from '../../components/BackendConnectionStatus';
 import { DeploymentEnvironmentSelector } from '../../components/DeploymentEnvironmentSelector';

@@ -1,5 +1,4 @@
-import { Link, useLocation } from 'react-router';
-import { Home, ArrowLeft, AlertCircle } from 'lucide-react';
+import { useLocation } from 'react-router';
 import { Standard404 } from '../components/Standard404';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { useLanguage } from '../context/LanguageContext';

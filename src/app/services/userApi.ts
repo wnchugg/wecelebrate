@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabase';
 import { AdvancedAuthUser, EditUserRequest, SetPasswordRequest } from '../../types/advancedAuth';
 import { hasPermission } from './permissionService';
-import { logUserEdit, logUserPasswordSet, logUserCreation, logUserDeletion } from './auditLogService';
+import { logUserEdit, logUserCreation, logUserDeletion } from './auditLogService';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';
 
 /**

@@ -6,10 +6,6 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
-  showSuccessToast,
-  showErrorToast,
-  showWarningToast,
-  showInfoToast,
   extractErrorMessage,
   handleCatchError,
   isNetworkError,

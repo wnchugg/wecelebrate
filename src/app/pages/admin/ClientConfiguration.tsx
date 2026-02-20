@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import { 
   Save, Settings, Globe, Mail, Building2, Package, CreditCard, 
-  Link2, Users, MapPin, Check, AlertCircle, ArrowLeft, Loader2, Clock, ExternalLink, Server
+  Link2, Users, MapPin, ArrowLeft, Loader2, ExternalLink, Server
 } from 'lucide-react';
-import { Alert, AlertDescription } from '../../components/ui/alert';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card';

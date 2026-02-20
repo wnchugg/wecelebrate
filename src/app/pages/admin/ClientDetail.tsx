@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { 
-  ArrowLeft, Building2, Settings, Database, Users, Globe, ExternalLink, 
-  MapPin, CreditCard, Link2, Save, Loader2
+  ArrowLeft, Building2, Settings, Users, Globe, ExternalLink, 
+  MapPin, CreditCard, Link2
 } from 'lucide-react';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { apiRequest } from '../../utils/api';
 import { showErrorToast } from '../../utils/errorHandling';
-import { HRISIntegrationTab } from '../../components/admin/HRISIntegrationTab';
 import { ClientConfiguration } from './ClientConfiguration';
 
 interface Client {

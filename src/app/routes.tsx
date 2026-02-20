@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy } from 'react';
 import { createBrowserRouter } from 'react-router';
 import { Root } from './pages/Root';
 import { AdminRoot } from './pages/admin/AdminRoot';

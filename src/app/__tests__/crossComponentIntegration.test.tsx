@@ -10,7 +10,6 @@ import userEvent from '@testing-library/user-event';
 import { renderWithRouter } from '@/test/helpers';
 import React, { ReactNode } from 'react';
 import { CartProvider, useCart } from '../context/CartContext';
-import { AdminProvider } from '../context/AdminContext';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import { LanguageProvider, useLanguage } from '../context/LanguageContext';
 

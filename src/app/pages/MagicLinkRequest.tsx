@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams, Link } from 'react-router';
 import { sanitizeInput, validateEmailFormat, checkRateLimit, logSecurityEvent } from '../utils/security';
 import { toast } from 'sonner';
 import { logger } from '../utils/logger';
-import { Mail, Loader2, CheckCircle, AlertCircle, ArrowLeft, Send } from 'lucide-react';
+import { Mail, CheckCircle, ArrowLeft, Send } from 'lucide-react';
 import { companyConfig } from '../data/config';
 import { usePublicSite } from '../context/PublicSiteContext';
 import { LanguageSelector } from '../components/LanguageSelector';

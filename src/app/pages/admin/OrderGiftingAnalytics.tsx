@@ -9,20 +9,14 @@ import {
   DollarSign,
   Clock,
   CheckCircle,
-  AlertCircle,
   Users,
-  MapPin,
   BarChart3,
   Download,
-  Filter,
-  ChevronDown,
   Award
 } from 'lucide-react';
 import { 
   BarChart, 
-  Bar, 
-  LineChart,
-  Line,
+  Bar,
   PieChart, 
   Pie, 
   Cell,
@@ -33,8 +27,6 @@ import {
   Legend, 
   ResponsiveContainer 
 } from 'recharts';
-import type { TooltipProps } from 'recharts';
-import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
 
 interface OrderMetrics {
   totalOrders: number;

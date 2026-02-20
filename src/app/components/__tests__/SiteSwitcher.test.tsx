@@ -16,7 +16,6 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithRouter } from '@/test/helpers';
 import { SiteSwitcher } from '../SiteSwitcher';
-import { SiteContext } from '../../context/SiteContext';
 
 // Mock language context
 vi.mock('../../context/LanguageContext', () => ({

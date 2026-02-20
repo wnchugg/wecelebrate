@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
+  CardContent 
 } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -15,11 +12,7 @@ import { toast } from 'sonner';
 import { 
   Save, 
   TestTube, 
-  Server, 
-  Key, 
-  Folder, 
-  User, 
-  Lock,
+  Server,
   RefreshCw,
   CheckCircle,
   XCircle,

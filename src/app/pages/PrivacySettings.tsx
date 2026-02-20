@@ -1,9 +1,9 @@
 import { Link } from 'react-router';
 import { useLanguage } from '../context/LanguageContext';
-import { PrivacyProvider, usePrivacy } from '../context/PrivacyContext';
+import { usePrivacy } from '../context/PrivacyContext';
 import { LanguageSelector } from '../components/LanguageSelector';
 import Logo from '../../imports/Logo';
-import { Shield, Check, X, ArrowLeft, Lock, Eye, Database, Cookie } from 'lucide-react';
+import { Shield, Check, ArrowLeft } from 'lucide-react';
 
 export function PrivacySettings() {
   const { t } = useLanguage();

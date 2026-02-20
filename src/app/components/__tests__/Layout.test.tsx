@@ -11,12 +11,11 @@
  * Total Tests: 5
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { Layout } from '../Layout';
-import { CartProvider, useCart } from '../../context/CartContext';
-import { AdminProvider } from '../../context/AdminContext';
+import { useCart } from '../../context/CartContext';
 
 vi.mock('../../context/CartContext', () => ({
   useCart: vi.fn(() => ({

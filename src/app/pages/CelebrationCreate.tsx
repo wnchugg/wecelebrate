@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { useSite } from '../context/SiteContext';
 import { projectId, publicAnonKey } from '../../../utils/supabase/info';

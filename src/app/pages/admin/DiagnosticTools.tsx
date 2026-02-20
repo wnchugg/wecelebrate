@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { AlertCircle, CheckCircle, RefreshCw, Wrench, Users, Database, Shield } from 'lucide-react';
+import { AlertCircle, CheckCircle, RefreshCw, Wrench, Users, Database } from 'lucide-react';
 import { getCurrentEnvironment } from '../../config/deploymentEnvironments';
 import { showSuccessToast, showErrorToast, showInfoToast } from '../../utils/errorHandling';
 import { logger } from '../../utils/logger';
-import { authApi, apiRequest } from '../../utils/api';
+import { apiRequest } from '../../utils/api';
 
 export function DiagnosticTools() {
   const [isChecking, setIsChecking] = useState(false);

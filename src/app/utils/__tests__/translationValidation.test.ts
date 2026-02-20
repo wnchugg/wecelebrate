@@ -14,9 +14,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   validateTranslations,
-  canPublishTranslations,
-  type TranslationValidationResult,
-  type PublishValidationResult
+  canPublishTranslations
 } from '../translationValidation';
 
 describe('validateTranslations', () => {

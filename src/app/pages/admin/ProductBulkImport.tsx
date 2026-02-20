@@ -22,10 +22,6 @@ import { Card } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Progress } from '../../components/ui/progress';
 import { ScrollArea } from '../../components/ui/scroll-area';
-import { Tabs, TabsList, TabsContent } from '../../components/ui/tabs';
-import { apiRequest } from '../../utils/api';
-import { showSuccessToast, showErrorToast } from '../../utils/errorHandling';
-import { logger } from '../../utils/logger';
 import { 
   parseCSVFile, 
   parseExcelFile, 
@@ -33,8 +29,6 @@ import {
   detectFieldMapping, 
   validateProductData,
   downloadTemplate,
-  ProductData,
-  ValidationError,
   ImportResult,
   FIELD_MAPPINGS
 } from '../../utils/bulkImport';

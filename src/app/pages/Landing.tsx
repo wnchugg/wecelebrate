@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router';
-import { Gift, Award, Shield, Package, Eye, Database, Code, Layers, TestTube2, ArrowRight, Sparkles } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Card, CardContent } from '../components/ui/card';
+import { Gift, Award, Shield, Package, Eye, Database, Code, Layers, TestTube2 } from 'lucide-react';
 import { usePublicSite } from '../context/PublicSiteContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useSiteContent } from '../hooks/useSiteContent';

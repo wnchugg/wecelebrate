@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ExternalLink, Eye, Globe, Gift as GiftIcon, Palette, Settings as SettingsIcon } from 'lucide-react';
+import { ExternalLink, Globe, Gift as GiftIcon, Palette, Settings as SettingsIcon } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';

@@ -1,7 +1,6 @@
-import type { HRISCredentials, HRISConnection, HRISAuthType, HRISProvider as HRISProviderType } from '../../types/admin';
+import type { HRISConnection } from '../../types/admin';
 import { useState, useEffect } from 'react';
 import { Switch } from '../ui/switch';
-import { Select } from '../ui/select';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Search, Check, Star } from 'lucide-react';
-import { languages, Language } from '../../context/LanguageContext';
+import { languages } from '../../context/LanguageContext';
 
 export interface MultiLanguageSelectorProps {
   selectedLanguages: string[];

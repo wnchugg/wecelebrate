@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Shield, Server, Database, CheckCircle, XCircle, AlertTriangle, RefreshCw } from 'lucide-react';
 import { getCurrentEnvironment, getAvailableEnvironments } from '../../config/deploymentEnvironments';
 import { projectId, publicAnonKey } from '../../../../utils/supabase/info';

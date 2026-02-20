@@ -3,8 +3,6 @@ import type {
   Site,
   Client,
   SiteGiftConfiguration,
-  Catalog,
-  SiteCatalogConfiguration,
   AdminUser,
 } from '../../types';
 import type {

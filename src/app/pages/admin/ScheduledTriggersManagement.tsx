@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Clock, Calendar, Play, CheckCircle, XCircle, AlertTriangle, TrendingUp } from 'lucide-react';
+import { Clock, Calendar, Play, CheckCircle, AlertTriangle, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { projectId, publicAnonKey } from '../../../../utils/supabase/info';
 import { getAccessToken } from '../../lib/apiClient';

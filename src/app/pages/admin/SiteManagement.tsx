@@ -1,7 +1,6 @@
 import { CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router';
-import { toast } from 'sonner';
 import {
   Plus,
   Edit,
@@ -17,8 +16,7 @@ import {
   Building2,
   ImageIcon,
   Upload,
-  X,
-  ChevronDown
+  X
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -26,7 +24,6 @@ import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
 import { Switch } from '../../components/ui/switch';
 import { getPublicSiteUrl } from '../../utils/url';
-import { DeployedDomainBanner } from '../../components/admin/DeployedDomainBanner';
 import {
   Dialog,
   DialogContent,
@@ -35,9 +32,9 @@ import {
   DialogTitle,
 } from '../../components/ui/dialog';
 import { useSite } from '../../context/SiteContext';
-import { apiRequest, getAccessToken } from '../../utils/api';
+import { apiRequest } from '../../utils/api';
 import { showErrorToast, showSuccessToast } from '../../utils/errorHandling';
-import { uploadLogo, isBase64DataUrl, isSupabaseStorageUrl } from '../../utils/storage';
+import { uploadLogo } from '../../utils/storage';
 import { logger } from '../../utils/logger';
 
 interface Client {

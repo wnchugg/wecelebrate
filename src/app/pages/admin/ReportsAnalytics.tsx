@@ -9,14 +9,12 @@ import {
   ShoppingCart,
   RefreshCw,
   BarChart3,
-  PieChart as PieChartIcon,
   Building2,
   Gift,
   CheckCircle,
   Clock,
   Truck,
   XCircle,
-  Filter,
   Eye
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
@@ -35,14 +33,10 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  Legend, 
   ResponsiveContainer,
   Area,
   AreaChart
 } from 'recharts';
-import type { TooltipProps } from 'recharts';
-import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { apiRequest } from '../../utils/api';
 import { showErrorToast, showSuccessToast } from '../../utils/errorHandling';
 import { logger } from '../../utils/logger';

@@ -33,8 +33,6 @@ import {
   PolarRadiusAxis,
   Radar
 } from 'recharts';
-import type { TooltipProps } from 'recharts';
-import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
 import { CurrencyDisplay } from '../../components/CurrencyDisplay';
 import { useNumberFormat } from '../../hooks/useNumberFormat';
 

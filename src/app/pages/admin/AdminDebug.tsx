@@ -6,19 +6,15 @@ import {
   Server, 
   CheckCircle, 
   XCircle, 
-  AlertTriangle, 
   Copy, 
-  RefreshCw, 
-  Terminal,
+  RefreshCw,
   Globe,
   Key,
   CheckCheck,
   LogOut,
   AlertCircle
 } from 'lucide-react';
-import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
-import { Badge } from '../../components/ui/badge';
 import { logger } from '../../utils/logger';
 import { projectId, publicAnonKey } from '../../../../utils/supabase/info';
 import { getCurrentEnvironment } from '../../config/deploymentEnvironments';

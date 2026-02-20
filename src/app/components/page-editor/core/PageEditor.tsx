@@ -9,7 +9,6 @@ import {
   PageEditorState,
   PageConfiguration,
   EditorMode,
-  SaveStatus,
 } from './types';
 import { DeviceMode } from '../preview/types';
 import { HistoryManager } from '../utils/HistoryManager';

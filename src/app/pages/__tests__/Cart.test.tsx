@@ -4,8 +4,8 @@
  * Tests for src/app/pages/Cart.tsx
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen, within, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Cart } from '../Cart';
 import { renderWithRouter } from '@/test/helpers';

@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useParams, Outlet } from 'react-router';
 import { usePublicSite } from '../context/PublicSiteContext';
 import { logger } from '../utils/logger';

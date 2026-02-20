@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
-import { Plus, Search, Filter, Edit2, Trash2, Database, FileText, Package, ExternalLink } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Database, FileText, Package, ExternalLink } from 'lucide-react';
 import { fetchCatalogs, deleteCatalog } from '../../services/catalogApi';
 import type { Catalog, CatalogType, CatalogStatus } from '../../types/catalog';
 import type { CatalogFilters } from '../../../types/catalog';

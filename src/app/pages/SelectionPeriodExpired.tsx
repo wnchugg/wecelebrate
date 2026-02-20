@@ -1,5 +1,4 @@
 import { AlertCircle, Mail, ArrowLeft } from 'lucide-react';
-import { companyConfig } from '../data/config';
 import { Link } from 'react-router';
 import { usePublicSite } from '../context/PublicSiteContext';
 import { useSiteContent } from '../hooks/useSiteContent';

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Save, Eye, Plus, Trash2, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 import { useSite } from '../../context/SiteContext';
-import { HeaderFooterConfig, NavigationItem, FooterColumn, SocialLink, SocialPlatform } from '../../types/siteCustomization';
+import { HeaderFooterConfig, NavigationItem, FooterColumn } from '../../types/siteCustomization';
 import { toast } from 'sonner';
 
 const defaultConfig: HeaderFooterConfig = {

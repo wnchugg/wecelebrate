@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useSite } from '../../context/SiteContext';
 import { useEmailTemplate } from '../../context/EmailTemplateContext';
-import { Plus, Mail, Bell, MessageSquare, ChevronDown, ChevronUp, Edit, Trash2, RotateCcw, Check, X, Send, Zap } from 'lucide-react';
+import { Plus, Mail, Bell, MessageSquare, ChevronDown, ChevronUp, Edit, Trash2, RotateCcw, Send, Zap } from 'lucide-react';
 import { toast } from 'sonner';
-import { GlobalTemplate, SiteTemplate } from '../../types/emailTemplates';
+import { SiteTemplate } from '../../types/emailTemplates';
 import { TestEmailModal } from '../../components/admin/TestEmailModal';
 import { EmailAutomationTriggers } from '../../components/admin/EmailAutomationTriggers';
 

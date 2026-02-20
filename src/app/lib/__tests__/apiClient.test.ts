@@ -23,7 +23,6 @@ vi.mock('../../utils/logger', () => ({
   }
 }));
 
-import { apiClient } from '../apiClient';
 import * as tokenManager from '../../utils/tokenManager';
 
 // authenticatedRequest is not exported from apiClient; define a local helper

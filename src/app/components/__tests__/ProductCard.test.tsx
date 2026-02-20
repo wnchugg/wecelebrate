@@ -11,13 +11,12 @@
  * Total Tests: 10
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithRouter, createMock, mockProduct } from '@/test/helpers';
 import { ProductCard } from '../ProductCard';
 import { CartProvider } from '../../context/CartContext';
-import { ReactNode } from 'react';
 
 // Mock out of stock product
 const mockOutOfStockProduct = createMock(mockProduct, {

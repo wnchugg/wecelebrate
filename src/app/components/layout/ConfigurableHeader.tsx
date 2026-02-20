@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
-import { ChevronRight, Menu, X, Search, User, LogOut, Settings } from 'lucide-react';
-import { useState, useEffect, useMemo } from 'react';
+import { ChevronRight, Menu, X, Search, User, LogOut } from 'lucide-react';
+import { useState, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useSite } from '../../context/SiteContext';
 import { LanguageSelector } from '../LanguageSelector';

@@ -5,7 +5,7 @@ import { logSecurityEvent } from '../utils/security';
 import { getCurrentEnvironment, buildApiUrl } from '../config/deploymentEnvironments';
 import Logo from '../../imports/Logo';
 import { logger } from '../utils/logger';
-import { Loader2, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 
 export function MagicLinkValidation() {
   const navigate = useNavigate();

@@ -4,7 +4,7 @@
  * Helper functions and hooks for optimizing React component performance
  */
 
-import { useEffect, useRef, useMemo, useCallback, DependencyList, useState } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 
 // Re-export common hooks from dedicated files
 export { useDebounce } from '../hooks/useDebounce';

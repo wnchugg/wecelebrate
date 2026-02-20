@@ -1,15 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router';
 import { 
-  Clock, 
-  Search, 
-  AlertCircle, 
-  Gift, 
   Calendar, 
-  Heart, 
-  MessageCircle, 
-  ChevronRight, 
-  Plus, 
   Loader2, 
   Lock, 
   Building2, 
@@ -19,9 +11,8 @@ import {
   ExternalLink 
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { logger } from '../utils/logger';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';
-import { projectId, publicAnonKey } from '../../../utils/supabase/info';
+import { publicAnonKey } from '../../../utils/supabase/info';
 import { useLanguage } from '../context/LanguageContext';
 import { useDateFormat } from '../hooks/useDateFormat';
 

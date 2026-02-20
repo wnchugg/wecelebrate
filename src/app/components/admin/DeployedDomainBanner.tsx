@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { AlertCircle, Check, ExternalLink, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { setPublicSiteDomain, clearPublicSiteDomain, getPublicSiteOrigin } from '../../utils/url';
+import { setPublicSiteDomain, clearPublicSiteDomain } from '../../utils/url';
 
 /**
  * Banner that prompts admins to configure the deployed site domain

@@ -2,10 +2,9 @@ import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
-import { 
-  Save, Settings, Globe, Mail, Truck, Gift, Lock, 
-  Check, AlertCircle, ChevronDown, Building2, ExternalLink,
-  Layout, Package, Users, Clock, Calendar, CheckCircle, Palette, Shield, Loader2, Eye, FileEdit, Rocket, History, Edit3, Zap,
+import { Settings, Globe, Mail, Truck, Gift, Lock, 
+  Check, AlertCircle, Building2, ExternalLink,
+  Layout, Package, Users, Clock, Calendar, CheckCircle, Palette, Shield, Loader2, Eye, Rocket, History, Edit3, Zap,
   ShoppingBag, CreditCard, ShoppingCart, FileText
 } from 'lucide-react';
 import { useSite } from '../../context/SiteContext';
@@ -15,9 +14,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
-import { Badge } from '../../components/ui/badge';
-import { getPublicSiteUrl, getPublicSiteUrlBySlug, getEnvironmentBaseUrl } from '../../utils/url';
-import { getCurrentEnvironment } from '../../config/deploymentEnvironments';
+import { getPublicSiteUrlBySlug, getEnvironmentBaseUrl } from '../../utils/url';
 import { PublishConfirmationModal } from '../../components/PublishConfirmationModal';
 import { DiscardConfirmationModal } from '../../components/DiscardConfirmationModal';
 import { UnpublishedChangesIndicator } from '../../components/UnpublishedChangesIndicator';
@@ -33,9 +30,6 @@ const ShippingConfiguration = lazy(() => import('./ShippingConfiguration').then(
 const AccessManagement = lazy(() => import('./AccessManagement').then(m => ({ default: m.AccessManagement })));
 
 // Import SSO components
-import { OAuthFields } from '../../components/admin/OAuthFields';
-import { SAMLFields } from '../../components/admin/SAMLFields';
-import { ConfiguredStateSummary } from '../../components/admin/ConfiguredStateSummary';
 import { SSOConfigCard } from '../../components/admin/SSOConfigCard';
 
 // Import Multi-Language components

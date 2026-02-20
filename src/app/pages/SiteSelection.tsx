@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { useSite } from '../context/SiteContext';
-import { ChevronRight, Globe, Palette, Settings, Building2, Loader2, AlertCircle, ExternalLink } from 'lucide-react';
+import { Globe, Building2, Loader2, AlertCircle, ExternalLink } from 'lucide-react';
 import Logo from '../../imports/Logo';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';

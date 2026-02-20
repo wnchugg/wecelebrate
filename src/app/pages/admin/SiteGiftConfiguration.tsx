@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, Save, AlertCircle, Info, Plus, Trash2, Edit2, X, Check, Search, Grid3x3, List, GripVertical, ArrowUpDown, Eye, FileEdit, Rocket } from 'lucide-react';
+import { Package, AlertCircle, Info, Plus, Trash2, Edit2, X, Check, Search, Grid3x3, List, ArrowUpDown, Eye, FileEdit, Rocket } from 'lucide-react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useSite } from '../../context/SiteContext';
@@ -11,7 +11,6 @@ import { Button } from '../../components/ui/button';
 import { formatPrice, getCurrencySymbol } from '../../utils/currency';
 import { ComplianceBadges } from '../../components/ComplianceBadges';
 import { DraggableGiftCard } from '../../components/DraggableGiftCard';
-import { Badge } from '../../components/ui/badge';
 import { apiRequest } from '../../utils/api';
 import { logger } from '../../utils/logger';
 

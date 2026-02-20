@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Database, RefreshCw, Download, Search, FileText, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Database, RefreshCw, FileText, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 import { getAccessToken } from '../../utils/api';
 import { projectId, publicAnonKey } from '../../../../utils/supabase/info';
 import { showSuccessToast, showErrorToast } from '../../utils/errorHandling';

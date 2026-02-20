@@ -15,7 +15,7 @@
  */
 
 import { screen } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { renderWithRouter } from '@/test/helpers';
 import { Header } from '../Header';
 import { SiteContext } from '../../context/SiteContext';

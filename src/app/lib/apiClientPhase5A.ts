@@ -40,7 +40,7 @@ export interface CreateBrandInput {
   settings?: Record<string, any>;
 }
 
-export interface UpdateBrandInput extends Partial<CreateBrandInput> {}
+export type UpdateBrandInput = Partial<CreateBrandInput>;
 
 export interface EmailTemplate {
   id: string;
@@ -81,7 +81,7 @@ export interface CreateEmailTemplateInput {
   isDefault?: boolean;
 }
 
-export interface UpdateEmailTemplateInput extends Partial<CreateEmailTemplateInput> {}
+export type UpdateEmailTemplateInput = Partial<CreateEmailTemplateInput>;
 
 export interface SiteGiftConfig {
   id?: string;

@@ -62,7 +62,7 @@ export function Checkout() {
     const orderId = Math.random().toString(36).substring(2, 9).toUpperCase();
     clearCart();
     setIsProcessing(false);
-    navigate(`/order-confirmation/${orderId}`);
+    void navigate(`/order-confirmation/${orderId}`);
   };
 
   if (items.length === 0) {

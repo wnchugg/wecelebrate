@@ -33,7 +33,7 @@ export function GiftDetail() {
   useEffect(() => {
     const loadGift = async () => {
       if (!giftId) {
-        navigate('../gift-selection');
+        void navigate('../gift-selection');
         return;
       }
       
@@ -46,7 +46,7 @@ export function GiftDetail() {
         
         if (!sessionToken) {
           toast.error('Session expired. Please log in again.');
-          navigate('../access');
+          void navigate('../access');
           return;
         }
         
@@ -85,7 +85,7 @@ export function GiftDetail() {
       }
     };
     
-    loadGift();
+    void loadGift();
   }, [giftId, navigate]);
 
   useEffect(() => {
@@ -112,7 +112,7 @@ export function GiftDetail() {
     selectGift(gift);
     setQuantity(localQuantity);
     // Use relative navigation to stay within site context
-    navigate('../shipping-information');
+    void navigate('../shipping-information');
   };
 
   const isCurrentlySelected = selectedGift?.id === giftId;

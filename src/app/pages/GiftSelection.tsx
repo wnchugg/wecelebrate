@@ -80,7 +80,7 @@ export function GiftSelection() {
         
         if (!effectiveSiteId) {
           toast.error(t('notification.error.noSiteSpecified'));
-          navigate('/access');
+          void navigate('/access');
           return;
         }
         
@@ -92,7 +92,7 @@ export function GiftSelection() {
         // Verify session site matches requested site (if session exists)
         if (sessionToken && sessionSiteId && sessionSiteId !== effectiveSiteId) {
           toast.error(t('notification.error.invalidSiteAccess'));
-          navigate(`/access?site=${effectiveSiteId}`);
+          void navigate(`/access?site=${effectiveSiteId}`);
           return;
         }
         
@@ -180,7 +180,7 @@ export function GiftSelection() {
 
   const handleSelectGift = (giftId: string) => {
     // Use relative path to navigate to sibling route
-    navigate(siteId ? `../gift-detail/${giftId}` : `/gift-detail/${giftId}`);
+    void navigate(siteId ? `../gift-detail/${giftId}` : `/gift-detail/${giftId}`);
   };
 
   const clearFilters = () => {

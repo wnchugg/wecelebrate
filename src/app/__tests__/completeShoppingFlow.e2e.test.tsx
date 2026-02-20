@@ -67,7 +67,7 @@ function ProductDetailPage() {
   
   const handleAddToCart = () => {
     addToCart(mockProducts[0]);
-    navigate('/cart');
+    void navigate('/cart');
   };
   
   return (
@@ -126,7 +126,7 @@ function LoginPage() {
       email: 'user@example.com',
       name: 'Test User',
     });
-    navigate('/');
+    void navigate('/');
   };
   
   return (
@@ -165,7 +165,7 @@ function CheckoutPage() {
   
   const handleCheckout = () => {
     clearCart();
-    navigate('/confirmation');
+    void navigate('/confirmation');
   };
   
   return (

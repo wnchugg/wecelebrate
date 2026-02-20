@@ -58,7 +58,7 @@ export function Confirmation() {
   useEffect(() => {
     const loadOrder = async () => {
       if (!orderId) {
-        navigate('../gift-selection');
+        void navigate('../gift-selection');
         return;
       }
       
@@ -71,7 +71,7 @@ export function Confirmation() {
         
         if (!sessionToken) {
           toast.error('Session expired. Please log in again.');
-          navigate('../access');
+          void navigate('../access');
           return;
         }
         
@@ -106,7 +106,7 @@ export function Confirmation() {
       }
     };
     
-    loadOrder();
+    void loadOrder();
   }, [orderId, navigate, clearOrder]);
 
   // Calculate estimated delivery date (7 business days from order date)

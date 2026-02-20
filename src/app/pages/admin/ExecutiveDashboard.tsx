@@ -50,7 +50,7 @@ export function ExecutiveDashboard() {
   const [comparisonPeriod, setComparisonPeriod] = useState<'week' | 'month' | 'quarter'>('month');
 
   useEffect(() => {
-    loadData();
+    void loadData();
   }, []);
 
   const loadData = async () => {

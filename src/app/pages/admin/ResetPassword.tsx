@@ -170,7 +170,7 @@ export default function ResetPassword() {
 
       // Redirect to login after 3 seconds
       setTimeout(() => {
-        navigate('/admin/login');
+        void navigate('/admin/login');
       }, 3000);
 
     } catch (err: any) {

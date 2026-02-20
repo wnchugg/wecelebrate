@@ -176,7 +176,7 @@ export function CelebrationCreate() {
     const link = celebrationId 
       ? `${window.location.origin}/celebration?id=${celebrationId}`
       : `${window.location.origin}/celebrate/EMP001/anniversary-5`;
-    navigator.clipboard.writeText(link);
+    void navigator.clipboard.writeText(link);
     setCopiedLink(true);
     toast.success('Link copied to clipboard!');
     setTimeout(() => setCopiedLink(false), 2000);

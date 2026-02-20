@@ -21,7 +21,7 @@ export function BackendConnectionStatus({ showQuickFix = true }: BackendConnecti
   const [showDeploymentGuide, setShowDeploymentGuide] = useState(false);
   
   useEffect(() => {
-    checkConnection();
+    void checkConnection();
   }, []);
 
   const checkConnection = async () => {

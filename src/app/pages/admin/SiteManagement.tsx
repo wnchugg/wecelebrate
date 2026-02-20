@@ -126,7 +126,7 @@ export function SiteManagement() {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
   useEffect(() => {
-    loadData();
+    void loadData();
   }, []);
 
   const loadData = async () => {
@@ -189,7 +189,7 @@ export function SiteManagement() {
       }
       
       showSuccessToast(message);
-      loadData();
+      void loadData();
     } catch (error: unknown) {
       showErrorToast('Failed to update site status', error instanceof Error ? error.message : 'Unknown error');
     }
@@ -209,7 +209,7 @@ export function SiteManagement() {
         body: JSON.stringify(newSite)
       });
       showSuccessToast('Site duplicated successfully');
-      loadData();
+      void loadData();
     } catch (error: unknown) {
       showErrorToast('Failed to duplicate site', error instanceof Error ? error.message : 'Unknown error');
     }
@@ -224,7 +224,7 @@ export function SiteManagement() {
     try {
       await apiRequest(`/v2/sites/${siteId}`, { method: 'DELETE' });
       showSuccessToast(`"${siteName}" deleted successfully`);
-      loadData();
+      void loadData();
     } catch (error: unknown) {
       showErrorToast('Failed to delete site', error instanceof Error ? error.message : 'Unknown error');
     } finally {
@@ -249,7 +249,7 @@ export function SiteManagement() {
       }
       setShowSiteModal(false);
       setEditingSite(null);
-      loadData();
+      void loadData();
     } catch (error: unknown) {
       showErrorToast(
         editingSite ? 'Failed to update site' : 'Failed to create site',
@@ -462,7 +462,7 @@ export function SiteManagement() {
                             onClick={() => {
                               // Set current site in context and navigate to configuration
                               setCurrentSite(site as any);
-                              navigate('/admin/site-configuration');
+                              void navigate('/admin/site-configuration');
                             }}
                             title="Configure Site"
                           >
@@ -540,7 +540,7 @@ export function SiteManagement() {
                                   <button
                                     onClick={() => {
                                       setOpenDropdownId(null);
-                                      handleDelete(site.id, site.name);
+                                      void handleDelete(site.id, site.name);
                                     }}
                                     className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
                                     disabled={deletingSiteId === site.id}

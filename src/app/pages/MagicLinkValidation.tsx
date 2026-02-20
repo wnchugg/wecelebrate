@@ -76,7 +76,7 @@ export function MagicLinkValidation() {
 
         // Redirect to gift selection after a short delay
         setTimeout(() => {
-          navigate('/gift-selection');
+          void navigate('/gift-selection');
         }, 1500);
 
       } catch (error: any) {

@@ -59,7 +59,7 @@ export function CreateEvent() {
     // In a real app, this would send data to the server
     toast.success("Event created successfully!");
     setTimeout(() => {
-      navigate("/dashboard");
+      void navigate("/dashboard");
     }, 1000);
   };
 

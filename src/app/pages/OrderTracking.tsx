@@ -63,7 +63,7 @@ export function OrderTracking() {
   useEffect(() => {
     const loadOrder = async () => {
       if (!orderId) {
-        navigate('../gift-selection');
+        void navigate('../gift-selection');
         return;
       }
       
@@ -76,7 +76,7 @@ export function OrderTracking() {
         
         if (!sessionToken) {
           toast.error(t('notification.error.sessionExpired'));
-          navigate('../access');
+          void navigate('../access');
           return;
         }
         
@@ -108,7 +108,7 @@ export function OrderTracking() {
       }
     };
     
-    loadOrder();
+    void loadOrder();
   }, [orderId, navigate]);
 
   // Calculate estimated delivery date (7 business days from order date)

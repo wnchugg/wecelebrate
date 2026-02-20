@@ -53,7 +53,7 @@ export function Welcome() {
         // If no sites exist, redirect to initialize database
         if (data.success && data.sites === 0 && data.admins === 0) {
           // Database appears empty, redirecting to initialization
-          navigate('/initialize-database');
+          void navigate('/initialize-database');
           return;
         }
         
@@ -96,7 +96,7 @@ export function Welcome() {
           to: siteId ? '../gift-selection' : '/gift-selection'
         });
         // Navigate to gift-selection (sibling route) immediately
-        navigate(siteId ? '../gift-selection' : '/gift-selection', { replace: true });
+        void navigate(siteId ? '../gift-selection' : '/gift-selection', { replace: true });
         return; // Exit early to prevent rendering
       }
     }
@@ -159,7 +159,7 @@ export function Welcome() {
 
   const handleContinue = () => {
     // Use parent-relative path to navigate to sibling route
-    navigate(siteId ? '../gift-selection' : '/gift-selection');
+    void navigate(siteId ? '../gift-selection' : '/gift-selection');
   };
 
   const defaultTitle = t('welcome.defaultTitle') || 'Congratulations on Your Anniversary!';

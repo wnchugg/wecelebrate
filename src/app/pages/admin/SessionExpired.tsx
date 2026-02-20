@@ -13,7 +13,7 @@ export function SessionExpired() {
   }, []);
 
   const handleGoToLogin = () => {
-    navigate('/admin/login?session_expired=true');
+    void navigate('/admin/login?session_expired=true');
   };
 
   return (

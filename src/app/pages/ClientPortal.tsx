@@ -54,7 +54,7 @@ export default function ClientPortal() {
   useEffect(() => {
     if (!token) {
       toast.error(t('notification.error.loginRequired'));
-      navigate('/admin/login');
+      void navigate('/admin/login');
       return;
     }
 

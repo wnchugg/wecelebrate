@@ -175,7 +175,7 @@ export function WebhookManagement() {
   const copyIncomingWebhookUrl = () => {
     if (!currentSite) return;
     const url = `${API_BASE}/webhooks/incoming/${currentSite.id}`;
-    navigator.clipboard.writeText(url);
+    void navigator.clipboard.writeText(url);
     toast.success('Webhook URL copied to clipboard');
   };
 

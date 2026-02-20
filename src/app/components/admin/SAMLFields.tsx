@@ -29,7 +29,7 @@ export function SAMLFields({
   onFieldChange
 }: SAMLFieldsProps) {
   const handleCopyAcsUrl = () => {
-    navigator.clipboard.writeText(ssoAcsUrl);
+    void navigator.clipboard.writeText(ssoAcsUrl);
     toast.success('ACS URL copied to clipboard');
   };
 

@@ -23,13 +23,13 @@ export default function TokenClear() {
     if (autoRedirect) {
       setTimeout(() => {
         console.warn('🔄 Redirecting to login...');
-        navigate('/admin/login', { replace: true });
+        void navigate('/admin/login', { replace: true });
       }, 2000);
     }
   }, [navigate, autoRedirect]);
 
   const handleManualRedirect = () => {
-    navigate('/admin/login', { replace: true });
+    void navigate('/admin/login', { replace: true });
   };
 
   return (

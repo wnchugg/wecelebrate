@@ -59,7 +59,7 @@ export function SiteGiftAssignment() {
 
   useEffect(() => {
     if (siteId) {
-      loadData();
+      void loadData();
     }
   }, [siteId]);
 

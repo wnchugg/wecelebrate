@@ -25,17 +25,17 @@ export function PerformanceTest() {
   };
 
   useEffect(() => {
-    loadData();
+    void loadData();
   }, []);
 
   const handleClearCache = () => {
     clearAllCaches();
-    loadData();
+    void loadData();
   };
 
   const handleClearMetrics = () => {
     performanceMonitor.clear();
-    loadData();
+    void loadData();
   };
 
   const handleDownloadReport = () => {

@@ -29,7 +29,7 @@ export function PerformanceDashboard() {
   };
 
   useEffect(() => {
-    loadData();
+    void loadData();
   }, [refreshKey]);
 
   const handleToggleMonitoring = () => {
@@ -46,13 +46,13 @@ export function PerformanceDashboard() {
   const handleClearCache = () => {
     clearAllCaches();
     toast.success('All caches cleared');
-    loadData();
+    void loadData();
   };
 
   const handleClearMetrics = () => {
     performanceMonitor.clear();
     toast.success('Performance metrics cleared');
-    loadData();
+    void loadData();
   };
 
   const getRatingColor = (rating: string) => {

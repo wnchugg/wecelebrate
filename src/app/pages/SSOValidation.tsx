@@ -80,7 +80,7 @@ export function SSOValidation() {
         });
         
         authenticate(data.employee?.email || '');
-        navigate('/gift-selection');
+        void navigate('/gift-selection');
       } else {
         setError(data.error || 'Authentication failed. Please try again.');
         logSecurityEvent({

@@ -28,7 +28,7 @@ export function ReviewOrder() {
 
   useEffect(() => {
     if (!selectedGift || !shippingAddress) {
-      navigate('../gift-selection');
+      void navigate('../gift-selection');
     }
   }, [selectedGift, shippingAddress, navigate]);
 
@@ -48,7 +48,7 @@ export function ReviewOrder() {
       
       if (!sessionToken) {
         toast.error(t('notification.error.sessionExpired'));
-        navigate('../access');
+        void navigate('../access');
         return;
       }
       
@@ -96,7 +96,7 @@ export function ReviewOrder() {
       setIsSubmitting(false);
       
       // Navigate to confirmation page with order ID
-      navigate(`/confirmation/${data.order.id}`);
+      void navigate(`/confirmation/${data.order.id}`);
     } catch (error: unknown) {
       logger.error('Failed to submit order:', error);
       setError(error instanceof Error ? error.message : t('notification.error.failedToSubmitOrder'));

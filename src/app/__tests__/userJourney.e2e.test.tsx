@@ -54,7 +54,7 @@ function CreateEventPage() {
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/events/success');
+    void navigate('/events/success');
   };
   
   return (
@@ -157,7 +157,7 @@ function AccessValidationPage() {
       id: code,
       email: `employee${code}@example.com`,
     });
-    navigate('/site-selection');
+    void navigate('/site-selection');
   };
   
   return (
@@ -256,7 +256,7 @@ function ProfileSettingsPage() {
   }
   
   const handleSave = () => {
-    navigate('/');
+    void navigate('/');
   };
   
   return (

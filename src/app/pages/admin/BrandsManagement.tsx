@@ -120,7 +120,7 @@ export function BrandsManagement() {
   };
 
   const openEditPage = (brand: Brand) => {
-    navigate(`/admin/brands/${brand.id}/edit`);
+    void navigate(`/admin/brands/${brand.id}/edit`);
   };
 
   const handleExtractBranding = async () => {

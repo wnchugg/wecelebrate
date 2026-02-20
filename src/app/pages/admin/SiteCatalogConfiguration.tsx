@@ -65,7 +65,7 @@ export default function SiteCatalogConfiguration() {
   // Load data
   useEffect(() => {
     if (currentSite) {
-      loadData();
+      void loadData();
     }
   }, [currentSite]);
 

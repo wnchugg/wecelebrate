@@ -475,7 +475,7 @@ describe('Configuration Auto-save & Unsaved Changes', () => {
       if (Object.keys(validationErrors).length > 0) {
         // Don't call handleSave
       } else {
-        handleSave();
+        void handleSave();
       }
       
       expect(handleSave).not.toHaveBeenCalled();
@@ -486,7 +486,7 @@ describe('Configuration Auto-save & Unsaved Changes', () => {
       const handleSave = vi.fn();
       
       if (Object.keys(validationErrors).length === 0) {
-        handleSave();
+        void handleSave();
       }
       
       expect(handleSave).toHaveBeenCalled();

@@ -117,7 +117,7 @@ export function ConfigurableHeader({ config, siteName, clientName }: Configurabl
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/gift-selection?search=${encodeURIComponent(searchQuery)}`);
+      void navigate(`/gift-selection?search=${encodeURIComponent(searchQuery)}`);
       setSearchQuery('');
       setSearchOpen(false);
     }
@@ -125,7 +125,7 @@ export function ConfigurableHeader({ config, siteName, clientName }: Configurabl
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    void navigate('/');
   };
 
   return (

@@ -44,7 +44,7 @@ export default function CatalogEdit() {
   // Load catalog if editing
   useEffect(() => {
     if (isEdit && catalogId) {
-      loadCatalog(catalogId);
+      void loadCatalog(catalogId);
     }
   }, [catalogId, isEdit]);
 
@@ -135,7 +135,7 @@ export default function CatalogEdit() {
         await createCatalog(catalogData);
       }
       
-      navigate('/admin/catalogs');
+      void navigate('/admin/catalogs');
     } catch (err: any) {
       console.error('Error saving catalog:', err);
       setError(err.message || 'Failed to save catalog');

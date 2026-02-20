@@ -162,7 +162,7 @@ export function BackendConnectionDiagnostic() {
   };
 
   useEffect(() => {
-    checkConnection();
+    void checkConnection();
   }, []);
 
   const env = getCurrentEnvironment();
@@ -214,7 +214,7 @@ export function BackendConnectionDiagnostic() {
             size="sm"
             onClick={(e) => {
               e.stopPropagation();
-              checkConnection();
+              void checkConnection();
             }}
             disabled={isRefreshing}
             className="h-8"

@@ -50,7 +50,7 @@ export function SiteSwitcherDropdown() {
       
       // Navigate to site-specific route if needed
       if (window.location.pathname.startsWith('/site/')) {
-        navigate(`/site/${siteId}`);
+        void navigate(`/site/${siteId}`);
       }
     }
   };
@@ -161,7 +161,7 @@ export function SiteSwitcherDropdown() {
             <button
               onClick={() => {
                 setIsOpen(false);
-                navigate('/admin/sites');
+                void navigate('/admin/sites');
               }}
               className="w-full px-3 py-2 text-sm text-[#D91C81] hover:bg-white rounded-md transition-colors font-medium"
             >

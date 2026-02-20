@@ -41,7 +41,7 @@ export function OAuthFields({
   onFieldChange
 }: OAuthFieldsProps) {
   const handleCopyRedirectUri = () => {
-    navigator.clipboard.writeText(ssoRedirectUri);
+    void navigator.clipboard.writeText(ssoRedirectUri);
     toast.success('Redirect URI copied to clipboard');
   };
 

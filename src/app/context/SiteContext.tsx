@@ -549,7 +549,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    loadData();
+    void loadData();
   }, [isAdminAuthenticated, adminLoading]); // Removed currentSite from dependencies
 
   const addClient = async (client: Partial<Client>): Promise<Client> => {

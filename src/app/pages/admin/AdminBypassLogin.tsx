@@ -143,7 +143,7 @@ export default function AdminBypassLogin(): JSX.Element {
         
         // Redirect to site admin dashboard
         const redirectUrl = searchParams.get('redirect') || `/admin/sites/${siteId}`;
-        navigate(redirectUrl);
+        void navigate(redirectUrl);
       } else if (result.requires2FA && !requires2FA) {
         // 2FA is required but not yet provided
         logger.info('[AdminBypassLogin] 2FA required');

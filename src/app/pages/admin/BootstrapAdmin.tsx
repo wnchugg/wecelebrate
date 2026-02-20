@@ -68,7 +68,7 @@ export function BootstrapAdmin() {
       
       // Redirect to login after 1 second
       setTimeout(() => {
-        navigate('/admin/login');
+        void navigate('/admin/login');
       }, 1000);
     } catch (error: unknown) {
       console.error('Bootstrap error:', error);

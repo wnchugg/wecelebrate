@@ -33,7 +33,7 @@ export function ShippingInformation() {
 
   useEffect(() => {
     if (!selectedGift) {
-      navigate('../gift-selection');
+      void navigate('../gift-selection');
     }
   }, [selectedGift, navigate]);
 
@@ -57,10 +57,10 @@ export function ShippingInformation() {
     
     if (skipReview) {
       // Skip review page and go directly to confirmation
-      navigate('../confirmation');
+      void navigate('../confirmation');
     } else {
       // Go to review page
-      navigate('../review');
+      void navigate('../review');
     }
   };
 

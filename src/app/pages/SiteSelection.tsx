@@ -58,7 +58,7 @@ export function SiteSelection() {
     }
     
     // Navigate to the return path or access validation
-    navigate(returnPath);
+    void navigate(returnPath);
   };
 
   const clearSelection = () => {

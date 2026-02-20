@@ -140,7 +140,7 @@ export function ProductDetail() {
             <button
               onClick={() => {
                 handleAddToCart();
-                navigate('/checkout');
+                void navigate('/checkout');
               }}
               disabled={!product.inStock}
               className="flex-1 bg-gray-900 text-white py-4 rounded-xl font-semibold hover:bg-gray-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"

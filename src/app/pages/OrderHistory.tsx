@@ -40,7 +40,7 @@ export function OrderHistory() {
         
         if (!sessionToken || !employeeId) {
           toast.error(t('notification.error.sessionExpired'));
-          navigate('/access');
+          void navigate('/access');
           return;
         }
         

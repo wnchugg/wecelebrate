@@ -49,7 +49,7 @@ export default function AdminLogin(): JSX.Element {
   useEffect(() => {
     if (isAdminAuthenticated && !isCheckingAuth) {
       logger.info('[AdminLogin] User already authenticated, redirecting to dashboard');
-      navigate('/admin/dashboard');
+      void navigate('/admin/dashboard');
     }
   }, [isAdminAuthenticated, isCheckingAuth, navigate]);
 

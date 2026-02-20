@@ -119,7 +119,7 @@ export function EventDetails() {
   };
 
   const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
+    void navigator.clipboard.writeText(window.location.href);
     toast.success("Link copied to clipboard!");
   };
 

@@ -74,7 +74,7 @@ export function CelebrationAnalytics() {
   const [dateRange, setDateRange] = useState<'30' | '90' | '180' | '365' | 'all'>('90');
 
   useEffect(() => {
-    loadData();
+    void loadData();
   }, []);
 
   const loadData = async () => {

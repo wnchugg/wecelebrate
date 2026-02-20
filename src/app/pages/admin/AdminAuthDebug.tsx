@@ -30,7 +30,7 @@ export function AdminAuthDebug() {
   };
 
   const handleGoToDashboard = () => {
-    navigate('/admin/dashboard');
+    void navigate('/admin/dashboard');
   };
 
   return (

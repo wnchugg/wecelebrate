@@ -111,14 +111,14 @@ export function GiftProvider({ children }: { children: ReactNode }) {
     // This prevents errors when loading the login page
     const hasToken = sessionStorage.getItem('jala_access_token');
     if (hasToken) {
-      refreshData();
+      void refreshData();
     } else {
       setIsLoading(false);
     }
 
     // Listen for login success event to refresh data
     const handleLoginSuccess = () => {
-      refreshData();
+      void refreshData();
     };
     window.addEventListener('admin-login-success', handleLoginSuccess);
 

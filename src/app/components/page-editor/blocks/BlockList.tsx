@@ -118,7 +118,7 @@ export const BlockList: React.FC<BlockListProps> = ({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleDelete(index, block.type);
+                      void handleDelete(index, block.type);
                     }}
                     className="p-2 hover:bg-red-100 text-red-600 rounded"
                     title="Delete"

@@ -150,7 +150,7 @@ export function ClientConfiguration({
   // Load client data
   useEffect(() => {
     if (clientId) {
-      loadClient();
+      void loadClient();
     }
   }, [clientId]);
 
@@ -433,7 +433,7 @@ export function ClientConfiguration({
     setErrors(validationErrors.fieldErrors);
 
     if (Object.keys(validationErrors.fieldErrors).length === 0) {
-      handleSave();
+      void handleSave();
     }
   };
 

@@ -76,7 +76,7 @@ export function Cart() {
 
     try {
       // Navigate to checkout page
-      navigate('/checkout');
+      void navigate('/checkout');
     } catch (error: unknown) {
       logger.error('[Cart] Checkout error:', error);
       toast.error('Failed to proceed to checkout');

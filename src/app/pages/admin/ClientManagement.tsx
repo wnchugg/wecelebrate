@@ -123,7 +123,7 @@ export function ClientManagement() {
     // 1. Auth check is complete (not loading)
     // 2. User is authenticated
     if (!isAuthLoading && isAdminAuthenticated) {
-      loadData();
+      void loadData();
     } else if (!isAuthLoading && !isAdminAuthenticated) {
       // Auth check complete but not authenticated - don't load data
       setIsLoading(false);
@@ -221,7 +221,7 @@ export function ClientManagement() {
     try {
       await apiRequest(`/v2/clients/${clientId}`, { method: 'DELETE' });
       showSuccessToast('Client deleted successfully');
-      loadData();
+      void loadData();
     } catch (error: unknown) {
       showErrorToast('Failed to delete client', error instanceof Error ? error.message : 'Unknown error');
     } finally {
@@ -263,7 +263,7 @@ export function ClientManagement() {
         showSuccessToast('Client created successfully');
       }
       setShowClientModal(false);
-      loadData();
+      void loadData();
     } catch (error: unknown) {
       // Handle structured error responses from backend
       // Requirements: 4.6, 6.6, 7.6
@@ -317,7 +317,7 @@ export function ClientManagement() {
   };
 
   const handleViewClientSites = (clientId: string) => {
-    navigate(`/admin/sites?client=${clientId}`);
+    void navigate(`/admin/sites?client=${clientId}`);
   };
 
   const handleSeedDatabase = async () => {

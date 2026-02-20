@@ -46,7 +46,7 @@ export default function AdminAccountsList() {
   }, []);
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
+    void navigator.clipboard.writeText(text);
     toast.success('Copied to clipboard!');
   };
 

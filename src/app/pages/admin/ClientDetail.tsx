@@ -44,7 +44,7 @@ export function ClientDetail() {
 
   useEffect(() => {
     if (clientId) {
-      loadData();
+      void loadData();
     }
   }, [clientId]);
 

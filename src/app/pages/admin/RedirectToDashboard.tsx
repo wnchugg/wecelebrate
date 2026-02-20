@@ -14,12 +14,12 @@ export function RedirectToDashboard() {
     if (!isLoading && adminUser) {
       // Redirect based on user role
       if (adminUser.role === 'super_admin') {
-        navigate('/admin/system-dashboard', { replace: true });
+        void navigate('/admin/system-dashboard', { replace: true });
       } else if (adminUser.role === 'admin') {
-        navigate('/admin/client-dashboard', { replace: true });
+        void navigate('/admin/client-dashboard', { replace: true });
       } else {
         // Default to main dashboard
-        navigate('/admin/dashboard', { replace: true });
+        void navigate('/admin/dashboard', { replace: true });
       }
     }
   }, [adminUser, isLoading, navigate]);

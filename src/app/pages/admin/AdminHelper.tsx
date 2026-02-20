@@ -95,7 +95,7 @@ export function AdminHelper() {
         toast.success(`Welcome back, ${data.user.user_metadata?.name || 'Admin'}!`);
         
         setTimeout(() => {
-          navigate('/admin/dashboard');
+          void navigate('/admin/dashboard');
         }, 500);
       } else {
         const error = await response.json();

@@ -122,7 +122,7 @@ function CatalogConfigPage() {
   });
   
   const handleSave = () => {
-    navigate('/admin/catalogs');
+    void navigate('/admin/catalogs');
   };
   
   return (

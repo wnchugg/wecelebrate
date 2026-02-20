@@ -373,7 +373,7 @@ export function PublicSiteProvider({ children }: { children: ReactNode }) {
   }, [applyBranding, loadGiftsForSite]); // useCallback dependencies for setSiteBySlug
 
   useEffect(() => {
-    loadSite();
+    void loadSite();
   }, []);
 
   const refreshSite = async () => {

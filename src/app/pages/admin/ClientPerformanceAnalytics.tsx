@@ -79,7 +79,7 @@ export function ClientPerformanceAnalytics() {
   const [selectedClient, setSelectedClient] = useState<string | null>(null);
 
   useEffect(() => {
-    loadData();
+    void loadData();
   }, []);
 
   const loadData = async () => {

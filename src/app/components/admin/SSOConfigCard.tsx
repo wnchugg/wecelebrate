@@ -429,7 +429,7 @@ export function SSOConfigCard(props: SSOConfigCardProps) {
                           type="button"
                           variant="outline"
                           onClick={() => {
-                            navigator.clipboard.writeText(`${getPublicSiteUrlBySlug(siteUrl)}/admin-login`);
+                            void navigator.clipboard.writeText(`${getPublicSiteUrlBySlug(siteUrl)}/admin-login`);
                             toast.success('Bypass URL copied to clipboard');
                           }}
                         >

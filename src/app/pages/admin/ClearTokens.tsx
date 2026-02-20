@@ -22,7 +22,7 @@ export function ClearTokens() {
       
       // Auto-redirect to login after 2 seconds
       setTimeout(() => {
-        navigate('/admin/login');
+        void navigate('/admin/login');
       }, 2000);
     } catch (error) {
       console.error('Failed to clear tokens:', error);

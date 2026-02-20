@@ -106,7 +106,7 @@ export function AdminLayout() {
 
   const handleLogout = () => {
     adminLogout();
-    navigate('/admin/login');
+    void navigate('/admin/login');
   };
 
   const isActivePath = (path: string) => {

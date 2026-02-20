@@ -118,6 +118,10 @@ describe('SiteConfiguration Component', () => {
       updateBrand: vi.fn(),
       deleteBrand: vi.fn(),
       getSitesByBrand: vi.fn(),
+          saveSiteDraft: vi.fn(),
+          publishSite: vi.fn(),
+          discardSiteDraft: vi.fn(),
+          getSiteLive: vi.fn(),
     });
 
     vi.mocked(GiftContext.useGift).mockReturnValue({
@@ -186,6 +190,10 @@ describe('SiteConfiguration Component', () => {
         updateBrand: vi.fn(),
         deleteBrand: vi.fn(),
         getSitesByBrand: vi.fn(),
+          saveSiteDraft: vi.fn(),
+          publishSite: vi.fn(),
+          discardSiteDraft: vi.fn(),
+          getSiteLive: vi.fn(),
       });
 
       render(
@@ -281,6 +289,10 @@ describe('SiteConfiguration Component', () => {
         updateBrand: vi.fn(),
         deleteBrand: vi.fn(),
         getSitesByBrand: vi.fn(),
+          saveSiteDraft: vi.fn(),
+          publishSite: vi.fn(),
+          discardSiteDraft: vi.fn(),
+          getSiteLive: vi.fn(),
       });
 
       const { container } = render(
@@ -332,6 +344,10 @@ describe('SiteConfiguration Component', () => {
         updateBrand: vi.fn(),
         deleteBrand: vi.fn(),
         getSitesByBrand: vi.fn(),
+          saveSiteDraft: vi.fn(),
+          publishSite: vi.fn(),
+          discardSiteDraft: vi.fn(),
+          getSiteLive: vi.fn(),
       });
 
       render(

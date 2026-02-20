@@ -149,7 +149,7 @@ describe('Draft/Publish Workflow Integration Tests', () => {
 
       // Draft should have Spanish
       expect(liveSite.draft_available_languages).toEqual(['en', 'es']);
-      expect(liveSite.draft_settings?.translations?.welcomePage.title).toEqual({
+      expect((liveSite.draft_settings?.translations as any)?.welcomePage?.title).toEqual({
         en: 'Welcome',
         es: 'Bienvenido',
       });
@@ -208,10 +208,10 @@ describe('Draft/Publish Workflow Integration Tests', () => {
       };
 
       // Live translations should be different from draft
-      expect(site.translations.welcomePage.title.en).toBe('Live Title');
-      expect(site.draft_settings?.translations?.welcomePage.title.en).toBe('Draft Title');
-      expect(site.translations.welcomePage.title.en).not.toBe(
-        site.draft_settings?.translations?.welcomePage.title.en
+      expect((site.translations as any).welcomePage.title.en).toBe('Live Title');
+      expect((site.draft_settings?.translations as any)?.welcomePage.title.en).toBe('Draft Title');
+      expect((site.translations as any).welcomePage.title.en).not.toBe(
+        (site.draft_settings?.translations as any)?.welcomePage.title.en
       );
     });
   });

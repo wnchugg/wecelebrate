@@ -108,7 +108,7 @@ describe('getI18nConfig', () => {
   });
 
   it('should handle null values in partial config by using defaults', () => {
-    const partialConfig = {
+    const partialConfig: any = {
       currency: 'GBP' as const,
       currencyDisplay: undefined,
       decimalPlaces: undefined,

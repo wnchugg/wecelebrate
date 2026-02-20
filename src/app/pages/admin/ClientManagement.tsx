@@ -652,7 +652,7 @@ export function ClientManagement() {
       <ClientModal
         open={showClientModal}
         onClose={() => setShowClientModal(false)}
-        client={editingClient}
+        client={editingClient as any}
         onSave={handleSaveClient}
       />
     </div>

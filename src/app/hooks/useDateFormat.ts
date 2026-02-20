@@ -34,7 +34,7 @@ export function useDateFormat(): DateFormatResult {
     try {
       const dateObj = typeof date === 'string' ? new Date(date) : date;
       if (isNaN(dateObj.getTime())) {
-        console.warn(`Invalid date value: ${date}`);
+        console.warn(`Invalid date value: ${String(date)}`);
         return 'Invalid Date';
       }
       return new Intl.DateTimeFormat(locale, {
@@ -44,7 +44,7 @@ export function useDateFormat(): DateFormatResult {
         ...options,
       }).format(dateObj);
     } catch (error) {
-      console.warn(`Error formatting date: ${error}`);
+      console.warn(`Error formatting date: ${String(error)}`);
       return 'Invalid Date';
     }
   };
@@ -53,7 +53,7 @@ export function useDateFormat(): DateFormatResult {
     try {
       const dateObj = typeof date === 'string' ? new Date(date) : date;
       if (isNaN(dateObj.getTime())) {
-        console.warn(`Invalid date value: ${date}`);
+        console.warn(`Invalid date value: ${String(date)}`);
         return 'Invalid Date';
       }
       return new Intl.DateTimeFormat(locale, {
@@ -62,7 +62,7 @@ export function useDateFormat(): DateFormatResult {
         day: 'numeric',
       }).format(dateObj);
     } catch (error) {
-      console.warn(`Error formatting short date: ${error}`);
+      console.warn(`Error formatting short date: ${String(error)}`);
       return 'Invalid Date';
     }
   };
@@ -71,7 +71,7 @@ export function useDateFormat(): DateFormatResult {
     try {
       const dateObj = typeof date === 'string' ? new Date(date) : date;
       if (isNaN(dateObj.getTime())) {
-        console.warn(`Invalid date value: ${date}`);
+        console.warn(`Invalid date value: ${String(date)}`);
         return 'Invalid Date';
       }
       // Use 12-hour format for English locales, 24-hour for others
@@ -82,7 +82,7 @@ export function useDateFormat(): DateFormatResult {
         hour12,
       }).format(dateObj);
     } catch (error) {
-      console.warn(`Error formatting time: ${error}`);
+      console.warn(`Error formatting time: ${String(error)}`);
       return 'Invalid Date';
     }
   };
@@ -91,7 +91,7 @@ export function useDateFormat(): DateFormatResult {
     try {
       const dateObj = typeof date === 'string' ? new Date(date) : date;
       if (isNaN(dateObj.getTime())) {
-        console.warn(`Invalid date value: ${date}`);
+        console.warn(`Invalid date value: ${String(date)}`);
         return 'Invalid Date';
       }
       

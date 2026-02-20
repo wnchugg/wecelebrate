@@ -65,7 +65,7 @@ export function SiteSwitcher({
 
   const handleViewAllSites = () => {
     setIsOpen(false);
-    navigate('/site-selection');
+    void navigate('/site-selection');
   };
 
   // Don't show switcher if there's only one site or no sites

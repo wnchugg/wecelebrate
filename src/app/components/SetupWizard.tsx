@@ -60,7 +60,7 @@ export function SetupWizard() {
   };
 
   const copyCommand = (command: string) => {
-    navigator.clipboard.writeText(command);
+    void navigator.clipboard.writeText(command);
   };
 
   if (!showWizard) return null;

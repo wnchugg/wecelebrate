@@ -126,7 +126,7 @@ export const urlValidation = (value: string): string | null => {
 export const phoneValidation = (value: string): string | null => {
   if (!value) return null;
   
-  const phoneRegex = /^[\d\s\-\(\)]+$/;
+  const phoneRegex = /^[\d\s\-()]+$/;
   if (!phoneRegex.test(value)) {
     return 'Please enter a valid phone number';
   }

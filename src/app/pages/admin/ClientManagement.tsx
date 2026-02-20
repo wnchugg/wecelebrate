@@ -39,7 +39,7 @@ export function validatePhone(phone: string): { valid: boolean; error?: string }
     return { valid: true }; // Empty is valid for optional fields
   }
   
-  const phoneRegex = /^[\d\s\-\(\)\+]+$/;
+  const phoneRegex = /^[\d\s\-()+]+$/;
   if (!phoneRegex.test(phone)) {
     return { valid: false, error: 'Please enter a valid phone number' };
   }
@@ -213,7 +213,7 @@ export function ClientManagement() {
       return;
     }
     
-    if (!confirm(`Are you sure you want to delete \"${clientName}\"? This action cannot be undone.`)) {
+    if (!confirm(`Are you sure you want to delete "${clientName}"? This action cannot be undone.`)) {
       return;
     }
 

@@ -162,7 +162,7 @@ export function detectSiteId(): string | null {
   }
   
   // Strategy 3: Path-based (e.g., /site/client1)
-  const pathMatch = window.location.pathname.match(/^\/site\/([^\/]+)/);
+  const pathMatch = window.location.pathname.match(/^\/site\/([^/]+)/);
   if (pathMatch) {
     return pathMatch[1];
   }

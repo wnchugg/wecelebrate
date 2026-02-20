@@ -93,7 +93,7 @@ export function isValidUrl(url: string): boolean {
 export function isValidPhone(phone: string): boolean {
   if (!phone) return false;
   // Allow common phone formats: +1234567890, (123) 456-7890, 123-456-7890, etc.
-  const phoneRegex = /^[\d\s\-\+\(\)\.]+$/;
+  const phoneRegex = /^[\d\s\-+().\]]+$/;
   return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 7;
 }
 

@@ -275,7 +275,7 @@ export function validateSiteConfiguration(data: SiteConfigData): ValidationResul
   
   // Site Code validation (alphanumeric, hyphens allowed)
   if (data.siteCode && data.siteCode.trim()) {
-    if (!/^[a-zA-Z0-9\-]+$/.test(data.siteCode)) {
+    if (!/^[a-zA-Z0-9-]+$/.test(data.siteCode)) {
       errors.push('Site code can only contain letters, numbers, and hyphens');
       fieldErrors.siteCode = 'Invalid format (alphanumeric and hyphens only)';
     } else if (data.siteCode.length > 50) {
@@ -338,7 +338,7 @@ export function validateSiteConfiguration(data: SiteConfigData): ValidationResul
   // Regional phone validation (basic)
   if (data.regionalClientContactPhone && data.regionalClientContactPhone.trim()) {
     // Allow common phone formats: +1234567890, (123) 456-7890, 123-456-7890, etc.
-    const phoneRegex = /^[\d\s\-\+\(\)\.]+$/;
+    const phoneRegex = /^[\d\s\-+().]+$/;
     if (!phoneRegex.test(data.regionalClientContactPhone)) {
       errors.push('Regional contact phone contains invalid characters');
       fieldErrors.regionalClientContactPhone = 'Use numbers, spaces, and common punctuation only';

@@ -505,6 +505,7 @@ describe('User Journey E2E Suite', () => {
         <TestWrapper>
           <Routes>
             <Route path="/" element={<div><button onClick={() => {
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
               const { authenticate } = require('../context/AuthContext').useAuth();
               authenticate('user@example.com');
             }}>Login</button></div>} />

@@ -269,7 +269,7 @@ export function AccessValidation() {
           </div>
 
           {/* Form */}
-          <form onSubmit={() => void handleSubmit()} className="space-y-6">
+          <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
             <div>
               <label htmlFor="credential" className="block text-sm font-semibold text-gray-700 mb-2">
                 {config.label}

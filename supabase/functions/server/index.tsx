@@ -6134,8 +6134,28 @@ app.post("/make-server-6fcaeea3/public/validate/employee", async (c) => {
     
     // Get all employees for the site
     console.log(`[Employee Validation] Looking for employees with prefix: employee:${siteId}:`);
-    const employees = await kv.getByPrefix(`employee:${siteId}:`, environmentId);
-    
+    let employees = await kv.getByPrefix(`employee:${siteId}:`, environmentId);
+
+    // If no employees found in KV, fall back to PostgreSQL
+    if (!employees || employees.length === 0) {
+      console.log(`[Employee Validation] No employees in KV for site ${siteId}, falling back to PostgreSQL`);
+      try {
+        const dbEmployees = await db.getEmployees({ site_id: siteId, status: 'active' });
+        employees = dbEmployees.map(emp => ({
+          id: emp.id,
+          email: emp.email,
+          employeeId: emp.employee_id,
+          name: `${emp.first_name || ''} ${emp.last_name || ''}`.trim() || emp.email,
+          siteId: emp.site_id,
+          status: emp.status,
+        }));
+        console.log(`[Employee Validation] Found ${employees.length} employees in PostgreSQL for site ${siteId}`);
+      } catch (dbError) {
+        console.error('[Employee Validation] Failed to load employees from PostgreSQL:', dbError);
+        employees = [];
+      }
+    }
+
     console.log(`[Employee Validation] Found ${employees.length} employees for site ${siteId}`);
     if (employees.length > 0) {
       console.log(`[Employee Validation] Employee serial cards:`, employees.map(e => e.serialCard));
@@ -6497,43 +6517,98 @@ app.get("/make-server-6fcaeea3/public/sites/:siteId/gifts", async (c) => {
       console.log(`[SECURITY WARNING] Accessing gifts without session for site: ${siteId} in environment: ${environmentId}`);
     }
     
-    // Get site to verify it exists and is active - FIXED: Using new key pattern
-    const site = await kv.get(`site:${environmentId}:${siteId}`, environmentId);
+    // Get site to verify it exists and is active — try KV first, fall back to PostgreSQL
+    let site = await kv.get(`site:${environmentId}:${siteId}`, environmentId);
     if (!site) {
-      // Don't log as error - this is informational (expected when database not initialized)
-      console.log(`[Public API] Site "${siteId}" not found when fetching gifts in environment: ${environmentId}`);
+      console.log(`[Public API] Site "${siteId}" not in KV, falling back to PostgreSQL`);
+      try {
+        const dbSite = await db.getSiteById(siteId);
+        if (dbSite) {
+          site = {
+            id: dbSite.id,
+            name: dbSite.name,
+            description: (dbSite.settings as any)?.description || '',
+            status: dbSite.status,
+            catalogId: (dbSite as any).catalog_id,
+            // No startDate/endDate — date period checks are skipped gracefully when undefined
+          };
+        }
+      } catch (dbError) {
+        console.error('[Public Gifts] Failed to load site from PostgreSQL:', dbError);
+      }
+    }
+
+    if (!site) {
+      console.log(`[Public API] Site "${siteId}" not found in KV or PostgreSQL in environment: ${environmentId}`);
       return c.json({ error: 'Site not found' }, 404);
     }
-    
+
     if (site.status !== 'active') {
       return c.json({ error: 'Site is not active' }, 403);
     }
-    
-    // Check if site is within selection period
-    const now = new Date();
-    const startDate = new Date(site.startDate);
-    const endDate = new Date(site.endDate);
-    
-    if (now < startDate) {
-      return c.json({ 
-        error: 'Selection period has not started yet',
-        startDate: site.startDate 
-      }, 403);
+
+    // Check if site is within selection period (only if dates are defined)
+    if (site.startDate || site.endDate) {
+      const now = new Date();
+      if (site.startDate) {
+        const startDate = new Date(site.startDate);
+        if (!isNaN(startDate.getTime()) && now < startDate) {
+          return c.json({
+            error: 'Selection period has not started yet',
+            startDate: site.startDate
+          }, 403);
+        }
+      }
+      if (site.endDate) {
+        const endDate = new Date(site.endDate);
+        if (!isNaN(endDate.getTime()) && now > endDate) {
+          return c.json({
+            error: 'Selection period has ended',
+            endDate: site.endDate
+          }, 403);
+        }
+      }
     }
-    
-    if (now > endDate) {
-      return c.json({ 
-        error: 'Selection period has ended',
-        endDate: site.endDate 
-      }, 403);
-    }
-    
-    // Get all site-gift assignments for this site
+
+    // Get all site-gift assignments for this site (KV-based approach)
     const assignments = await kv.getByPrefix(`site-gift-assignment:${siteId}:`, environmentId);
-    
+
     console.log(`[Public Gifts] Found ${assignments?.length || 0} gift assignments for site ${siteId}`);
-    
+
     if (!assignments || assignments.length === 0) {
+      // No KV assignments — fall back to catalog-based approach using PostgreSQL
+      const catalogId = site.catalogId || (site as any).catalog_id;
+      if (catalogId) {
+        console.log(`[Public Gifts] No KV assignments, loading products from catalog: ${catalogId}`);
+        try {
+          const products = await db.getProducts({ catalog_id: catalogId, status: 'active' });
+          const giftsFromCatalog = products.map(product => ({
+            id: product.id,
+            name: product.name,
+            description: product.description || '',
+            category: product.category || '',
+            image: product.image_url || '',
+            imageUrl: product.image_url || '',
+            price: product.price || 0,
+            value: product.price || 0,
+            status: product.status,
+            inventoryTracking: product.track_inventory ?? false,
+            inventoryQuantity: product.available_quantity ?? 0,
+            available: product.status === 'active' && (!product.track_inventory || (product.available_quantity ?? 0) > 0),
+            inventoryStatus: product.track_inventory
+              ? `${product.available_quantity || 0} available`
+              : 'In Stock',
+            priority: 0,
+          }));
+          console.log(`[Public Gifts] Returning ${giftsFromCatalog.length} gifts from catalog`);
+          return c.json({
+            gifts: giftsFromCatalog,
+            site: { name: site.name, description: site.description || '' },
+          });
+        } catch (catalogError) {
+          console.error('[Public Gifts] Failed to load from catalog:', catalogError);
+        }
+      }
       return c.json({ gifts: [], site: { name: site.name, description: site.description } });
     }
     

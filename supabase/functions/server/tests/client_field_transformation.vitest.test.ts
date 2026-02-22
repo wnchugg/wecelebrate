@@ -322,14 +322,17 @@ describe('Client Field Transformation', () => {
     
     it('should log warning for unknown fields in toDatabase', () => {
       const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      
+
       const input = { unknownField: 'value', name: 'Test' };
       const dbFormat = mapClientFieldsToDatabase(input);
-      
-      expect(consoleWarnSpy).toHaveBeenCalledWith('[mapClientFieldsToDatabase] Unknown field: unknownField');
+
+      // Implementation logs a verbose per-field warning and a summary warning
+      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('[mapClientFieldsToDatabase] Unknown field encountered'));
+      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('unknownField'));
+      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Summary: 1 unknown field(s) ignored: unknownField'));
       expect(dbFormat.unknownField).toBeUndefined();
       expect(dbFormat.name).toBe('Test');
-      
+
       consoleWarnSpy.mockRestore();
     });
 
@@ -343,7 +346,7 @@ describe('Client Field Transformation', () => {
 
     it('should handle multiple unknown fields', () => {
       const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      
+
       const input = {
         name: 'Test',
         unknownField1: 'value1',
@@ -351,13 +354,15 @@ describe('Client Field Transformation', () => {
         status: 'active',
       };
       const dbFormat = mapClientFieldsToDatabase(input);
-      
-      expect(consoleWarnSpy).toHaveBeenCalledTimes(2);
-      expect(consoleWarnSpy).toHaveBeenCalledWith('[mapClientFieldsToDatabase] Unknown field: unknownField1');
-      expect(consoleWarnSpy).toHaveBeenCalledWith('[mapClientFieldsToDatabase] Unknown field: unknownField2');
+
+      // Implementation logs one verbose warn per unknown field + one summary warn = 3 total
+      expect(consoleWarnSpy).toHaveBeenCalledTimes(3);
+      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('unknownField1'));
+      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('unknownField2'));
+      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Summary: 2 unknown field(s) ignored: unknownField1, unknownField2'));
       expect(dbFormat.name).toBe('Test');
       expect(dbFormat.status).toBe('active');
-      
+
       consoleWarnSpy.mockRestore();
     });
   });

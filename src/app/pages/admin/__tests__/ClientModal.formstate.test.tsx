@@ -6,8 +6,31 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import fc from 'fast-check';
 import { ClientModal } from '../ClientModal';
+import { LanguageProvider } from '../../../context/LanguageContext';
+
+// Mock AddressInput to use simple labeled inputs for testing form state preservation.
+// AddressInput's autocomplete renders without an `id`, breaking getByLabelText association.
+vi.mock('../../../components/ui/address-input', () => ({
+  AddressInput: ({ value, onChange }: { value: any; onChange: (data: any) => void }) => (
+    <div>
+      <label htmlFor="mock-address-line1">Address Line 1</label>
+      <input
+        id="mock-address-line1"
+        value={value?.line1 || ''}
+        onChange={(e) => onChange({ ...(value || {}), line1: e.target.value })}
+      />
+      <label htmlFor="mock-city">City</label>
+      <input
+        id="mock-city"
+        value={value?.city || ''}
+        onChange={(e) => onChange({ ...(value || {}), city: e.target.value })}
+      />
+    </div>
+  ),
+}));
 
 describe('Client Modal Form State Preservation', () => {
   
@@ -47,14 +70,17 @@ describe('Client Modal Form State Preservation', () => {
             clientInvoiceType: fc.option(fc.string({ minLength: 1, maxLength: 30 }), { nil: undefined }),
           }),
           async (formData) => {
-            const { container } = render(
-              <ClientModal
-                open={true}
-                onClose={mockOnClose}
-                client={null}
-                onSave={mockOnSave}
-              />
+            const { unmount } = render(
+              <LanguageProvider>
+                <ClientModal
+                  open={true}
+                  onClose={mockOnClose}
+                  client={null}
+                  onSave={mockOnSave}
+                />
+              </LanguageProvider>
             );
+            try {
 
             // Fill in Basic Info tab
             const nameInput = screen.getByLabelText(/Client Name/i);
@@ -64,13 +90,13 @@ describe('Client Modal Form State Preservation', () => {
             fireEvent.change(emailInput, { target: { value: formData.contactEmail } });
             
             if (formData.clientCode) {
-              const codeInput = screen.getByLabelText(/Client Code/i);
+              const codeInput = screen.getByLabelText(/URL Slug/i);
               fireEvent.change(codeInput, { target: { value: formData.clientCode } });
             }
 
             // Navigate to Contact tab
             const contactTab = screen.getByRole('tab', { name: /Contact/i });
-            fireEvent.click(contactTab);
+            await userEvent.click(contactTab);
             
             await waitFor(() => {
               expect(screen.getByLabelText(/Contact Name/i)).toBeInTheDocument();
@@ -81,15 +107,18 @@ describe('Client Modal Form State Preservation', () => {
               const contactNameInput = screen.getByLabelText(/Contact Name/i);
               fireEvent.change(contactNameInput, { target: { value: formData.clientContactName } });
             }
-            
+
+            // Capture actual displayed phone value after filling (PhoneInput may auto-format)
+            let filledPhoneValue: string | undefined;
             if (formData.clientContactPhone) {
               const phoneInput = screen.getByLabelText(/Contact Phone/i);
               fireEvent.change(phoneInput, { target: { value: formData.clientContactPhone } });
+              filledPhoneValue = (phoneInput as HTMLInputElement).value;
             }
 
             // Navigate to Address tab
             const addressTab = screen.getByRole('tab', { name: /Address/i });
-            fireEvent.click(addressTab);
+            await userEvent.click(addressTab);
             
             await waitFor(() => {
               expect(screen.getByLabelText(/Address Line 1/i)).toBeInTheDocument();
@@ -108,10 +137,10 @@ describe('Client Modal Form State Preservation', () => {
 
             // Navigate to Account Management tab
             const accountTab = screen.getByRole('tab', { name: /Account Management/i });
-            fireEvent.click(accountTab);
-            
+            await userEvent.click(accountTab);
+
             await waitFor(() => {
-              expect(screen.getByLabelText(/Account Manager/i)).toBeInTheDocument();
+              expect(screen.getByLabelText(/^Account Manager$/i)).toBeInTheDocument();
             });
 
             // Fill in Account Management tab
@@ -122,7 +151,7 @@ describe('Client Modal Form State Preservation', () => {
 
             // Navigate to App Settings tab
             const appTab = screen.getByRole('tab', { name: /App Settings/i });
-            fireEvent.click(appTab);
+            await userEvent.click(appTab);
             
             await waitFor(() => {
               expect(screen.getByLabelText(/Client URL/i)).toBeInTheDocument();
@@ -136,7 +165,7 @@ describe('Client Modal Form State Preservation', () => {
 
             // Navigate to Billing & Integrations tab
             const billingTab = screen.getByRole('tab', { name: /Billing & Integrations/i });
-            fireEvent.click(billingTab);
+            await userEvent.click(billingTab);
             
             await waitFor(() => {
               expect(screen.getByLabelText(/Invoice Type/i)).toBeInTheDocument();
@@ -150,7 +179,7 @@ describe('Client Modal Form State Preservation', () => {
 
             // Navigate back to Basic Info tab
             const basicTab = screen.getByRole('tab', { name: /Basic Info/i });
-            fireEvent.click(basicTab);
+            await userEvent.click(basicTab);
             
             await waitFor(() => {
               expect(screen.getByLabelText(/Client Name/i)).toBeInTheDocument();
@@ -164,12 +193,12 @@ describe('Client Modal Form State Preservation', () => {
             expect(emailInputAfter.value).toBe(formData.contactEmail);
             
             if (formData.clientCode) {
-              const codeInputAfter = screen.getByLabelText(/Client Code/i);
+              const codeInputAfter = screen.getByLabelText(/URL Slug/i);
               expect(codeInputAfter.value).toBe(formData.clientCode);
             }
 
             // Navigate back to Contact tab and verify
-            fireEvent.click(contactTab);
+            await userEvent.click(contactTab);
             
             await waitFor(() => {
               expect(screen.getByLabelText(/Contact Name/i)).toBeInTheDocument();
@@ -179,14 +208,14 @@ describe('Client Modal Form State Preservation', () => {
               const contactNameInputAfter = screen.getByLabelText(/Contact Name/i);
               expect(contactNameInputAfter.value).toBe(formData.clientContactName);
             }
-            
-            if (formData.clientContactPhone) {
+
+            if (filledPhoneValue !== undefined) {
               const phoneInputAfter = screen.getByLabelText(/Contact Phone/i);
-              expect(phoneInputAfter.value).toBe(formData.clientContactPhone);
+              expect(phoneInputAfter.value).toBe(filledPhoneValue);
             }
 
             // Navigate back to Address tab and verify
-            fireEvent.click(addressTab);
+            await userEvent.click(addressTab);
             
             await waitFor(() => {
               expect(screen.getByLabelText(/Address Line 1/i)).toBeInTheDocument();
@@ -203,10 +232,10 @@ describe('Client Modal Form State Preservation', () => {
             }
 
             // Navigate back to Account Management tab and verify
-            fireEvent.click(accountTab);
-            
+            await userEvent.click(accountTab);
+
             await waitFor(() => {
-              expect(screen.getByLabelText(/Account Manager/i)).toBeInTheDocument();
+              expect(screen.getByLabelText(/^Account Manager$/i)).toBeInTheDocument();
             });
 
             if (formData.clientAccountManager) {
@@ -215,7 +244,7 @@ describe('Client Modal Form State Preservation', () => {
             }
 
             // Navigate back to App Settings tab and verify
-            fireEvent.click(appTab);
+            await userEvent.click(appTab);
             
             await waitFor(() => {
               expect(screen.getByLabelText(/Client URL/i)).toBeInTheDocument();
@@ -227,7 +256,7 @@ describe('Client Modal Form State Preservation', () => {
             }
 
             // Navigate back to Billing & Integrations tab and verify
-            fireEvent.click(billingTab);
+            await userEvent.click(billingTab);
             
             await waitFor(() => {
               expect(screen.getByLabelText(/Invoice Type/i)).toBeInTheDocument();
@@ -237,11 +266,14 @@ describe('Client Modal Form State Preservation', () => {
               const invoiceTypeInputAfter = screen.getByLabelText(/Invoice Type/i);
               expect(invoiceTypeInputAfter.value).toBe(formData.clientInvoiceType);
             }
+            } finally {
+              unmount();
+            }
           }
         ),
-        { numRuns: 10 } // Reduced runs for UI tests
+        { numRuns: 5 } // Reduced runs for UI tests (async userEvent needs larger timeout)
       );
-    });
+    }, 30000); // 30s timeout: 5 iterations × ~10 async tab switches each
   });
 
   // ===== Unit Tests for Specific Tab Navigation Scenarios =====
@@ -249,12 +281,14 @@ describe('Client Modal Form State Preservation', () => {
   describe('Tab Navigation - Specific Examples', () => {
     it('should preserve name and email when navigating from Basic Info to Contact and back', async () => {
       render(
-        <ClientModal
-          open={true}
-          onClose={mockOnClose}
-          client={null}
-          onSave={mockOnSave}
-        />
+        <LanguageProvider>
+          <ClientModal
+            open={true}
+            onClose={mockOnClose}
+            client={null}
+            onSave={mockOnSave}
+          />
+        </LanguageProvider>
       );
 
       // Fill in Basic Info
@@ -266,7 +300,7 @@ describe('Client Modal Form State Preservation', () => {
 
       // Navigate to Contact tab
       const contactTab = screen.getByRole('tab', { name: /Contact/i });
-      fireEvent.click(contactTab);
+      await userEvent.click(contactTab);
       
       await waitFor(() => {
         expect(screen.getByLabelText(/Contact Name/i)).toBeInTheDocument();
@@ -274,7 +308,7 @@ describe('Client Modal Form State Preservation', () => {
 
       // Navigate back to Basic Info
       const basicTab = screen.getByRole('tab', { name: /Basic Info/i });
-      fireEvent.click(basicTab);
+      await userEvent.click(basicTab);
       
       await waitFor(() => {
         expect(screen.getByLabelText(/Client Name/i)).toBeInTheDocument();
@@ -290,17 +324,19 @@ describe('Client Modal Form State Preservation', () => {
 
     it('should preserve address fields when navigating to other tabs and back', async () => {
       render(
-        <ClientModal
-          open={true}
-          onClose={mockOnClose}
-          client={null}
-          onSave={mockOnSave}
-        />
+        <LanguageProvider>
+          <ClientModal
+            open={true}
+            onClose={mockOnClose}
+            client={null}
+            onSave={mockOnSave}
+          />
+        </LanguageProvider>
       );
 
       // Navigate to Address tab
       const addressTab = screen.getByRole('tab', { name: /Address/i });
-      fireEvent.click(addressTab);
+      await userEvent.click(addressTab);
       
       await waitFor(() => {
         expect(screen.getByLabelText(/Address Line 1/i)).toBeInTheDocument();
@@ -315,14 +351,14 @@ describe('Client Modal Form State Preservation', () => {
 
       // Navigate to Billing tab
       const billingTab = screen.getByRole('tab', { name: /Billing & Integrations/i });
-      fireEvent.click(billingTab);
+      await userEvent.click(billingTab);
       
       await waitFor(() => {
         expect(screen.getByLabelText(/Invoice Type/i)).toBeInTheDocument();
       });
 
       // Navigate back to Address tab
-      fireEvent.click(addressTab);
+      await userEvent.click(addressTab);
       
       await waitFor(() => {
         expect(screen.getByLabelText(/Address Line 1/i)).toBeInTheDocument();
@@ -338,12 +374,14 @@ describe('Client Modal Form State Preservation', () => {
 
     it('should preserve all fields across multiple tab navigations', async () => {
       render(
-        <ClientModal
-          open={true}
-          onClose={mockOnClose}
-          client={null}
-          onSave={mockOnSave}
-        />
+        <LanguageProvider>
+          <ClientModal
+            open={true}
+            onClose={mockOnClose}
+            client={null}
+            onSave={mockOnSave}
+          />
+        </LanguageProvider>
       );
 
       // Fill Basic Info
@@ -352,7 +390,7 @@ describe('Client Modal Form State Preservation', () => {
 
       // Navigate to Contact and fill
       const contactTab = screen.getByRole('tab', { name: /Contact/i });
-      fireEvent.click(contactTab);
+      await userEvent.click(contactTab);
       
       await waitFor(() => {
         expect(screen.getByLabelText(/Contact Name/i)).toBeInTheDocument();
@@ -363,7 +401,7 @@ describe('Client Modal Form State Preservation', () => {
 
       // Navigate to App Settings and fill
       const appTab = screen.getByRole('tab', { name: /App Settings/i });
-      fireEvent.click(appTab);
+      await userEvent.click(appTab);
       
       await waitFor(() => {
         expect(screen.getByLabelText(/Client URL/i)).toBeInTheDocument();
@@ -374,7 +412,7 @@ describe('Client Modal Form State Preservation', () => {
 
       // Navigate back to Basic Info and verify
       const basicTab = screen.getByRole('tab', { name: /Basic Info/i });
-      fireEvent.click(basicTab);
+      await userEvent.click(basicTab);
       
       await waitFor(() => {
         expect(screen.getByLabelText(/Client Name/i)).toBeInTheDocument();
@@ -384,7 +422,7 @@ describe('Client Modal Form State Preservation', () => {
       expect(nameInputAfter.value).toBe('Acme Corp');
 
       // Navigate back to Contact and verify
-      fireEvent.click(contactTab);
+      await userEvent.click(contactTab);
       
       await waitFor(() => {
         expect(screen.getByLabelText(/Contact Name/i)).toBeInTheDocument();
@@ -394,7 +432,7 @@ describe('Client Modal Form State Preservation', () => {
       expect(contactNameInputAfter.value).toBe('John Doe');
 
       // Navigate back to App Settings and verify
-      fireEvent.click(appTab);
+      await userEvent.click(appTab);
       
       await waitFor(() => {
         expect(screen.getByLabelText(/Client URL/i)).toBeInTheDocument();

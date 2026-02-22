@@ -6499,30 +6499,16 @@ app.get("/make-server-6fcaeea3/public/sites/:siteId/gifts", async (c) => {
   const sessionToken = c.req.header('X-Session-Token'); // Changed from Authorization header
   
   try {
-    // SECURITY: Session token verification
-    // For demo/preview purposes, we allow access without session but log it
-    // In production, consider making this mandatory by removing the conditional
-    if (sessionToken) {
-      // Verify session token and site match
-      const session = await kv.get(`session:${sessionToken}`, environmentId);
-      if (!session) {
-        return c.json({ error: 'Invalid or expired session. Please validate your access again.' }, 403);
-      }
-      
-      if (session.siteId !== siteId) {
-        return c.json({ error: 'Session site mismatch. You can only access gifts for your assigned site.' }, 403);
-      }
-    } else {
-      // No session provided - log for security audit
-      console.log(`[SECURITY WARNING] Accessing gifts without session for site: ${siteId} in environment: ${environmentId}`);
-    }
-    
-    // Get site to verify it exists and is active — try KV first, fall back to PostgreSQL
+    // Get site first — try KV, then PostgreSQL (handles both UUID and slug in URL)
     let site = await kv.get(`site:${environmentId}:${siteId}`, environmentId);
     if (!site) {
       console.log(`[Public API] Site "${siteId}" not in KV, falling back to PostgreSQL`);
       try {
-        const dbSite = await db.getSiteById(siteId);
+        // Detect if siteId is a UUID or a slug and query accordingly
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        const dbSite = uuidRegex.test(siteId)
+          ? await db.getSiteById(siteId)
+          : await db.getSiteBySlug(siteId);
         if (dbSite) {
           site = {
             id: dbSite.id,
@@ -6541,6 +6527,22 @@ app.get("/make-server-6fcaeea3/public/sites/:siteId/gifts", async (c) => {
     if (!site) {
       console.log(`[Public API] Site "${siteId}" not found in KV or PostgreSQL in environment: ${environmentId}`);
       return c.json({ error: 'Site not found' }, 404);
+    }
+
+    // SECURITY: Session token verification (after site is resolved so we compare UUIDs)
+    // session.siteId is always a UUID; site.id is the resolved UUID even when URL used a slug
+    if (sessionToken) {
+      const session = await kv.get(`session:${sessionToken}`, environmentId);
+      if (!session) {
+        return c.json({ error: 'Invalid or expired session. Please validate your access again.' }, 403);
+      }
+
+      if (session.siteId !== site.id) {
+        return c.json({ error: 'Session site mismatch. You can only access gifts for your assigned site.' }, 403);
+      }
+    } else {
+      // No session provided - log for security audit
+      console.log(`[SECURITY WARNING] Accessing gifts without session for site: ${siteId} in environment: ${environmentId}`);
     }
 
     if (site.status !== 'active') {

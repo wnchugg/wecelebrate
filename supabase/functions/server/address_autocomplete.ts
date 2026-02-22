@@ -96,6 +96,28 @@ const GOOGLE_DETAILS_URL = 'https://maps.googleapis.com/maps/api/place/details/j
 const GEOAPIFY_AUTOCOMPLETE_URL = 'https://api.geoapify.com/v1/geocode/autocomplete';
 const GEOAPIFY_DETAILS_URL = 'https://api.geoapify.com/v1/geocode/search';
 
+// ===== Country Search Mode =====
+
+/**
+ * Countries where postal/zip code is the primary address lookup method.
+ * Users in these countries type the postal code first; the system fills in city/region.
+ * Japan: 7-digit code (〒150-0001) → fills prefecture + city/ward
+ * South Korea: 5-digit code → fills city + district
+ */
+const POSTCODE_PRIMARY_COUNTRIES = new Set(['jp', 'kr']);
+
+/**
+ * Returns the Geoapify result types to request based on the target country.
+ * For postcode-primary countries, include 'postcode' so zip searches return results.
+ * For all others, restrict to address-level types to avoid zip code false-matches.
+ */
+function getGeoapifyResultTypes(country?: string): string {
+  if (country && POSTCODE_PRIMARY_COUNTRIES.has(country.toLowerCase())) {
+    return 'postcode,building,street';
+  }
+  return 'building,street';
+}
+
 // ===== Provider Detection =====
 
 function getActiveProvider(): Provider {
@@ -241,6 +263,9 @@ async function searchAddressesGeoapify(
       text: query,
       apiKey: GEOAPIFY_API_KEY!,
       limit: '5',
+      // Result types vary by country — postcode-primary countries (JP, KR) include
+      // 'postcode' so zip searches work; all others restrict to address-level only.
+      type: getGeoapifyResultTypes(country),
     });
 
     if (country) {

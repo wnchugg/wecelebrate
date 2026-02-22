@@ -92,7 +92,14 @@ export function AddressAutocomplete({
       clearTimeout(debounceTimerRef.current);
     }
 
-    if (query.length >= minQueryLength) {
+    // In most countries, don't search on digit-only queries (e.g. "1532") because
+    // Geoapify matches zip codes instead of street addresses. Wait for a street name.
+    // Exception: postcode-primary countries (JP, KR) where users search by zip code first.
+    const POSTCODE_PRIMARY_COUNTRIES = new Set(['JP', 'KR']);
+    const isPostcodePrimary = country ? POSTCODE_PRIMARY_COUNTRIES.has(country.toUpperCase()) : false;
+    const isOnlyDigits = /^\d+$/.test(query);
+
+    if (query.length >= minQueryLength && (!isOnlyDigits || isPostcodePrimary)) {
       debounceTimerRef.current = setTimeout(() => {
         handleSearch(query);
       }, debounceMs);
@@ -113,7 +120,7 @@ export function AddressAutocomplete({
     (suggestion: AddressSuggestion) => {
       const parsedAddress = parseAddressSuggestion(suggestion);
       onSelect(parsedAddress);
-      setQuery(suggestion.description);
+      setQuery(suggestion.line1 || suggestion.description);
       setSuggestions([]);
       setIsOpen(false);
       setSelectedIndex(-1);

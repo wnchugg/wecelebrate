@@ -89,7 +89,7 @@ npm run build:staging
 
 **Deployment:**
 - **Frontend** → Netlify (auto-deploys from GitHub on push to `main` or `development`)
-- **Backend** → Supabase Edge Functions (Deno serverless, auto-deployed to Supabase project `wjfcqqrlhwdvvjmefxky`)
+- **Backend** → Supabase Edge Functions — **must be deployed manually** with `supabase functions deploy make-server-6fcaeea3 --project-ref wjfcqqrlhwdvvjmefxky`. Git pushes do NOT auto-deploy the backend. Always run this command after changing any file in `supabase/functions/`.
 - **Database** → Supabase-managed PostgreSQL (same project)
 
 **Git branches:**

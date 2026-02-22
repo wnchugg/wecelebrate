@@ -29,6 +29,7 @@ interface AddressAutocompleteProps {
   country?: string;
   placeholder?: string;
   className?: string;
+  inputClassName?: string;
   disabled?: boolean;
   minQueryLength?: number;
   debounceMs?: number;
@@ -40,6 +41,7 @@ export function AddressAutocomplete({
   country,
   placeholder = 'Start typing address...',
   className,
+  inputClassName,
   disabled = false,
   minQueryLength = 3,
   debounceMs = 300,
@@ -191,7 +193,7 @@ export function AddressAutocomplete({
           }}
           placeholder={placeholder}
           disabled={disabled}
-          className={cn('pl-10 pr-10', error && 'border-red-500')}
+          className={cn('pl-10 pr-10', error && 'border-red-500', inputClassName)}
         />
         {isLoading && (
           <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />

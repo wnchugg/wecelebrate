@@ -228,6 +228,7 @@ export function ShippingInformation() {
                     onChange={(value) => setFormData(prev => ({ ...prev, street: value }))}
                     country={formData.country}
                     placeholder={t('shipping.enterStreet')}
+                    inputClassName="h-auto py-3 border-2 border-gray-200 rounded-xl focus:border-[#D91C81] focus:ring-4 focus:ring-pink-100 transition-all outline-none"
                   />
                 </div>
 

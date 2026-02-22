@@ -60,6 +60,7 @@ interface GeoapifyFeature {
     street?: string;
     city?: string;
     state?: string;
+    state_code?: string;
     postcode?: string;
     country_code?: string;
     country?: string;
@@ -239,7 +240,6 @@ async function searchAddressesGeoapify(
     const params = new URLSearchParams({
       text: query,
       apiKey: GEOAPIFY_API_KEY!,
-      format: 'json',
       limit: '5',
     });
 
@@ -248,13 +248,14 @@ async function searchAddressesGeoapify(
     }
 
     const response = await fetch(`${GEOAPIFY_AUTOCOMPLETE_URL}?${params.toString()}`);
-    
+
     if (!response.ok) {
       throw new Error(`Geoapify API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const results: GeoapifyFeature[] = data.results || [];
+    // GeoJSON FeatureCollection format (default, without format=json)
+    const results: GeoapifyFeature[] = data.features || [];
 
     return results.map((result, index) => {
       const props = result.properties;
@@ -281,7 +282,7 @@ async function searchAddressesGeoapify(
           line1,
           line2: props.address_line2 || undefined,
           city: props.city || '',
-          state: props.state || '',
+          state: props.state_code || props.state || '',
           postalCode: props.postcode || '',
           country: props.country_code?.toUpperCase() || props.country || '',
         },
@@ -302,7 +303,6 @@ async function getPlaceDetailsGeoapify(placeId: string): Promise<AddressData | n
     // We need to use the search endpoint with the place_id
     const params = new URLSearchParams({
       apiKey: GEOAPIFY_API_KEY!,
-      format: 'json',
     });
 
     // Extract OSM type and ID from place_id
@@ -317,13 +317,14 @@ async function getPlaceDetailsGeoapify(placeId: string): Promise<AddressData | n
     }
 
     const response = await fetch(`${GEOAPIFY_DETAILS_URL}?${params.toString()}`);
-    
+
     if (!response.ok) {
       throw new Error(`Geoapify API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const results: GeoapifyFeature[] = data.results || [];
+    // GeoJSON FeatureCollection format (default, without format=json)
+    const results: GeoapifyFeature[] = data.features || [];
 
     if (results.length === 0) {
       return null;
@@ -365,8 +366,8 @@ function parseGeoapifyAddress(props: GeoapifyFeature['properties']): AddressData
   // City
   address.city = props.city || '';
 
-  // State
-  address.state = props.state || '';
+  // State — prefer abbreviation (state_code) over full name (state)
+  address.state = props.state_code || props.state || '';
 
   // Postal code
   address.postalCode = props.postcode || '';

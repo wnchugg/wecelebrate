@@ -263,7 +263,10 @@ import { Button } from '../../../components/ui/button';
 
 ## Known Gaps / Work In Progress
 
-- **Public order endpoints are missing** — `POST /public/orders` and `GET /public/orders/:id` need to be added to `index.tsx`. The frontend pages `ReviewOrder.tsx` and `Confirmation.tsx` expect these to exist. This is the main blocker for the end-to-end employee gift flow.
 - **Gift detail endpoint** — `GET /public/gifts/:giftId` may need to be verified/added for the `GiftDetail.tsx` page.
 - **Lint warnings** — ~4,749 warnings remain (intentional, non-blocking). Do not add new ones without good reason.
 - **Two gift configuration pages** — `SiteGiftAssignment.tsx` and `SiteGiftConfiguration.tsx` both exist. The canonical one for admin routes needs to be clarified.
+
+## Recently Resolved
+
+- **Public order endpoints** ✅ — `POST /public/orders` and `GET /public/orders/:orderId` exist in `index.tsx` and now persist orders to **both** the KV store (fast, for the confirmation page) and **PostgreSQL** (permanent, visible in admin order management). The employee gift flow is end-to-end functional. Key detail: gift display fields (name, description, image) are stored in the order's `metadata` JSON column since the `orders` table references gifts by `product_id` only. The GET endpoint also falls back to PostgreSQL if the KV entry has expired.

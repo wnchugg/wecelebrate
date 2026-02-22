@@ -6731,14 +6731,65 @@ app.post("/make-server-6fcaeea3/public/orders", async (c) => {
     
     // Generate order number
     const orderNumber = `ORD-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
-    const orderId = `order:${session.siteId}:${crypto.randomUUID()}`;
-    
+
     // Calculate totals
     const orderQuantity = quantity || 1;
     const itemValue = gift.price || 0;
     const totalValue = itemValue * orderQuantity;
 
-    // Create order object
+    const normalizedShippingAddress = {
+      fullName: shippingAddress.fullName,
+      addressLine1: shippingAddress.addressLine1,
+      addressLine2: shippingAddress.addressLine2 || '',
+      city: shippingAddress.city,
+      state: shippingAddress.state,
+      postalCode: shippingAddress.postalCode,
+      country: shippingAddress.country,
+      phone: shippingAddress.phone || ''
+    };
+
+    // Save to PostgreSQL first — this generates the canonical UUID for the order.
+    // We store gift display details in metadata since the orders table doesn't
+    // have dedicated gift columns (it references products by product_id).
+    let orderId: string;
+    try {
+      const savedDbOrder = await db.createOrder({
+        client_id: site.client_id,
+        site_id: session.siteId,
+        product_id: giftId,
+        employee_id: session.employeeId,
+        order_number: orderNumber,
+        customer_name: session.employeeName,
+        customer_email: session.employeeEmail,
+        status: 'pending',
+        total_amount: totalValue,
+        currency: 'USD',
+        shipping_address: normalizedShippingAddress,
+        items: [{
+          product_id: giftId,
+          product_name: gift.name,
+          quantity: orderQuantity,
+          unit_price: itemValue,
+          total_price: totalValue,
+        }],
+        metadata: {
+          giftName: gift.name,
+          giftDescription: gift.description,
+          giftCategory: gift.category,
+          giftImageUrl: gift.image,
+          siteName: site.name,
+        },
+      });
+      orderId = savedDbOrder.id;
+      console.log(`[Order Creation] Saved to PostgreSQL with id: ${orderId}`);
+    } catch (dbError) {
+      // If DB save fails, fall back to a local UUID so the employee still gets
+      // a working confirmation. The order will only be in KV until it expires.
+      console.error('[Order Creation] Failed to save order to database (KV fallback):', dbError);
+      orderId = crypto.randomUUID();
+    }
+
+    // Create order object (camelCase, for KV and API responses)
     const order = {
       id: orderId,
       orderNumber,
@@ -6761,36 +6812,27 @@ app.post("/make-server-6fcaeea3/public/orders", async (c) => {
       giftDescription: gift.description,
       giftCategory: gift.category,
       giftImageUrl: gift.image,
-      
+
       // Order details
       quantity: orderQuantity,
       itemValue: itemValue,
       totalValue: totalValue,
-      
+
       // Shipping information
-      shippingAddress: {
-        fullName: shippingAddress.fullName,
-        addressLine1: shippingAddress.addressLine1,
-        addressLine2: shippingAddress.addressLine2 || '',
-        city: shippingAddress.city,
-        state: shippingAddress.state,
-        postalCode: shippingAddress.postalCode,
-        country: shippingAddress.country,
-        phone: shippingAddress.phone || ''
-      },
-      
+      shippingAddress: normalizedShippingAddress,
+
       // Timestamps
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      
+
       // Tracking
       trackingNumber: null,
       shippedAt: null,
       deliveredAt: null
     };
-    
-    // Save order to KV for quick retrieval on confirmation page
-    await kv.set(orderId, order, environmentId);
+
+    // Also save to KV for fast retrieval on the confirmation page (no DB round-trip needed)
+    await kv.set(`order:${orderId}`, order, environmentId);
 
     // Send order confirmation email
     try {
@@ -6888,31 +6930,64 @@ app.get("/make-server-6fcaeea3/public/orders/:orderId", async (c) => {
   const orderId = c.req.param('orderId');
   // Read session token from X-Session-Token header (preferred) or Authorization Bearer fallback
   const sessionToken = c.req.header('X-Session-Token') || c.req.header('Authorization')?.replace('Bearer ', '');
-  
+
   try {
-    // Verify session token
+    // Validate session token once (fixes the previous double-fetch bug)
+    let session = null;
     if (sessionToken) {
-      const session = await kv.get(`session:${sessionToken}`, environmentId);
+      session = await kv.get(`session:${sessionToken}`, environmentId);
       if (!session) {
         return c.json({ error: 'Invalid session' }, 403);
       }
     }
-    
-    // Get order
-    const order = await kv.get(orderId, environmentId);
-    
+
+    // Fast path: try KV first (order was just created and cached here)
+    let order = await kv.get(`order:${orderId}`, environmentId);
+
+    // Slow path: fall back to PostgreSQL if KV has expired or was missed
+    if (!order) {
+      console.log(`[Get Order] KV miss for order:${orderId}, falling back to PostgreSQL`);
+      const dbOrder = await db.getOrderById(orderId);
+      if (dbOrder) {
+        // Map DB snake_case fields to the camelCase shape the frontend expects
+        order = {
+          id: dbOrder.id,
+          orderNumber: dbOrder.order_number,
+          status: dbOrder.status,
+          employeeId: dbOrder.employee_id,
+          employeeName: dbOrder.customer_name,
+          employeeEmail: dbOrder.customer_email,
+          siteId: dbOrder.site_id,
+          clientId: dbOrder.client_id,
+          giftId: dbOrder.product_id,
+          // Gift display details were stored in metadata at order creation time
+          giftName: dbOrder.metadata?.giftName ?? null,
+          giftDescription: dbOrder.metadata?.giftDescription ?? null,
+          giftCategory: dbOrder.metadata?.giftCategory ?? null,
+          giftImageUrl: dbOrder.metadata?.giftImageUrl ?? null,
+          siteName: dbOrder.metadata?.siteName ?? null,
+          quantity: dbOrder.items?.[0]?.quantity ?? 1,
+          itemValue: dbOrder.items?.[0]?.unit_price ?? 0,
+          totalValue: dbOrder.total_amount,
+          shippingAddress: dbOrder.shipping_address,
+          createdAt: dbOrder.created_at,
+          updatedAt: dbOrder.updated_at,
+          trackingNumber: dbOrder.tracking_number ?? null,
+          shippedAt: dbOrder.shipped_at ?? null,
+          deliveredAt: dbOrder.delivered_at ?? null,
+        };
+      }
+    }
+
     if (!order) {
       return c.json({ error: 'Order not found' }, 404);
     }
-    
-    // Verify access (employee can only see their own orders)
-    if (sessionToken) {
-      const session = await kv.get(`session:${sessionToken}`, environmentId);
-      if (session && order.employeeId !== session.employeeId) {
-        return c.json({ error: 'Access denied' }, 403);
-      }
+
+    // Verify access: employees can only see their own orders
+    if (session && order.employeeId !== session.employeeId) {
+      return c.json({ error: 'Access denied' }, 403);
     }
-    
+
     return c.json({ order });
   } catch (error: any) {
     console.error('Get order error:', error);

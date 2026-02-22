@@ -134,7 +134,7 @@ export function Confirmation() {
         <div className="text-center">
           <p className="text-red-500 text-lg font-bold mb-4">{error || 'Order not found'}</p>
           <button
-            onClick={() => navigate('../gift-selection')}
+            onClick={() => void navigate('../gift-selection')}
             className="text-[#D91C81] hover:text-[#B71569] font-medium"
           >
             Return to Gift Selection

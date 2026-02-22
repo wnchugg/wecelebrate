@@ -8,7 +8,56 @@ import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AddressAutocomplete, AddressSuggestion } from '../address-autocomplete';
 
+// Mock deployment environments so dynamic import doesn't fail
+vi.mock('../../config/deploymentEnvironments', () => ({
+  getCurrentEnvironment: vi.fn(() =>
+    Promise.resolve({
+      id: 'test',
+      supabaseUrl: 'https://test.supabase.co',
+      supabaseAnonKey: 'test-anon-key',
+    })
+  ),
+}));
+
 const originalFetch = global.fetch;
+
+/**
+ * Creates a fetch mock that handles the two-step address API:
+ * 1. GET /search?q=... → { suggestions: [{ placeId, description, mainText }] }
+ * 2. GET /details/:placeId → { address: { line1, city, ... } }
+ */
+function createFetchMock(suggestions: AddressSuggestion[]) {
+  return vi.fn().mockImplementation((url: string) => {
+    if (String(url).includes('/search')) {
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({
+          suggestions: suggestions.map(s => ({
+            placeId: s.id,
+            description: s.description,
+            mainText: s.line1,
+          })),
+        }),
+      } as Response);
+    }
+    // Details endpoint: match by placeId in URL
+    const suggestion = suggestions.find(s => String(url).includes(String(s.id))) || suggestions[0];
+    if (!suggestion) return Promise.resolve({ ok: false, status: 404 } as Response);
+    return Promise.resolve({
+      ok: true,
+      json: async () => ({
+        address: {
+          line1: suggestion.line1,
+          line2: suggestion.line2,
+          city: suggestion.city,
+          state: suggestion.state,
+          postalCode: suggestion.postalCode,
+          country: suggestion.country,
+        },
+      }),
+    } as Response);
+  });
+}
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -44,10 +93,7 @@ describe('AddressAutocomplete Component', () => {
         },
       ];
 
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockSuggestions,
-      } as Response);
+      global.fetch = createFetchMock(mockSuggestions);
 
       const onSelect = vi.fn();
       const user = userEvent.setup();
@@ -62,7 +108,7 @@ describe('AddressAutocomplete Component', () => {
       await waitFor(() => {
         const suggestions = container.querySelectorAll('li');
         expect(suggestions.length).toBe(2);
-      });
+      }, { timeout: 3000 });
 
       expect(screen.getByText('123 Main St, New York, NY 10001')).toBeTruthy();
       expect(screen.getByText('456 Oak Ave, Los Angeles, CA 90001')).toBeTruthy();
@@ -92,7 +138,7 @@ describe('AddressAutocomplete Component', () => {
       global.fetch = vi.fn().mockImplementation(
         () => new Promise(resolve => setTimeout(() => resolve({
           ok: true,
-          json: async () => [],
+          json: async () => ({ suggestions: [] }),
         } as Response), 500))
       );
 
@@ -126,10 +172,7 @@ describe('AddressAutocomplete Component', () => {
         country: 'US',
       };
 
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => [mockSuggestion],
-      } as Response);
+      global.fetch = createFetchMock([mockSuggestion]);
 
       const onSelect = vi.fn();
       const user = userEvent.setup();
@@ -144,7 +187,7 @@ describe('AddressAutocomplete Component', () => {
       await waitFor(() => {
         const suggestions = container.querySelectorAll('li');
         expect(suggestions.length).toBe(1);
-      });
+      }, { timeout: 3000 });
 
       const suggestion = container.querySelector('li') as HTMLElement;
       await user.click(suggestion);
@@ -181,10 +224,7 @@ describe('AddressAutocomplete Component', () => {
         },
       ];
 
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockSuggestions,
-      } as Response);
+      global.fetch = createFetchMock(mockSuggestions);
 
       const onSelect = vi.fn();
       const user = userEvent.setup();
@@ -199,14 +239,14 @@ describe('AddressAutocomplete Component', () => {
       await waitFor(() => {
         const suggestions = container.querySelectorAll('li');
         expect(suggestions.length).toBe(2);
-      });
+      }, { timeout: 3000 });
 
       // Navigate down to first item
       await user.keyboard('{ArrowDown}');
-      
+
       // Navigate down to second item
       await user.keyboard('{ArrowDown}');
-      
+
       // Select second item
       await user.keyboard('{Enter}');
 
@@ -231,10 +271,7 @@ describe('AddressAutocomplete Component', () => {
         country: 'US',
       };
 
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => [mockSuggestion],
-      } as Response);
+      global.fetch = createFetchMock([mockSuggestion]);
 
       const onSelect = vi.fn();
       const user = userEvent.setup();
@@ -249,7 +286,7 @@ describe('AddressAutocomplete Component', () => {
       await waitFor(() => {
         const suggestions = container.querySelectorAll('li');
         expect(suggestions.length).toBe(1);
-      });
+      }, { timeout: 3000 });
 
       // Press Escape
       await user.keyboard('{Escape}');
@@ -373,7 +410,10 @@ describe('AddressAutocomplete Component', () => {
     });
 
     it('should respect custom minQueryLength', async () => {
-      global.fetch = vi.fn();
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ suggestions: [] }),
+      } as Response);
 
       const onSelect = vi.fn();
       const user = userEvent.setup();
@@ -387,7 +427,7 @@ describe('AddressAutocomplete Component', () => {
       );
 
       const input = container.querySelector('input');
-      
+
       // Type 4 characters (below minimum)
       await user.type(input, 'test');
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -418,7 +458,7 @@ describe('AddressAutocomplete Component', () => {
     it('should debounce API calls', async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => [],
+        json: async () => ({ suggestions: [] }),
       } as Response);
 
       const onSelect = vi.fn();
@@ -429,7 +469,7 @@ describe('AddressAutocomplete Component', () => {
       );
 
       const input = container.querySelector('input');
-      
+
       // Type multiple characters quickly
       await user.type(input, 'test');
 

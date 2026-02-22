@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Maintain Demo Data",
+  "description": "Ensures demo data exists for Employee Onboarding (email validation), Event Gifting (gift code), Service Award with celebrations, and Service Award without celebrations",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Verify and maintain demo data for these use cases in the development environment:\n\n1. Employee Onboarding - Simple email validation flow with varied employee profiles (new hires, different departments, multiple locations)\n\n2. Event Gifting - Gift code validation with different event types (holidays, company milestones, team celebrations) and gift assignment strategies\n\n3. Service Award with Data & Celebrations - Complete service award flow including employee data, milestone celebrations (5, 10, 15, 20+ years), price level variations, and gift selection history\n\n4. Service Award without Celebrations - Service award flow with employee data but no celebration milestones, testing basic recognition without anniversary tracking\n\nFor each use case, ensure:\n- Multiple test users with varied attributes\n- Different validation methods configured\n- Gift catalogs with appropriate assignment strategies\n- Sites properly configured with white-label settings\n- Test data covers edge cases (expired tokens, used codes, boundary conditions)\n\nCheck if demo data exists, create missing data, and report what was verified or created."
+  }
+}

@@ -42,10 +42,10 @@ export function validateFileType(
  * This is a defense-in-depth measure for the xlsx prototype pollution vulnerability.
  * It removes dangerous keys that could affect object prototypes.
  */
-export function sanitizeObjectKeys<T extends Record<string, any>>(obj: T): T {
+export function sanitizeObjectKeys<T extends Record<string, unknown>>(obj: T): T {
   const dangerousKeys = ['__proto__', 'constructor', 'prototype'];
   // Create object with null prototype to avoid __proto__ being in prototype chain
-  const sanitized: Record<string, any> = Object.create(null);
+  const sanitized: Record<string, unknown> = Object.create(null);
   
   for (const key in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, key)) {

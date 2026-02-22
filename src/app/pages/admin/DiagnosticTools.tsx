@@ -113,7 +113,7 @@ export function DiagnosticTools() {
             {/* Action Buttons */}
             <div className="grid md:grid-cols-2 gap-4">
               <button
-                onClick={checkAdminUsers}
+                onClick={() => void checkAdminUsers()}
                 disabled={isChecking}
                 className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-6 rounded-xl font-bold text-lg hover:shadow-lg transition-all disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
@@ -131,7 +131,7 @@ export function DiagnosticTools() {
               </button>
 
               <button
-                onClick={handleRepairAdminUsers}
+                onClick={() => void handleRepairAdminUsers()}
                 disabled={isRepairing || !checkResults}
                 className="bg-gradient-to-r from-green-600 to-green-700 text-white py-4 px-6 rounded-xl font-bold text-lg hover:shadow-lg transition-all disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >

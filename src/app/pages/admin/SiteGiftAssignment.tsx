@@ -277,7 +277,7 @@ export function SiteGiftAssignment() {
       <div className="flex flex-col items-center justify-center min-h-screen">
         <Package className="w-16 h-16 text-gray-300 mb-4" />
         <p className="text-gray-600 text-lg mb-4">Site not found</p>
-        <Button onClick={() => navigate('/admin/sites')}>
+        <Button onClick={() => void navigate('/admin/sites')}>
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Sites
         </Button>
@@ -295,7 +295,7 @@ export function SiteGiftAssignment() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate('/admin/sites')}
+                onClick={() => void navigate('/admin/sites')}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
@@ -307,7 +307,7 @@ export function SiteGiftAssignment() {
             </p>
           </div>
           <Button
-            onClick={handleSave}
+            onClick={() => void handleSave()}
             disabled={isSaving}
             className="bg-[#D91C81] hover:bg-[#B01669] text-white"
           >

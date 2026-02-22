@@ -467,7 +467,7 @@ export async function updateOrderStatus(
   } : undefined;
   
   // Prepare updates
-  const updates: any = {
+  const updates: Record<string, unknown> = {
     status,
   };
   

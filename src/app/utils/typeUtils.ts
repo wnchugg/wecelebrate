@@ -105,12 +105,12 @@ export type ArrayElement<T> = T extends (infer U)[] ? U : never;
 /**
  * Function type helper
  */
-export type Func<Args extends any[] = any[], Return = any> = (...args: Args) => Return;
+export type Func<Args extends unknown[] = unknown[], Return = unknown> = (...args: Args) => Return;
 
 /**
  * Async function type helper
  */
-export type AsyncFunc<Args extends any[] = any[], Return = any> = (
+export type AsyncFunc<Args extends unknown[] = unknown[], Return = unknown> = (
   ...args: Args
 ) => Promise<Return>;
 
@@ -148,7 +148,7 @@ export type PropsWithStyle<P = {}> = P & {
 /**
  * Generic object type
  */
-export type GenericObject<T = any> = Record<string, T>;
+export type GenericObject<T = unknown> = Record<string, T>;
 
 /**
  * String literal union
@@ -158,12 +158,12 @@ export type StringLiteral<T> = T extends string ? (string extends T ? never : T)
 /**
  * Tuple to union
  */
-export type TupleToUnion<T extends readonly any[]> = T[number];
+export type TupleToUnion<T extends readonly unknown[]> = T[number];
 
 /**
  * Union to intersection
  */
-export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
+export type UnionToIntersection<U> = (U extends unknown ? (k: U) => void : never) extends (
   k: infer I
 ) => void
   ? I
@@ -245,7 +245,7 @@ export type Primitive = string | number | boolean | null | undefined | symbol | 
 /**
  * Builtin types
  */
-export type Builtin = Primitive | ((...args: any[]) => any) | Date | Error | RegExp;
+export type Builtin = Primitive | ((...args: unknown[]) => unknown) | Date | Error | RegExp;
 
 /**
  * Deep readonly
@@ -287,12 +287,12 @@ export type DeepWritable<T> = T extends Builtin
 /**
  * Class constructor type
  */
-export type Constructor<T = any> = new (...args: any[]) => T;
+export type Constructor<T = unknown> = new (...args: unknown[]) => T;
 
 /**
  * Abstract class constructor type
  */
-export type AbstractConstructor<T = any> = abstract new (...args: any[]) => T;
+export type AbstractConstructor<T = unknown> = abstract new (...args: unknown[]) => T;
 
 /**
  * Instance type from constructor
@@ -380,7 +380,7 @@ export type TypeGuard<T> = (value: unknown) => value is T;
 /**
  * Type predicate
  */
-export type TypePredicate<T> = (value: any) => value is T;
+export type TypePredicate<T> = (value: unknown) => value is T;
 
 /**
  * Comparison function

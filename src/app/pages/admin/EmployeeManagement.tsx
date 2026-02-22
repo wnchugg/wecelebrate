@@ -186,7 +186,7 @@ export function EmployeeManagement() {
           <Button
             variant="outline"
             size="sm"
-            onClick={loadEmployees}
+            onClick={() => void loadEmployees()}
             className="gap-2"
           >
             <RefreshCw className="w-4 h-4" />
@@ -462,21 +462,21 @@ export function EmployeeManagement() {
         <SiteMappingRules 
           client={currentClient} 
           sites={sites} 
-          onRulesUpdated={loadEmployees}
+          onRulesUpdated={() => void loadEmployees()}
         />
       )}
 
       {activeTab === 'manual' && (
         <ManualEmployeeUpload 
           client={currentClient} 
-          onUploadComplete={loadEmployees}
+          onUploadComplete={() => void loadEmployees()}
         />
       )}
 
       {activeTab === 'sftp' && (
         <SFTPConfiguration 
           client={currentClient}
-          onConfigUpdated={loadEmployees}
+          onConfigUpdated={() => void loadEmployees()}
         />
       )}
 
@@ -484,7 +484,7 @@ export function EmployeeManagement() {
         <HRISIntegrationTab
           client={currentClient}
           sites={sites.map(s => ({ ...s, isActive: s.status === 'active' })) as any}
-          onSyncComplete={loadEmployees}
+          onSyncComplete={() => void loadEmployees()}
         />
       )}
     </div>

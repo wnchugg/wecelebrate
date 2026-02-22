@@ -218,7 +218,7 @@ export function AdminHelper() {
           </div>
 
           <button
-            onClick={checkAdminExists}
+            onClick={() => void checkAdminExists()}
             disabled={isChecking}
             className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
@@ -274,7 +274,7 @@ export function AdminHelper() {
             </div>
           </div>
 
-          <form onSubmit={handleDiagnostic} className="space-y-4">
+          <form onSubmit={() => void handleDiagnostic()} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Diagnostic Identifier
@@ -324,7 +324,7 @@ export function AdminHelper() {
               </div>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={() => void handleLogin()} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email Address
@@ -381,7 +381,7 @@ export function AdminHelper() {
               </div>
             </div>
 
-            <form onSubmit={handleSignup} className="space-y-4">
+            <form onSubmit={() => void handleSignup()} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Full Name
@@ -464,21 +464,21 @@ export function AdminHelper() {
         <div className="mt-6 text-center">
           <div className="inline-flex gap-4 bg-white rounded-xl px-6 py-3 shadow-lg">
             <button
-              onClick={() => navigate('/admin/login')}
+              onClick={() => void navigate('/admin/login')}
               className="text-[#D91C81] font-medium hover:underline"
             >
               Go to Login Page
             </button>
             <span className="text-gray-300">|</span>
             <button
-              onClick={() => navigate('/admin/signup')}
+              onClick={() => void navigate('/admin/signup')}
               className="text-[#00B4CC] font-medium hover:underline"
             >
               Go to Signup Page
             </button>
             <span className="text-gray-300">|</span>
             <button
-              onClick={() => navigate('/admin/deployment-checklist')}
+              onClick={() => void navigate('/admin/deployment-checklist')}
               className="text-[#1B2A5E] font-medium hover:underline"
             >
               Deployment Checklist

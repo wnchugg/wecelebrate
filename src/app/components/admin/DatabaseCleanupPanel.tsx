@@ -64,7 +64,9 @@ export function DatabaseCleanupPanel() {
       
       if (data.success) {
         toast.success(`Deleted ${data.results.deleted} records`);
-        fetchStats(); // Refresh stats
+        void fetchStats().catch((error) => {
+          console.error('Error refreshing stats:', error);
+        }); // Refresh stats
       } else {
         toast.error('Cleanup failed');
       }
@@ -91,7 +93,9 @@ export function DatabaseCleanupPanel() {
       
       if (data.success) {
         toast.success(`Deleted ${data.deleted} records with prefix "${prefix}:"`);
-        fetchStats(); // Refresh stats
+        void fetchStats().catch((error) => {
+          console.error('Error refreshing stats:', error);
+        }); // Refresh stats
       } else {
         toast.error('Delete failed');
       }
@@ -129,7 +133,7 @@ export function DatabaseCleanupPanel() {
 
           <div className="flex gap-2">
             <Button
-              onClick={fetchStats}
+              onClick={() => void fetchStats()}
               disabled={analyzing}
               variant="outline"
             >
@@ -147,7 +151,7 @@ export function DatabaseCleanupPanel() {
             </Button>
 
             <Button
-              onClick={runCleanup}
+              onClick={() => void runCleanup()}
               disabled={loading}
               variant="destructive"
             >
@@ -220,7 +224,7 @@ export function DatabaseCleanupPanel() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => deletePrefix(prefix)}
+                            onClick={() => void deletePrefix(prefix)}
                             disabled={loading}
                           >
                             <Trash2 className="w-3 h-3 mr-1" />

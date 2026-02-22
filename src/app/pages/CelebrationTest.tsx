@@ -324,7 +324,7 @@ export function CelebrationTest() {
           </div>
           <p className="text-gray-600 mb-4">Verify the backend server is running and responding.</p>
           <button
-            onClick={testHealthCheck}
+            onClick={() => void testHealthCheck()}
             disabled={results.health.status === 'running'}
             className="px-6 py-2 bg-[#D91C81] text-white rounded-lg font-semibold hover:bg-[#C01872] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
@@ -407,7 +407,7 @@ export function CelebrationTest() {
           </div>
 
           <button
-            onClick={testCreateCelebration}
+            onClick={() => void testCreateCelebration()}
             disabled={results.create.status === 'running'}
             className="px-6 py-2 bg-[#D91C81] text-white rounded-lg font-semibold hover:bg-[#C01872] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
@@ -437,7 +437,7 @@ export function CelebrationTest() {
           </div>
           <p className="text-gray-600 mb-4">Retrieve all celebrations for an employee.</p>
           <button
-            onClick={testFetchCelebrations}
+            onClick={() => void testFetchCelebrations()}
             disabled={results.fetch.status === 'running'}
             className="px-6 py-2 bg-[#D91C81] text-white rounded-lg font-semibold hover:bg-[#C01872] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
@@ -495,7 +495,7 @@ export function CelebrationTest() {
           </div>
 
           <button
-            onClick={testSendInvite}
+            onClick={() => void testSendInvite()}
             disabled={results.invite.status === 'running' || !celebrationId}
             className="px-6 py-2 bg-[#D91C81] text-white rounded-lg font-semibold hover:bg-[#C01872] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
@@ -525,7 +525,7 @@ export function CelebrationTest() {
           </div>
           <p className="text-gray-600 mb-4">Test incrementing the like counter on a celebration.</p>
           <button
-            onClick={testLikeCelebration}
+            onClick={() => void testLikeCelebration()}
             disabled={results.like.status === 'running' || !celebrationId}
             className="px-6 py-2 bg-[#D91C81] text-white rounded-lg font-semibold hover:bg-[#C01872] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
@@ -555,7 +555,7 @@ export function CelebrationTest() {
           </div>
           <p className="text-gray-600 mb-4">Fetch a specific celebration by ID.</p>
           <button
-            onClick={testGetSingle}
+            onClick={() => void testGetSingle()}
             disabled={results.single.status === 'running' || !celebrationId}
             className="px-6 py-2 bg-[#D91C81] text-white rounded-lg font-semibold hover:bg-[#C01872] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
@@ -574,7 +574,7 @@ export function CelebrationTest() {
           <p className="mb-6 text-white/90">Execute all tests in sequence to verify the complete celebration system.</p>
           <div className="flex gap-4">
             <button
-              onClick={runAllTests}
+              onClick={() => void runAllTests()}
               disabled={runningAll}
               className="flex items-center gap-2 px-6 py-3 bg-white text-[#D91C81] rounded-lg font-semibold hover:bg-gray-100 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
             >

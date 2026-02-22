@@ -95,8 +95,8 @@ export function ReviewOrder() {
       
       setIsSubmitting(false);
       
-      // Navigate to confirmation page with order ID
-      void navigate(`/confirmation/${data.order.id}`);
+      // Navigate to confirmation page with order ID (relative path preserves siteId context)
+      void navigate(`../confirmation/${data.order.id}`);
     } catch (error: unknown) {
       logger.error('Failed to submit order:', error);
       setError(error instanceof Error ? error.message : t('notification.error.failedToSubmitOrder'));
@@ -136,7 +136,7 @@ export function ReviewOrder() {
                 {t('review.selectedGift')}
               </h2>
               <button
-                onClick={() => navigate('../gift-selection')}
+                onClick={() => void navigate('../gift-selection')}
                 className="flex items-center gap-2 text-[#D91C81] hover:text-[#B71569] font-medium text-sm"
               >
                 <Edit className="w-4 h-4" />
@@ -177,7 +177,7 @@ export function ReviewOrder() {
                 {t('review.shippingInformation')}
               </h2>
               <button
-                onClick={() => navigate('../shipping-information')}
+                onClick={() => void navigate('../shipping-information')}
                 className="flex items-center gap-2 text-[#D91C81] hover:text-[#B71569] font-medium text-sm"
               >
                 <Edit className="w-4 h-4" />
@@ -229,7 +229,7 @@ export function ReviewOrder() {
           {/* Submit Button */}
           <div className="flex justify-center pt-4">
             <button
-              onClick={handleSubmitOrder}
+              onClick={() => void handleSubmitOrder()}
               disabled={isSubmitting}
               className="flex items-center gap-3 bg-gradient-to-r from-[#D91C81] to-[#B71569] text-white px-12 py-5 rounded-xl font-bold text-lg transition-all disabled:bg-gray-300 disabled:cursor-not-allowed"
               style={{ boxShadow: '0 4px 12px rgba(217, 28, 129, 0.3)' }}

@@ -1,4 +1,26 @@
 {
     "git.ignoreLimitWarning": true,
-    "kiroAgent.configureMCP": "Enabled"
+    "kiroAgent.configureMCP": "Enabled",
+    "kiroAgent.trustedCommands": [
+        "npm run dev",
+        "npm run build",
+        "npm run build:staging",
+        "npm run build:production",
+        "npm run preview",
+        "npm run type-check",
+        "npm run lint",
+        "npm run lint:validate",
+        "npm run lint:baseline",
+        "npm run test:safe",
+        "npm run test:full",
+        "npm run test:all",
+        "npm run test:coverage",
+        "npm run test:watch",
+        "npm run test:e2e",
+        "npm run test:e2e:ui",
+        "npm run db-optimizer:analyze",
+        "npm run db-optimizer:generate",
+        "./deploy-backend.sh dev",
+        "./deploy-backend.sh prod"
+    ]
 }

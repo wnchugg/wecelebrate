@@ -282,7 +282,7 @@ export default function CatalogManagement() {
                         Edit
                       </Link>
                       <button
-                        onClick={() => handleDelete(catalog.id)}
+                        onClick={() => void handleDelete(catalog.id)}
                         disabled={deleting === catalog.id}
                         className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                           deleteConfirm === catalog.id

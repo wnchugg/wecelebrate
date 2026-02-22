@@ -68,11 +68,12 @@ describe('AddressInput - Validation Integration', () => {
 
   it('should validate address line for PO Box in US', async () => {
     const onChange = vi.fn();
-    
+
     render(
       <AddressInput
         defaultCountry="US"
         onChange={onChange}
+        enableAutocomplete={false}
       />
     );
 
@@ -89,11 +90,12 @@ describe('AddressInput - Validation Integration', () => {
 
   it('should validate address line for minimum length', async () => {
     const onChange = vi.fn();
-    
+
     render(
       <AddressInput
         defaultCountry="US"
         onChange={onChange}
+        enableAutocomplete={false}
       />
     );
 

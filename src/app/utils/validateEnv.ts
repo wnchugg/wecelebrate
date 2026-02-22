@@ -9,7 +9,7 @@ import { validateBuildEnvironment, detectBuildEnvironment } from '../config/buil
 import { logEnvVars } from './env';
 
 // Safe helper to access import.meta.env
-function safeGetEnv(key?: string): any {
+function safeGetEnv(key?: string): string | ImportMetaEnv | undefined {
   try {
     if (key) {
       return (import.meta.env as any)[key];

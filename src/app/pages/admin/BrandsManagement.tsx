@@ -357,7 +357,7 @@ export function BrandsManagement() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handleDelete(brand.id, brand.name)}
+                onClick={() => void handleDelete(brand.id, brand.name)}
                 disabled={isDeleting}
                 className="text-red-600 hover:text-red-700 hover:bg-red-50"
               >
@@ -390,7 +390,7 @@ export function BrandsManagement() {
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleCreateOrUpdate}>
+          <form onSubmit={() => void handleCreateOrUpdate()}>
             <div className="space-y-4">
               <div>
                 <Label htmlFor="clientId">Client *</Label>
@@ -545,7 +545,7 @@ export function BrandsManagement() {
                   className="flex-1"
                 />
                 <Button 
-                  onClick={handleExtractBranding}
+                  onClick={() => void handleExtractBranding()}
                   disabled={isExtracting || !extractUrl}
                 >
                   {isExtracting ? 'Extracting...' : 'Extract Colors'}

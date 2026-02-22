@@ -80,7 +80,7 @@ export function QuickAuthCheck() {
           <h1 className="text-2xl font-bold text-red-600 mb-4">Error</h1>
           <p className="text-gray-800">{error}</p>
           <button
-            onClick={checkAuth}
+            onClick={() => void checkAuth()}
             className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
           >
             Retry
@@ -210,7 +210,7 @@ export function QuickAuthCheck() {
 
           <div className="mt-6 flex gap-4">
             <button
-              onClick={checkAuth}
+              onClick={() => void checkAuth()}
               className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
             >
               Refresh

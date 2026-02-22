@@ -278,7 +278,7 @@ export function SFTPConfiguration({ client, onConfigUpdated }: SFTPConfiguration
 
           <div className="mt-4">
             <Button
-              onClick={handleTestConnection}
+              onClick={() => void handleTestConnection()}
               variant="outline"
               disabled={isTesting || !config.host || !config.username}
               className="gap-2"
@@ -506,7 +506,7 @@ export function SFTPConfiguration({ client, onConfigUpdated }: SFTPConfiguration
       {/* Actions */}
       <div className="flex gap-3">
         <Button
-          onClick={handleSaveConfig}
+          onClick={() => void handleSaveConfig()}
           disabled={isSaving}
           className="bg-[#D91C81] hover:bg-[#B01669] text-white"
         >
@@ -524,7 +524,7 @@ export function SFTPConfiguration({ client, onConfigUpdated }: SFTPConfiguration
         </Button>
 
         <Button
-          onClick={handleSyncNow}
+          onClick={() => void handleSyncNow()}
           variant="outline"
           disabled={!config.enabled || !testResult?.success}
         >

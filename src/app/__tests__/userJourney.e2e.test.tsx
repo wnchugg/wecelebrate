@@ -81,7 +81,7 @@ function CreateEventPage() {
           onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
         />
         <button type="submit">Create Event</button>
-        <button type="button" onClick={() => navigate('/events')}>Cancel</button>
+        <button type="button" onClick={() => void navigate('/events')}>Cancel</button>
       </form>
     </div>
   );
@@ -94,7 +94,7 @@ function EventsListPage() {
   return (
     <div>
       <h1>Events</h1>
-      <button onClick={() => navigate('/events/create')}>Create New Event</button>
+      <button onClick={() => void navigate('/events/create')}>Create New Event</button>
       <div data-testid="events-list">
         <div>Annual Awards - Dec 2026</div>
         <div>Team Building - Jan 2027</div>
@@ -110,8 +110,8 @@ function EventSuccessPage() {
   return (
     <div>
       <h1>Event Created Successfully</h1>
-      <button onClick={() => navigate('/events')}>View All Events</button>
-      <button onClick={() => navigate('/')}>Return Home</button>
+      <button onClick={() => void navigate('/events')}>View All Events</button>
+      <button onClick={() => void navigate('/')}>Return Home</button>
     </div>
   );
 }
@@ -124,9 +124,9 @@ function SiteSelectionPage() {
     <div>
       <h1>Select Your Site</h1>
       <div data-testid="site-list">
-        <button onClick={() => navigate('/site/site-1/home')}>Acme Corp</button>
-        <button onClick={() => navigate('/site/site-2/home')}>TechStart Inc</button>
-        <button onClick={() => navigate('/site/site-3/home')}>Global Solutions</button>
+        <button onClick={() => void navigate('/site/site-1/home')}>Acme Corp</button>
+        <button onClick={() => void navigate('/site/site-2/home')}>TechStart Inc</button>
+        <button onClick={() => void navigate('/site/site-3/home')}>Global Solutions</button>
       </div>
     </div>
   );
@@ -140,8 +140,8 @@ function SiteHomePage() {
     <div>
       <h1>Site Home</h1>
       <p>Welcome to your company portal</p>
-      <button onClick={() => navigate('/products')}>Browse Gifts</button>
-      <button onClick={() => navigate('/site-selection')}>Change Site</button>
+      <button onClick={() => void navigate('/products')}>Browse Gifts</button>
+      <button onClick={() => void navigate('/site-selection')}>Change Site</button>
     </div>
   );
 }
@@ -171,7 +171,7 @@ function AccessValidationPage() {
         onChange={(e) => setCode(e.target.value)}
       />
       <button onClick={handleValidate}>Validate Access</button>
-      <button onClick={() => navigate('/access/magic-link')}>Request Magic Link</button>
+      <button onClick={() => void navigate('/access/magic-link')}>Request Magic Link</button>
     </div>
   );
 }
@@ -198,12 +198,12 @@ function MagicLinkRequestPage() {
             onChange={(e) => setEmail(e.target.value)}
           />
           <button onClick={handleRequest}>Send Magic Link</button>
-          <button onClick={() => navigate('/access')}>Back</button>
+          <button onClick={() => void navigate('/access')}>Back</button>
         </>
       ) : (
         <>
           <p data-testid="magic-link-sent">Check your email for the magic link</p>
-          <button onClick={() => navigate('/')}>Return Home</button>
+          <button onClick={() => void navigate('/')}>Return Home</button>
         </>
       )}
     </div>
@@ -219,7 +219,7 @@ function OrderHistoryPage() {
     return (
       <div>
         <p>Please login to view order history</p>
-        <button onClick={() => navigate('/login')}>Login</button>
+        <button onClick={() => void navigate('/login')}>Login</button>
       </div>
     );
   }
@@ -232,7 +232,7 @@ function OrderHistoryPage() {
         <div>Order #1235 - In Transit</div>
         <div>Order #1236 - Processing</div>
       </div>
-      <button onClick={() => navigate('/products')}>Shop Again</button>
+      <button onClick={() => void navigate('/products')}>Shop Again</button>
     </div>
   );
 }
@@ -250,7 +250,7 @@ function ProfileSettingsPage() {
     return (
       <div>
         <p>Please login</p>
-        <button onClick={() => navigate('/login')}>Login</button>
+        <button onClick={() => void navigate('/login')}>Login</button>
       </div>
     );
   }
@@ -273,7 +273,7 @@ function ProfileSettingsPage() {
         onChange={(e) => setProfile({ ...profile, email: e.target.value })}
       />
       <button onClick={handleSave}>Save Changes</button>
-      <button onClick={() => navigate('/')}>Cancel</button>
+      <button onClick={() => void navigate('/')}>Cancel</button>
     </div>
   );
 }
@@ -574,7 +574,7 @@ describe('User Journey E2E Suite', () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
-            <button onClick={() => navigate('/')}>Save Changes</button>
+            <button onClick={() => void navigate('/')}>Save Changes</button>
           </div>
         );
       };

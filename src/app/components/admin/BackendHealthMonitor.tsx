@@ -141,13 +141,17 @@ export function BackendHealthMonitor() {
       clearTimeout(wakeTimeoutId);
       
       setTimeout(() => {
-        checkHealth(false);
+        void checkHealth(false).catch((error) => {
+          console.error('Error checking health after wake:', error);
+        });
         showSuccessToast('Backend Awakened', 'Edge Function is now active');
       }, 1000);
     } catch (error: unknown) {
       // Ignore timeout errors during wake-up, just check health after
       setTimeout(() => {
-        checkHealth(false);
+        void checkHealth(false).catch((error) => {
+          console.error('Error checking health after wake error:', error);
+        });
       }, 1000);
     } finally {
       setIsChecking(false);
@@ -213,11 +217,15 @@ export function BackendHealthMonitor() {
   useEffect(() => {
     if (autoMonitor) {
       // Check immediately on mount
-      checkHealth(true);
+      void checkHealth(true).catch((error) => {
+        console.error('Error in auto-monitor initial check:', error);
+      });
 
       // Then check every 30 seconds
       const interval = setInterval(() => {
-        checkHealth(true);
+        void checkHealth(true).catch((error) => {
+          console.error('Error in auto-monitor interval check:', error);
+        });
       }, 30000);
 
       return () => clearInterval(interval);
@@ -383,7 +391,7 @@ export function BackendHealthMonitor() {
           </button>
 
           <button
-            onClick={wakeUpBackend}
+            onClick={() => void wakeUpBackend()}
             disabled={isChecking}
             className="flex items-center gap-2 px-4 py-2 bg-[#00B4CC] text-white rounded-lg hover:bg-[#0099B3] transition-colors disabled:opacity-50"
           >
@@ -392,7 +400,7 @@ export function BackendHealthMonitor() {
           </button>
 
           <button
-            onClick={testDatabase}
+            onClick={() => void testDatabase()}
             disabled={isChecking}
             className="flex items-center gap-2 px-4 py-2 bg-[#1B2A5E] text-white rounded-lg hover:bg-[#152247] transition-colors disabled:opacity-50"
           >

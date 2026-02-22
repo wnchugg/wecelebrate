@@ -216,7 +216,7 @@ export function EmailNotificationConfiguration() {
                             </button>
 
                             <button
-                              onClick={() => handleDeleteTemplate(template.id)}
+                              onClick={() => void handleDeleteTemplate(template.id)}
                               className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             >
                               <Trash2 className="w-5 h-5" />
@@ -315,7 +315,7 @@ export function EmailNotificationConfiguration() {
                     <div
                       key={globalTemplate.id}
                       className="border border-gray-200 rounded-lg p-4 hover:border-[#D91C81] hover:bg-pink-50 transition-all cursor-pointer"
-                      onClick={() => handleAddTemplate(globalTemplate.id)}
+                      onClick={() => void handleAddTemplate(globalTemplate.id)}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">

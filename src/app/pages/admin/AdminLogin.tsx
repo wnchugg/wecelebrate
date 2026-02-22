@@ -206,7 +206,7 @@ export default function AdminLogin(): JSX.Element {
         )}
 
         {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={(e) => void handleSubmit(e)} noValidate className="space-y-6">
           {/* Identifier Field (Email or Username) */}
           <div>
             <label htmlFor="identifier" className="block text-sm font-medium text-gray-700 mb-2">

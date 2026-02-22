@@ -225,7 +225,7 @@ class TokenManager {
   /**
    * Parse JWT token (without verification - for display only)
    */
-  parseToken(token: string): any {
+  parseToken(token: string): Record<string, unknown> | null {
     try {
       const parts = token.split('.');
       if (parts.length !== 3) {
@@ -234,7 +234,7 @@ class TokenManager {
 
       const payload = parts[1];
       const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
-      return JSON.parse(decoded);
+      return JSON.parse(decoded) as Record<string, unknown>;
     } catch (e) {
       logger.error('[TokenManager] Failed to parse token:', e);
       return null;
@@ -326,15 +326,15 @@ export const clearRefreshToken = () => {
   storage.removeItem('refresh_token');
 };
 
-export const parseJWT = (token: string): { header: any; payload: any; signature: string } | null => {
+export const parseJWT = (token: string): { header: Record<string, unknown>; payload: Record<string, unknown>; signature: string } | null => {
   try {
     const parts = token.split('.');
     if (parts.length !== 3) {
       return null;
     }
 
-    const header = JSON.parse(atob(parts[0].replace(/-/g, '+').replace(/_/g, '/')));
-    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+    const header = JSON.parse(atob(parts[0].replace(/-/g, '+').replace(/_/g, '/'))) as Record<string, unknown>;
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))) as Record<string, unknown>;
     const signature = parts[2];
 
     return { header, payload, signature };

@@ -48,7 +48,7 @@ export function DeveloperTools() {
       const token = getAccessToken();
       const env = getCurrentEnvironment();
       
-      const diagnostic: any = {
+      const diagnostic: Record<string, unknown> = {
         timestamp: new Date().toISOString(),
         environment: env.id,
         tokenExists: !!token,
@@ -112,7 +112,7 @@ export function DeveloperTools() {
   // Connection Test Logic
   const runConnectionTest = async () => {
     setIsLoadingConnection(true);
-    const results: any = {
+    const results: Record<string, unknown> = {
       timestamp: new Date().toISOString(),
       figmaMakeConfig: {
         projectId,
@@ -192,7 +192,7 @@ export function DeveloperTools() {
     const token = getAccessToken();
     const baseUrl = `https://${projectId}.supabase.co/functions/v1/make-server-6fcaeea3`;
 
-    const diagnosticResults: any = {
+    const diagnosticResults: Record<string, unknown> = {
       environment: {
         projectId: projectId,
         baseUrl: baseUrl,
@@ -213,7 +213,7 @@ export function DeveloperTools() {
 
     for (const endpoint of endpoints) {
       try {
-        const headers: any = {
+        const headers: Record<string, string> = {
           'Content-Type': 'application/json',
         };
 
@@ -229,7 +229,7 @@ export function DeveloperTools() {
           headers,
         });
 
-        let data: any = null;
+        let data: unknown = null;
         let parseError: string | null = null;
         let responseText = '';
         try {
@@ -274,7 +274,7 @@ export function DeveloperTools() {
       return;
     }
 
-    const headers: any = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'X-Access-Token': token,
       'Authorization': `Bearer ${publicAnonKey}`,
@@ -332,7 +332,7 @@ export function DeveloperTools() {
       return;
     }
 
-    const headers: any = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'X-Access-Token': token,
       'Authorization': `Bearer ${publicAnonKey}`,
@@ -572,7 +572,7 @@ export function DeveloperTools() {
                   <CardDescription>Comprehensive environment and connection testing</CardDescription>
                 </div>
                 <Button
-                  onClick={runConnectionTest}
+                  onClick={() => void runConnectionTest()}
                   disabled={isLoadingConnection}
                   className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
@@ -705,7 +705,7 @@ export function DeveloperTools() {
                   <CardDescription>Check backend connectivity and data availability</CardDescription>
                 </div>
                 <Button
-                  onClick={runDataDiagnostic}
+                  onClick={() => void runDataDiagnostic()}
                   disabled={isLoadingData}
                   className="bg-[#D91C81] hover:bg-[#B01669] text-white"
                 >
@@ -829,7 +829,7 @@ export function DeveloperTools() {
                   {/* Reseed Button - Always visible */}
                   <div className="flex justify-center gap-4 pt-4">
                     <Button
-                      onClick={clearAllData}
+                      onClick={() => void clearAllData()}
                       disabled={isClearing}
                       size="lg"
                       variant="outline"
@@ -848,7 +848,7 @@ export function DeveloperTools() {
                       )}
                     </Button>
                     <Button
-                      onClick={reseedDatabase}
+                      onClick={() => void reseedDatabase()}
                       disabled={isSeeding}
                       size="lg"
                       className="bg-gradient-to-r from-[#D91C81] to-[#B01669] hover:from-[#B01669] hover:to-[#8B1352] text-white font-semibold shadow-lg"
@@ -879,7 +879,7 @@ export function DeveloperTools() {
                       Click below to populate the database with sample clients, sites, gifts, employees, and test data.
                     </p>
                     <Button
-                      onClick={reseedDatabase}
+                      onClick={() => void reseedDatabase()}
                       disabled={isSeeding}
                       size="lg"
                       className="bg-gradient-to-r from-[#D91C81] to-[#B01669] hover:from-[#B01669] hover:to-[#8B1352] text-white font-bold shadow-xl text-lg px-8 py-6 h-auto"
@@ -924,7 +924,7 @@ export function DeveloperTools() {
             <CardContent className="space-y-6">
               <div className="flex justify-center">
                 <Button
-                  onClick={runJWTDiagnostic}
+                  onClick={() => void runJWTDiagnostic()}
                   disabled={isCheckingJWT}
                   className="bg-[#D91C81] hover:bg-[#B01669] text-white"
                 >

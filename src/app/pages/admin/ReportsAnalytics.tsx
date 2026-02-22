@@ -498,14 +498,14 @@ export function ReportsAnalytics() {
           <Button
             variant="outline"
             size="sm"
-            onClick={loadAllData}
+            onClick={() => void loadAllData()}
             className="gap-2"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
           </Button>
           <Button
-            onClick={() => handleExport('csv')}
+            onClick={() => void handleExport('csv')}
             className="bg-[#D91C81] hover:bg-[#B01669] text-white gap-2"
             size="sm"
           >

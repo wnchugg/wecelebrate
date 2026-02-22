@@ -224,14 +224,14 @@ export function ExecutiveDashboard() {
           <Button
             variant="outline"
             size="sm"
-            onClick={loadData}
+            onClick={() => void loadData()}
             className="gap-2"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
           </Button>
           <Button
-            onClick={() => navigate('/admin/reports')}
+            onClick={() => void navigate('/admin/reports')}
             className="bg-[#D91C81] hover:bg-[#B01669] text-white gap-2"
             size="sm"
           >
@@ -429,7 +429,7 @@ export function ExecutiveDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card 
           className="cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => navigate('/admin/client-analytics')}
+          onClick={() => void navigate('/admin/client-analytics')}
         >
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -444,7 +444,7 @@ export function ExecutiveDashboard() {
 
         <Card 
           className="cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => navigate('/admin/celebration-analytics')}
+          onClick={() => void navigate('/admin/celebration-analytics')}
         >
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -459,7 +459,7 @@ export function ExecutiveDashboard() {
 
         <Card 
           className="cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => navigate('/admin/reports')}
+          onClick={() => void navigate('/admin/reports')}
         >
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">

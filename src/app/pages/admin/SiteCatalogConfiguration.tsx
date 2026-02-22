@@ -647,7 +647,7 @@ export default function SiteCatalogConfiguration() {
         <div className="flex items-center justify-end gap-4">
           <button
             type="button"
-            onClick={loadData}
+            onClick={() => void loadData()}
             disabled={saving}
             className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
           >
@@ -656,7 +656,7 @@ export default function SiteCatalogConfiguration() {
           </button>
           <button
             type="button"
-            onClick={handleSave}
+            onClick={() => void handleSave()}
             disabled={saving || !selectedCatalogId}
             className="px-6 py-2 bg-[#D91C81] text-white rounded-lg hover:bg-[#B91670] transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >

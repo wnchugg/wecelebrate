@@ -217,7 +217,7 @@ export function ManualEmployeeUpload({ client, onUploadComplete }: ManualEmploye
 
             {/* Upload Button */}
             <Button
-              onClick={handleUpload}
+              onClick={() => void handleUpload()}
               disabled={!selectedFile || isImporting}
               className="w-full bg-[#D91C81] hover:bg-[#B01669] text-white"
             >

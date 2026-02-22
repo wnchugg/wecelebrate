@@ -23,6 +23,7 @@ import {
 } from "./securityHeaders.ts";
 import { rateLimit as enhancedRateLimit, RATE_LIMIT_CONFIGS } from "./rateLimit.ts";
 import * as kv from "./kv_env.ts"; // Use environment-aware KV store
+import * as db from "./database/db.ts"; // PostgreSQL database access
 import * as erp from "./erp_integration.ts";
 import * as erpEnhanced from "./erp_integration_enhanced.ts";
 import * as scheduler from "./erp_scheduler.ts";
@@ -6664,14 +6665,15 @@ app.get("/make-server-6fcaeea3/public/gifts/:giftId", async (c) => {
 // Create order (PUBLIC - with session verification)
 app.post("/make-server-6fcaeea3/public/orders", async (c) => {
   const environmentId = c.req.header('X-Environment-ID') || 'development';
-  const sessionToken = c.req.header('Authorization')?.replace('Bearer ', '');
-  
+  // Read session token from X-Session-Token header (preferred) or Authorization Bearer fallback
+  const sessionToken = c.req.header('X-Session-Token') || c.req.header('Authorization')?.replace('Bearer ', '');
+
   try {
     // Verify session token
     if (!sessionToken) {
       return c.json({ error: 'Session token required' }, 401);
     }
-    
+
     const session = await kv.get(`session:${sessionToken}`, environmentId);
     
     if (!session) {
@@ -6700,31 +6702,29 @@ app.post("/make-server-6fcaeea3/public/orders", async (c) => {
       }
     }
     
-    // Get gift details
-    const gift = await kv.get(`gift:${giftId}`, environmentId);
-    
+    // Get gift details from PostgreSQL database
+    const gift = await giftsApi.getGiftById(environmentId, giftId);
+
     if (!gift) {
       return c.json({ error: 'Gift not found' }, 404);
     }
-    
+
     if (gift.status !== 'active') {
       return c.json({ error: 'Gift is not available' }, 400);
     }
-    
+
     // Check inventory
-    if (gift.inventoryTracking) {
-      const requestedQty = quantity || 1;
-      if ((gift.inventoryQuantity || 0) < requestedQty) {
-        return c.json({ 
-          error: 'Insufficient inventory',
-          available: gift.inventoryQuantity || 0,
-          requested: requestedQty
-        }, 400);
-      }
+    const requestedQty = quantity || 1;
+    if (gift.availableQuantity > 0 && gift.availableQuantity < requestedQty) {
+      return c.json({
+        error: 'Insufficient inventory',
+        available: gift.availableQuantity,
+        requested: requestedQty
+      }, 400);
     }
-    
-    // Get site details
-    const site = await kv.get(`site:${session.siteId}`, environmentId);
+
+    // Get site details from PostgreSQL database
+    const site = await db.getSiteById(session.siteId);
     if (!site) {
       return c.json({ error: 'Site not found' }, 404);
     }
@@ -6735,32 +6735,32 @@ app.post("/make-server-6fcaeea3/public/orders", async (c) => {
     
     // Calculate totals
     const orderQuantity = quantity || 1;
-    const itemValue = gift.value || 0;
+    const itemValue = gift.price || 0;
     const totalValue = itemValue * orderQuantity;
-    
+
     // Create order object
     const order = {
       id: orderId,
       orderNumber,
       status: 'pending',
-      
+
       // Employee information
       employeeId: session.employeeId,
       employeeName: session.employeeName,
       employeeEmail: session.employeeEmail,
-      
+
       // Site information
       siteId: session.siteId,
       siteName: site.name,
-      clientId: site.clientId,
-      clientName: site.clientName,
-      
+      clientId: site.client_id,
+      clientName: null,
+
       // Gift information
       giftId: gift.id,
       giftName: gift.name,
       giftDescription: gift.description,
       giftCategory: gift.category,
-      giftImageUrl: gift.imageUrl,
+      giftImageUrl: gift.image,
       
       // Order details
       quantity: orderQuantity,
@@ -6789,15 +6789,9 @@ app.post("/make-server-6fcaeea3/public/orders", async (c) => {
       deliveredAt: null
     };
     
-    // Save order to database
+    // Save order to KV for quick retrieval on confirmation page
     await kv.set(orderId, order, environmentId);
-    
-    // Update gift inventory
-    if (gift.inventoryTracking) {
-      gift.inventoryQuantity = (gift.inventoryQuantity || 0) - orderQuantity;
-      await kv.set(`gift:${giftId}`, gift, environmentId);
-    }
-    
+
     // Send order confirmation email
     try {
       await emailService.sendOrderConfirmationEmail({
@@ -6806,7 +6800,7 @@ app.post("/make-server-6fcaeea3/public/orders", async (c) => {
         orderNumber: orderNumber,
         giftName: gift.name,
         giftDescription: gift.description,
-        giftImageUrl: gift.imageUrl,
+        giftImageUrl: gift.image,
         quantity: orderQuantity,
         shippingAddress: `${shippingAddress.fullName}, ${shippingAddress.addressLine1}, ${shippingAddress.city}, ${shippingAddress.state} ${shippingAddress.postalCode}`,
         estimatedDelivery: 'within 7-10 business days',
@@ -6829,7 +6823,7 @@ app.post("/make-server-6fcaeea3/public/orders", async (c) => {
         },
         {
           name: gift.name,
-          imageUrl: gift.imageUrl,
+          imageUrl: gift.image,
         },
         environmentId
       );
@@ -6892,7 +6886,8 @@ app.post("/make-server-6fcaeea3/public/orders", async (c) => {
 app.get("/make-server-6fcaeea3/public/orders/:orderId", async (c) => {
   const environmentId = c.req.header('X-Environment-ID') || 'development';
   const orderId = c.req.param('orderId');
-  const sessionToken = c.req.header('Authorization')?.replace('Bearer ', '');
+  // Read session token from X-Session-Token header (preferred) or Authorization Bearer fallback
+  const sessionToken = c.req.header('X-Session-Token') || c.req.header('Authorization')?.replace('Bearer ', '');
   
   try {
     // Verify session token

@@ -181,7 +181,7 @@ export function OrderTracking() {
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <p className="text-red-500 text-lg font-bold mb-4">{error || 'Order not found'}</p>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => void navigate('/')}
             className="text-[#D91C81] hover:text-[#B71569] font-medium"
           >
             Return Home
@@ -202,7 +202,7 @@ export function OrderTracking() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => navigate('/')}
+                onClick={() => void navigate('/')}
                 className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
                 aria-label="Back"
               >

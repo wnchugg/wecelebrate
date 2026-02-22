@@ -30,7 +30,7 @@ function ErrorPage() {
     <div>
       <h1>Something went wrong</h1>
       <p>An unexpected error occurred</p>
-      <button onClick={() => navigate('/')}>Return Home</button>
+      <button onClick={() => void navigate('/')}>Return Home</button>
       <button onClick={() => window.location.reload()}>Reload Page</button>
     </div>
   );
@@ -45,10 +45,10 @@ function SessionExpiredPage() {
     <div>
       <h1>Session Expired</h1>
       <p>Your session has expired. Please login again.</p>
-      <button onClick={() => navigate('/login', { state: { from: location } })}>
+      <button onClick={() => void navigate('/login', { state: { from: location } })}>
         Login Again
       </button>
-      <button onClick={() => navigate('/')}>Go Home</button>
+      <button onClick={() => void navigate('/')}>Go Home</button>
     </div>
   );
 }
@@ -69,7 +69,7 @@ function NetworkErrorPage() {
       <p>Unable to connect to the server</p>
       {retrying && <p data-testid="retrying">Retrying...</p>}
       <button onClick={handleRetry}>Retry Connection</button>
-      <button onClick={() => navigate('/')}>Go Home</button>
+      <button onClick={() => void navigate('/')}>Go Home</button>
     </div>
   );
 }
@@ -153,7 +153,7 @@ function CatalogConfigPage() {
         Enable Catalog
       </label>
       <button onClick={handleSave}>Save Configuration</button>
-      <button onClick={() => navigate('/admin/catalogs')}>Cancel</button>
+      <button onClick={() => void navigate('/admin/catalogs')}>Cancel</button>
     </div>
   );
 }
@@ -201,8 +201,8 @@ function SiteCatalogAssignmentPage() {
         </label>
       </div>
       <p data-testid="assignment-count">{assignments.length} catalogs assigned</p>
-      <button onClick={() => navigate('/admin/sites')}>Save Assignment</button>
-      <button onClick={() => navigate('/admin/sites')}>Cancel</button>
+      <button onClick={() => void navigate('/admin/sites')}>Save Assignment</button>
+      <button onClick={() => void navigate('/admin/sites')}>Cancel</button>
     </div>
   );
 }
@@ -740,7 +740,7 @@ describe('Complex Scenarios E2E Suite', () => {
         return (
           <div>
             <p data-testid="cart-count">Cart: {totalItems}</p>
-            <button onClick={() => navigate('/other')}>Navigate</button>
+            <button onClick={() => void navigate('/other')}>Navigate</button>
           </div>
         );
       };

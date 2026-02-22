@@ -167,7 +167,7 @@ export function AccessGroupManagement() {
 
       const method = selectedGroup ? 'PUT' : 'POST';
 
-      const body: any = {
+      const body: Record<string, unknown> = {
         name: formData.name,
         description: formData.description,
         type: formData.type,
@@ -486,7 +486,7 @@ export function AccessGroupManagement() {
                             <Edit2 className="w-4 h-4 text-gray-600" />
                           </button>
                           <button 
-                            onClick={() => handleDeleteAccessGroup(group)}
+                            onClick={() => void handleDeleteAccessGroup(group)}
                             disabled={isSaving}
                             className="p-2 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Delete Access Group"
@@ -690,7 +690,7 @@ export function AccessGroupManagement() {
                 Cancel
               </button>
               <button
-                onClick={handleSaveAccessGroup}
+                onClick={() => void handleSaveAccessGroup()}
                 disabled={isSaving}
                 className="px-4 py-2 bg-[#D91C81] text-white rounded-lg font-semibold hover:bg-[#B71569] transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
               >

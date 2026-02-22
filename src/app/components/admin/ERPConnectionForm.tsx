@@ -679,7 +679,7 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
           <div className="flex gap-3">
             {isEdit && (
               <button
-                onClick={handleTest}
+                onClick={() => void handleTest()}
                 disabled={testing}
                 className="px-6 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors flex items-center gap-2 disabled:opacity-50"
               >
@@ -698,7 +698,7 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
             )}
 
             <button
-              onClick={handleSave}
+              onClick={() => void handleSave()}
               disabled={saving}
               className="px-6 py-2 bg-[#D91C81] text-white rounded-lg hover:bg-[#B91670] transition-colors flex items-center gap-2 disabled:opacity-50"
             >

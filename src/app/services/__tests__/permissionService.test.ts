@@ -14,7 +14,7 @@ import {
 import { supabase } from '../../lib/supabase';
 
 // Mock supabase
-vi.mock('../../lib/supabaseClient', () => ({
+vi.mock('../../lib/supabase', () => ({
   supabase: {
     auth: {
       getUser: vi.fn(),

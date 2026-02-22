@@ -105,7 +105,7 @@ export function Cart() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Button */}
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => void navigate(-1)}
           className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -269,7 +269,7 @@ export function Cart() {
 
                     {/* Checkout Button */}
                     <Button
-                      onClick={handleCheckout}
+                      onClick={() => void handleCheckout()}
                       disabled={isProcessing || items.length === 0}
                       className="w-full bg-[#D91C81] hover:bg-[#B71569] text-white py-6 text-lg font-semibold"
                     >

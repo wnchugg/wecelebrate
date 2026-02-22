@@ -417,7 +417,7 @@ export function SiteGiftConfiguration() {
                 View Live
               </Button>
               <Button
-                onClick={handlePublish}
+                onClick={() => void handlePublish()}
                 className="bg-green-600 hover:bg-green-700 text-white"
                 disabled={isPublishing}
                 size="sm"

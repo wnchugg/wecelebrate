@@ -68,7 +68,7 @@ export function CopyButton({
 
   return (
     <button
-      onClick={handleCopy}
+      onClick={() => void handleCopy()}
       className={`
         inline-flex items-center gap-1.5 rounded transition-all
         ${sizeClasses[size]}

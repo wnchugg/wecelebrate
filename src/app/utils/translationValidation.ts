@@ -85,33 +85,24 @@ export function validateTranslations(
  * Requirements: 5.1, 5.2, 5.3
  */
 export function canPublishTranslations(
-  translations: any,
+  translations: Record<string, unknown>,
   requiredFields: string[],
   defaultLanguage: string
 ): PublishValidationResult {
   const missingDefaultTranslations: string[] = [];
-  
+
   // Check each required field for default language translation
   for (const field of requiredFields) {
-    // Navigate the nested path
-    const parts = field.split('.');
-    let current: any = translations;
-    
-    // Navigate to the field
-    for (const part of parts) {
-      if (!current || typeof current !== 'object') {
-        current = null;
-        break;
-      }
-      current = current[part];
-    }
-    
+    // Access the field directly (flat key structure)
+    const fieldTranslations = translations[field];
+
     // Check if we have a translation object with the default language
-    if (!current || typeof current !== 'object') {
+    if (!fieldTranslations || typeof fieldTranslations !== 'object') {
       missingDefaultTranslations.push(field);
       continue;
     }
-    
+
+    const current = fieldTranslations as Record<string, unknown>;
     const translation = current[defaultLanguage];
     
     if (!translation || typeof translation !== 'string' || translation.trim().length === 0) {

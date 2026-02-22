@@ -243,7 +243,7 @@ export function SSOValidation() {
             {/* SSO Button */}
             <div className="space-y-6">
               <button
-                onClick={handleSSOLogin}
+                onClick={() => void handleSSOLogin()}
                 disabled={isInitiating || isSiteLoading}
                 className="w-full bg-white border-2 border-gray-300 hover:border-gray-400 text-gray-800 py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all disabled:bg-gray-100 disabled:cursor-not-allowed flex items-center justify-center gap-3 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-offset-2 min-h-[44px]"
               >

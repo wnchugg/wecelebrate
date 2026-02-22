@@ -97,9 +97,9 @@ function ProgrammaticNavigationTest() {
   return (
     <div>
       <h1>Navigation Test</h1>
-      <button onClick={() => navigate('/products')}>Navigate to Products</button>
-      <button onClick={() => navigate(-1)}>Go Back</button>
-      <button onClick={() => navigate(1)}>Go Forward</button>
+      <button onClick={() => void navigate('/products')}>Navigate to Products</button>
+      <button onClick={() => void navigate(-1)}>Go Back</button>
+      <button onClick={() => void navigate(1)}>Go Forward</button>
     </div>
   );
 }

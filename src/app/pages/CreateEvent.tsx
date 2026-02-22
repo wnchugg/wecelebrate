@@ -232,7 +232,7 @@ export function CreateEvent() {
               type="button"
               variant="outline"
               className="flex-1"
-              onClick={() => navigate(-1)}
+              onClick={() => void navigate(-1)}
             >
               Cancel
             </Button>

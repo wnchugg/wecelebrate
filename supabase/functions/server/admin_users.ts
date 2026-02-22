@@ -170,7 +170,7 @@ export async function updateAdminUser(
     }
 
     // Sanitize inputs if provided
-    const sanitizedUpdates: any = {};
+    const sanitizedUpdates: Record<string, unknown> = {};
     if (updates.username) {
       sanitizedUpdates.username = sanitize.string(updates.username);
     }
@@ -201,7 +201,7 @@ export async function updateAdminUser(
 
     // Update user metadata in Supabase Auth if email or username changed
     if (sanitizedUpdates.email || sanitizedUpdates.username || sanitizedUpdates.role) {
-      const authUpdates: any = {};
+      const authUpdates: Record<string, unknown> = {};
       
       if (sanitizedUpdates.email) {
         authUpdates.email = sanitizedUpdates.email;

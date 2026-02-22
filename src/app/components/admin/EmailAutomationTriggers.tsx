@@ -197,7 +197,7 @@ export function EmailAutomationTriggers({ siteId, templates }: EmailAutomationTr
 
     setIsSaving(true);
     try {
-      const ruleData: any = {
+      const ruleData: Record<string, unknown> = {
         siteId,
         name: formData.name.trim(),
         description: formData.description.trim(),
@@ -207,7 +207,7 @@ export function EmailAutomationTriggers({ siteId, templates }: EmailAutomationTr
       };
 
       // Add conditions based on trigger type
-      const conditions: any = {};
+      const conditions: Record<string, unknown> = {};
       if (formData.trigger === 'selection_expiring' && formData.daysBeforeExpiry) {
         conditions.daysBeforeExpiry = parseInt(formData.daysBeforeExpiry);
       }
@@ -361,7 +361,7 @@ export function EmailAutomationTriggers({ siteId, templates }: EmailAutomationTr
                   {/* Actions */}
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => toggleRule(rule.id)}
+                      onClick={() => void toggleRule(rule.id)}
                       className={`p-2 rounded-lg transition-colors ${
                         rule.enabled
                           ? 'text-green-600 hover:bg-green-50'
@@ -379,7 +379,7 @@ export function EmailAutomationTriggers({ siteId, templates }: EmailAutomationTr
                       <Edit className="w-5 h-5" />
                     </button>
                     <button
-                      onClick={() => deleteRule(rule.id)}
+                      onClick={() => void deleteRule(rule.id)}
                       className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="Delete rule"
                     >
@@ -577,7 +577,7 @@ export function EmailAutomationTriggers({ siteId, templates }: EmailAutomationTr
                 Cancel
               </button>
               <button
-                onClick={handleSaveRule}
+                onClick={() => void handleSaveRule()}
                 disabled={isSaving}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-[#D91C81] text-white rounded-lg hover:bg-[#B71569] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >

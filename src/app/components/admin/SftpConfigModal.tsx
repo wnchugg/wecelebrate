@@ -380,7 +380,7 @@ export function SftpConfigModal({ open, onClose, config, onSave }: SftpConfigMod
           {formData.enabled && (
             <div>
               <Button
-                onClick={handleTestConnection}
+                onClick={() => void handleTestConnection()}
                 disabled={testing || !formData.host || !formData.username}
                 variant="outline"
                 className="w-full"

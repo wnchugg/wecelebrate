@@ -372,7 +372,7 @@ As a token of our appreciation for your continued service, we invite you to sele
           {/* View All Messages Link */}
           <div className="text-center">
             <button
-              onClick={() => navigate('/celebration')}
+              onClick={() => void navigate('/celebration')}
               className="inline-flex items-center gap-2 text-lg font-semibold hover:gap-3 transition-all"
               style={{ color: primaryColor }}
             >

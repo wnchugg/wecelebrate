@@ -342,7 +342,7 @@ export function CelebrationCreate() {
           {/* Back Button */}
           <div className="text-center">
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => void navigate(-1)}
               className="text-gray-600 hover:text-gray-900 font-medium inline-flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -640,7 +640,7 @@ export function CelebrationCreate() {
               Edit Message
             </button>
             <button
-              onClick={handleSubmit}
+              onClick={() => void handleSubmit()}
               className="flex-1 px-6 py-4 bg-[#D91C81] text-white rounded-xl font-semibold hover:bg-[#C01872] transition-colors flex items-center justify-center gap-2"
             >
               <Send className="w-5 h-5" />
@@ -716,7 +716,7 @@ export function CelebrationCreate() {
 
           {/* Done Button */}
           <button
-            onClick={() => navigate('/')}
+            onClick={() => void navigate('/')}
             className="w-full px-8 py-4 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
           >
             Done
@@ -750,7 +750,7 @@ export function CelebrationCreate() {
                   Cancel
                 </button>
                 <button
-                  onClick={handleSendInvite}
+                  onClick={() => void handleSendInvite()}
                   disabled={!inviteEmail}
                   className="flex-1 px-6 py-3 bg-[#D91C81] text-white rounded-xl font-semibold hover:bg-[#C01872] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                 >

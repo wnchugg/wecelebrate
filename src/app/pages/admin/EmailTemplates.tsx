@@ -307,7 +307,7 @@ export function EmailTemplates() {
           <Button
             variant="outline"
             size="sm"
-            onClick={loadTemplates}
+            onClick={() => void loadTemplates()}
             className="gap-2"
           >
             <RefreshCw className="w-4 h-4" />
@@ -504,7 +504,7 @@ export function EmailTemplates() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => duplicateTemplate(template)}
+                      onClick={() => void duplicateTemplate(template)}
                       title="Duplicate"
                     >
                       <Copy className="w-4 h-4" />
@@ -530,7 +530,7 @@ export function EmailTemplates() {
         <TemplateEditor
           template={editingTemplate}
           onClose={() => setEditingTemplate(null)}
-          onSave={handleSaveTemplate}
+          onSave={() => void handleSaveTemplate()}
         />
       )}
 
@@ -547,7 +547,7 @@ export function EmailTemplates() {
         <TestEmailDialog
           template={testingTemplate}
           onClose={() => setTestingTemplate(null)}
-          onSend={handleTestEmail}
+          onSend={() => void handleTestEmail()}
         />
       )}
     </div>

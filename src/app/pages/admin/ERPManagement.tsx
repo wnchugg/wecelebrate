@@ -380,7 +380,7 @@ export function ERPManagement() {
                   {/* Actions */}
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => handleTestConnection(connection)}
+                      onClick={() => void handleTestConnection(connection)}
                       disabled={testingConnection === connection.id}
                       className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
                       title="Test Connection"
@@ -402,14 +402,14 @@ export function ERPManagement() {
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleDeleteConnection(connection.id)}
+                      onClick={() => void handleDeleteConnection(connection.id)}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="Delete Connection"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => toggleExpand(connection.id)}
+                      onClick={() => void toggleExpand(connection.id)}
                       className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                       title="Toggle Details"
                     >
@@ -459,7 +459,7 @@ export function ERPManagement() {
                       </h4>
                       <div className="flex items-center gap-3 flex-wrap">
                         <button
-                          onClick={() => handleSyncProducts(connection.id)}
+                          onClick={() => void handleSyncProducts(connection.id)}
                           disabled={syncingConnection === connection.id}
                           className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
                         >
@@ -471,7 +471,7 @@ export function ERPManagement() {
                           Sync Products
                         </button>
                         <button
-                          onClick={() => handleSyncInventory(connection.id)}
+                          onClick={() => void handleSyncInventory(connection.id)}
                           disabled={syncingConnection === connection.id}
                           className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
                         >
@@ -803,7 +803,7 @@ function ERPConnectionModal({ connection, onClose, onSave }: ERPConnectionModalP
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto space-y-6">
+        <form onSubmit={() => void handleSubmit()} className="flex-1 overflow-y-auto space-y-6">
           {/* Basic Info */}
           <div className="space-y-4">
             <div>

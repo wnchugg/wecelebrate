@@ -60,7 +60,7 @@ export default function AuthDiagnostic() {
   const testConnection = async () => {
     setTesting(true);
     const env = getCurrentEnvironment();
-    const results: any = {
+    const results: Record<string, unknown> = {
       tests: []
     };
 
@@ -218,7 +218,7 @@ export default function AuthDiagnostic() {
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">Connection Test</h2>
           <button
-            onClick={testConnection}
+            onClick={() => void testConnection()}
             disabled={testing}
             className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
           >

@@ -96,7 +96,7 @@ export function OrderHistory() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => navigate('/')}
+                onClick={() => void navigate('/')}
                 className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
                 aria-label="Back"
               >

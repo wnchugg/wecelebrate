@@ -109,45 +109,49 @@ function TestWrapper({ children }: { children: React.ReactNode }) {
   );
 }
 
+// Module-level mock for useSite — currentSiteOverride can be set per-test
+let currentSiteOverride: Site | null = null;
+const mockSiteContextValue = (site: Site | null) => ({
+  currentSite: site,
+  sites: site ? [site] : [],
+  clients: [] as any[],
+  brands: [] as any[],
+  currentClient: null as any,
+  isLoading: false,
+  setCurrentSite: vi.fn(),
+  setCurrentClient: vi.fn(),
+  addClient: vi.fn(),
+  updateClient: vi.fn(),
+  deleteClient: vi.fn(),
+  addSite: vi.fn(),
+  updateSite: vi.fn(),
+  saveSiteDraft: vi.fn(),
+  publishSite: vi.fn(),
+  discardSiteDraft: vi.fn(),
+  getSiteLive: vi.fn(),
+  deleteSite: vi.fn(),
+  getSitesByClient: vi.fn(),
+  getClientById: vi.fn(),
+  refreshData: vi.fn(),
+  addBrand: vi.fn(),
+  updateBrand: vi.fn(),
+  deleteBrand: vi.fn(),
+  getSitesByBrand: vi.fn(),
+});
+
+vi.mock('../context/SiteContext', async () => {
+  const actual = await vi.importActual<typeof import('../context/SiteContext')>('../context/SiteContext');
+  return {
+    ...actual,
+    useSite: () => mockSiteContextValue(currentSiteOverride),
+  };
+});
+
 describe('Language Switching Integration Tests', () => {
   beforeEach(() => {
     // Clear localStorage before each test
     localStorage.clear();
-    
-    // Mock the SiteContext to return our mock site
-    vi.mock('../context/SiteContext', async () => {
-      const actual = await vi.importActual('../context/SiteContext');
-      return {
-        ...actual,
-        useSite: () => ({
-          currentSite: mockSite,
-          sites: [mockSite],
-          clients: [] as any[],
-          brands: [] as any[],
-          currentClient: null as any,
-          isLoading: false,
-          setCurrentSite: vi.fn(),
-          setCurrentClient: vi.fn(),
-          addClient: vi.fn(),
-          updateClient: vi.fn(),
-          deleteClient: vi.fn(),
-          addSite: vi.fn(),
-          updateSite: vi.fn(),
-          saveSiteDraft: vi.fn(),
-          publishSite: vi.fn(),
-          discardSiteDraft: vi.fn(),
-          getSiteLive: vi.fn(),
-          deleteSite: vi.fn(),
-          getSitesByClient: vi.fn(),
-          getClientById: vi.fn(),
-          refreshData: vi.fn(),
-          addBrand: vi.fn(),
-          updateBrand: vi.fn(),
-          deleteBrand: vi.fn(),
-          getSitesByBrand: vi.fn(),
-        }),
-      };
-    });
+    currentSiteOverride = mockSite;
   });
 
   it('should display content in default language (English) on initial load', () => {
@@ -359,43 +363,16 @@ describe('Language Switching with RTL Layout', () => {
   };
 
   function RTLTestWrapper({ children }: { children: React.ReactNode }) {
-    return (
-      <SiteContext.Provider
-        value={{
-          currentSite: mockSiteWithRTL,
-          sites: [mockSiteWithRTL],
-          clients: [],
-          brands: [],
-          currentClient: null,
-          isLoading: false,
-          setCurrentSite: vi.fn(),
-          setCurrentClient: vi.fn(),
-          addClient: vi.fn(),
-          updateClient: vi.fn(),
-          deleteClient: vi.fn(),
-          addSite: vi.fn(),
-          updateSite: vi.fn(),
-          saveSiteDraft: vi.fn(),
-          publishSite: vi.fn(),
-          discardSiteDraft: vi.fn(),
-          getSiteLive: vi.fn(),
-          deleteSite: vi.fn(),
-          getSitesByClient: vi.fn(),
-          getClientById: vi.fn(),
-          refreshData: vi.fn(),
-          addBrand: vi.fn(),
-          updateBrand: vi.fn(),
-          deleteBrand: vi.fn(),
-          getSitesByBrand: vi.fn(),
-        }}
-      >
-        <LanguageProvider>{children}</LanguageProvider>
-      </SiteContext.Provider>
-    );
+    // useSite is mocked to return currentSiteOverride (set in beforeEach)
+    return <LanguageProvider>{children}</LanguageProvider>;
   }
 
   beforeEach(() => {
     localStorage.clear();
+    currentSiteOverride = mockSiteWithRTL;
+    // Reset global DOM state that LanguageContext modifies via useEffect
+    document.documentElement.dir = 'ltr';
+    document.documentElement.lang = 'en';
   });
 
   it('should apply RTL layout when switching to Arabic', async () => {
@@ -532,7 +509,7 @@ describe('Language Switching with RTL Layout', () => {
 
   it('should handle missing RTL translations with fallback', async () => {
     const user = userEvent.setup();
-    
+
     // Site with incomplete Arabic translations
     const incompleteSite: Site = {
       ...mockSiteWithRTL,
@@ -549,42 +526,8 @@ describe('Language Switching with RTL Layout', () => {
         },
       },
     };
-
-    function IncompleteRTLTestWrapper({ children }: { children: React.ReactNode }) {
-      return (
-        <SiteContext.Provider
-          value={{
-            currentSite: incompleteSite,
-            sites: [incompleteSite],
-            clients: [],
-            brands: [],
-            currentClient: null,
-            isLoading: false,
-            setCurrentSite: vi.fn(),
-            setCurrentClient: vi.fn(),
-            addClient: vi.fn(),
-            updateClient: vi.fn(),
-            deleteClient: vi.fn(),
-            addSite: vi.fn(),
-            updateSite: vi.fn(),
-            saveSiteDraft: vi.fn(),
-            publishSite: vi.fn(),
-            discardSiteDraft: vi.fn(),
-            getSiteLive: vi.fn(),
-            deleteSite: vi.fn(),
-            getSitesByClient: vi.fn(),
-            getClientById: vi.fn(),
-            refreshData: vi.fn(),
-            addBrand: vi.fn(),
-            updateBrand: vi.fn(),
-            deleteBrand: vi.fn(),
-            getSitesByBrand: vi.fn(),
-          }}
-        >
-          <LanguageProvider>{children}</LanguageProvider>
-        </SiteContext.Provider>
-      );
-    }
+    // Override site for this specific test
+    currentSiteOverride = incompleteSite;
 
     function RTLTestComponent() {
       const { getTranslatedContent } = useSiteContent();
@@ -606,9 +549,9 @@ describe('Language Switching with RTL Layout', () => {
     }
 
     render(
-      <IncompleteRTLTestWrapper>
+      <LanguageProvider>
         <RTLTestComponent />
-      </IncompleteRTLTestWrapper>
+      </LanguageProvider>
     );
 
     // Switch to Arabic
@@ -629,41 +572,7 @@ describe('Language Switching with RTL Layout', () => {
 describe('Language Switching with useSiteContent Hook', () => {
   beforeEach(() => {
     localStorage.clear();
-    
-    // Mock the SiteContext
-    vi.mock('../context/SiteContext', async () => {
-      const actual = await vi.importActual('../context/SiteContext');
-      return {
-        ...actual,
-        useSite: () => ({
-          currentSite: mockSite,
-          sites: [mockSite],
-          clients: [] as any[],
-          brands: [] as any[],
-          currentClient: null as any,
-          isLoading: false,
-          setCurrentSite: vi.fn(),
-          setCurrentClient: vi.fn(),
-          addClient: vi.fn(),
-          updateClient: vi.fn(),
-          deleteClient: vi.fn(),
-          addSite: vi.fn(),
-          updateSite: vi.fn(),
-          saveSiteDraft: vi.fn(),
-          publishSite: vi.fn(),
-          discardSiteDraft: vi.fn(),
-          getSiteLive: vi.fn(),
-          deleteSite: vi.fn(),
-          getSitesByClient: vi.fn(),
-          getClientById: vi.fn(),
-          refreshData: vi.fn(),
-          addBrand: vi.fn(),
-          updateBrand: vi.fn(),
-          deleteBrand: vi.fn(),
-          getSitesByBrand: vi.fn(),
-        }),
-      };
-    });
+    currentSiteOverride = mockSite;
   });
 
   it('should return translated content for current language', () => {

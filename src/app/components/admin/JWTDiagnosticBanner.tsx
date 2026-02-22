@@ -205,7 +205,7 @@ export function JWTDiagnosticBanner() {
           <div className="flex items-center gap-2 flex-wrap">
             {(diagnostic.issue === 'token_mismatch' || diagnostic.issue === 'token_expired') && (
               <button
-                onClick={handleClearTokens}
+                onClick={() => void handleClearTokens()}
                 disabled={clearing}
                 className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-current rounded text-sm font-medium hover:bg-opacity-90 transition-colors disabled:opacity-50"
               >
@@ -231,7 +231,7 @@ export function JWTDiagnosticBanner() {
             </button>
             
             <button
-              onClick={runDiagnostic}
+              onClick={() => void runDiagnostic()}
               className="inline-flex items-center gap-1 text-sm font-medium underline hover:no-underline"
             >
               <RefreshCw className="w-3 h-3" />

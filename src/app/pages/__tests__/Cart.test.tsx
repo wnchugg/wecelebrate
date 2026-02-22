@@ -29,7 +29,7 @@ vi.mock('../../components/LanguageSelector', () => ({
 }));
 
 vi.mock('../../../imports/Logo', () => ({
-  default: '<svg></svg>',
+  default: () => <svg data-testid="logo" />,
 }));
 
 vi.mock('sonner', () => ({

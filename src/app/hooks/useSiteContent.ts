@@ -49,7 +49,7 @@ export function useSiteContent() {
 
       // Navigate to the field using the path
       const pathParts = path.split('.');
-      let current: any = translations;
+      let current: unknown = translations;
 
       for (const part of pathParts) {
         if (!current || typeof current !== 'object') {

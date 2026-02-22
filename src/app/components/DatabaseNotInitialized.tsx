@@ -63,7 +63,7 @@ export function DatabaseNotInitialized({ error, showDetails = true }: DatabaseNo
 
           {/* Action Button */}
           <button
-            onClick={() => navigate('/initialize-database')}
+            onClick={() => void navigate('/initialize-database')}
             className="w-full bg-gradient-to-r from-[#D91C81] to-[#B71569] text-white px-6 py-4 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2 group"
           >
             <Database className="w-5 h-5" />

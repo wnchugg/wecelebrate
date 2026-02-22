@@ -243,7 +243,7 @@ export async function executeScheduledSync(scheduleId: string): Promise<Schedule
   let recordsProcessed = 0;
   let recordsFailed = 0;
   let error: string | undefined;
-  let details: any = {};
+  let details: Record<string, unknown> = {};
 
   try {
     // Execute product sync if needed

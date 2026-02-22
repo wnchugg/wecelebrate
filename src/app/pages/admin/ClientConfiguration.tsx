@@ -456,7 +456,7 @@ export function ClientConfiguration({
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
-              onClick={() => navigate(`/admin/clients/${clientCode || clientId}`)}
+              onClick={() => void navigate(`/admin/clients/${clientCode || clientId}`)}
               className="p-2"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -1449,7 +1449,7 @@ export function ClientConfiguration({
                     View Portal
                   </Button>
                   <Button
-                    onClick={() => navigate('/client-portal')}
+                    onClick={() => void navigate('/client-portal')}
                     className="bg-[#D91C81] hover:bg-[#B01669] text-white"
                   >
                     <Settings className="w-4 h-4 mr-2" />
@@ -1473,7 +1473,7 @@ export function ClientConfiguration({
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">Sites for {clientName}</h2>
             <Button
-              onClick={() => navigate(`/admin/sites?client=${clientId}`)}
+              onClick={() => void navigate(`/admin/sites?client=${clientId}`)}
               className="bg-[#D91C81] hover:bg-[#B01669] text-white"
             >
               Manage Sites
@@ -1487,7 +1487,7 @@ export function ClientConfiguration({
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">No Sites</h3>
                 <p className="text-gray-600 mb-6">This client doesn't have any sites yet.</p>
                 <Button
-                  onClick={() => navigate(`/admin/sites?client=${clientId}`)}
+                  onClick={() => void navigate(`/admin/sites?client=${clientId}`)}
                   className="bg-[#D91C81] hover:bg-[#B01669] text-white"
                 >
                   Add Site
@@ -1498,7 +1498,7 @@ export function ClientConfiguration({
                 <div
                   key={site.id}
                   className="bg-white rounded-xl border border-gray-200 p-4 hover:border-[#D91C81] transition-colors cursor-pointer"
-                  onClick={() => navigate(`/admin/sites?site=${site.id}`)}
+                  onClick={() => void navigate(`/admin/sites?site=${site.id}`)}
                 >
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="font-semibold text-gray-900">{site.name}</h3>

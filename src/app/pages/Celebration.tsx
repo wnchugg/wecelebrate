@@ -97,7 +97,7 @@ export function Celebration() {
         <div className="max-w-6xl mx-auto">
           {/* Back Button */}
           <button
-            onClick={() => navigate('/')}
+            onClick={() => void navigate('/')}
             className="flex items-center gap-2 text-white/90 hover:text-white mb-6 transition-colors"
           >
             <ArrowRight className="w-5 h-5" />

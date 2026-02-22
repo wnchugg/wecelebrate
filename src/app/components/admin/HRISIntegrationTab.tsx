@@ -171,8 +171,12 @@ export function HRISIntegrationTab({ client, sites, onSyncComplete }: HRISIntegr
   const serverUrl = `https://${projectId}.supabase.co/functions/v1/make-server-6fcaeea3`;
 
   useEffect(() => {
-    loadConnections();
-    loadSyncHistory();
+    void loadConnections().catch((error) => {
+      console.error('Error loading connections:', error);
+    });
+    void loadSyncHistory().catch((error) => {
+      console.error('Error loading sync history:', error);
+    });
   }, [client.id]);
 
   const loadConnections = async () => {
@@ -378,7 +382,9 @@ export function HRISIntegrationTab({ client, sites, onSyncComplete }: HRISIntegr
       setShowConnectionModal(false);
       setSelectedConnection(null);
       setSelectedProvider(null);
-      loadConnections();
+      void loadConnections().catch((error) => {
+        console.error('Error reloading connections:', error);
+      });
     } catch (error) {
       logger.error('Error saving HRIS connection:', error);
       showErrorToast(`Failed to ${selectedConnection ? 'update' : 'create'} connection`);
@@ -406,7 +412,9 @@ export function HRISIntegrationTab({ client, sites, onSyncComplete }: HRISIntegr
         showErrorToast(`Connection test failed: ${result.error}`);
       }
       
-      loadConnections();
+      void loadConnections().catch((error) => {
+        console.error('Error reloading connections:', error);
+      });
     } catch (error) {
       logger.error('Error testing connection:', error);
       showErrorToast('Failed to test connection');
@@ -430,8 +438,12 @@ export function HRISIntegrationTab({ client, sites, onSyncComplete }: HRISIntegr
 
       showSuccessToast('Sync started successfully');
       setTimeout(() => {
-        loadSyncHistory();
-        loadConnections();
+        void loadSyncHistory().catch((error) => {
+          console.error('Error reloading sync history:', error);
+        });
+        void loadConnections().catch((error) => {
+          console.error('Error reloading connections:', error);
+        });
         if (onSyncComplete) {
           onSyncComplete();
         }
@@ -460,7 +472,9 @@ export function HRISIntegrationTab({ client, sites, onSyncComplete }: HRISIntegr
       if (!response.ok) throw new Error('Failed to delete connection');
 
       showSuccessToast('HRIS connection deleted successfully');
-      loadConnections();
+      void loadConnections().catch((error) => {
+        console.error('Error reloading connections:', error);
+      });
     } catch (error) {
       logger.error('Error deleting connection:', error);
       showErrorToast('Failed to delete connection');
@@ -596,14 +610,14 @@ export function HRISIntegrationTab({ client, sites, onSyncComplete }: HRISIntegr
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleTestConnection(connection.id)}
+                            onClick={() => void handleTestConnection(connection.id)}
                           >
                             Test
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleSync(connection.id)}
+                            onClick={() => void handleSync(connection.id)}
                           >
                             <RefreshCw className="w-4 h-4" />
                           </Button>
@@ -617,7 +631,7 @@ export function HRISIntegrationTab({ client, sites, onSyncComplete }: HRISIntegr
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleDeleteConnection(connection.id)}
+                            onClick={() => void handleDeleteConnection(connection.id)}
                             className="text-red-600 hover:text-red-700"
                           >
                             Delete
@@ -1104,7 +1118,7 @@ export function HRISIntegrationTab({ client, sites, onSyncComplete }: HRISIntegr
                 Cancel
               </Button>
               <Button
-                onClick={handleSaveConnection}
+                onClick={() => void handleSaveConnection()}
                 className="bg-[#D91C81] hover:bg-[#B01669] text-white"
               >
                 {selectedConnection ? 'Update' : 'Create'} Connection

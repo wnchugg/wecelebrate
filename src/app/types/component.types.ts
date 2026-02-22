@@ -99,34 +99,64 @@ export interface EmployeeImportModalProps {
   onImport: (employees: Employee[]) => void;
 }
 
+export interface SftpConfig {
+  host: string;
+  port: number;
+  username: string;
+  password?: string;
+  privateKey?: string;
+  path?: string;
+}
+
+export interface StoreLocation {
+  id?: string;
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  phone?: string;
+  email?: string;
+}
+
+export interface Brand {
+  id?: string;
+  name: string;
+  logo?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  description?: string;
+}
+
 export interface SftpConfigModalProps {
   open: boolean;
   onClose: () => void;
-  config?: any;
-  onSave: (config: any) => void;
+  config?: SftpConfig;
+  onSave: (config: SftpConfig) => void;
 }
 
 export interface StoreLocationModalProps {
   open: boolean;
   onClose: () => void;
-  store?: any;
-  onSave: (store: any) => void;
+  store?: StoreLocation;
+  onSave: (store: StoreLocation) => void;
 }
 
 export interface BrandModalProps {
   open: boolean;
   onClose: () => void;
-  brand?: any;
-  onSave: (brand: any) => void;
+  brand?: Brand;
+  onSave: (brand: Brand) => void;
 }
 
 /**
  * Form component props
  */
-export interface FormProps extends BaseComponentProps {
-  onSubmit: (data: any) => void;
-  validationSchema?: any;
-  initialValues?: any;
+export interface FormProps<T = Record<string, unknown>> extends BaseComponentProps {
+  onSubmit: (data: T) => void;
+  validationSchema?: unknown;
+  initialValues?: Partial<T>;
   disabled?: boolean;
 }
 
@@ -167,23 +197,23 @@ export interface RadioGroupFieldProps extends FormFieldProps {
 /**
  * Table component props
  */
-export interface TableProps extends BaseComponentProps {
-  data: any[];
-  columns: TableColumn[];
+export interface TableProps<T = Record<string, unknown>> extends BaseComponentProps {
+  data: T[];
+  columns: TableColumn<T>[];
   loading?: boolean;
   emptyMessage?: string;
   pagination?: PaginationProps;
   sortable?: boolean;
   selectable?: boolean;
-  onRowClick?: (row: any) => void;
-  onSelectionChange?: (selectedRows: any[]) => void;
+  onRowClick?: (row: T) => void;
+  onSelectionChange?: (selectedRows: T[]) => void;
 }
 
-export interface TableColumn {
+export interface TableColumn<T = Record<string, unknown>> {
   key: string;
   header: string;
-  accessor?: string | ((row: any) => any);
-  render?: (value: any, row: any) => ReactNode;
+  accessor?: string | ((row: T) => unknown);
+  render?: (value: unknown, row: T) => ReactNode;
   sortable?: boolean;
   width?: string | number;
   align?: 'left' | 'center' | 'right';
@@ -201,16 +231,16 @@ export interface PaginationProps {
 /**
  * Data display component props
  */
-export interface DataTableProps<T = any> {
+export interface DataTableProps<T = Record<string, unknown>> {
   data: T[];
-  columns: TableColumn[];
+  columns: TableColumn<T>[];
   loading?: boolean;
   error?: Error | null;
   pagination?: PaginationProps;
   filters?: FilterConfig[];
   sorting?: SortConfig;
   onSort?: (config: SortConfig) => void;
-  onFilter?: (filters: Record<string, any>) => void;
+  onFilter?: (filters: Record<string, unknown>) => void;
 }
 
 export interface FilterConfig {

@@ -197,7 +197,7 @@ export function EmailHistoryPage() {
               </span>
             </div>
             <button
-              onClick={loadHistory}
+              onClick={() => void loadHistory()}
               className="inline-flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-[#D91C81] hover:bg-pink-50 rounded-lg transition-colors"
             >
               <RefreshCw className="w-4 h-4" />

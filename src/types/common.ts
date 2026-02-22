@@ -122,18 +122,18 @@ export interface DialogProps extends ModalProps {
 
 // ==================== Table Types ====================
 
-export interface TableColumn<T = any> {
+export interface TableColumn<T = TableRow> {
   key: string;
   label: string;
   sortable?: boolean;
   width?: string | number;
   align?: 'left' | 'center' | 'right';
-  render?: (value: any, row: T, index: number) => React.ReactNode;
+  render?: (value: unknown, row: T, index: number) => React.ReactNode;
 }
 
 export interface TableRow {
   id: string | number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface TableProps<T = TableRow> extends CommonProps {
@@ -152,7 +152,7 @@ export interface TableProps<T = TableRow> extends CommonProps {
 export interface ListItem {
   id: string | number;
   label: string;
-  value?: any;
+  value?: unknown;
   disabled?: boolean;
   icon?: React.ReactNode;
 }
@@ -190,15 +190,15 @@ export interface PaginationProps {
 
 export type SortDirection = 'asc' | 'desc';
 
-export interface SortConfig<T = any> {
+export interface SortConfig<T = Record<string, unknown>> {
   key: keyof T | string;
   direction: SortDirection;
 }
 
-export interface FilterConfig<T = any> {
+export interface FilterConfig<T = Record<string, unknown>> {
   key: keyof T | string;
   operator: 'eq' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'contains' | 'startsWith' | 'endsWith';
-  value: any;
+  value: unknown;
 }
 
 export interface SearchConfig {
@@ -209,11 +209,11 @@ export interface SearchConfig {
 
 // ==================== API Response Types ====================
 
-export interface SuccessResponse<T = any> {
+export interface SuccessResponse<T = unknown> {
   success: true;
   data: T;
   message?: string;
-  meta?: Record<string, any>;
+  meta?: Record<string, unknown>;
 }
 
 export interface ErrorResponse {
@@ -221,23 +221,23 @@ export interface ErrorResponse {
   error: string;
   message?: string;
   code?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
-export type ApiResponse<T = any> = SuccessResponse<T> | ErrorResponse;
+export type ApiResponse<T = unknown> = SuccessResponse<T> | ErrorResponse;
 
-export interface PaginatedResponse<T = any> {
+export interface PaginatedResponse<T = unknown> {
   success: true;
   data: T[];
   pagination: PaginationInfo;
-  meta?: Record<string, any>;
+  meta?: Record<string, unknown>;
 }
 
 // ==================== Loading State Types ====================
 
 export type LoadingState = 'idle' | 'loading' | 'success' | 'error';
 
-export interface AsyncState<T = any> {
+export interface AsyncState<T = unknown> {
   status: LoadingState;
   data: T | null;
   error: string | null;
@@ -290,7 +290,7 @@ export interface Notification {
 
 export interface RouteConfig {
   path: string;
-  component: React.ComponentType<any>;
+  component: React.ComponentType<Record<string, unknown>>;
   exact?: boolean;
   protected?: boolean;
   redirect?: string;
@@ -321,11 +321,11 @@ export function isSuccessResponse<T>(response: ApiResponse<T>): response is Succ
   return response.success === true;
 }
 
-export function isErrorResponse(response: ApiResponse<any>): response is ErrorResponse {
+export function isErrorResponse(response: ApiResponse<unknown>): response is ErrorResponse {
   return response.success === false;
 }
 
-export function isPaginatedResponse<T>(response: any): response is PaginatedResponse<T> {
+export function isPaginatedResponse<T>(response: unknown): response is PaginatedResponse<T> {
   return (
     response &&
     typeof response === 'object' &&

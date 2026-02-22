@@ -46,7 +46,7 @@ export function SecureForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className={className}>
+    <form onSubmit={() => void handleSubmit()} className={className}>
       {/* Hidden CSRF Token Field */}
       <input type="hidden" name="_csrf" value={csrfToken} />
 

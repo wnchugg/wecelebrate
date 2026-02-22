@@ -156,7 +156,7 @@ const FIELD_LABELS: Record<string, string> = {
   ssoProvider: 'SSO Provider',
 };
 
-function getNestedValue(obj: any, path: string): any {
+function getNestedValue(obj: any, path: string): unknown {
   return path.split('.').reduce((current, key) => current?.[key], obj);
 }
 

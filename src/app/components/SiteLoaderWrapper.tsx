@@ -35,10 +35,14 @@ export function SiteLoaderWrapper() {
       
       if (isUUID) {
         logger.info('[SiteLoaderWrapper] Loading by UUID');
-        setSiteById(siteId);
+        void setSiteById(siteId).catch((error) => {
+          console.error('Error loading site by UUID:', error);
+        });
       } else {
         logger.info('[SiteLoaderWrapper] Loading by slug');
-        setSiteBySlug(siteId);
+        void setSiteBySlug(siteId).catch((error) => {
+          console.error('Error loading site by slug:', error);
+        });
       }
     }
   }, [siteId, setSiteById, setSiteBySlug]);

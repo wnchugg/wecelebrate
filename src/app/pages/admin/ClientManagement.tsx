@@ -478,7 +478,7 @@ export function ClientManagement() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                   <Button
-                    onClick={handleSeedDatabase}
+                    onClick={() => void handleSeedDatabase()}
                     disabled={isSeeding}
                     className="bg-amber-500 hover:bg-amber-600 text-white"
                   >
@@ -544,7 +544,7 @@ export function ClientManagement() {
                         <div>
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => navigate(getClientUrl(client))}
+                              onClick={() => void navigate(getClientUrl(client))}
                               className="text-lg font-bold text-gray-900 hover:text-[#D91C81] transition-colors"
                             >
                               {client.name}
@@ -600,14 +600,14 @@ export function ClientManagement() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => navigate(getClientUrl(client))}
+                        onClick={() => void navigate(getClientUrl(client))}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDeleteClient(client.id, client.name)}
+                        onClick={() => void handleDeleteClient(client.id, client.name)}
                         className="text-red-600 hover:text-red-700 hover:bg-red-50"
                         disabled={isDeleting}
                       >
@@ -653,7 +653,7 @@ export function ClientManagement() {
         open={showClientModal}
         onClose={() => setShowClientModal(false)}
         client={editingClient as any}
-        onSave={handleSaveClient}
+        onSave={() => void handleSaveClient()}
       />
     </div>
   );

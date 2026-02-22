@@ -6,7 +6,7 @@
 /**
  * Deep merge two objects
  */
-export function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>): T {
+export function deepMerge<T extends Record<string, unknown>>(target: T, source: Partial<T>): T {
   const output = { ...target };
   
   if (isObject(target) && isObject(source)) {
@@ -15,7 +15,7 @@ export function deepMerge<T extends Record<string, any>>(target: T, source: Part
         if (!(key in target)) {
           Object.assign(output, { [key]: source[key] });
         } else {
-          (output as Record<string, any>)[key] = deepMerge(target[key], source[key]);
+          (output as Record<string, unknown>)[key] = deepMerge(target[key], source[key]);
         }
       } else {
         Object.assign(output, { [key]: source[key] });
@@ -29,14 +29,14 @@ export function deepMerge<T extends Record<string, any>>(target: T, source: Part
 /**
  * Check if a value is a plain object
  */
-function isObject(item: any): item is Record<string, any> {
-  return item && typeof item === 'object' && !Array.isArray(item);
+function isObject(item: unknown): item is Record<string, unknown> {
+  return typeof item === 'object' && item !== null && !Array.isArray(item);
 }
 
 /**
  * Pick specified keys from an object
  */
-export function pick<T extends Record<string, any>, K extends keyof T>(
+export function pick<T extends Record<string, unknown>, K extends keyof T>(
   obj: T,
   keys: K[]
 ): Pick<T, K> {
@@ -54,7 +54,7 @@ export function pick<T extends Record<string, any>, K extends keyof T>(
 /**
  * Omit specified keys from an object
  */
-export function omit<T extends Record<string, any>, K extends keyof T>(
+export function omit<T extends Record<string, unknown>, K extends keyof T>(
   obj: T,
   keys: K[]
 ): Omit<T, K> {
@@ -76,11 +76,11 @@ export function deepClone<T>(obj: T): T {
   }
   
   if (obj instanceof Date) {
-    return new Date(obj.getTime()) as any;
+    return new Date(obj.getTime()) as T;
   }
   
   if (obj instanceof Array) {
-    return obj.map(item => deepClone(item)) as any;
+    return obj.map(item => deepClone(item)) as T;
   }
   
   if (obj instanceof Object) {
@@ -99,7 +99,7 @@ export function deepClone<T>(obj: T): T {
 /**
  * Check if two objects are deeply equal
  */
-export function deepEqual(obj1: any, obj2: any): boolean {
+export function deepEqual(obj1: unknown, obj2: unknown): boolean {
   if (obj1 === obj2) return true;
   
   if (typeof obj1 !== 'object' || obj1 === null || typeof obj2 !== 'object' || obj2 === null) {
@@ -112,7 +112,7 @@ export function deepEqual(obj1: any, obj2: any): boolean {
   if (keys1.length !== keys2.length) return false;
   
   for (const key of keys1) {
-    if (!keys2.includes(key) || !deepEqual(obj1[key], obj2[key])) {
+    if (!keys2.includes(key) || !deepEqual((obj1 as Record<string, unknown>)[key], (obj2 as Record<string, unknown>)[key])) {
       return false;
     }
   }
@@ -123,51 +123,56 @@ export function deepEqual(obj1: any, obj2: any): boolean {
 /**
  * Get nested property value using dot notation
  */
-export function get<T = any>(obj: any, path: string, defaultValue?: T): T {
+export function get<T = unknown>(obj: unknown, path: string, defaultValue?: T): T | undefined {
   const keys = path.split('.');
-  let result = obj;
+  let result: unknown = obj;
   
   for (const key of keys) {
-    if (result == null) {
+    if (result == null || typeof result !== 'object') {
       return defaultValue;
     }
-    result = result[key];
+    result = (result as Record<string, unknown>)[key];
   }
   
-  return result !== undefined ? result : defaultValue;
+  return result !== undefined ? (result as T) : defaultValue;
 }
 
 /**
  * Set nested property value using dot notation
  */
-export function set<T extends Record<string, any>>(obj: T, path: string, value: any): T {
+export function set<T extends Record<string, unknown>>(obj: T, path: string, value: unknown): T {
   const keys = path.split('.');
   const lastKey = keys.pop();
-  let current = obj;
+  let current: Record<string, unknown> = obj;
   
   for (const key of keys) {
-    if (!(key in current) || typeof current[key] !== 'object') {
-      (current as Record<string, any>)[key] = {};
+    if (!(key in current) || typeof current[key] !== 'object' || current[key] === null) {
+      current[key] = {};
     }
-    current = current[key];
+    current = current[key] as Record<string, unknown>;
   }
 
-  (current as Record<string, any>)[lastKey] = value;
+  if (lastKey) {
+    current[lastKey] = value;
+  }
   return obj;
 }
 
 /**
  * Check if object has a nested property
  */
-export function has(obj: any, path: string): boolean {
+export function has(obj: unknown, path: string): boolean {
   const keys = path.split('.');
-  let current = obj;
+  let current: unknown = obj;
   
   for (const key of keys) {
-    if (current == null || !(key in current)) {
+    if (current == null || typeof current !== 'object') {
       return false;
     }
-    current = current[key];
+    if (!(key in (current as Record<string, unknown>))) {
+      return false;
+    }
+    current = (current as Record<string, unknown>)[key];
   }
   
   return true;
@@ -176,8 +181,8 @@ export function has(obj: any, path: string): boolean {
 /**
  * Flatten a nested object
  */
-export function flatten(obj: Record<string, any>, prefix: string = ''): Record<string, any> {
-  const result: Record<string, any> = {};
+export function flatten(obj: Record<string, unknown>, prefix: string = ''): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
   
   for (const key in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
@@ -197,8 +202,8 @@ export function flatten(obj: Record<string, any>, prefix: string = ''): Record<s
 /**
  * Unflatten a flat object (reverse of flatten)
  */
-export function unflatten(obj: Record<string, any>): Record<string, any> {
-  const result: Record<string, any> = {};
+export function unflatten(obj: Record<string, unknown>): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
   
   for (const key in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
@@ -212,7 +217,7 @@ export function unflatten(obj: Record<string, any>): Record<string, any> {
 /**
  * Get all keys of an object including nested keys
  */
-export function deepKeys(obj: Record<string, any>, prefix: string = ''): string[] {
+export function deepKeys(obj: Record<string, unknown>, prefix: string = ''): string[] {
   const keys: string[] = [];
   
   for (const key in obj) {
@@ -232,14 +237,14 @@ export function deepKeys(obj: Record<string, any>, prefix: string = ''): string[
 /**
  * Check if object is empty
  */
-export function isEmpty(obj: Record<string, any> | null | undefined): boolean {
+export function isEmpty(obj: Record<string, unknown> | null | undefined): boolean {
   return !obj || Object.keys(obj).length === 0;
 }
 
 /**
  * Map object values
  */
-export function mapValues<T extends Record<string, any>, R>(
+export function mapValues<T extends Record<string, unknown>, R>(
   obj: T,
   fn: (value: T[keyof T], key: keyof T) => R
 ): Record<keyof T, R> {
@@ -257,7 +262,7 @@ export function mapValues<T extends Record<string, any>, R>(
 /**
  * Map object keys
  */
-export function mapKeys<T extends Record<string, any>>(
+export function mapKeys<T extends Record<string, unknown>>(
   obj: T,
   fn: (key: keyof T) => string
 ): Record<string, T[keyof T]> {
@@ -275,7 +280,7 @@ export function mapKeys<T extends Record<string, any>>(
 /**
  * Filter object by predicate
  */
-export function filter<T extends Record<string, any>>(
+export function filter<T extends Record<string, unknown>>(
   obj: T,
   predicate: (value: T[keyof T], key: keyof T) => boolean
 ): Partial<T> {
@@ -308,20 +313,20 @@ export function invert<T extends Record<string, string | number>>(obj: T): Recor
 /**
  * Get object entries with proper typing
  */
-export function entries<T extends Record<string, any>>(obj: T): [keyof T, T[keyof T]][] {
+export function entries<T extends Record<string, unknown>>(obj: T): [keyof T, T[keyof T]][] {
   return Object.entries(obj) as [keyof T, T[keyof T]][];
 }
 
 /**
  * Get object keys with proper typing
  */
-export function keys<T extends Record<string, any>>(obj: T): (keyof T)[] {
+export function keys<T extends Record<string, unknown>>(obj: T): (keyof T)[] {
   return Object.keys(obj) as (keyof T)[];
 }
 
 /**
  * Get object values with proper typing
  */
-export function values<T extends Record<string, any>>(obj: T): T[keyof T][] {
+export function values<T extends Record<string, unknown>>(obj: T): T[keyof T][] {
   return Object.values(obj) as T[keyof T][];
 }

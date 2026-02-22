@@ -96,7 +96,7 @@ declare module 'react-dnd' {
 }
 
 declare module 'react-dnd-html5-backend' {
-  const HTML5Backend: any;
+  const HTML5Backend: unknown;
   export { HTML5Backend };
 }
 

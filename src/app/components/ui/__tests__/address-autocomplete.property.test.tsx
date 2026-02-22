@@ -9,8 +9,57 @@ import { render, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AddressAutocomplete, AddressSuggestion } from '../address-autocomplete';
 
+// Mock deployment environments so dynamic import doesn't fail
+vi.mock('../../config/deploymentEnvironments', () => ({
+  getCurrentEnvironment: vi.fn(() =>
+    Promise.resolve({
+      id: 'test',
+      supabaseUrl: 'https://test.supabase.co',
+      supabaseAnonKey: 'test-anon-key',
+    })
+  ),
+}));
+
 // Mock fetch globally
 const originalFetch = global.fetch;
+
+/**
+ * Creates a fetch mock for the two-step address API:
+ * 1. GET /search?q=... → { suggestions: [{ placeId, description, mainText }] }
+ * 2. GET /details/:placeId → { address: { line1, city, ... } }
+ */
+function createTwoStepFetchMock(suggestions: AddressSuggestion[]) {
+  return vi.fn().mockImplementation((url: string) => {
+    if (String(url).includes('/search')) {
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({
+          suggestions: suggestions.map(s => ({
+            placeId: s.id,
+            description: s.description,
+            mainText: s.line1,
+          })),
+        }),
+      } as Response);
+    }
+    // Details endpoint: match by placeId in URL
+    const suggestion = suggestions.find(s => String(url).includes(String(s.id))) || suggestions[0];
+    if (!suggestion) return Promise.resolve({ ok: false, status: 404 } as Response);
+    return Promise.resolve({
+      ok: true,
+      json: async () => ({
+        address: {
+          line1: suggestion.line1,
+          line2: suggestion.line2,
+          city: suggestion.city,
+          state: suggestion.state,
+          postalCode: suggestion.postalCode,
+          country: suggestion.country,
+        },
+      }),
+    } as Response);
+  });
+}
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -60,11 +109,8 @@ describe('Property 25: Country filter limits results', () => {
             },
           ];
 
-          // Mock fetch to return filtered suggestions
-          global.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            json: async () => mockSuggestions,
-          } as Response);
+          // Mock fetch to return filtered suggestions (two-step API)
+          global.fetch = createTwoStepFetchMock(mockSuggestions);
 
           const onSelect = vi.fn();
           const user = userEvent.setup();
@@ -91,10 +137,11 @@ describe('Property 25: Country filter limits results', () => {
             { timeout: 1000 }
           );
 
-          // Verify fetch was called with country parameter
-          const fetchCall = (global.fetch as any).mock.calls[0];
-          const url = fetchCall[0];
-          expect(url).toContain(`country=${countryCode}`);
+          // Verify fetch was called with country parameter (check all calls, not just first)
+          const allFetchUrls: string[] = (global.fetch as any).mock.calls.map((call: any[]) => String(call[0]));
+          const searchUrl = allFetchUrls.find(url => url.includes('/search'));
+          expect(searchUrl).toBeDefined();
+          expect(searchUrl).toContain(`country=${countryCode}`);
 
           // Wait for suggestions to appear
           await waitFor(
@@ -154,11 +201,12 @@ describe('Property 25: Country filter limits results', () => {
             { timeout: 1000 }
           );
 
-          // Verify the API was called with the country parameter
-          const fetchCall = (global.fetch as any).mock.calls[0];
-          const url = fetchCall[0];
-          expect(url).toContain('country=');
-          expect(url).toContain(country);
+          // Verify the API was called with the country parameter (check all calls)
+          const allFetchUrls: string[] = (global.fetch as any).mock.calls.map((call: any[]) => String(call[0]));
+          const searchUrl = allFetchUrls.find(url => url.includes('/search'));
+          expect(searchUrl).toBeDefined();
+          expect(searchUrl).toContain('country=');
+          expect(searchUrl).toContain(country);
           
           cleanup(); // Clean up after each iteration
         }
@@ -198,10 +246,11 @@ describe('Property 25: Country filter limits results', () => {
             { timeout: 1000 }
           );
 
-          // Verify the API was called without country parameter
-          const fetchCall = (global.fetch as any).mock.calls[0];
-          const url = fetchCall[0];
-          expect(url).not.toContain('country=');
+          // Verify the search API was called without country parameter
+          const allFetchUrls: string[] = (global.fetch as any).mock.calls.map((call: any[]) => String(call[0]));
+          const searchUrl = allFetchUrls.find(url => url.includes('/search'));
+          expect(searchUrl).toBeDefined();
+          expect(searchUrl).not.toContain('country=');
           
           cleanup(); // Clean up after each iteration
         }
@@ -239,10 +288,7 @@ describe('Property 26: Suggestion selection parses address', () => {
             ...addressData,
           };
 
-          global.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            json: async () => [mockSuggestion],
-          } as Response);
+          global.fetch = createTwoStepFetchMock([mockSuggestion]);
 
           const onSelect = vi.fn();
           const user = userEvent.setup();
@@ -322,10 +368,7 @@ describe('Property 26: Suggestion selection parses address', () => {
             line2: undefined, // Explicitly no line2
           };
 
-          global.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            json: async () => [mockSuggestion],
-          } as Response);
+          global.fetch = createTwoStepFetchMock([mockSuggestion]);
 
           const onSelect = vi.fn();
           const user = userEvent.setup();
@@ -399,10 +442,7 @@ describe('Property 27: Suggestion selection invokes callback', () => {
             ...addressData,
           };
 
-          global.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            json: async () => [mockSuggestion],
-          } as Response);
+          global.fetch = createTwoStepFetchMock([mockSuggestion]);
 
           const onSelect = vi.fn();
           const user = userEvent.setup();
@@ -441,7 +481,7 @@ describe('Property 27: Suggestion selection invokes callback', () => {
               country: addressData.country,
             })
           );
-          
+
           cleanup();
         }
       ),
@@ -461,17 +501,14 @@ describe('Property 27: Suggestion selection invokes callback', () => {
         }),
         async (addressData) => {
           cleanup();
-          
+
           const mockSuggestion: AddressSuggestion = {
             id: '1',
             description: `${addressData.line1}, ${addressData.city}`,
             ...addressData,
           };
 
-          global.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            json: async () => [mockSuggestion],
-          } as Response);
+          global.fetch = createTwoStepFetchMock([mockSuggestion]);
 
           const onSelect = vi.fn();
           const user = userEvent.setup();

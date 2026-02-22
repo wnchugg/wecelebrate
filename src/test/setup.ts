@@ -7,6 +7,11 @@ import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
+// Load environment variables from .env file for tests
+// This allows integration tests to access DATABASE_URL and other env vars
+import { config } from 'dotenv';
+config();
+
 // Cleanup after each test
 afterEach(() => {
   cleanup();
@@ -82,6 +87,17 @@ if (typeof HTMLElement !== 'undefined') {
 
 // Mock scrollTo
 window.scrollTo = vi.fn();
+
+// Override HTMLFormElement.prototype.requestSubmit (JSDOM has it but throws "Not implemented")
+if (typeof HTMLFormElement !== 'undefined') {
+  HTMLFormElement.prototype.requestSubmit = function (submitter?: HTMLElement) {
+    if (submitter) {
+      submitter.click();
+    } else {
+      this.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    }
+  };
+}
 
 // Mock fetch if not already mocked
 if (!global.fetch) {

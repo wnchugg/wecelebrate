@@ -37,6 +37,51 @@ import { MultiLanguageSelector } from '../../components/admin/MultiLanguageSelec
 import { TranslationProgress } from '../../components/admin/TranslationProgress';
 import { TranslatableInput } from '../../components/admin/TranslatableInput';
 import { TranslatableTextarea } from '../../components/admin/TranslatableTextarea';
+import type { Site } from '../../../types';
+
+// Extended Site interface with all properties used in this component
+interface ExtendedSite extends Site {
+  // ERP Integration fields
+  siteCode?: string;
+  siteErpIntegration?: string;
+  siteErpInstance?: string;
+  siteShipFromCountry?: string;
+  siteHrisSystem?: string;
+  
+  // Site Management fields
+  siteDropDownName?: string;
+  siteCustomDomainUrl?: string;
+  siteAccountManager?: string;
+  siteAccountManagerEmail?: string;
+  siteCelebrationsEnabled?: boolean;
+  allowSessionTimeoutExtend?: boolean;
+  enableEmployeeLogReport?: boolean;
+  
+  // Regional Client Info
+  regionalClientInfo?: {
+    officeName?: string;
+    contactName?: string;
+    contactEmail?: string;
+    contactPhone?: string;
+    addressLine1?: string;
+    addressLine2?: string;
+    addressLine3?: string;
+    city?: string;
+    countryState?: string;
+    taxId?: string;
+  };
+  
+  // Authentication fields
+  disableDirectAccessAuth?: boolean;
+  ssoProvider?: string;
+  ssoClientOfficeName?: string;
+  
+  // Draft settings
+  draftSettings?: Record<string, unknown>;
+  
+  // Type field
+  type?: 'event-gifting' | 'onboarding-kit' | 'service-awards' | 'incentives' | 'custom';
+}
 
 function LoadingSpinner() {
   return (
@@ -111,7 +156,7 @@ export function SiteConfiguration() {
   const [isDiscarding, setIsDiscarding] = useState(false);
   const [showUnsavedChangesModal, setShowUnsavedChangesModal] = useState(false);
   const [pendingModeSwitch, setPendingModeSwitch] = useState<'live' | null>(null);
-  const [originalSiteData, setOriginalSiteData] = useState<any>(null);
+  const [originalSiteData, setOriginalSiteData] = useState<Partial<ExtendedSite> | null>(null);
   
   // Error handling and validation
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -158,7 +203,8 @@ export function SiteConfiguration() {
   const [draftAvailableLanguages, setDraftAvailableLanguages] = useState<string[]>(currentSite?.draftAvailableLanguages || currentSite?.availableLanguages || ['en']);
   
   // Translation state
-  const [translations, setTranslations] = useState<Record<string, any>>(currentSite?.translations || {});
+  type TranslationValue = string | boolean | Record<string, string>;
+  const [translations, setTranslations] = useState<Record<string, TranslationValue>>(currentSite?.translations || {});
   
   const [availabilityStartDate, setAvailabilityStartDate] = useState(currentSite?.settings?.availabilityStartDate || '');
   const [availabilityEndDate, setAvailabilityEndDate] = useState(currentSite?.settings?.availabilityEndDate || '');
@@ -222,7 +268,23 @@ export function SiteConfiguration() {
   const [ssoEditMode, setSsoEditMode] = useState(false);
   
   // SSO Field State Variables
-  const ssoConfig = currentSite?.settings?.ssoConfig as any;
+  interface SSOConfig {
+    clientId?: string;
+    clientSecret?: string;
+    authUrl?: string;
+    tokenUrl?: string;
+    userInfoUrl?: string;
+    scope?: string;
+    idpEntryPoint?: string;
+    entityId?: string;
+    certificate?: string;
+    autoProvision?: boolean;
+    allowAdminBypass?: boolean;
+    bypassRequires2FA?: boolean;
+    bypassAllowedIPs?: string[];
+  }
+  
+  const ssoConfig = (currentSite?.settings?.ssoConfig as SSOConfig) || {};
   const [ssoClientId, setSsoClientId] = useState(ssoConfig?.clientId || '');
   const [ssoClientSecret, setSsoClientSecret] = useState(ssoConfig?.clientSecret || '');
   const [ssoAuthUrl, setSsoAuthUrl] = useState(ssoConfig?.authUrl || '');
@@ -309,41 +371,41 @@ export function SiteConfiguration() {
       setSortOptions(currentSite.settings?.sortOptions || ['name', 'price', 'popularity']);
       
       // ERP Integration settings
-      setSiteCode((currentSite as any).siteCode || '');
-      setSiteErpIntegration((currentSite as any).siteErpIntegration || '');
-      setSiteErpInstance((currentSite as any).siteErpInstance || '');
-      setSiteShipFromCountry((currentSite as any).siteShipFromCountry || 'US');
-      setSiteHrisSystem((currentSite as any).siteHrisSystem || '');
+      setSiteCode((currentSite as ExtendedSite).siteCode || '');
+      setSiteErpIntegration((currentSite as ExtendedSite).siteErpIntegration || '');
+      setSiteErpInstance((currentSite as ExtendedSite).siteErpInstance || '');
+      setSiteShipFromCountry((currentSite as ExtendedSite).siteShipFromCountry || 'US');
+      setSiteHrisSystem((currentSite as ExtendedSite).siteHrisSystem || '');
       
       // Site Management settings
-      setSiteDropDownName((currentSite as any).siteDropDownName || '');
-      setSiteCustomDomainUrl((currentSite as any).siteCustomDomainUrl || '');
-      setSiteAccountManager((currentSite as any).siteAccountManager || '');
-      setSiteAccountManagerEmail((currentSite as any).siteAccountManagerEmail || '');
-      setSiteCelebrationsEnabled((currentSite as any).siteCelebrationsEnabled ?? false);
-      setAllowSessionTimeoutExtend((currentSite as any).allowSessionTimeoutExtend ?? false);
-      setEnableEmployeeLogReport((currentSite as any).enableEmployeeLogReport ?? false);
+      setSiteDropDownName((currentSite as ExtendedSite).siteDropDownName || '');
+      setSiteCustomDomainUrl((currentSite as ExtendedSite).siteCustomDomainUrl || '');
+      setSiteAccountManager((currentSite as ExtendedSite).siteAccountManager || '');
+      setSiteAccountManagerEmail((currentSite as ExtendedSite).siteAccountManagerEmail || '');
+      setSiteCelebrationsEnabled((currentSite as ExtendedSite).siteCelebrationsEnabled ?? false);
+      setAllowSessionTimeoutExtend((currentSite as ExtendedSite).allowSessionTimeoutExtend ?? false);
+      setEnableEmployeeLogReport((currentSite as ExtendedSite).enableEmployeeLogReport ?? false);
       
       // Regional Client Info settings
-      setRegionalOfficeName((currentSite as any).regionalClientInfo?.officeName || '');
-      setRegionalContactName((currentSite as any).regionalClientInfo?.contactName || '');
-      setRegionalContactEmail((currentSite as any).regionalClientInfo?.contactEmail || '');
-      setRegionalContactPhone((currentSite as any).regionalClientInfo?.contactPhone || '');
-      setRegionalAddressLine1((currentSite as any).regionalClientInfo?.addressLine1 || '');
-      setRegionalAddressLine2((currentSite as any).regionalClientInfo?.addressLine2 || '');
-      setRegionalAddressLine3((currentSite as any).regionalClientInfo?.addressLine3 || '');
-      setRegionalCity((currentSite as any).regionalClientInfo?.city || '');
-      setRegionalCountryState((currentSite as any).regionalClientInfo?.countryState || '');
-      setRegionalTaxId((currentSite as any).regionalClientInfo?.taxId || '');
+      setRegionalOfficeName((currentSite as ExtendedSite).regionalClientInfo?.officeName || '');
+      setRegionalContactName((currentSite as ExtendedSite).regionalClientInfo?.contactName || '');
+      setRegionalContactEmail((currentSite as ExtendedSite).regionalClientInfo?.contactEmail || '');
+      setRegionalContactPhone((currentSite as ExtendedSite).regionalClientInfo?.contactPhone || '');
+      setRegionalAddressLine1((currentSite as ExtendedSite).regionalClientInfo?.addressLine1 || '');
+      setRegionalAddressLine2((currentSite as ExtendedSite).regionalClientInfo?.addressLine2 || '');
+      setRegionalAddressLine3((currentSite as ExtendedSite).regionalClientInfo?.addressLine3 || '');
+      setRegionalCity((currentSite as ExtendedSite).regionalClientInfo?.city || '');
+      setRegionalCountryState((currentSite as ExtendedSite).regionalClientInfo?.countryState || '');
+      setRegionalTaxId((currentSite as ExtendedSite).regionalClientInfo?.taxId || '');
       
       // Authentication settings
-      setDisableDirectAccessAuth((currentSite as any).disableDirectAccessAuth ?? false);
-      setSsoProvider((currentSite as any).ssoProvider || '');
-      setSsoClientOfficeName((currentSite as any).ssoClientOfficeName || '');
+      setDisableDirectAccessAuth((currentSite as ExtendedSite).disableDirectAccessAuth ?? false);
+      setSsoProvider((currentSite as ExtendedSite).ssoProvider || '');
+      setSsoClientOfficeName((currentSite as ExtendedSite).ssoClientOfficeName || '');
       
       // SSO Configuration State
       const ssoConfigData = currentSite.settings?.ssoConfig as any;
-      setSsoConfigured(!!(currentSite as any).ssoProvider);
+      setSsoConfigured(!!(currentSite as ExtendedSite).ssoProvider);
       setSsoClientId(ssoConfigData?.clientId || '');
       setSsoClientSecret(ssoConfigData?.clientSecret || '');
       setSsoAuthUrl(ssoConfigData?.authUrl || '');
@@ -436,37 +498,37 @@ export function SiteConfiguration() {
           setSortOptions(dataToLoad.settings?.sortOptions || ['name', 'price', 'popularity']);
           
           // ERP Integration settings
-          setSiteCode((dataToLoad as any).siteCode || '');
-          setSiteErpIntegration((dataToLoad as any).siteErpIntegration || '');
-          setSiteErpInstance((dataToLoad as any).siteErpInstance || '');
-          setSiteShipFromCountry((dataToLoad as any).siteShipFromCountry || 'US');
-          setSiteHrisSystem((dataToLoad as any).siteHrisSystem || '');
+          setSiteCode((dataToLoad as ExtendedSite).siteCode || '');
+          setSiteErpIntegration((dataToLoad as ExtendedSite).siteErpIntegration || '');
+          setSiteErpInstance((dataToLoad as ExtendedSite).siteErpInstance || '');
+          setSiteShipFromCountry((dataToLoad as ExtendedSite).siteShipFromCountry || 'US');
+          setSiteHrisSystem((dataToLoad as ExtendedSite).siteHrisSystem || '');
           
           // Site Management settings
-          setSiteDropDownName((dataToLoad as any).siteDropDownName || '');
-          setSiteCustomDomainUrl((dataToLoad as any).siteCustomDomainUrl || '');
-          setSiteAccountManager((dataToLoad as any).siteAccountManager || '');
-          setSiteAccountManagerEmail((dataToLoad as any).siteAccountManagerEmail || '');
-          setSiteCelebrationsEnabled((dataToLoad as any).siteCelebrationsEnabled ?? false);
-          setAllowSessionTimeoutExtend((dataToLoad as any).allowSessionTimeoutExtend ?? false);
-          setEnableEmployeeLogReport((dataToLoad as any).enableEmployeeLogReport ?? false);
+          setSiteDropDownName((dataToLoad as ExtendedSite).siteDropDownName || '');
+          setSiteCustomDomainUrl((dataToLoad as ExtendedSite).siteCustomDomainUrl || '');
+          setSiteAccountManager((dataToLoad as ExtendedSite).siteAccountManager || '');
+          setSiteAccountManagerEmail((dataToLoad as ExtendedSite).siteAccountManagerEmail || '');
+          setSiteCelebrationsEnabled((dataToLoad as ExtendedSite).siteCelebrationsEnabled ?? false);
+          setAllowSessionTimeoutExtend((dataToLoad as ExtendedSite).allowSessionTimeoutExtend ?? false);
+          setEnableEmployeeLogReport((dataToLoad as ExtendedSite).enableEmployeeLogReport ?? false);
           
           // Regional Client Info settings
-          setRegionalOfficeName((dataToLoad as any).regionalClientInfo?.officeName || '');
-          setRegionalContactName((dataToLoad as any).regionalClientInfo?.contactName || '');
-          setRegionalContactEmail((dataToLoad as any).regionalClientInfo?.contactEmail || '');
-          setRegionalContactPhone((dataToLoad as any).regionalClientInfo?.contactPhone || '');
-          setRegionalAddressLine1((dataToLoad as any).regionalClientInfo?.addressLine1 || '');
-          setRegionalAddressLine2((dataToLoad as any).regionalClientInfo?.addressLine2 || '');
-          setRegionalAddressLine3((dataToLoad as any).regionalClientInfo?.addressLine3 || '');
-          setRegionalCity((dataToLoad as any).regionalClientInfo?.city || '');
-          setRegionalCountryState((dataToLoad as any).regionalClientInfo?.countryState || '');
-          setRegionalTaxId((dataToLoad as any).regionalClientInfo?.taxId || '');
+          setRegionalOfficeName((dataToLoad as ExtendedSite).regionalClientInfo?.officeName || '');
+          setRegionalContactName((dataToLoad as ExtendedSite).regionalClientInfo?.contactName || '');
+          setRegionalContactEmail((dataToLoad as ExtendedSite).regionalClientInfo?.contactEmail || '');
+          setRegionalContactPhone((dataToLoad as ExtendedSite).regionalClientInfo?.contactPhone || '');
+          setRegionalAddressLine1((dataToLoad as ExtendedSite).regionalClientInfo?.addressLine1 || '');
+          setRegionalAddressLine2((dataToLoad as ExtendedSite).regionalClientInfo?.addressLine2 || '');
+          setRegionalAddressLine3((dataToLoad as ExtendedSite).regionalClientInfo?.addressLine3 || '');
+          setRegionalCity((dataToLoad as ExtendedSite).regionalClientInfo?.city || '');
+          setRegionalCountryState((dataToLoad as ExtendedSite).regionalClientInfo?.countryState || '');
+          setRegionalTaxId((dataToLoad as ExtendedSite).regionalClientInfo?.taxId || '');
           
           // Authentication settings
-          setDisableDirectAccessAuth((dataToLoad as any).disableDirectAccessAuth ?? false);
-          setSsoProvider((dataToLoad as any).ssoProvider || '');
-          setSsoClientOfficeName((dataToLoad as any).ssoClientOfficeName || '');
+          setDisableDirectAccessAuth((dataToLoad as ExtendedSite).disableDirectAccessAuth ?? false);
+          setSsoProvider((dataToLoad as ExtendedSite).ssoProvider || '');
+          setSsoClientOfficeName((dataToLoad as ExtendedSite).ssoClientOfficeName || '');
           
           // Additional Optional Fields
           setShippingMode(dataToLoad.settings?.shippingMode || 'employee');
@@ -594,20 +656,20 @@ export function SiteConfiguration() {
               enableWelcomePage: currentSite.settings?.enableWelcomePage ?? false,
               skipReviewPage: currentSite.settings?.skipReviewPage ?? false,
             },
-            siteCode: (currentSite as any).siteCode || '',
-            siteErpIntegration: (currentSite as any).siteErpIntegration || '',
-            siteErpInstance: (currentSite as any).siteErpInstance || '',
-            siteShipFromCountry: (currentSite as any).siteShipFromCountry || 'US',
-            siteHrisSystem: (currentSite as any).siteHrisSystem || '',
-            siteDropDownName: (currentSite as any).siteDropDownName || '',
-            siteCustomDomainUrl: (currentSite as any).siteCustomDomainUrl || '',
-            siteAccountManager: (currentSite as any).siteAccountManager || '',
-            siteAccountManagerEmail: (currentSite as any).siteAccountManagerEmail || '',
-            siteCelebrationsEnabled: (currentSite as any).siteCelebrationsEnabled ?? false,
-            allowSessionTimeoutExtend: (currentSite as any).allowSessionTimeoutExtend ?? false,
-            enableEmployeeLogReport: (currentSite as any).enableEmployeeLogReport ?? false,
-            disableDirectAccessAuth: (currentSite as any).disableDirectAccessAuth ?? false,
-            ssoProvider: (currentSite as any).ssoProvider || '',
+            siteCode: (currentSite as ExtendedSite).siteCode || '',
+            siteErpIntegration: (currentSite as ExtendedSite).siteErpIntegration || '',
+            siteErpInstance: (currentSite as ExtendedSite).siteErpInstance || '',
+            siteShipFromCountry: (currentSite as ExtendedSite).siteShipFromCountry || 'US',
+            siteHrisSystem: (currentSite as ExtendedSite).siteHrisSystem || '',
+            siteDropDownName: (currentSite as ExtendedSite).siteDropDownName || '',
+            siteCustomDomainUrl: (currentSite as ExtendedSite).siteCustomDomainUrl || '',
+            siteAccountManager: (currentSite as ExtendedSite).siteAccountManager || '',
+            siteAccountManagerEmail: (currentSite as ExtendedSite).siteAccountManagerEmail || '',
+            siteCelebrationsEnabled: (currentSite as ExtendedSite).siteCelebrationsEnabled ?? false,
+            allowSessionTimeoutExtend: (currentSite as ExtendedSite).allowSessionTimeoutExtend ?? false,
+            enableEmployeeLogReport: (currentSite as ExtendedSite).enableEmployeeLogReport ?? false,
+            disableDirectAccessAuth: (currentSite as ExtendedSite).disableDirectAccessAuth ?? false,
+            ssoProvider: (currentSite as ExtendedSite).ssoProvider || '',
           });
         }
       };
@@ -671,12 +733,12 @@ export function SiteConfiguration() {
       const pathParts = path.split('.');
       
       // Navigate to the correct nested object
-      let current: any = newTranslations;
+      let current: Record<string, unknown> = newTranslations;
       for (let i = 0; i < pathParts.length - 1; i++) {
         if (!current[pathParts[i]]) {
           current[pathParts[i]] = {};
         }
-        current = current[pathParts[i]];
+        current = current[pathParts[i]] as Record<string, unknown>;
       }
       
       // Set the language value
@@ -684,7 +746,7 @@ export function SiteConfiguration() {
       if (!current[lastPart]) {
         current[lastPart] = {};
       }
-      current[lastPart][language] = value;
+      (current[lastPart] as Record<string, unknown>)[language] = value;
       
       return newTranslations;
     });
@@ -1859,7 +1921,7 @@ export function SiteConfiguration() {
             {/* Live/Draft Mode Toggle - Always editable, auto-switches to draft */}
             <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
               <button
-                onClick={() => handleModeToggle('live')}
+                onClick={() => void handleModeToggle('live')}
                 disabled={currentSite.status === 'draft'}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-semibold transition-all ${
                   configMode === 'live'
@@ -1872,7 +1934,7 @@ export function SiteConfiguration() {
                 <span className="hidden sm:inline">Live</span>
               </button>
               <button
-                onClick={() => handleModeToggle('draft')}
+                onClick={() => void handleModeToggle('draft')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-semibold transition-all ${
                   configMode === 'draft'
                     ? 'bg-amber-500 text-white shadow-sm'
@@ -1886,7 +1948,7 @@ export function SiteConfiguration() {
             </div>
             
             {/* Info message when in live mode - only show if no draft exists */}
-            {configMode === 'live' && currentSite.status === 'active' && !currentSite._hasUnpublishedChanges && !(currentSite as any).draftSettings && (
+            {configMode === 'live' && currentSite.status === 'active' && !currentSite._hasUnpublishedChanges && !(currentSite as ExtendedSite).draftSettings && (
               <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1897,16 +1959,16 @@ export function SiteConfiguration() {
             )}
             
             {/* Unpublished Changes Indicator - Show in live mode when draft changes exist */}
-            {configMode === 'live' && (currentSite._hasUnpublishedChanges || (currentSite as any).draftSettings) && (
+            {configMode === 'live' && (currentSite._hasUnpublishedChanges || (currentSite as ExtendedSite).draftSettings) && (
               <UnpublishedChangesIndicator 
-                onNavigateToDraft={() => handleModeToggle('draft')}
+                onNavigateToDraft={() => void handleModeToggle('draft')}
               />
             )}
 
             {/* Publish Button - Show in draft mode when there are unpublished changes (saved or unsaved) */}
-            {configMode === 'draft' && (currentSite.status === 'draft' || hasChanges || currentSite._hasUnpublishedChanges || (currentSite as any).draftSettings) && (
+            {configMode === 'draft' && (currentSite.status === 'draft' || hasChanges || currentSite._hasUnpublishedChanges || (currentSite as ExtendedSite).draftSettings) && (
               <Button
-                onClick={handlePublish}
+                onClick={() => void handlePublish()}
                 className="bg-green-600 hover:bg-green-700 text-white"
                 disabled={isPublishing || hasChanges}
                 size="default"
@@ -1928,9 +1990,9 @@ export function SiteConfiguration() {
             )}
             
             {/* Discard Draft Button - Only show in draft mode if there are saved draft changes */}
-            {configMode === 'draft' && !hasChanges && (currentSite._hasUnpublishedChanges || (currentSite as any).draftSettings) && (
+            {configMode === 'draft' && !hasChanges && (currentSite._hasUnpublishedChanges || (currentSite as ExtendedSite).draftSettings) && (
               <Button
-                onClick={handleDiscardDraft}
+                onClick={() => void handleDiscardDraft()}
                 variant="outline"
                 className="border-red-300 text-red-600 hover:bg-red-50"
                 size="default"
@@ -6035,7 +6097,7 @@ export function SiteConfiguration() {
       <PublishConfirmationModal
         isOpen={showPublishModal}
         onClose={() => setShowPublishModal(false)}
-        onConfirm={handleConfirmPublish}
+        onConfirm={() => void handleConfirmPublish()}
         changes={originalSiteData ? detectSiteChanges(originalSiteData, buildCurrentStateForComparison()) : []}
         isPublishing={isPublishing}
         siteName={siteName}
@@ -6045,7 +6107,7 @@ export function SiteConfiguration() {
       <DiscardConfirmationModal
         isOpen={showDiscardModal}
         onClose={() => setShowDiscardModal(false)}
-        onConfirm={handleConfirmDiscard}
+        onConfirm={() => void handleConfirmDiscard()}
         isDiscarding={isDiscarding}
         siteName={siteName}
       />
@@ -6057,7 +6119,7 @@ export function SiteConfiguration() {
           setShowUnsavedChangesModal(false);
           setPendingModeSwitch(null);
         }}
-        onSave={handleSaveUnsavedChanges}
+        onSave={() => void handleSaveUnsavedChanges()}
         onDiscard={handleDiscardUnsavedChanges}
         isSaving={isAutoSaving}
       />

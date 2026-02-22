@@ -212,7 +212,7 @@ export function AdminUserManagement() {
 
       const method = selectedUser ? 'PUT' : 'POST';
 
-      const body: any = {
+      const body: Record<string, unknown> = {
         username: formData.username,
         email: formData.email,
         role: formData.role,
@@ -667,7 +667,7 @@ export function AdminUserManagement() {
                         <td className="px-6 py-4">
                           <select
                             value={user.status}
-                            onChange={(e) => handleToggleStatus(user, e.target.value as 'active' | 'inactive')}
+                            onChange={(e) => void handleToggleStatus(user, e.target.value as 'active' | 'inactive')}
                             disabled={isSaving}
                             className={`px-3 py-1.5 text-xs font-semibold rounded-full border cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
                               user.status === 'active' 
@@ -706,7 +706,7 @@ export function AdminUserManagement() {
                               <Key className="w-4 h-4 text-blue-600" />
                             </button>
                             <button 
-                              onClick={() => handleDeleteUser(user)}
+                              onClick={() => void handleDeleteUser(user)}
                               disabled={isSaving}
                               className="p-2 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                               title="Delete User"
@@ -1034,7 +1034,7 @@ export function AdminUserManagement() {
                 Cancel
               </button>
               <button
-                onClick={handleSaveUser}
+                onClick={() => void handleSaveUser()}
                 disabled={isSaving}
                 className="px-4 py-2 bg-[#D91C81] text-white rounded-lg font-semibold hover:bg-[#B71569] transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
               >
@@ -1136,7 +1136,7 @@ export function AdminUserManagement() {
                 Cancel
               </button>
               <button
-                onClick={handleResetPassword}
+                onClick={() => void handleResetPassword()}
                 disabled={isSaving}
                 className="px-4 py-2 bg-[#D91C81] text-white rounded-lg font-semibold hover:bg-[#B71569] transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
               >

@@ -111,7 +111,7 @@ export function BootstrapAdmin() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={() => void handleSubmit()} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Email Address
@@ -188,7 +188,7 @@ export function BootstrapAdmin() {
 
         <div className="mt-6 text-center">
           <button
-            onClick={() => navigate('/admin/login')}
+            onClick={() => void navigate('/admin/login')}
             className="text-[#D91C81] hover:text-[#B71569] text-sm font-medium"
           >
             ← Back to Login

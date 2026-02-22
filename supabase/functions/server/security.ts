@@ -252,7 +252,7 @@ export const sanitize = {
     
     // If allowedKeys specified, filter object
     if (allowedKeys) {
-      const sanitized: any = {};
+      const sanitized: Record<string, unknown> = {};
       for (const key of allowedKeys) {
         if (key in input) {
           sanitized[key] = input[key];

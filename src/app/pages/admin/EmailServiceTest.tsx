@@ -134,7 +134,7 @@ export function EmailServiceTest() {
           )}
 
           <Button
-            onClick={checkEmailStatus}
+            onClick={() => void checkEmailStatus()}
             disabled={isCheckingStatus}
             className="w-full bg-[#D91C81] hover:bg-[#B01566] text-white"
           >
@@ -208,7 +208,7 @@ export function EmailServiceTest() {
           </div>
 
           <Button
-            onClick={handleSendTest}
+            onClick={() => void handleSendTest()}
             disabled={isSending || !emailStatus?.configured || !testEmail || !selectedTemplate}
             className="w-full bg-[#D91C81] hover:bg-[#B01566] text-white"
           >

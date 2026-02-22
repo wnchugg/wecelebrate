@@ -191,7 +191,7 @@ export function CreateSiteModal({ isOpen, onClose, onSuccess, clients }: CreateS
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
+        <form onSubmit={() => void handleSubmit()} className="flex-1 overflow-y-auto">
           {/* Step 0: Template Selection */}
           {step === 0 && (
             <div className="p-6 space-y-6">
@@ -489,7 +489,7 @@ export function CreateSiteModal({ isOpen, onClose, onSuccess, clients }: CreateS
             {step === 3 && (
               <button
                 type="button"
-                onClick={handleSubmit}
+                onClick={(e) => void handleSubmit(e as React.FormEvent)}
                 className="px-6 py-2 bg-[#D91C81] text-white rounded-lg font-semibold hover:bg-[#B71569] transition-all"
               >
                 Create Site

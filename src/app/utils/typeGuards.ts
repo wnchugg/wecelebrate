@@ -377,7 +377,7 @@ export function safeGet<T>(
   if (!isObject(obj)) return defaultValue;
   
   const keys = path.split('.');
-  let current: any = obj;
+  let current: unknown = obj;
   
   for (const key of keys) {
     if (!isObject(current) || !(key in current)) {
@@ -389,10 +389,10 @@ export function safeGet<T>(
   return isDefined(current) ? current : defaultValue;
 }
 
-export function safeSet<T extends Record<string, any>>(
+export function safeSet<T extends Record<string, unknown>>(
   obj: T,
   path: string,
-  value: any
+  value: unknown
 ): T {
   if (!isObject(obj)) return obj;
   
@@ -401,7 +401,7 @@ export function safeSet<T extends Record<string, any>>(
   
   if (!lastKey) return obj;
   
-  let current: any = obj;
+  let current: Record<string, unknown> = obj;
   
   for (const key of keys) {
     if (!isObject(current[key])) {

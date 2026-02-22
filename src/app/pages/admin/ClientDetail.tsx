@@ -111,7 +111,7 @@ export function ClientDetail() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <p className="text-gray-600">Client not found</p>
-          <Button onClick={() => navigate('/admin/clients')} className="mt-4">
+          <Button onClick={() => void navigate('/admin/clients')} className="mt-4">
             Back to Clients
           </Button>
         </div>
@@ -137,7 +137,7 @@ export function ClientDetail() {
         <div className="flex items-start gap-4">
           <Button
             variant="ghost"
-            onClick={() => navigate('/admin/clients')}
+            onClick={() => void navigate('/admin/clients')}
             className="mt-1"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -189,7 +189,7 @@ export function ClientDetail() {
             clientIdProp={client.id} 
             embedded={true} 
             activeTab={activeTab}
-            onSaveSuccess={loadData}
+            onSaveSuccess={() => void loadData()}
             sites={sites}
           />
         )}

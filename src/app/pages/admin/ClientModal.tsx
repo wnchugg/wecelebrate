@@ -319,7 +319,7 @@ export function ClientModal({ open, onClose, client, onSave }: ClientModalProps)
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="flex-1 overflow-hidden flex flex-col">
+        <form onSubmit={() => void handleSubmit()} className="flex-1 overflow-hidden flex flex-col">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 overflow-hidden flex flex-col">
             <TabsList className="w-full justify-start overflow-x-auto flex-shrink-0">
               <TabsTrigger value="basic">Basic Info</TabsTrigger>

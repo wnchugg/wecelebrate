@@ -1536,7 +1536,7 @@ export async function updateBrand(id: string, updates: any) {
   try {
     console.log('[CRUD DB] Updating brand:', id, updates);
     
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       updated_at: new Date().toISOString()
     };
     
@@ -1726,7 +1726,7 @@ export async function updateEmailTemplate(id: string, updates: any) {
   try {
     console.log('[CRUD DB] Updating email template:', id, updates);
     
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       updated_at: new Date().toISOString()
     };
     
@@ -2250,7 +2250,7 @@ export async function publishSite(id: string) {
     
     // Merge draft settings into live columns
     console.log('[CRUD DB] Merging draft settings into live columns');
-    const updates: any = {
+    const updates: Record<string, unknown> = {
       ...currentSite.draft_settings,  // All draft changes
       status: 'active',
       draft_settings: undefined,  // Clear draft after publishing

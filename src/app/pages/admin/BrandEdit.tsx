@@ -119,7 +119,7 @@ export function BrandEdit() {
             <p className="text-gray-600">{brand.name}</p>
           </div>
         </div>
-        <Button onClick={handleSave} disabled={isSaving}>
+        <Button onClick={() => void handleSave()} disabled={isSaving}>
           {isSaving ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -455,7 +455,7 @@ export function BrandEdit() {
 
       {/* Save Button (Bottom) */}
       <div className="mt-6 flex justify-end">
-        <Button onClick={handleSave} disabled={isSaving} size="lg">
+        <Button onClick={() => void handleSave()} disabled={isSaving} size="lg">
           {isSaving ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />

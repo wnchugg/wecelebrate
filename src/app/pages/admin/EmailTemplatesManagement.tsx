@@ -237,7 +237,7 @@ export function EmailTemplatesManagement() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleDuplicate(template)}
+                  onClick={() => void handleDuplicate(template)}
                 >
                   <Copy className="w-4 h-4" />
                 </Button>
@@ -251,7 +251,7 @@ export function EmailTemplatesManagement() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleDelete(template.id, template.name)}
+                  onClick={() => void handleDelete(template.id, template.name)}
                   disabled={isDeleting || template.isDefault}
                   className="text-red-600 hover:text-red-700 hover:bg-red-50"
                 >
@@ -285,7 +285,7 @@ export function EmailTemplatesManagement() {
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleCreateOrUpdate}>
+          <form onSubmit={() => void handleCreateOrUpdate()}>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>

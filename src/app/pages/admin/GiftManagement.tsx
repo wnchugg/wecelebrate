@@ -330,7 +330,7 @@ export function GiftManagement() {
             <Button
               variant="destructive"
               size="sm"
-              onClick={handleBulkDelete}
+              onClick={() => void handleBulkDelete()}
               disabled={isDeletingBulk}
             >
               <Trash2 className="w-4 h-4 mr-2" />
@@ -435,7 +435,7 @@ export function GiftManagement() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleDelete(gift.id, gift.name)}
+                    onClick={() => void handleDelete(gift.id, gift.name)}
                     className="text-red-600 hover:text-red-700 hover:bg-red-50"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -516,7 +516,7 @@ export function GiftManagement() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDelete(gift.id, gift.name)}
+                        onClick={() => void handleDelete(gift.id, gift.name)}
                         className="text-red-600 hover:text-red-700 hover:bg-red-50"
                       >
                         <Trash2 className="w-4 h-4" />

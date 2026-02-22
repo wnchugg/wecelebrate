@@ -19,14 +19,14 @@ import {
 /**
  * Check if value is a valid React element
  */
-export function isReactElement(value: any): value is ReactElement {
+export function isReactElement(value: unknown): value is ReactElement {
   return isValidElement(value);
 }
 
 /**
  * Get display name of a component
  */
-export function getDisplayName<P = any>(Component: ComponentType<P>): string {
+export function getDisplayName<P = Record<string, unknown>>(Component: ComponentType<P>): string {
   return Component.displayName || Component.name || 'Component';
 }
 
@@ -44,12 +44,12 @@ export function createNamedComponent<P = {}>(
 /**
  * Render children as function or element
  */
-export function renderChildren(
-  children: ReactNode | ((props: any) => ReactNode),
-  props?: any
+export function renderChildren<T = Record<string, unknown>>(
+  children: ReactNode | ((props: T) => ReactNode),
+  props?: T
 ): ReactNode {
   if (typeof children === 'function') {
-    return children(props);
+    return children(props as T);
   }
   return children;
 }
@@ -57,7 +57,7 @@ export function renderChildren(
 /**
  * Clone element with additional props
  */
-export function cloneElementWithProps<P = any>(
+export function cloneElementWithProps<P = Record<string, unknown>>(
   element: ReactElement<P>,
   additionalProps: Partial<P>
 ): ReactElement<P> {
@@ -67,7 +67,7 @@ export function cloneElementWithProps<P = any>(
 /**
  * Map children and clone with props
  */
-export function mapChildrenWithProps<P = any>(
+export function mapChildrenWithProps<P = Record<string, unknown>>(
   children: ReactNode,
   additionalProps: Partial<P> | ((child: ReactElement<P>, index: number) => Partial<P>)
 ): ReactNode {
@@ -87,7 +87,7 @@ export function mapChildrenWithProps<P = any>(
 /**
  * Filter children by type
  */
-export function filterChildrenByType<P = any>(
+export function filterChildrenByType<P = Record<string, unknown>>(
   children: ReactNode,
   type: ComponentType<P> | string
 ): Array<ReactElement<P>> {
@@ -105,7 +105,7 @@ export function filterChildrenByType<P = any>(
 /**
  * Find child by type
  */
-export function findChildByType<P = any>(
+export function findChildByType<P = Record<string, unknown>>(
   children: ReactNode,
   type: ComponentType<P> | string
 ): ReactElement<P> | null {
@@ -137,7 +137,7 @@ export function hasChildren(children: ReactNode): boolean {
 /**
  * Get only child (throws if multiple)
  */
-export function getOnlyChild<P = any>(children: ReactNode): ReactElement<P> {
+export function getOnlyChild<P = Record<string, unknown>>(children: ReactNode): ReactElement<P> {
   return Children.only(children) as ReactElement<P>;
 }
 
@@ -170,7 +170,7 @@ export function flattenChildren(children: ReactNode): ReactNode[] {
  */
 export function createCompoundComponent<
   MainProps,
-  SubComponents extends Record<string, ComponentType<any>>
+  SubComponents extends Record<string, ComponentType<Record<string, unknown>>>
 >(
   MainComponent: FC<MainProps>,
   subComponents: SubComponents
@@ -227,22 +227,22 @@ export function createContextWithHook<T>(displayName: string): {
 /**
  * Compose components (HOC)
  */
-export function compose<P = any>(
-  ...components: Array<ComponentType<any>>
+export function compose<P = Record<string, unknown>>(
+  ...components: Array<ComponentType<Record<string, unknown>>>
 ): ComponentType<P> {
   return components.reduce(
-    (Acc, Curr) => (props: P) => createElement(Curr, props as any, createElement(Acc, props)),
-    ((props: P) => props) as any
+    (Acc, Curr) => (props: P) => createElement(Curr, props as Record<string, unknown>, createElement(Acc, props)),
+    ((props: P) => props) as ComponentType<P>
   );
 }
 
 /**
  * Create lazy component with preload
  */
-export function createLazyWithPreload<T extends ComponentType<any>>(
+export function createLazyWithPreload<T extends ComponentType<Record<string, unknown>>>(
   factory: () => Promise<{ default: T }>
 ): React.LazyExoticComponent<T> & { preload: () => Promise<{ default: T }> } {
-  const LazyComponent = React.lazy(factory) as any;
+  const LazyComponent = React.lazy(factory) as React.LazyExoticComponent<T> & { preload: () => Promise<{ default: T }> };
   LazyComponent.preload = factory;
   return LazyComponent;
 }
@@ -271,7 +271,7 @@ export const If: FC<{ condition: boolean; children: ReactNode; fallback?: ReactN
 /**
  * Switch/Case render
  */
-export const Switch: FC<{ value: any; children: ReactNode }> = ({ value, children }) => {
+export const Switch: FC<{ value: unknown; children: ReactNode }> = ({ value, children }) => {
   let matchedCase: ReactNode = null;
   let defaultCase: ReactNode = null;
   
@@ -290,7 +290,7 @@ export const Switch: FC<{ value: any; children: ReactNode }> = ({ value, childre
   return <>{matchedCase || defaultCase}</>;
 };
 
-export const Case: FC<{ value: any; children: ReactNode }> = ({ children }) => <>{children}</>;
+export const Case: FC<{ value: unknown; children: ReactNode }> = ({ children }) => <>{children}</>;
 export const Default: FC<{ children: ReactNode }> = ({ children }) => <>{children}</>;
 
 /**

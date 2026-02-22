@@ -24,7 +24,7 @@ const SAMPLE_VARIABLES: Record<string, string> = {
   logoUrl: 'https://example.com/logo.png',
 };
 
-const VARIABLE_ICONS: Record<string, any> = {
+const VARIABLE_ICONS: Record<string, React.ComponentType> = {
   userName: User,
   userEmail: MailIcon,
   companyName: Building,
@@ -139,7 +139,7 @@ export function TestEmailModal({ template, onClose }: TestEmailModalProps) {
                 }}
               />
               <button
-                onClick={handleSendTest}
+                onClick={() => void handleSendTest()}
                 disabled={isSending}
                 className="inline-flex items-center gap-2 bg-[#D91C81] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#B71569] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >

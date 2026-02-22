@@ -65,7 +65,7 @@ export function ValidationTest() {
               </p>
             </div>
             <button
-              onClick={runTests}
+              onClick={() => void runTests()}
               disabled={isRunning}
               className="flex items-center gap-2 px-6 py-3 bg-[#D91C81] text-white rounded-lg hover:bg-[#B71569] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >

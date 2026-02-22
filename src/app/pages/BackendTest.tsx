@@ -51,7 +51,7 @@ export function BackendTest() {
         </p>
         
         <button
-          onClick={handleTest}
+          onClick={() => void handleTest()}
           className="px-6 py-3 bg-[#D91C81] text-white rounded-lg hover:bg-[#B71869] transition-colors font-semibold"
         >
           Run Backend Test

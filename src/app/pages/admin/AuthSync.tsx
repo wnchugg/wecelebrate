@@ -109,7 +109,7 @@ export default function AuthSync() {
         </CardHeader>
         <CardContent className="space-y-4">
           <Button
-            onClick={checkAuthStatus}
+            onClick={() => void checkAuthStatus()}
             disabled={checking}
             className="bg-[#00B4CC] hover:bg-[#0099B3] text-white"
           >
@@ -194,7 +194,7 @@ export default function AuthSync() {
         </CardHeader>
         <CardContent className="space-y-4">
           <Button
-            onClick={syncAdminAuth}
+            onClick={() => void syncAdminAuth()}
             disabled={loading}
             className="bg-[#D91C81] hover:bg-[#B01669] text-white"
           >

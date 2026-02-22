@@ -205,7 +205,7 @@ export function TestingDashboard() {
         </div>
         
         <Button
-          onClick={handleRefresh}
+          onClick={() => void handleRefresh()}
           disabled={isRefreshing}
           variant="outline"
           className="gap-2"

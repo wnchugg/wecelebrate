@@ -304,7 +304,7 @@ export function ClientSiteERPAssignment() {
 
               {/* Save Button */}
               <button
-                onClick={handleSaveClientAssignment}
+                onClick={() => void handleSaveClientAssignment()}
                 disabled={saving || !clientAssignment.erpConnectionId}
                 className="w-full px-6 py-3 bg-[#D91C81] text-white rounded-lg hover:bg-[#B91670] transition-colors flex items-center justify-center gap-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -465,7 +465,7 @@ export function ClientSiteERPAssignment() {
 
                   {/* Save Button */}
                   <button
-                    onClick={handleSaveSiteAssignment}
+                    onClick={() => void handleSaveSiteAssignment()}
                     disabled={saving || !siteAssignment.erpConnectionId}
                     className="w-full px-6 py-3 bg-[#D91C81] text-white rounded-lg hover:bg-[#B91670] transition-colors flex items-center justify-center gap-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >

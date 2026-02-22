@@ -241,7 +241,7 @@ export function ClientPerformanceAnalytics() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/admin/reports')}
+            onClick={() => void navigate('/admin/reports')}
             className="gap-2"
           >
             <ArrowLeft className="w-4 h-4" />

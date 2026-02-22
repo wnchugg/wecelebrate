@@ -291,7 +291,7 @@ export function WebhookManagement() {
 
                     <div className="flex items-center gap-2 ml-4">
                       <button
-                        onClick={() => handleToggleWebhook(webhook)}
+                        onClick={() => void handleToggleWebhook(webhook)}
                         className="p-2 text-gray-600 hover:text-[#D91C81] hover:bg-pink-50 rounded-lg transition-colors"
                         title={webhook.enabled ? 'Disable' : 'Enable'}
                       >
@@ -312,7 +312,7 @@ export function WebhookManagement() {
                         <Edit className="w-5 h-5" />
                       </button>
                       <button
-                        onClick={() => handleDelete(webhook.id)}
+                        onClick={() => void handleDelete(webhook.id)}
                         className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Delete"
                       >

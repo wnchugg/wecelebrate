@@ -283,7 +283,7 @@ export function OrderManagement() {
           <Button
             variant="outline"
             size="sm"
-            onClick={loadOrders}
+            onClick={() => void loadOrders()}
             className="gap-2"
           >
             <RefreshCw className="w-4 h-4" />
@@ -411,7 +411,7 @@ export function OrderManagement() {
               <Button
                 size="sm"
                 variant="secondary"
-                onClick={() => handleBulkStatusUpdate('processing')}
+                onClick={() => void handleBulkStatusUpdate('processing')}
                 className="bg-white/20 hover:bg-white/30 text-white border-0"
               >
                 Mark Processing
@@ -419,7 +419,7 @@ export function OrderManagement() {
               <Button
                 size="sm"
                 variant="secondary"
-                onClick={() => handleBulkStatusUpdate('shipped')}
+                onClick={() => void handleBulkStatusUpdate('shipped')}
                 className="bg-white/20 hover:bg-white/30 text-white border-0"
               >
                 Mark Shipped
@@ -427,7 +427,7 @@ export function OrderManagement() {
               <Button
                 size="sm"
                 variant="secondary"
-                onClick={() => handleBulkStatusUpdate('delivered')}
+                onClick={() => void handleBulkStatusUpdate('delivered')}
                 className="bg-white/20 hover:bg-white/30 text-white border-0"
               >
                 Mark Delivered

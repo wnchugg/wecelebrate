@@ -149,7 +149,7 @@ export function GiftDetail() {
         <div className="max-w-6xl mx-auto">
           {/* Back Button */}
           <button
-            onClick={() => navigate('../gift-selection')}
+            onClick={() => void navigate('../gift-selection')}
             className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors mb-6"
             aria-label={t('common.back')}
           >

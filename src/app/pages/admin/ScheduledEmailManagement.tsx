@@ -44,8 +44,12 @@ export function ScheduledEmailManagement() {
 
   useEffect(() => {
     if (currentSite) {
-      loadScheduledEmails();
-      loadStats();
+      void loadScheduledEmails().catch((error) => {
+        console.error('Error loading scheduled emails:', error);
+      });
+      void loadStats().catch((error) => {
+        console.error('Error loading stats:', error);
+      });
     }
   }, [currentSite?.id, filterStatus]);
 
@@ -111,8 +115,12 @@ export function ScheduledEmailManagement() {
       if (!response.ok) throw new Error('Failed to cancel email');
       
       toast.success(t('notification.success.emailCancelled'));
-      loadScheduledEmails();
-      loadStats();
+      void loadScheduledEmails().catch((error) => {
+        console.error('Error reloading emails:', error);
+      });
+      void loadStats().catch((error) => {
+        console.error('Error reloading stats:', error);
+      });
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : t('notification.error.unknownError'));
     }
@@ -128,8 +136,12 @@ export function ScheduledEmailManagement() {
       if (!response.ok) throw new Error('Failed to retry email');
       
       toast.success(t('notification.success.emailRetry'));
-      loadScheduledEmails();
-      loadStats();
+      void loadScheduledEmails().catch((error) => {
+        console.error('Error reloading emails:', error);
+      });
+      void loadStats().catch((error) => {
+        console.error('Error reloading stats:', error);
+      });
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : t('notification.error.unknownError'));
     }
@@ -149,8 +161,12 @@ export function ScheduledEmailManagement() {
       if (!response.ok) throw new Error('Failed to delete email');
       
       toast.success(t('notification.success.emailDeleted'));
-      loadScheduledEmails();
-      loadStats();
+      void loadScheduledEmails().catch((error) => {
+        console.error('Error reloading emails:', error);
+      });
+      void loadStats().catch((error) => {
+        console.error('Error reloading stats:', error);
+      });
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : t('notification.error.unknownError'));
     }
@@ -169,8 +185,12 @@ export function ScheduledEmailManagement() {
       toast.success(
         translateWithParams(t, 'notification.success.emailsProcessed', { processed: data.processed, sent: data.sent, failed: data.failed })
       );
-      loadScheduledEmails();
-      loadStats();
+      void loadScheduledEmails().catch((error) => {
+        console.error('Error reloading emails:', error);
+      });
+      void loadStats().catch((error) => {
+        console.error('Error reloading stats:', error);
+      });
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : t('notification.error.unknownError'));
     }
@@ -191,8 +211,12 @@ export function ScheduledEmailManagement() {
 
       toast.success(t('notification.success.emailScheduled'));
       setShowForm(false);
-      loadScheduledEmails();
-      loadStats();
+      void loadScheduledEmails().catch((error) => {
+        console.error('Error reloading emails:', error);
+      });
+      void loadStats().catch((error) => {
+        console.error('Error reloading stats:', error);
+      });
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : t('notification.error.unknownError'));
     }
@@ -294,7 +318,7 @@ export function ScheduledEmailManagement() {
           </div>
           <div className="flex items-center gap-3">
             <button
-              onClick={handleProcessEmails}
+              onClick={() => void handleProcessEmails()}
               className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Send className="w-4 h-4" />
@@ -379,7 +403,7 @@ export function ScheduledEmailManagement() {
 
                     {email.status === 'pending' && (
                       <button
-                        onClick={() => handleCancel(email.id)}
+                        onClick={() => void handleCancel(email.id)}
                         className="ml-4 p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Cancel"
                       >
@@ -397,7 +421,7 @@ export function ScheduledEmailManagement() {
         {showForm && (
           <ScheduleEmailForm
             siteId={currentSite.id}
-            onSave={handleScheduleEmail}
+            onSave={() => void handleScheduleEmail()}
             onCancel={() => setShowForm(false)}
           />
         )}

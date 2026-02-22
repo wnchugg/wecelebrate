@@ -165,7 +165,7 @@ export default function CatalogEdit() {
       {/* Header */}
       <div className="mb-6">
         <button
-          onClick={() => navigate('/admin/catalogs')}
+          onClick={() => void navigate('/admin/catalogs')}
           className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -187,7 +187,7 @@ export default function CatalogEdit() {
       )}
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={() => void handleSubmit()} className="space-y-6">
         {/* Basic Information */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
@@ -476,7 +476,7 @@ export default function CatalogEdit() {
         <div className="flex items-center justify-end gap-4">
           <button
             type="button"
-            onClick={() => navigate('/admin/catalogs')}
+            onClick={() => void navigate('/admin/catalogs')}
             className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             disabled={saving}
           >

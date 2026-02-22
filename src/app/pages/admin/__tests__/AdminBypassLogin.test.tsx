@@ -4,10 +4,11 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import AdminBypassLogin from '../AdminBypassLogin';
 import { BrowserRouter } from 'react-router';
+import { LanguageProvider } from '../../../context/LanguageContext';
 
 // Mock useParams and useSearchParams
 vi.mock('react-router', async () => {
@@ -83,9 +84,11 @@ vi.mock('../../../utils/apiErrors', () => ({
 
 function TestWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <BrowserRouter>
-      {children}
-    </BrowserRouter>
+    <LanguageProvider>
+      <BrowserRouter>
+        {children}
+      </BrowserRouter>
+    </LanguageProvider>
   );
 }
 
@@ -181,16 +184,18 @@ describe('Admin Bypass Login Component', () => {
 
     it('should clear validation errors when user types', async () => {
       const user = userEvent.setup();
-      render(
+      const { container } = render(
         <TestWrapper>
           <AdminBypassLogin />
         </TestWrapper>
       );
 
       const emailInput = screen.getByLabelText('Email Address');
-      const submitButton = screen.getByRole('button', { name: /sign in/i });
 
-      await user.click(submitButton);
+      // Submit the form directly (button is disabled when fields are empty)
+      const form = container.querySelector('form');
+      expect(form).toBeTruthy();
+      fireEvent.submit(form!);
 
       await waitFor(() => {
         expect(screen.getByText('Email is required')).toBeInTheDocument();

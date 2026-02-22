@@ -80,15 +80,15 @@ export async function timeoutWithRetry<T>(
 /**
  * Debounce an async function
  */
-export function debounceAsync<T extends (...args: any[]) => Promise<any>>(
+export function debounceAsync<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
   delay: number
 ): T {
   let timeoutId: NodeJS.Timeout;
-  let latestResolve: ((value: any) => void) | null = null;
-  let latestReject: ((reason: any) => void) | null = null;
+  let latestResolve: ((value: unknown) => void) | null = null;
+  let latestReject: ((reason: unknown) => void) | null = null;
   
-  return ((...args: any[]) => {
+  return ((...args: unknown[]) => {
     clearTimeout(timeoutId);
     
     return new Promise((resolve, reject) => {
@@ -97,7 +97,7 @@ export function debounceAsync<T extends (...args: any[]) => Promise<any>>(
       
       timeoutId = setTimeout(async () => {
         try {
-          const result = await fn(...args);
+          const result = await fn(...(args as Parameters<T>));
           if (latestResolve === resolve) {
             resolve(result);
           }
@@ -114,28 +114,28 @@ export function debounceAsync<T extends (...args: any[]) => Promise<any>>(
 /**
  * Throttle an async function
  */
-export function throttleAsync<T extends (...args: any[]) => Promise<any>>(
+export function throttleAsync<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
   delay: number
 ): T {
   let isThrottled = false;
-  let pendingArgs: any[] | null = null;
+  let pendingArgs: unknown[] | null = null;
   
-  return (async (...args: any[]) => {
+  return (async (...args: unknown[]) => {
     if (isThrottled) {
       pendingArgs = args;
       return;
     }
     
     isThrottled = true;
-    const result = await fn(...args);
+    const result = await fn(...(args as Parameters<T>));
     
     setTimeout(() => {
       isThrottled = false;
       if (pendingArgs) {
         const args = pendingArgs;
         pendingArgs = null;
-        void fn(...args);
+        void fn(...(args as Parameters<T>));
       }
     }, delay);
     
@@ -146,13 +146,13 @@ export function throttleAsync<T extends (...args: any[]) => Promise<any>>(
 /**
  * Execute promises in batches
  */
-export async function batchExecute<T>(
+export async function batchExecute<T, R>(
   items: T[],
   batchSize: number,
-  executor: (item: T) => Promise<any>,
+  executor: (item: T) => Promise<R>,
   delayBetweenBatches?: number
-): Promise<any[]> {
-  const results: any[] = [];
+): Promise<R[]> {
+  const results: R[] = [];
   
   for (let i = 0; i < items.length; i += batchSize) {
     const batch = items.slice(i, i + batchSize);
@@ -170,11 +170,11 @@ export async function batchExecute<T>(
 /**
  * Execute promises sequentially
  */
-export async function sequential<T>(
+export async function sequential<T, R>(
   items: T[],
-  executor: (item: T, index: number) => Promise<any>
-): Promise<any[]> {
-  const results: any[] = [];
+  executor: (item: T, index: number) => Promise<R>
+): Promise<R[]> {
+  const results: R[] = [];
   
   for (let i = 0; i < items.length; i++) {
     const result = await executor(items[i], i);
@@ -187,12 +187,12 @@ export async function sequential<T>(
 /**
  * Execute promises in parallel with concurrency limit
  */
-export async function parallel<T>(
+export async function parallel<T, R>(
   items: T[],
   concurrency: number,
-  executor: (item: T) => Promise<any>
-): Promise<any[]> {
-  const results: any[] = new Array(items.length);
+  executor: (item: T) => Promise<R>
+): Promise<R[]> {
+  const results: R[] = new Array(items.length);
   let currentIndex = 0;
   
   async function executeNext(index: number): Promise<void> {
@@ -269,14 +269,14 @@ export async function withFallbacks<T>(
 /**
  * Memoize async function results
  */
-export function memoizeAsync<T extends (...args: any[]) => Promise<any>>(
+export function memoizeAsync<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
   options?: {
     maxAge?: number;
     keyFn?: (...args: Parameters<T>) => string;
   }
 ): T {
-  const cache = new Map<string, { value: any; timestamp: number }>();
+  const cache = new Map<string, { value: Awaited<ReturnType<T>>; timestamp: number }>();
   const maxAge = options?.maxAge ?? Infinity;
   const keyFn = options?.keyFn ?? ((...args: Parameters<T>) => JSON.stringify(args));
   
@@ -358,12 +358,12 @@ export async function poll<T>(
 export interface Deferred<T> {
   promise: Promise<T>;
   resolve: (value: T) => void;
-  reject: (reason?: any) => void;
+  reject: (reason?: unknown) => void;
 }
 
 export function deferred<T>(): Deferred<T> {
   let resolve: (value: T) => void;
-  let reject: (reason?: any) => void;
+  let reject: (reason?: unknown) => void;
   
   const promise = new Promise<T>((res, rej) => {
     resolve = res;
@@ -378,20 +378,20 @@ export function deferred<T>(): Deferred<T> {
  */
 export async function allSettled<T>(
   promises: Promise<T>[]
-): Promise<Array<{ status: 'fulfilled'; value: T } | { status: 'rejected'; reason: any }>> {
+): Promise<Array<{ status: 'fulfilled'; value: T } | { status: 'rejected'; reason: unknown }>> {
   return Promise.allSettled(promises);
 }
 
 /**
  * Safe async function wrapper
  */
-export function safeAsync<T extends (...args: any[]) => Promise<any>>(
+export function safeAsync<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T
 ): (...args: Parameters<T>) => Promise<{ data: Awaited<ReturnType<T>> | null; error: Error | null }> {
   return async (...args: Parameters<T>) => {
     try {
       const data = await fn(...args);
-      return { data, error: null };
+      return { data: data as Awaited<ReturnType<T>>, error: null };
     } catch (error) {
       return { data: null, error: error instanceof Error ? error : new Error(String(error)) };
     }

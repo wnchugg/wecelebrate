@@ -6152,7 +6152,8 @@ app.post("/make-server-6fcaeea3/public/validate/employee", async (c) => {
         console.log(`[Employee Validation] Found ${employees.length} employees in PostgreSQL for site ${siteId}`);
       } catch (dbError) {
         console.error('[Employee Validation] Failed to load employees from PostgreSQL:', dbError);
-        employees = [];
+        // DEBUG: temporarily expose error to diagnose why DB fallback fails
+        return c.json({ error: 'DB_ERROR', details: String(dbError), siteId, step: 'getEmployees' }, 500);
       }
     }
 
@@ -6535,12 +6536,14 @@ app.get("/make-server-6fcaeea3/public/sites/:siteId/gifts", async (c) => {
         }
       } catch (dbError) {
         console.error('[Public Gifts] Failed to load site from PostgreSQL:', dbError);
+        // DEBUG: temporarily expose error to diagnose why DB fallback fails
+        return c.json({ error: 'DB_ERROR', details: String(dbError), siteId, step: 'getSiteById' }, 500);
       }
     }
 
     if (!site) {
       console.log(`[Public API] Site "${siteId}" not found in KV or PostgreSQL in environment: ${environmentId}`);
-      return c.json({ error: 'Site not found' }, 404);
+      return c.json({ error: 'Site not found', debug_note: 'DB fallback returned null/undefined', siteId }, 404);
     }
 
     if (site.status !== 'active') {

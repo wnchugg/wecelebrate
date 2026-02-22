@@ -3,8 +3,6 @@ import { useNavigate, useParams, Link } from 'react-router';
 import { useLanguage } from '../context/LanguageContext';
 import { useOrder } from '../context/OrderContext';
 import { CheckCircle, Package, Calendar, Home, Sparkles, Loader2 } from 'lucide-react';
-import { LanguageSelector } from '../components/LanguageSelector';
-import Logo from '../../imports/Logo';
 import { getCurrentEnvironment, buildApiUrl } from '../config/deploymentEnvironments';
 import { toast } from 'sonner';
 import { logger } from '../utils/logger';
@@ -146,18 +144,6 @@ export function Confirmation() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="h-8 w-[88px]">
-              <Logo />
-            </div>
-            <LanguageSelector />
-          </div>
-        </div>
-      </header>
-
       {/* Main Content */}
       <div className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
@@ -190,7 +176,7 @@ export function Confirmation() {
             {/* Order Number */}
             <div className="text-center pb-6 mb-6 border-b border-gray-200">
               <p className="text-sm text-gray-500 mb-1">{t('confirmation.orderNumber')}</p>
-              <p className="text-2xl font-bold text-gray-900 font-mono">{order.orderNumber}</p>
+              <p className="text-2xl font-bold text-gray-900">{order.orderNumber}</p>
             </div>
 
             {/* Gift Details */}
@@ -267,7 +253,7 @@ export function Confirmation() {
             <p>{t('confirmation.needHelp')}</p>
             <p className="mt-1">
               {t('confirmation.contactSupportWithOrder')}{' '}
-              <span className="font-mono font-semibold text-gray-900">{orderId}</span>
+              <span className="font-mono font-semibold text-gray-900">{order.orderNumber || orderId}</span>
             </p>
           </div>
         </div>

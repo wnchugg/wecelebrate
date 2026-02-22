@@ -25,6 +25,7 @@ export interface AddressSuggestion {
 
 interface AddressAutocompleteProps {
   onSelect: (address: AddressData) => void;
+  onChange?: (value: string) => void;
   country?: string;
   placeholder?: string;
   className?: string;
@@ -35,6 +36,7 @@ interface AddressAutocompleteProps {
 
 export function AddressAutocomplete({
   onSelect,
+  onChange,
   country,
   placeholder = 'Start typing address...',
   className,
@@ -177,7 +179,10 @@ export function AddressAutocomplete({
           ref={inputRef}
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            onChange?.(e.target.value);
+          }}
           onKeyDown={handleKeyDown}
           onFocus={() => {
             if (suggestions.length > 0) {

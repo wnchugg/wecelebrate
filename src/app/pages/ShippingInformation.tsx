@@ -6,6 +6,8 @@ import { useOrder } from '../context/OrderContext';
 import { usePublicSite } from '../context/PublicSiteContext';
 import { countries, getCountryByCode, Country } from '../utils/countries';
 import { useLanguage } from '../context/LanguageContext';
+import { AddressAutocomplete, AddressData } from '../components/ui/address-autocomplete';
+import { toast } from 'sonner';
 
 export function ShippingInformation() {
   const navigate = useNavigate();
@@ -31,6 +33,20 @@ export function ShippingInformation() {
   // Get current country details
   const selectedCountry = getCountryByCode(formData.country);
 
+  // Handle address autocomplete selection — auto-fills all address fields
+  const handleAddressSelect = (address: AddressData) => {
+    setFormData(prev => ({
+      ...prev,
+      street: address.line1,
+      city: address.city || prev.city,
+      state: address.state || prev.state,
+      zipCode: address.postalCode || prev.zipCode,
+      ...(address.country && availableCountries.some(c => c.code === address.country)
+        ? { country: address.country }
+        : {}),
+    }));
+  };
+
   useEffect(() => {
     if (!selectedGift) {
       void navigate('../gift-selection');
@@ -39,7 +55,13 @@ export function ShippingInformation() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    // Validate street address when not using company shipping
+    if (companyConfig.shippingMethod !== 'company' && !formData.street.trim()) {
+      toast.error('Please enter your street address');
+      return;
+    }
+
     if (companyConfig.shippingMethod === 'company' && companyConfig.companyAddress) {
       // Use company address
       setShippingAddress({
@@ -198,17 +220,13 @@ export function ShippingInformation() {
                 </div>
               
                 <div>
-                  <label htmlFor="street" className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     {t('shipping.address')} *
                   </label>
-                  <input
-                    type="text"
-                    id="street"
-                    name="street"
-                    value={formData.street}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#D91C81] focus:ring-4 focus:ring-pink-100 transition-all outline-none"
+                  <AddressAutocomplete
+                    onSelect={handleAddressSelect}
+                    onChange={(value) => setFormData(prev => ({ ...prev, street: value }))}
+                    country={formData.country}
                     placeholder={t('shipping.enterStreet')}
                   />
                 </div>

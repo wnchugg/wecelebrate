@@ -114,6 +114,13 @@ export function ConfigurableHeader({ config, siteName, clientName }: Configurabl
     : location.pathname;
   const currentStep = stepMap[currentPath];
 
+  // The hamburger menu is only needed if there's actual content beyond the language selector
+  const hasMobileMenuContent =
+    (headerConfig.navigation.enabled && headerConfig.navigation.items.length > 0) ||
+    headerConfig.authButtons.enabled ||
+    (headerConfig.search.enabled) ||
+    (headerConfig.siteSwitcher.enabled && headerConfig.siteSwitcher.showInHeader && sites.length > 1);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -160,203 +167,208 @@ export function ConfigurableHeader({ config, siteName, clientName }: Configurabl
             )}
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
-            {/* Navigation Items */}
-            {headerConfig.navigation.enabled && headerConfig.navigation.items.length > 0 && (
-              <nav className="flex items-center gap-4">
-                {headerConfig.navigation.items
-                  .filter(item => {
-                    if (item.requiresAuth && !isAuthenticated) return false;
-                    return true;
-                  })
-                  .map(item => (
-                    <Link
-                      key={item.id}
-                      to={item.url}
-                      className="text-gray-700 hover:text-[#D91C81] px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                      target={item.external ? '_blank' : undefined}
-                      rel={item.external ? 'noopener noreferrer' : undefined}
-                    >
-                      {item.label}
-                      {item.badge && (
-                        <span className="ml-2 px-2 py-0.5 text-xs bg-[#D91C81] text-white rounded-full">
-                          {item.badge}
-                        </span>
-                      )}
-                    </Link>
-                  ))}
-              </nav>
-            )}
-
-            {/* Progress Bar */}
-            {isAuthenticated && headerConfig.progressBar.enabled && currentStep && (
-              <nav aria-label="Progress steps" className="flex items-center gap-2 text-sm">
-                {/* Welcome Step (only if enabled) */}
-                {isWelcomePageEnabled && (
-                  <>
-                    <Link
-                      to={siteId ? `/site/${siteId}/welcome` : '/welcome'}
-                      className={`px-3 py-1 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[#D91C81] ${
-                        currentStep.step === 0
-                          ? 'bg-pink-100 text-[#D91C81] font-semibold'
-                          : currentStep.step > 0
-                          ? 'text-gray-600 hover:text-[#D91C81]'
-                          : 'text-gray-400'
-                      }`}
-                      aria-current={currentStep.step === 0 ? 'step' : undefined}
-                    >
-                      {headerConfig.progressBar.showLabels ? '0. Welcome' : '0'}
-                    </Link>
-                    <ChevronRight className="w-4 h-4 text-gray-400" aria-hidden="true" />
-                  </>
-                )}
-                
-                {/* Select Gift Step */}
-                <Link
-                  to={siteId ? `/site/${siteId}/gift-selection` : '/gift-selection'}
-                  className={`px-3 py-1 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[#D91C81] ${
-                    currentStep.step === 1
-                      ? 'bg-pink-100 text-[#D91C81] font-semibold'
-                      : currentStep.step > 1
-                      ? 'text-gray-600 hover:text-[#D91C81]'
-                      : 'text-gray-400'
-                  }`}
-                  aria-current={currentStep.step === 1 ? 'step' : undefined}
-                >
-                  {headerConfig.progressBar.showLabels ? '1. Select Gift' : '1'}
-                </Link>
-                <ChevronRight className="w-4 h-4 text-gray-400" aria-hidden="true" />
-                
-                {/* Shipping Step */}
-                <span
-                  className={`px-3 py-1 rounded-lg transition-colors ${
-                    currentStep.step === 2
-                      ? 'bg-pink-100 text-[#D91C81] font-semibold'
-                      : currentStep.step > 2
-                      ? 'text-gray-600'
-                      : 'text-gray-400'
-                  }`}
-                  aria-current={currentStep.step === 2 ? 'step' : undefined}
-                >
-                  {headerConfig.progressBar.showLabels ? '2. Shipping' : '2'}
-                </span>
-                <ChevronRight className="w-4 h-4 text-gray-400" aria-hidden="true" />
-                
-                {/* Review Step */}
-                <span
-                  className={`px-3 py-1 rounded-lg transition-colors ${
-                    currentStep.step === 3
-                      ? 'bg-pink-100 text-[#D91C81] font-semibold'
-                      : currentStep.step > 3
-                      ? 'text-gray-600'
-                      : 'text-gray-400'
-                  }`}
-                  aria-current={currentStep.step === 3 ? 'step' : undefined}
-                >
-                  {headerConfig.progressBar.showLabels ? '3. Review' : '3'}
-                </span>
-                <ChevronRight className="w-4 h-4 text-gray-400" aria-hidden="true" />
-                
-                {/* Confirmation Step */}
-                <span
-                  className={`px-3 py-1 rounded-lg transition-colors ${
-                    currentStep.step === 4
-                      ? 'bg-pink-100 text-[#D91C81] font-semibold'
-                      : 'text-gray-400'
-                  }`}
-                  aria-current={currentStep.step === 4 ? 'step' : undefined}
-                >
-                  {headerConfig.progressBar.showLabels ? '4. Confirmation' : '4'}
-                </span>
-              </nav>
-            )}
-
-            {/* Site Switcher */}
-            {headerConfig.siteSwitcher.enabled && headerConfig.siteSwitcher.showInHeader && sites.length > 1 && (
-              <SiteSwitcherDropdown />
-            )}
-
-            {/* Search */}
-            {headerConfig.search.enabled && (
-              <div className="relative">
-                {searchOpen ? (
-                  <form onSubmit={handleSearch} className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder={headerConfig.search.placeholder}
-                      className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#D91C81] w-64"
-                      autoFocus
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setSearchOpen(false)}
-                      className="text-gray-400 hover:text-gray-600"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  </form>
-                ) : (
-                  <button
-                    onClick={() => setSearchOpen(true)}
-                    className="p-2 text-gray-600 hover:text-[#D91C81] rounded-md transition-colors"
-                    aria-label="Search"
-                  >
-                    <Search className="w-5 h-5" />
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* Language Selector */}
+          {/* Right side: language selector always visible, other items desktop-only */}
+          <div className="flex items-center gap-3">
+            {/* Language Selector — shown on all breakpoints so mobile users don't need hamburger */}
             {headerConfig.languageSelector.enabled && <LanguageSelector />}
 
-            {/* Auth Buttons */}
-            {headerConfig.authButtons.enabled && (
-              <div className="flex items-center gap-2">
-                {isAuthenticated && headerConfig.authButtons.showWhenAuthenticated && (
-                  <>
-                    {user && (
-                      <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-md">
-                        <User className="w-4 h-4" />
-                        <span className="text-sm font-medium">{user.name || user.email}</span>
-                      </div>
-                    )}
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center gap-2 px-3 py-1 text-sm text-gray-700 hover:text-[#D91C81] rounded-md transition-colors"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Logout
-                    </button>
-                  </>
-                )}
-                {!isAuthenticated && headerConfig.authButtons.showWhenUnauthenticated && (
+            {/* Desktop-only navigation and controls */}
+            <div className="hidden md:flex items-center gap-6">
+              {/* Navigation Items */}
+              {headerConfig.navigation.enabled && headerConfig.navigation.items.length > 0 && (
+                <nav className="flex items-center gap-4">
+                  {headerConfig.navigation.items
+                    .filter(item => {
+                      if (item.requiresAuth && !isAuthenticated) return false;
+                      return true;
+                    })
+                    .map(item => (
+                      <Link
+                        key={item.id}
+                        to={item.url}
+                        className="text-gray-700 hover:text-[#D91C81] px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                        target={item.external ? '_blank' : undefined}
+                        rel={item.external ? 'noopener noreferrer' : undefined}
+                      >
+                        {item.label}
+                        {item.badge && (
+                          <span className="ml-2 px-2 py-0.5 text-xs bg-[#D91C81] text-white rounded-full">
+                            {item.badge}
+                          </span>
+                        )}
+                      </Link>
+                    ))}
+                </nav>
+              )}
+
+              {/* Progress Bar */}
+              {isAuthenticated && headerConfig.progressBar.enabled && currentStep && (
+                <nav aria-label="Progress steps" className="flex items-center gap-2 text-sm">
+                  {/* Welcome Step (only if enabled) */}
+                  {isWelcomePageEnabled && (
+                    <>
+                      <Link
+                        to={siteId ? `/site/${siteId}/welcome` : '/welcome'}
+                        className={`px-3 py-1 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[#D91C81] ${
+                          currentStep.step === 0
+                            ? 'bg-pink-100 text-[#D91C81] font-semibold'
+                            : currentStep.step > 0
+                            ? 'text-gray-600 hover:text-[#D91C81]'
+                            : 'text-gray-400'
+                        }`}
+                        aria-current={currentStep.step === 0 ? 'step' : undefined}
+                      >
+                        {headerConfig.progressBar.showLabels ? '0. Welcome' : '0'}
+                      </Link>
+                      <ChevronRight className="w-4 h-4 text-gray-400" aria-hidden="true" />
+                    </>
+                  )}
+
+                  {/* Select Gift Step */}
                   <Link
-                    to="/access"
-                    className="px-4 py-2 bg-[#D91C81] text-white rounded-md hover:bg-[#B71569] transition-colors text-sm font-medium"
+                    to={siteId ? `/site/${siteId}/gift-selection` : '/gift-selection'}
+                    className={`px-3 py-1 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[#D91C81] ${
+                      currentStep.step === 1
+                        ? 'bg-pink-100 text-[#D91C81] font-semibold'
+                        : currentStep.step > 1
+                        ? 'text-gray-600 hover:text-[#D91C81]'
+                        : 'text-gray-400'
+                    }`}
+                    aria-current={currentStep.step === 1 ? 'step' : undefined}
                   >
-                    Sign In
+                    {headerConfig.progressBar.showLabels ? '1. Select Gift' : '1'}
                   </Link>
-                )}
-              </div>
+                  <ChevronRight className="w-4 h-4 text-gray-400" aria-hidden="true" />
+
+                  {/* Shipping Step */}
+                  <span
+                    className={`px-3 py-1 rounded-lg transition-colors ${
+                      currentStep.step === 2
+                        ? 'bg-pink-100 text-[#D91C81] font-semibold'
+                        : currentStep.step > 2
+                        ? 'text-gray-600'
+                        : 'text-gray-400'
+                    }`}
+                    aria-current={currentStep.step === 2 ? 'step' : undefined}
+                  >
+                    {headerConfig.progressBar.showLabels ? '2. Shipping' : '2'}
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-gray-400" aria-hidden="true" />
+
+                  {/* Review Step */}
+                  <span
+                    className={`px-3 py-1 rounded-lg transition-colors ${
+                      currentStep.step === 3
+                        ? 'bg-pink-100 text-[#D91C81] font-semibold'
+                        : currentStep.step > 3
+                        ? 'text-gray-600'
+                        : 'text-gray-400'
+                    }`}
+                    aria-current={currentStep.step === 3 ? 'step' : undefined}
+                  >
+                    {headerConfig.progressBar.showLabels ? '3. Review' : '3'}
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-gray-400" aria-hidden="true" />
+
+                  {/* Confirmation Step */}
+                  <span
+                    className={`px-3 py-1 rounded-lg transition-colors ${
+                      currentStep.step === 4
+                        ? 'bg-pink-100 text-[#D91C81] font-semibold'
+                        : 'text-gray-400'
+                    }`}
+                    aria-current={currentStep.step === 4 ? 'step' : undefined}
+                  >
+                    {headerConfig.progressBar.showLabels ? '4. Confirmation' : '4'}
+                  </span>
+                </nav>
+              )}
+
+              {/* Site Switcher */}
+              {headerConfig.siteSwitcher.enabled && headerConfig.siteSwitcher.showInHeader && sites.length > 1 && (
+                <SiteSwitcherDropdown />
+              )}
+
+              {/* Search */}
+              {headerConfig.search.enabled && (
+                <div className="relative">
+                  {searchOpen ? (
+                    <form onSubmit={handleSearch} className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder={headerConfig.search.placeholder}
+                        className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#D91C81] w-64"
+                        autoFocus
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setSearchOpen(false)}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </form>
+                  ) : (
+                    <button
+                      onClick={() => setSearchOpen(true)}
+                      className="p-2 text-gray-600 hover:text-[#D91C81] rounded-md transition-colors"
+                      aria-label="Search"
+                    >
+                      <Search className="w-5 h-5" />
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Auth Buttons */}
+              {headerConfig.authButtons.enabled && (
+                <div className="flex items-center gap-2">
+                  {isAuthenticated && headerConfig.authButtons.showWhenAuthenticated && (
+                    <>
+                      {user && (
+                        <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-md">
+                          <User className="w-4 h-4" />
+                          <span className="text-sm font-medium">{user.name || user.email}</span>
+                        </div>
+                      )}
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 px-3 py-1 text-sm text-gray-700 hover:text-[#D91C81] rounded-md transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Logout
+                      </button>
+                    </>
+                  )}
+                  {!isAuthenticated && headerConfig.authButtons.showWhenUnauthenticated && (
+                    <Link
+                      to="/access"
+                      className="px-4 py-2 bg-[#D91C81] text-white rounded-md hover:bg-[#B71569] transition-colors text-sm font-medium"
+                    >
+                      Sign In
+                    </Link>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Menu Button — only shown when there's content worth a menu */}
+            {hasMobileMenuContent && (
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden p-2 text-gray-600 hover:text-[#D91C81] rounded-md"
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
             )}
           </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-gray-600 hover:text-[#D91C81] rounded-md"
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
         </div>
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
+        {/* Mobile Menu — only renders when hasMobileMenuContent */}
+        {mobileMenuOpen && hasMobileMenuContent && (
           <div className="md:hidden py-4 border-t border-gray-200">
             {/* Navigation Items */}
             {headerConfig.navigation.enabled && headerConfig.navigation.items.length > 0 && (
@@ -377,13 +389,6 @@ export function ConfigurableHeader({ config, siteName, clientName }: Configurabl
                     </Link>
                   ))}
               </nav>
-            )}
-
-            {/* Language Selector */}
-            {headerConfig.languageSelector.enabled && (
-              <div className="mb-4">
-                <LanguageSelector />
-              </div>
             )}
 
             {/* Auth Buttons */}

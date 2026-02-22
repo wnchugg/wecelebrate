@@ -6705,22 +6705,51 @@ app.get("/make-server-6fcaeea3/public/gifts/:giftId", async (c) => {
       console.log(`[SECURITY WARNING] Accessing gift ${giftId} without session in environment: ${environmentId}`);
     }
     
-    const gift = await kv.get(`gift:${environmentId}:${giftId}`, environmentId);
-    
+    // Try KV store first (fast path)
+    let gift = await kv.get(`gift:${environmentId}:${giftId}`, environmentId);
+
+    // If not in KV, fall back to PostgreSQL
+    if (!gift) {
+      console.log(`[GET /public/gifts/${giftId}] KV miss, falling back to PostgreSQL`);
+      const dbProduct = await db.getProductById(giftId);
+      if (dbProduct) {
+        gift = {
+          id: dbProduct.id,
+          name: dbProduct.name,
+          description: dbProduct.description || '',
+          longDescription: dbProduct.description || '',
+          image: dbProduct.image_url || '',
+          imageUrl: dbProduct.image_url || '',
+          category: dbProduct.category || '',
+          price: dbProduct.price,
+          value: dbProduct.price,
+          sku: dbProduct.sku,
+          features: dbProduct.features || [],
+          specifications: dbProduct.specifications || {},
+          status: dbProduct.status === 'out_of_stock' ? 'inactive' : dbProduct.status,
+          availableQuantity: dbProduct.available_quantity || 0,
+          inventoryTracking: true,
+          inventoryQuantity: dbProduct.available_quantity || 0,
+          createdAt: dbProduct.created_at,
+          updatedAt: dbProduct.updated_at,
+        };
+      }
+    }
+
     if (!gift) {
       return c.json({ error: 'Gift not found' }, 404);
     }
-    
+
     if (gift.status !== 'active') {
       return c.json({ error: 'Gift is not available' }, 403);
     }
-    
+
     // Check inventory
-    const inventoryAvailable = gift.inventoryTracking 
-      ? (gift.inventoryQuantity || 0) > 0 
+    const inventoryAvailable = gift.inventoryTracking
+      ? (gift.inventoryQuantity || 0) > 0
       : true;
-    
-    return c.json({ 
+
+    return c.json({
       gift: {
         ...gift,
         // Map image to imageUrl for frontend compatibility
@@ -6728,7 +6757,7 @@ app.get("/make-server-6fcaeea3/public/gifts/:giftId", async (c) => {
         // Map price to value for frontend compatibility
         value: gift.value || gift.price,
         available: inventoryAvailable,
-        inventoryStatus: gift.inventoryTracking 
+        inventoryStatus: gift.inventoryTracking
           ? `${gift.inventoryQuantity || 0} available`
           : 'In Stock'
       }

@@ -60,7 +60,7 @@ export function ShippingInformation() {
       void navigate('../confirmation');
     } else {
       // Go to review page
-      void navigate('../review');
+      void navigate('../review-order');
     }
   };
 

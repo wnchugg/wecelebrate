@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { AlertTriangle, LogOut, Shield } from 'lucide-react';
 import { clearAccessToken } from '../../lib/apiClient';
-import { logger } from '../../utils/logger';
 
 export function SessionExpired() {
   const navigate = useNavigate();
@@ -14,7 +13,7 @@ export function SessionExpired() {
   }, []);
 
   const handleGoToLogin = () => {
-    navigate('/admin/login?session_expired=true');
+    void navigate('/admin/login?session_expired=true');
   };
 
   return (

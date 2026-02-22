@@ -10,7 +10,7 @@ export function SitesDiagnostic() {
 
   const runDiagnostics = async () => {
     setLoading(true);
-    const diagnostics: any = {
+    const diagnostics: Record<string, unknown> = {
       timestamp: new Date().toISOString(),
       environment: null,
       token: null,
@@ -156,7 +156,7 @@ export function SitesDiagnostic() {
         </p>
       </div>
 
-      <Button onClick={runDiagnostics} disabled={loading} className="mb-6">
+      <Button onClick={() => void runDiagnostics()} disabled={loading} className="mb-6">
         {loading ? 'Running Diagnostics...' : 'Run Diagnostics'}
       </Button>
 

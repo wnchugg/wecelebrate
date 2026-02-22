@@ -4,7 +4,7 @@
  */
 
 // Input Sanitization - now handles objects recursively
-export function sanitizeInput(input: any): any {
+export function sanitizeInput<T>(input: T): T {
   if (!input) return input;
   
   // Handle strings
@@ -14,23 +14,23 @@ export function sanitizeInput(input: any): any {
       .replace(/[<>]/g, '') // Remove angle brackets
       .replace(/javascript:/gi, '') // Remove javascript: protocol
       .replace(/on\w+\s*=/gi, '') // Remove event handlers
-      .trim();
+      .trim() as T;
   }
   
   // Handle arrays
   if (Array.isArray(input)) {
-    return input.map(item => sanitizeInput(item));
+    return input.map(item => sanitizeInput(item)) as T;
   }
   
   // Handle objects
   if (typeof input === 'object') {
-    const sanitized: any = {};
+    const sanitized: Record<string, unknown> = {};
     for (const key in input) {
       if (Object.prototype.hasOwnProperty.call(input, key)) {
-        sanitized[key] = sanitizeInput(input[key]);
+        sanitized[key] = sanitizeInput((input as Record<string, unknown>)[key]);
       }
     }
-    return sanitized;
+    return sanitized as T;
   }
   
   // For other types (numbers, booleans, etc.), return as-is
@@ -345,12 +345,12 @@ export function clearSessionTimer(): void {
 
 // Security Event Logging
 export function logSecurityEvent(
-  eventOrParams: string | { action: string; status?: string; userId?: string; details?: any },
+  eventOrParams: string | { action: string; status?: string; userId?: string; details?: Record<string, unknown> },
   level: 'info' | 'warning' | 'error' = 'info',
-  details?: any
+  details?: Record<string, unknown>
 ): void {
   let event: string;
-  let logDetails: any;
+  let logDetails: Record<string, unknown>;
   let userId: string | undefined;
   
   // Handle both calling patterns

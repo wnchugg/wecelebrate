@@ -1,0 +1,144 @@
+{
+  "timestamp": "2026-02-20T01:50:00.043Z",
+  "totalWarnings": 5147,
+  "totalErrors": 0,
+  "totalFiles": 347,
+  "totalIssues": 5147,
+  "warningsByRule": [
+    {
+      "rule": "@typescript-eslint/no-unsafe-member-access",
+      "count": 1640,
+      "severity": "warning",
+      "fileCount": 136
+    },
+    {
+      "rule": "@typescript-eslint/no-explicit-any",
+      "count": 993,
+      "severity": "warning",
+      "fileCount": 178
+    },
+    {
+      "rule": "@typescript-eslint/no-unsafe-assignment",
+      "count": 836,
+      "severity": "warning",
+      "fileCount": 139
+    },
+    {
+      "rule": "@typescript-eslint/no-unsafe-argument",
+      "count": 417,
+      "severity": "warning",
+      "fileCount": 105
+    },
+    {
+      "rule": "unused-imports/no-unused-vars",
+      "count": 350,
+      "severity": "warning",
+      "fileCount": 158
+    },
+    {
+      "rule": "@typescript-eslint/no-misused-promises",
+      "count": 265,
+      "severity": "warning",
+      "fileCount": 109
+    },
+    {
+      "rule": "@typescript-eslint/no-floating-promises",
+      "count": 155,
+      "severity": "warning",
+      "fileCount": 68
+    },
+    {
+      "rule": "@typescript-eslint/no-unsafe-call",
+      "count": 135,
+      "severity": "warning",
+      "fileCount": 40
+    },
+    {
+      "rule": "@typescript-eslint/no-unsafe-return",
+      "count": 106,
+      "severity": "warning",
+      "fileCount": 35
+    },
+    {
+      "rule": "@typescript-eslint/require-await",
+      "count": 56,
+      "severity": "warning",
+      "fileCount": 26
+    },
+    {
+      "rule": "react-hooks/exhaustive-deps",
+      "count": 56,
+      "severity": "warning",
+      "fileCount": 45
+    },
+    {
+      "rule": "react-refresh/only-export-components",
+      "count": 53,
+      "severity": "warning",
+      "fileCount": 26
+    },
+    {
+      "rule": "@typescript-eslint/no-empty-object-type",
+      "count": 30,
+      "severity": "warning",
+      "fileCount": 5
+    },
+    {
+      "rule": "@typescript-eslint/no-base-to-string",
+      "count": 19,
+      "severity": "warning",
+      "fileCount": 10
+    },
+    {
+      "rule": "no-useless-escape",
+      "count": 13,
+      "severity": "warning",
+      "fileCount": 4
+    },
+    {
+      "rule": "promise/param-names",
+      "count": 11,
+      "severity": "warning",
+      "fileCount": 4
+    },
+    {
+      "rule": "@typescript-eslint/no-redundant-type-constituents",
+      "count": 7,
+      "severity": "warning",
+      "fileCount": 5
+    },
+    {
+      "rule": "promise/catch-or-return",
+      "count": 4,
+      "severity": "warning",
+      "fileCount": 4
+    },
+    {
+      "rule": "prefer-const",
+      "count": 1,
+      "severity": "warning",
+      "fileCount": 1
+    }
+  ],
+  "categoryCounts": {
+    "@typescript-eslint/no-unsafe-member-access": 1640,
+    "@typescript-eslint/no-explicit-any": 993,
+    "@typescript-eslint/no-unsafe-assignment": 836,
+    "@typescript-eslint/no-unsafe-argument": 417,
+    "unused-imports/no-unused-vars": 350,
+    "@typescript-eslint/no-misused-promises": 265,
+    "@typescript-eslint/no-floating-promises": 155,
+    "@typescript-eslint/no-unsafe-call": 135,
+    "@typescript-eslint/no-unsafe-return": 106,
+    "@typescript-eslint/require-await": 56,
+    "react-hooks/exhaustive-deps": 56,
+    "react-refresh/only-export-components": 53,
+    "@typescript-eslint/no-empty-object-type": 30,
+    "@typescript-eslint/no-base-to-string": 19,
+    "no-useless-escape": 13,
+    "promise/param-names": 11,
+    "@typescript-eslint/no-redundant-type-constituents": 7,
+    "promise/catch-or-return": 4,
+    "prefer-const": 1
+  }
+}

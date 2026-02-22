@@ -319,7 +319,7 @@ export async function updateOrderStatus(
   const timelineEvent = getTimelineEventForStatus(status, trackingNumber, carrier);
   
   // Prepare updates
-  const updates: any = {
+  const updates: Record<string, unknown> = {
     status: dbStatus,
   };
   

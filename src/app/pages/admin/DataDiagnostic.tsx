@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Database, RefreshCw, Download, Search, FileText, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Database, RefreshCw, FileText, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 import { getAccessToken } from '../../utils/api';
 import { projectId, publicAnonKey } from '../../../../utils/supabase/info';
 import { showSuccessToast, showErrorToast } from '../../utils/errorHandling';
@@ -14,7 +14,7 @@ export function DataDiagnostic() {
     const token = getAccessToken();
     const baseUrl = `https://${projectId}.supabase.co/functions/v1/make-server-6fcaeea3`;
 
-    const diagnosticResults: any = {
+    const diagnosticResults: Record<string, unknown> = {
       environment: {
         projectId: projectId,
         baseUrl: baseUrl,
@@ -35,7 +35,7 @@ export function DataDiagnostic() {
 
     for (const endpoint of endpoints) {
       try {
-        const headers: any = {
+        const headers: Record<string, string> = {
           'Content-Type': 'application/json',
         };
 
@@ -55,7 +55,7 @@ export function DataDiagnostic() {
         });
 
         // Try to parse JSON, but handle cases where response is not JSON
-        let data: any = null;
+        let data: unknown = null;
         let parseError: string | null = null;
         let responseText = '';
         try {
@@ -132,7 +132,7 @@ export function DataDiagnostic() {
           <p className="text-gray-600 mt-1">Check backend connectivity and data availability</p>
         </div>
         <button
-          onClick={handleRunDiagnostic}
+          onClick={() => void handleRunDiagnostic()}
           disabled={isRunning}
           className="flex items-center gap-2 px-4 py-2 bg-[#D91C81] hover:bg-[#B01669] text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
@@ -265,7 +265,7 @@ export function DataDiagnostic() {
           {results.endpoints['Get Clients']?.data?.clients?.length === 0 && (
             <div className="mt-6">
               <button
-                onClick={handleReseed}
+                onClick={() => void handleReseed()}
                 disabled={isReseeding}
                 className="flex items-center gap-2 px-4 py-2 bg-[#D91C81] hover:bg-[#B01669] text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >

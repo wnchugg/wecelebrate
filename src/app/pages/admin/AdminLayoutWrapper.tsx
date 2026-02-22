@@ -1,5 +1,5 @@
-import { useEffect, Suspense } from 'react';
-import { Outlet, useNavigate, useLocation, Navigate } from 'react-router';
+import { Suspense } from 'react';
+import { useNavigate, useLocation, Navigate } from 'react-router';
 import { useAdmin } from '../../context/AdminContext';
 import { AdminLayout } from './AdminLayout';
 import { Loader2 } from 'lucide-react';

@@ -21,7 +21,7 @@ export function BackendConnectionStatus({ showQuickFix = true }: BackendConnecti
   const [showDeploymentGuide, setShowDeploymentGuide] = useState(false);
   
   useEffect(() => {
-    checkConnection();
+    void checkConnection();
   }, []);
 
   const checkConnection = async () => {
@@ -51,7 +51,7 @@ export function BackendConnectionStatus({ showQuickFix = true }: BackendConnecti
         
         try {
           data = JSON.parse(text);
-        } catch (e) {
+        } catch {
           // If parsing fails, treat as plain text response
           data = { message: text };
         }
@@ -192,7 +192,7 @@ export function BackendConnectionStatus({ showQuickFix = true }: BackendConnecti
               </ul>
               <div className="flex gap-2">
                 <button
-                  onClick={checkConnection}
+                  onClick={() => void checkConnection()}
                   className="text-xs font-medium text-blue-600 hover:text-blue-700 underline"
                 >
                   Retry Connection
@@ -209,7 +209,7 @@ export function BackendConnectionStatus({ showQuickFix = true }: BackendConnecti
           {connectionStatus.status === 'error' && (
             <div className="flex gap-2 mt-2">
               <button
-                onClick={checkConnection}
+                onClick={() => void checkConnection()}
                 className="text-xs font-medium text-amber-700 hover:text-amber-800 underline"
               >
                 Retry Connection

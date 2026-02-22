@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router';
 import { LanguageSelector } from '../components/LanguageSelector';
 import Logo from '../../imports/Logo';
-import { getCurrentEnvironment } from '../config/deploymentEnvironments';
 import { toast } from 'sonner';
 import { logger } from '../utils/logger';
-import { Package, Truck, CheckCircle, Clock, XCircle, ArrowLeft, Search, Calendar, MapPin, Eye, ShoppingBag } from 'lucide-react';
+import { Package, ArrowLeft, Calendar, Eye, ShoppingBag } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { CurrencyDisplay } from '../components/CurrencyDisplay';
+import { useDateFormat } from '../hooks/useDateFormat';
 
 interface OrderSummary {
   id: string;
@@ -22,6 +23,7 @@ interface OrderSummary {
 export function OrderHistory() {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { formatShortDate } = useDateFormat();
   const [orders, setOrders] = useState<OrderSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,8 +39,8 @@ export function OrderHistory() {
         const employeeId = sessionStorage.getItem('employee_id');
         
         if (!sessionToken || !employeeId) {
-          toast.error('Session expired. Please log in again.');
-          navigate('/access');
+          toast.error(t('notification.error.sessionExpired'));
+          void navigate('/access');
           return;
         }
         
@@ -50,11 +52,11 @@ export function OrderHistory() {
         // TODO: Implement backend endpoint to get orders by employee ID
         setOrders([]);
         
-        toast.info('Order history feature coming soon!');
+        toast.info(t('notification.info.orderHistoryComingSoon'));
       } catch (error: any) {
         logger.error('Failed to load orders:', error);
         setError(error.message || 'Failed to load order history');
-        toast.error(error.message || 'Failed to load orders');
+        toast.error(error.message || t('notification.error.failedToLoadOrders'));
       } finally {
         setIsLoading(false);
       }
@@ -94,7 +96,7 @@ export function OrderHistory() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => navigate('/')}
+                onClick={() => void navigate('/')}
                 className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
                 aria-label="Back"
               >
@@ -190,17 +192,13 @@ export function OrderHistory() {
                       <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
                         <div className="flex items-center gap-1">
                           <Calendar className="w-4 h-4" />
-                          {new Date(order.createdAt).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric'
-                          })}
+                          {formatShortDate(order.createdAt)}
                         </div>
                         <div>
                           Quantity: {order.quantity}
                         </div>
                         <div>
-                          Total: ${order.totalValue.toFixed(2)}
+                          Total: <CurrencyDisplay amount={order.totalValue} />
                         </div>
                       </div>
 

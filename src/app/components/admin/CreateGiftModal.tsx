@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Upload, Image as ImageIcon, DollarSign, Tag, Package, Plus } from 'lucide-react';
+import { X, Package, Plus } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -270,7 +270,7 @@ export function CreateGiftModal({ giftId, onClose }: CreateGiftModalProps) {
                 <Input
                   type="file"
                   accept="image/*"
-                  onChange={handleImageUpload}
+                  onChange={() => void handleImageUpload()}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
                 />
               </div>

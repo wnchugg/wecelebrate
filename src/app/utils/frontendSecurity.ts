@@ -456,8 +456,8 @@ export function isSafeContent(content: string): boolean {
 /**
  * Sanitize object keys to prevent prototype pollution
  */
-export function sanitizeObject<T extends Record<string, any>>(obj: T): T {
-  const sanitized: any = {};
+export function sanitizeObject<T extends Record<string, unknown>>(obj: T): T {
+  const sanitized: Record<string, unknown> = {};
   
   for (const key in obj) {
     // Skip prototype properties
@@ -519,8 +519,8 @@ export function logSecurityEvent(event: {
 /**
  * Secure form data before submission
  */
-export function secureFormData(formData: Record<string, any>): Record<string, any> {
-  const secured: Record<string, any> = {};
+export function secureFormData(formData: Record<string, unknown>): Record<string, unknown> {
+  const secured: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(formData)) {
     if (typeof value === 'string') {

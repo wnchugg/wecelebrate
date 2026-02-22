@@ -33,6 +33,7 @@ export function DeveloperTools() {
   const [globalReseedResult, setGlobalReseedResult] = useState<string | null>(null);
   const [jwtDiagnostic, setJwtDiagnostic] = useState<any>(null);
   const [isCheckingJWT, setIsCheckingJWT] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
 
   const currentEnv = getCurrentEnvironment();
   const allEnvs = getAvailableEnvironments();
@@ -47,7 +48,7 @@ export function DeveloperTools() {
       const token = getAccessToken();
       const env = getCurrentEnvironment();
       
-      const diagnostic: any = {
+      const diagnostic: Record<string, unknown> = {
         timestamp: new Date().toISOString(),
         environment: env.id,
         tokenExists: !!token,
@@ -111,7 +112,7 @@ export function DeveloperTools() {
   // Connection Test Logic
   const runConnectionTest = async () => {
     setIsLoadingConnection(true);
-    const results: any = {
+    const results: Record<string, unknown> = {
       timestamp: new Date().toISOString(),
       figmaMakeConfig: {
         projectId,
@@ -191,7 +192,7 @@ export function DeveloperTools() {
     const token = getAccessToken();
     const baseUrl = `https://${projectId}.supabase.co/functions/v1/make-server-6fcaeea3`;
 
-    const diagnosticResults: any = {
+    const diagnosticResults: Record<string, unknown> = {
       environment: {
         projectId: projectId,
         baseUrl: baseUrl,
@@ -204,15 +205,15 @@ export function DeveloperTools() {
     // Test endpoints
     const endpoints = [
       { name: 'Health Check', url: `${baseUrl}/health`, method: 'GET', requiresAuth: false },
-      { name: 'Get Clients', url: `${baseUrl}/clients`, method: 'GET', requiresAuth: true },
-      { name: 'Get Sites', url: `${baseUrl}/sites`, method: 'GET', requiresAuth: true },
+      { name: 'Get Clients', url: `${baseUrl}/v2/clients`, method: 'GET', requiresAuth: true },
+      { name: 'Get Sites', url: `${baseUrl}/v2/sites`, method: 'GET', requiresAuth: true },
       { name: 'Get Gifts', url: `${baseUrl}/gifts`, method: 'GET', requiresAuth: true },
       { name: 'Check Admin', url: `${baseUrl}/debug/check-admin-users`, method: 'GET', requiresAuth: false },
     ];
 
     for (const endpoint of endpoints) {
       try {
-        const headers: any = {
+        const headers: Record<string, string> = {
           'Content-Type': 'application/json',
         };
 
@@ -228,7 +229,7 @@ export function DeveloperTools() {
           headers,
         });
 
-        let data: any = null;
+        let data: unknown = null;
         let parseError: string | null = null;
         let responseText = '';
         try {
@@ -273,7 +274,7 @@ export function DeveloperTools() {
       return;
     }
 
-    const headers: any = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'X-Access-Token': token,
       'Authorization': `Bearer ${publicAnonKey}`,
@@ -288,9 +289,21 @@ export function DeveloperTools() {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success('Database reseeded successfully!');
+        // Clear localStorage to remove stale site/client selections
+        try {
+          localStorage.removeItem('admin_selected_site_id');
+        } catch (e) {
+          console.warn('Failed to clear localStorage:', e);
+        }
+        
+        toast.success('Database reseeded successfully! Page will reload...');
         // Re-run diagnostic after reseed
         await runDataDiagnostic();
+        
+        // Reload the page to clear any cached state
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       } else {
         console.error('Reseed failed:', data);
         toast.error(`Failed to reseed: ${data.error || 'Unknown error'}`);
@@ -300,6 +313,69 @@ export function DeveloperTools() {
       toast.error(`Network error: ${error.message}`);
     } finally {
       setIsSeeding(false);
+    }
+  };
+
+  const clearAllData = async () => {
+    if (!confirm('⚠️ WARNING: This will delete ALL data from the database. Are you sure?')) {
+      return;
+    }
+
+    setIsClearing(true);
+    const token = getAccessToken();
+    const baseUrl = `https://${projectId}.supabase.co/functions/v1/make-server-6fcaeea3`;
+
+    // Check if user is logged in
+    if (!token) {
+      toast.error('You must be logged in as an admin to clear the database');
+      setIsClearing(false);
+      return;
+    }
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'X-Access-Token': token,
+      'Authorization': `Bearer ${publicAnonKey}`,
+    };
+
+    try {
+      // Delete all major data prefixes (including both singular and plural forms)
+      const prefixes = [
+        'client', 'clients',  // Both singular and plural
+        'site', 'sites',      // Both singular and plural
+        'gift', 'gifts',      // Both singular and plural
+        'employee', 'employees',
+        'order', 'orders',
+        'admin', 'admins',
+        'role', 'roles',
+        'celebration', 'celebrations'
+      ];
+      let totalDeleted = 0;
+
+      for (const prefix of prefixes) {
+        try {
+          const response = await fetch(`${baseUrl}/admin/database/prefix/${prefix}`, {
+            method: 'DELETE',
+            headers,
+          });
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            totalDeleted += data.deleted || 0;
+          }
+        } catch (error) {
+          console.error(`Failed to delete prefix ${prefix}:`, error);
+        }
+      }
+
+      toast.success(`Successfully cleared ${totalDeleted} records from the database`);
+      // Re-run diagnostic after clearing
+      await runDataDiagnostic();
+    } catch (error: any) {
+      console.error('Clear error:', error);
+      toast.error(`Failed to clear database: ${error.message}`);
+    } finally {
+      setIsClearing(false);
     }
   };
 
@@ -496,7 +572,7 @@ export function DeveloperTools() {
                   <CardDescription>Comprehensive environment and connection testing</CardDescription>
                 </div>
                 <Button
-                  onClick={runConnectionTest}
+                  onClick={() => void runConnectionTest()}
                   disabled={isLoadingConnection}
                   className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
@@ -629,7 +705,7 @@ export function DeveloperTools() {
                   <CardDescription>Check backend connectivity and data availability</CardDescription>
                 </div>
                 <Button
-                  onClick={runDataDiagnostic}
+                  onClick={() => void runDataDiagnostic()}
                   disabled={isLoadingData}
                   className="bg-[#D91C81] hover:bg-[#B01669] text-white"
                 >
@@ -751,9 +827,28 @@ export function DeveloperTools() {
                   </div>
 
                   {/* Reseed Button - Always visible */}
-                  <div className="flex justify-center pt-4">
+                  <div className="flex justify-center gap-4 pt-4">
                     <Button
-                      onClick={reseedDatabase}
+                      onClick={() => void clearAllData()}
+                      disabled={isClearing}
+                      size="lg"
+                      variant="outline"
+                      className="border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700 font-semibold shadow-lg"
+                    >
+                      {isClearing ? (
+                        <>
+                          <AlertTriangle className="w-5 h-5 mr-2 animate-pulse" />
+                          Clearing...
+                        </>
+                      ) : (
+                        <>
+                          <AlertTriangle className="w-5 h-5 mr-2" />
+                          Clear All Data
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      onClick={() => void reseedDatabase()}
                       disabled={isSeeding}
                       size="lg"
                       className="bg-gradient-to-r from-[#D91C81] to-[#B01669] hover:from-[#B01669] hover:to-[#8B1352] text-white font-semibold shadow-lg"
@@ -784,7 +879,7 @@ export function DeveloperTools() {
                       Click below to populate the database with sample clients, sites, gifts, employees, and test data.
                     </p>
                     <Button
-                      onClick={reseedDatabase}
+                      onClick={() => void reseedDatabase()}
                       disabled={isSeeding}
                       size="lg"
                       className="bg-gradient-to-r from-[#D91C81] to-[#B01669] hover:from-[#B01669] hover:to-[#8B1352] text-white font-bold shadow-xl text-lg px-8 py-6 h-auto"
@@ -829,7 +924,7 @@ export function DeveloperTools() {
             <CardContent className="space-y-6">
               <div className="flex justify-center">
                 <Button
-                  onClick={runJWTDiagnostic}
+                  onClick={() => void runJWTDiagnostic()}
                   disabled={isCheckingJWT}
                   className="bg-[#D91C81] hover:bg-[#B01669] text-white"
                 >

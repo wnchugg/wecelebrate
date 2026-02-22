@@ -50,7 +50,7 @@ export function useApi<T>(
   }, [fetcher]);
   
   useEffect(() => {
-    fetchData();
+    void fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
   
@@ -217,7 +217,7 @@ export function usePaginatedApi<T>(
   }, [fetcher, page, pageSize]);
   
   useEffect(() => {
-    fetchData();
+    void fetchData();
   }, [fetchData]);
   
   useEffect(() => {
@@ -382,7 +382,7 @@ export function usePollingApi<T>(
       return () => {}; // Return empty cleanup
     }
     
-    fetchData();
+    void fetchData();
     intervalRef.current = setInterval(fetchData, interval);
     
     return () => {
@@ -442,7 +442,7 @@ export function useOptimisticUpdate<T>(
   );
   
   useEffect(() => {
-    fetchData();
+    void fetchData();
   }, [fetchData]);
   
   useEffect(() => {

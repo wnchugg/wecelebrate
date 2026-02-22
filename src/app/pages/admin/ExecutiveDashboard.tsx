@@ -11,13 +11,12 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import type { TooltipProps } from 'recharts';
-import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { apiRequest } from '../../utils/api';
 import { showErrorToast } from '../../utils/errorHandling';
 import { logger } from '../../utils/logger';
 import { useNavigate } from 'react-router';
+import { useDateFormat } from '../../hooks/useDateFormat';
 
 interface DashboardData {
   orders: any[];
@@ -38,6 +37,7 @@ const CHART_COLORS = {
 
 export function ExecutiveDashboard() {
   const navigate = useNavigate();
+  const { formatShortDate } = useDateFormat();
   const [data, setData] = useState<DashboardData>({
     orders: [],
     clients: [],
@@ -50,7 +50,7 @@ export function ExecutiveDashboard() {
   const [comparisonPeriod, setComparisonPeriod] = useState<'week' | 'month' | 'quarter'>('month');
 
   useEffect(() => {
-    loadData();
+    void loadData();
   }, []);
 
   const loadData = async () => {
@@ -155,7 +155,7 @@ export function ExecutiveDashboard() {
     data.orders
       .filter(o => new Date(o.createdAt) >= thirtyDaysAgo)
       .forEach(order => {
-        const date = new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const date = formatShortDate(order.createdAt);
         last30Days[date] = (last30Days[date] || 0) + (order.totalAmount || 0);
       });
 
@@ -163,7 +163,7 @@ export function ExecutiveDashboard() {
       .map(([date, revenue]) => ({ date, revenue }))
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .slice(-14);
-  }, [data.orders]);
+  }, [data.orders, formatShortDate]);
 
   const ordersByStatus = useMemo(() => {
     const statusCounts: Record<string, number> = {};
@@ -224,14 +224,14 @@ export function ExecutiveDashboard() {
           <Button
             variant="outline"
             size="sm"
-            onClick={loadData}
+            onClick={() => void loadData()}
             className="gap-2"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
           </Button>
           <Button
-            onClick={() => navigate('/admin/reports')}
+            onClick={() => void navigate('/admin/reports')}
             className="bg-[#D91C81] hover:bg-[#B01669] text-white gap-2"
             size="sm"
           >
@@ -429,7 +429,7 @@ export function ExecutiveDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card 
           className="cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => navigate('/admin/client-analytics')}
+          onClick={() => void navigate('/admin/client-analytics')}
         >
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -444,7 +444,7 @@ export function ExecutiveDashboard() {
 
         <Card 
           className="cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => navigate('/admin/celebration-analytics')}
+          onClick={() => void navigate('/admin/celebration-analytics')}
         >
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -459,7 +459,7 @@ export function ExecutiveDashboard() {
 
         <Card 
           className="cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => navigate('/admin/reports')}
+          onClick={() => void navigate('/admin/reports')}
         >
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">

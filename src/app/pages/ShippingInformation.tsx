@@ -1,14 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { Building2, ArrowRight, ArrowLeft, MapPin, Package, Globe } from 'lucide-react';
+import { Building2, ArrowRight, MapPin, Package, Globe } from 'lucide-react';
 import { companyConfig } from '../data/config';
-import { toast } from 'sonner';
 import { useOrder } from '../context/OrderContext';
 import { usePublicSite } from '../context/PublicSiteContext';
 import { countries, getCountryByCode, Country } from '../utils/countries';
 import { useLanguage } from '../context/LanguageContext';
-import { LanguageSelector } from '../components/LanguageSelector';
-import Logo from '../../imports/Logo';
 
 export function ShippingInformation() {
   const navigate = useNavigate();
@@ -36,7 +33,7 @@ export function ShippingInformation() {
 
   useEffect(() => {
     if (!selectedGift) {
-      navigate('../gift-selection');
+      void navigate('../gift-selection');
     }
   }, [selectedGift, navigate]);
 
@@ -60,10 +57,10 @@ export function ShippingInformation() {
     
     if (skipReview) {
       // Skip review page and go directly to confirmation
-      navigate('../confirmation');
+      void navigate('../confirmation');
     } else {
       // Go to review page
-      navigate('../review');
+      void navigate('../review');
     }
   };
 

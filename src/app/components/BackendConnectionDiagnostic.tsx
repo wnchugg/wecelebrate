@@ -10,7 +10,7 @@ import {
   ChevronDown, 
   AlertCircle 
 } from 'lucide-react';
-import { projectId, publicAnonKey } from '../../../utils/supabase/info';
+import { publicAnonKey } from '../../../utils/supabase/info';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';
 import { logger } from '../utils/logger';
 
@@ -78,12 +78,12 @@ export function BackendConnectionDiagnostic() {
       let testDbData = null;
       try {
         healthData = JSON.parse(healthText);
-      } catch (e) {
+      } catch {
         logger.warn('[Backend Diagnostic] Could not parse health response as JSON');
       }
       try {
         testDbData = JSON.parse(testDbText);
-      } catch (e) {
+      } catch {
         logger.warn('[Backend Diagnostic] Could not parse test-db response as JSON');
       }
 
@@ -162,7 +162,7 @@ export function BackendConnectionDiagnostic() {
   };
 
   useEffect(() => {
-    checkConnection();
+    void checkConnection();
   }, []);
 
   const env = getCurrentEnvironment();
@@ -214,7 +214,7 @@ export function BackendConnectionDiagnostic() {
             size="sm"
             onClick={(e) => {
               e.stopPropagation();
-              checkConnection();
+              void checkConnection();
             }}
             disabled={isRefreshing}
             className="h-8"

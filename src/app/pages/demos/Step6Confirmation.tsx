@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { ArrowLeft, CheckCircle, Package, Truck, Download, Calendar, Mail, MapPin, Gift, Star, Info, ExternalLink, Share2 } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
+import { translateWithParams } from '../../utils/translationHelpers';
 
 export function Step6Confirmation() {
   const [selectedVariation, setSelectedVariation] = useState('standard');
+  const { t } = useLanguage();
 
   const variations = [
     { id: 'standard', label: 'Standard', description: 'Basic order confirmation' },
@@ -163,7 +166,7 @@ export function Step6Confirmation() {
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <div className="flex items-center gap-2 text-green-600">
                       <Calendar className="w-5 h-5" />
-                      <span className="font-medium">Expected delivery: {orderDetails.estimatedDelivery}</span>
+                      <span className="font-medium">{translateWithParams(t, 'shipping.estimatedDelivery', { date: orderDetails.estimatedDelivery })}</span>
                     </div>
                   </div>
                 </div>
@@ -184,9 +187,8 @@ export function Step6Confirmation() {
                     </div>
                     
                     <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                      <p className="text-sm text-gray-600 mb-1">Tracking Number</p>
+                      <p className="text-sm text-gray-600 mb-1">{translateWithParams(t, 'shipping.trackingNumber', { number: orderDetails.trackingNumber })}</p>
                       <div className="flex items-center justify-between">
-                        <p className="font-mono font-semibold text-gray-900">{orderDetails.trackingNumber}</p>
                         <button className="text-[#00B4CC] hover:text-[#0095AD] font-medium text-sm flex items-center gap-1">
                           <ExternalLink className="w-4 h-4" />
                           Track

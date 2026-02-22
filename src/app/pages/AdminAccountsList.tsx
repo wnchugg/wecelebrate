@@ -46,7 +46,7 @@ export default function AdminAccountsList() {
   }, []);
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
+    void navigator.clipboard.writeText(text);
     toast.success('Copied to clipboard!');
   };
 
@@ -121,7 +121,7 @@ export default function AdminAccountsList() {
           <div className="mb-4 flex justify-between items-center">
             <h2 className="text-lg font-bold text-gray-900">All Admin Accounts</h2>
             <button
-              onClick={fetchAdmins}
+              onClick={() => void fetchAdmins()}
               disabled={loading}
               className="flex items-center gap-2 px-4 py-2 bg-[#D91C81] text-white rounded-lg hover:bg-[#B71569] transition-colors disabled:opacity-50"
             >

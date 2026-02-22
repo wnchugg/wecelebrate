@@ -48,7 +48,7 @@ export const passwordValidation = (value: string): string | null => {
  * Required field validation
  */
 export const requiredValidation = (fieldName: string = 'This field') => {
-  return (value: any): string | null => {
+  return (value: unknown): string | null => {
     if (value === null || value === undefined || value === '') {
       return `${fieldName} is required`;
     }
@@ -126,7 +126,7 @@ export const urlValidation = (value: string): string | null => {
 export const phoneValidation = (value: string): string | null => {
   if (!value) return null;
   
-  const phoneRegex = /^[\d\s\-\(\)]+$/;
+  const phoneRegex = /^[\d\s\-()]+$/;
   if (!phoneRegex.test(value)) {
     return 'Please enter a valid phone number';
   }
@@ -208,8 +208,8 @@ export const pastDateValidation = (value: string): string | null => {
 /**
  * Match validation (e.g., password confirmation)
  */
-export const matchValidation = (matchValue: any, fieldName: string = 'Fields') => {
-  return (value: any): string | null => {
+export const matchValidation = <T>(matchValue: T, fieldName: string = 'Fields') => {
+  return (value: T): string | null => {
     if (value !== matchValue) {
       return `${fieldName} do not match`;
     }
@@ -241,7 +241,7 @@ export const signupFormSchema: ValidationSchema<{
 }> = {
   email: emailValidation,
   password: passwordValidation,
-  confirmPassword: (value: string, formData?: any) => {
+  confirmPassword: (value: string, formData?: { password?: string }) => {
     const passwordError = requiredValidation('Confirm password')(value);
     if (passwordError) return passwordError;
     
@@ -272,7 +272,13 @@ export const clientFormSchema: ValidationSchema<{
 /**
  * Site form validation schema
  */
-export const siteFormSchema: ValidationSchema<any> = {
+export const siteFormSchema: ValidationSchema<{
+  name: string;
+  clientId: string;
+  domain: string;
+  'settings.validationMethod': string;
+  'settings.giftsPerUser': number;
+}> = {
   name: (value: string) => {
     const required = requiredValidation('Site name')(value);
     if (required) return required;
@@ -290,7 +296,13 @@ export const siteFormSchema: ValidationSchema<any> = {
 /**
  * Gift form validation schema
  */
-export const giftFormSchema: ValidationSchema<any> = {
+export const giftFormSchema: ValidationSchema<{
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  imageUrl: string;
+}> = {
   name: (value: string) => {
     const required = requiredValidation('Gift name')(value);
     if (required) return required;
@@ -311,7 +323,13 @@ export const giftFormSchema: ValidationSchema<any> = {
 /**
  * Employee form validation schema
  */
-export const employeeFormSchema: ValidationSchema<any> = {
+export const employeeFormSchema: ValidationSchema<{
+  employeeId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  department: string;
+}> = {
   employeeId: requiredValidation('Employee ID'),
   firstName: requiredValidation('First name'),
   lastName: requiredValidation('Last name'),
@@ -322,7 +340,13 @@ export const employeeFormSchema: ValidationSchema<any> = {
 /**
  * Shipping address validation schema
  */
-export const shippingAddressSchema: ValidationSchema<any> = {
+export const shippingAddressSchema: ValidationSchema<{
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+}> = {
   street: requiredValidation('Street address'),
   city: requiredValidation('City'),
   state: requiredValidation('State'),
@@ -338,10 +362,19 @@ export const shippingAddressSchema: ValidationSchema<any> = {
 /**
  * Order form validation schema
  */
-export const orderFormSchema: ValidationSchema<any> = {
+export const orderFormSchema: ValidationSchema<{
+  userId: string;
+  siteId: string;
+  items: unknown[];
+  'shippingAddress.street': string;
+  'shippingAddress.city': string;
+  'shippingAddress.state': string;
+  'shippingAddress.zipCode': string;
+  'shippingAddress.country': string;
+}> = {
   userId: requiredValidation('User'),
   siteId: requiredValidation('Site'),
-  items: (value: any[]) => {
+  items: (value: unknown[]) => {
     if (!value || value.length === 0) {
       return 'At least one item is required';
     }
@@ -357,7 +390,12 @@ export const orderFormSchema: ValidationSchema<any> = {
 /**
  * Contact form validation schema
  */
-export const contactFormSchema: ValidationSchema<any> = {
+export const contactFormSchema: ValidationSchema<{
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}> = {
   name: requiredValidation('Name'),
   email: emailValidation,
   subject: requiredValidation('Subject'),
@@ -372,7 +410,13 @@ export const contactFormSchema: ValidationSchema<any> = {
 /**
  * Profile form validation schema
  */
-export const profileFormSchema: ValidationSchema<any> = {
+export const profileFormSchema: ValidationSchema<{
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  bio: string;
+}> = {
   firstName: requiredValidation('First name'),
   lastName: requiredValidation('Last name'),
   email: emailValidation,
@@ -383,10 +427,14 @@ export const profileFormSchema: ValidationSchema<any> = {
 /**
  * Password change validation schema
  */
-export const passwordChangeSchema: ValidationSchema<any> = {
+export const passwordChangeSchema: ValidationSchema<{
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}> = {
   currentPassword: requiredValidation('Current password'),
   newPassword: passwordValidation,
-  confirmPassword: (value: string, formData?: any) => {
+  confirmPassword: (value: string, formData?: { newPassword?: string }) => {
     const required = requiredValidation('Confirm password')(value);
     if (required) return required;
     
@@ -397,7 +445,9 @@ export const passwordChangeSchema: ValidationSchema<any> = {
 /**
  * Search form validation schema
  */
-export const searchFormSchema: ValidationSchema<any> = {
+export const searchFormSchema: ValidationSchema<{
+  query: string;
+}> = {
   query: (value: string) => {
     const required = requiredValidation('Search query')(value);
     if (required) return required;
@@ -409,14 +459,17 @@ export const searchFormSchema: ValidationSchema<any> = {
 /**
  * Filter form validation schema
  */
-export const filterFormSchema: ValidationSchema<any> = {
-  minPrice: (value: number, formData?: any) => {
+export const filterFormSchema: ValidationSchema<{
+  minPrice: number;
+  maxPrice: number;
+}> = {
+  minPrice: (value: number, formData?: { maxPrice?: number }) => {
     if (value && formData?.maxPrice && value > formData.maxPrice) {
       return 'Min price must be less than max price';
     }
     return null;
   },
-  maxPrice: (value: number, formData?: any) => {
+  maxPrice: (value: number, formData?: { minPrice?: number }) => {
     if (value && formData?.minPrice && value < formData.minPrice) {
       return 'Max price must be greater than min price';
     }
@@ -427,8 +480,11 @@ export const filterFormSchema: ValidationSchema<any> = {
 /**
  * Date range validation schema
  */
-export const dateRangeSchema: ValidationSchema<any> = {
-  startDate: (value: string, formData?: any) => {
+export const dateRangeSchema: ValidationSchema<{
+  startDate: string;
+  endDate: string;
+}> = {
+  startDate: (value: string, formData?: { endDate?: string }) => {
     const dateError = dateValidation(value);
     if (dateError) return dateError;
     
@@ -443,7 +499,7 @@ export const dateRangeSchema: ValidationSchema<any> = {
     
     return null;
   },
-  endDate: (value: string, formData?: any) => {
+  endDate: (value: string, formData?: { startDate?: string }) => {
     const dateError = dateValidation(value);
     if (dateError) return dateError;
     
@@ -463,10 +519,10 @@ export const dateRangeSchema: ValidationSchema<any> = {
 /**
  * Compose multiple validators
  */
-export function composeValidators(
-  ...validators: Array<(value: any) => string | null>
-): (value: any) => string | null {
-  return (value: any) => {
+export function composeValidators<T>(
+  ...validators: Array<(value: T) => string | null>
+): (value: T) => string | null {
+  return (value: T) => {
     for (const validator of validators) {
       const error = validator(value);
       if (error) return error;
@@ -478,11 +534,11 @@ export function composeValidators(
 /**
  * Create conditional validator
  */
-export function conditionalValidator(
-  condition: (formData: any) => boolean,
-  validator: (value: any) => string | null
-): (value: any, formData?: any) => string | null {
-  return (value: any, formData?: any) => {
+export function conditionalValidator<T, TFormData = Record<string, unknown>>(
+  condition: (formData: TFormData) => boolean,
+  validator: (value: T) => string | null
+): (value: T, formData?: TFormData) => string | null {
+  return (value: T, formData?: TFormData) => {
     if (formData && condition(formData)) {
       return validator(value);
     }
@@ -493,10 +549,10 @@ export function conditionalValidator(
 /**
  * Create async validator (for API checks)
  */
-export function createAsyncValidator(
-  validatorFn: (value: any) => Promise<string | null>
-): (value: any) => Promise<string | null> {
-  return async (value: any) => {
+export function createAsyncValidator<T>(
+  validatorFn: (value: T) => Promise<string | null>
+): (value: T) => Promise<string | null> {
+  return async (value: T) => {
     try {
       return await validatorFn(value);
     } catch (error) {

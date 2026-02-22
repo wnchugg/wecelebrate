@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { RefreshCw, Mail, CheckCircle, Send, Eye, Edit, Trash2, Plus, X, Copy, Type, Download, Search } from 'lucide-react';
-import { toast } from 'sonner';
+import { RefreshCw, Mail, CheckCircle, Send, Eye, Edit, Copy, Type, Download, Search } from 'lucide-react';
 import { Card, CardContent } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -14,13 +13,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../components/ui/select';
+
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Badge } from '../../components/ui/badge';
 import { Switch } from '../../components/ui/switch';
@@ -68,7 +62,7 @@ const COMMON_VARIABLES: TemplateVariable[] = [
   { key: 'companyName', label: 'Company Name', example: 'TechCorp Inc.', required: false },
   { key: 'siteName', label: 'Site Name', example: 'Holiday Gifts 2026', required: false },
   { key: 'orderNumber', label: 'Order Number', example: 'ORD-2026-001', required: false },
-  { key: 'orderTotal', label: 'Order Total', example: '$149.99', required: false },
+  { key: 'orderTotal', label: 'Order Total', example: '149.99', required: false },
   { key: 'giftName', label: 'Gift Name', example: 'Wireless Headphones', required: false },
   { key: 'trackingNumber', label: 'Tracking Number', example: '1Z999AA10123456784', required: false },
   { key: 'magicLink', label: 'Magic Link', example: 'https://app.jala2.com/access/magic-link?token=...', required: false },
@@ -313,7 +307,7 @@ export function EmailTemplates() {
           <Button
             variant="outline"
             size="sm"
-            onClick={loadTemplates}
+            onClick={() => void loadTemplates()}
             className="gap-2"
           >
             <RefreshCw className="w-4 h-4" />
@@ -510,7 +504,7 @@ export function EmailTemplates() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => duplicateTemplate(template)}
+                      onClick={() => void duplicateTemplate(template)}
                       title="Duplicate"
                     >
                       <Copy className="w-4 h-4" />
@@ -536,7 +530,7 @@ export function EmailTemplates() {
         <TemplateEditor
           template={editingTemplate}
           onClose={() => setEditingTemplate(null)}
-          onSave={handleSaveTemplate}
+          onSave={() => void handleSaveTemplate()}
         />
       )}
 
@@ -553,7 +547,7 @@ export function EmailTemplates() {
         <TestEmailDialog
           template={testingTemplate}
           onClose={() => setTestingTemplate(null)}
-          onSend={handleTestEmail}
+          onSend={() => void handleTestEmail()}
         />
       )}
     </div>

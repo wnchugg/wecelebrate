@@ -4,7 +4,7 @@
  * Tests for route navigation and transitions
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { screen, waitFor, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes, Link, useNavigate } from 'react-router';
@@ -97,9 +97,9 @@ function ProgrammaticNavigationTest() {
   return (
     <div>
       <h1>Navigation Test</h1>
-      <button onClick={() => navigate('/products')}>Navigate to Products</button>
-      <button onClick={() => navigate(-1)}>Go Back</button>
-      <button onClick={() => navigate(1)}>Go Forward</button>
+      <button onClick={() => void navigate('/products')}>Navigate to Products</button>
+      <button onClick={() => void navigate(-1)}>Go Back</button>
+      <button onClick={() => void navigate(1)}>Go Forward</button>
     </div>
   );
 }

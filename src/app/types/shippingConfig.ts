@@ -2,7 +2,7 @@ export type CustomFieldType = 'text' | 'textarea' | 'number' | 'email' | 'phone'
 
 export type ShippingMode = 'employee' | 'company' | 'store';
 
-export type AddressValidationService = 'none' | 'usps' | 'smarty' | 'google';
+export type AddressValidationService = 'none' | 'usps' | 'smarty' | 'google' | 'geoapify';
 
 export interface CustomShippingField {
   id: string;
@@ -118,6 +118,7 @@ export interface ShippingPageConfiguration {
     service: AddressValidationService;
     requireValidation: boolean;
     allowOverride: boolean;
+    enableAutocomplete?: boolean; // Enable address autocomplete suggestions
   };
   createdAt: string;
   updatedAt: string;
@@ -172,6 +173,7 @@ export const defaultShippingConfig: Omit<ShippingPageConfiguration, 'id' | 'site
     service: 'none',
     requireValidation: false,
     allowOverride: false,
+    enableAutocomplete: true, // Default to enabled
   },
 };
 

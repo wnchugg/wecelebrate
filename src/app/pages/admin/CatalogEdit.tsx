@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { ArrowLeft, Save, Database, ExternalLink, FileText, Package } from 'lucide-react';
 import { fetchCatalogById, createCatalog, updateCatalog } from '../../services/catalogApi';
-import type { Catalog, CatalogType, SourceType, SyncFrequency } from '../../types/catalog';
+import type { CatalogType, SourceType, SyncFrequency } from '../../types/catalog';
 
 export default function CatalogEdit() {
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ export default function CatalogEdit() {
   // Load catalog if editing
   useEffect(() => {
     if (isEdit && catalogId) {
-      loadCatalog(catalogId);
+      void loadCatalog(catalogId);
     }
   }, [catalogId, isEdit]);
 
@@ -135,7 +135,7 @@ export default function CatalogEdit() {
         await createCatalog(catalogData);
       }
       
-      navigate('/admin/catalogs');
+      void navigate('/admin/catalogs');
     } catch (err: any) {
       console.error('Error saving catalog:', err);
       setError(err.message || 'Failed to save catalog');
@@ -165,7 +165,7 @@ export default function CatalogEdit() {
       {/* Header */}
       <div className="mb-6">
         <button
-          onClick={() => navigate('/admin/catalogs')}
+          onClick={() => void navigate('/admin/catalogs')}
           className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -187,7 +187,7 @@ export default function CatalogEdit() {
       )}
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={() => void handleSubmit()} className="space-y-6">
         {/* Basic Information */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
@@ -476,7 +476,7 @@ export default function CatalogEdit() {
         <div className="flex items-center justify-end gap-4">
           <button
             type="button"
-            onClick={() => navigate('/admin/catalogs')}
+            onClick={() => void navigate('/admin/catalogs')}
             className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             disabled={saving}
           >

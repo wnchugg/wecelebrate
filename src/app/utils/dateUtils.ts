@@ -567,3 +567,31 @@ export function getTimezoneOffset(): number {
 export function getTimezoneName(): string {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
+
+/**
+ * Convert date to a specific timezone
+ * @param date - The date to convert
+ * @param timezone - IANA timezone identifier (e.g., 'America/New_York', 'Europe/London', 'Asia/Tokyo')
+ * @returns Date object representing the same moment in time, adjusted for the specified timezone
+ */
+export function convertToSiteTimezone(date: Date, timezone: string): Date {
+  // Convert the date to a string in the target timezone, then parse it back
+  // This preserves the visual representation of the date/time in that timezone
+  const dateString = date.toLocaleString('en-US', { timeZone: timezone });
+  return new Date(dateString);
+}
+
+/**
+ * Add days to a date in a specific timezone
+ * @param date - The starting date
+ * @param days - Number of days to add (can be negative to subtract)
+ * @param timezone - IANA timezone identifier (e.g., 'America/New_York', 'Europe/London', 'Asia/Tokyo')
+ * @returns Date object with the days added in the context of the specified timezone
+ */
+export function addDaysInTimezone(date: Date, days: number, timezone: string): Date {
+  // First convert to the target timezone
+  const localDate = convertToSiteTimezone(date, timezone);
+  // Then add the days
+  localDate.setDate(localDate.getDate() + days);
+  return localDate;
+}

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { TrendingUp, TrendingDown, ShoppingCart, Gift, Users, Package, Globe, Building2, BarChart3, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, ShoppingCart, Gift, Users, Package, Globe, Building2, BarChart3, Clock, CheckCircle } from 'lucide-react';
 import { useSite } from '../../context/SiteContext';
 import { Link } from 'react-router';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';

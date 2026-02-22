@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
-import { Plus, Search, Filter, Edit2, Trash2, Database, FileText, Package, ExternalLink } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Database, FileText, Package, ExternalLink } from 'lucide-react';
 import { fetchCatalogs, deleteCatalog } from '../../services/catalogApi';
 import type { Catalog, CatalogType, CatalogStatus } from '../../types/catalog';
 import type { CatalogFilters } from '../../../types/catalog';
@@ -282,7 +282,7 @@ export default function CatalogManagement() {
                         Edit
                       </Link>
                       <button
-                        onClick={() => handleDelete(catalog.id)}
+                        onClick={() => void handleDelete(catalog.id)}
                         disabled={deleting === catalog.id}
                         className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                           deleteConfirm === catalog.id

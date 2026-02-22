@@ -4,8 +4,8 @@
  * Tests for src/app/pages/Products.tsx
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen, within } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Products } from '../Products';
 import { renderWithRouter } from '@/test/helpers';

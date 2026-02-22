@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Trash2, AlertTriangle, CheckCircle, RefreshCw, ArrowRight } from 'lucide-react';
 import { forceClearTokens } from '../../utils/api';
-import { logger } from '../../utils/logger';
-import { toast } from 'sonner';
 
 export function ClearTokens() {
   const navigate = useNavigate();
@@ -24,7 +22,7 @@ export function ClearTokens() {
       
       // Auto-redirect to login after 2 seconds
       setTimeout(() => {
-        navigate('/admin/login');
+        void navigate('/admin/login');
       }, 2000);
     } catch (error) {
       console.error('Failed to clear tokens:', error);
@@ -69,7 +67,7 @@ export function ClearTokens() {
               </div>
 
               <button
-                onClick={handleClearTokens}
+                onClick={() => void handleClearTokens()}
                 disabled={clearing}
                 className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#D91C81] hover:bg-[#B91670] text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -118,7 +116,7 @@ export function ClearTokens() {
 
           <div className="mt-6 text-center">
             <button
-              onClick={() => navigate('/admin/login')}
+              onClick={() => void navigate('/admin/login')}
               className="text-sm text-gray-600 hover:text-gray-900 underline inline-flex items-center gap-1"
             >
               Go to Login
@@ -131,7 +129,7 @@ export function ClearTokens() {
           <p className="text-xs text-gray-500">
             Need more help? Visit{' '}
             <button
-              onClick={() => navigate('/admin/debug')}
+              onClick={() => void navigate('/admin/debug')}
               className="text-[#D91C81] hover:underline"
             >
               Debug Console

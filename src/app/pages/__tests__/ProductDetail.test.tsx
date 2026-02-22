@@ -5,12 +5,50 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ProductDetail } from '../ProductDetail';
-import { renderWithRouter } from '@/test/helpers';
 import { CartProvider } from '../../context/CartContext';
+import { LanguageProvider } from '../../context/LanguageContext';
 import { MemoryRouter, Routes, Route } from 'react-router';
+
+// Mock hooks that depend on SiteProvider
+vi.mock('../../hooks/useUnits', () => ({
+  useUnits: () => ({
+    formatWeight: (val: number) => `${val} kg`,
+    formatLength: (val: number) => `${val} cm`,
+    system: 'metric',
+  }),
+}));
+
+vi.mock('../../hooks/useCurrencyFormat', () => ({
+  useCurrencyFormat: () => ({
+    formatPrice: (val: number) => `$${val.toFixed(2)}`,
+    formatRange: (min: number, max: number) => `$${min.toFixed(2)} - $${max.toFixed(2)}`,
+  }),
+}));
+
+vi.mock('../../hooks/useNumberFormat', () => ({
+  useNumberFormat: () => ({
+    formatInteger: (val: number) => val.toLocaleString(),
+    formatDecimal: (val: number) => val.toFixed(2),
+    formatPercent: (val: number) => `${val}%`,
+    formatCurrency: (val: number) => `$${val.toFixed(2)}`,
+  }),
+}));
+
+vi.mock('../../components/CurrencyDisplay', () => ({
+  CurrencyDisplay: ({ amount }: { amount: number }) => <span>${amount.toFixed(2)}</span>,
+  useCurrency: () => ({
+    currency: 'USD',
+    format: (val: number) => `$${val.toFixed(2)}`,
+    convert: (val: number) => val,
+  }),
+}));
+
+vi.mock('../../utils/translationHelpers', () => ({
+  translateWithParams: (_t: (key: string) => string, key: string) => key,
+}));
 
 // Mock dependencies
 vi.mock('lucide-react', () => ({
@@ -65,14 +103,16 @@ vi.mock('../../data/products', () => ({
 
 function TestWrapper({ children, productId = 'product-1' }: { children: React.ReactNode; productId?: string }) {
   return (
-    <MemoryRouter initialEntries={[`/products/${productId}`]}>
-      <CartProvider>
-        <Routes>
-          <Route path="/products/:productId" element={children} />
-          <Route path="/products" element={<div>Products Page</div>} />
-        </Routes>
-      </CartProvider>
-    </MemoryRouter>
+    <LanguageProvider>
+      <MemoryRouter initialEntries={[`/products/${productId}`]}>
+        <CartProvider>
+          <Routes>
+            <Route path="/products/:productId" element={children} />
+            <Route path="/products" element={<div>Products Page</div>} />
+          </Routes>
+        </CartProvider>
+      </MemoryRouter>
+    </LanguageProvider>
   );
 }
 
@@ -215,7 +255,7 @@ describe('Product Detail Page Component Suite', () => {
         </TestWrapper>
       );
       
-      const image = screen.getByAltText('Premium Headphones') as HTMLImageElement;
+      const image = screen.getByAltText('Premium Headphones');
       expect(image.src).toContain('headphones.jpg');
     });
 

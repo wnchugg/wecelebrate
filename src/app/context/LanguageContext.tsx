@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { t, TranslationKey } from '../i18n/translations';
+import { getTextDirection } from '../utils/rtl';
 
 export type Language = {
   code: string;
@@ -64,7 +65,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   // Apply RTL direction to document
   useEffect(() => {
-    const direction = currentLanguage.rtl ? 'rtl' : 'ltr';
+    const direction = getTextDirection(currentLanguage.code);
     document.documentElement.dir = direction;
     document.documentElement.lang = currentLanguage.code;
     localStorage.setItem('preferred-language', currentLanguage.code);

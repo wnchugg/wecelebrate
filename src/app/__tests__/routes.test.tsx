@@ -294,11 +294,11 @@ describe('Route Configuration Suite', () => {
       expect(editRoute).toBeDefined();
     });
 
-    it('should have catalog migration route', () => {
+    it('should have catalogs route', () => {
       const adminRoute = router.routes.find(route => route.path === '/admin');
       const layoutWrapper = adminRoute?.children?.find(child => child.children);
-      const migrateRoute = layoutWrapper?.children?.find(child => child.path === 'catalogs/migrate');
-      expect(migrateRoute).toBeDefined();
+      const catalogRoute = layoutWrapper?.children?.find(child => child.path === 'catalogs');
+      expect(catalogRoute).toBeDefined();
     });
 
     it('should have site catalog configuration route', () => {
@@ -381,7 +381,7 @@ describe('Route Configuration Suite', () => {
 
     it('should have confirmation route', () => {
       const publicRoute = router.routes.find(route => route.path === undefined);
-      const confirmationRoute = publicRoute?.children?.find(child => child.path === 'confirmation');
+      const confirmationRoute = publicRoute?.children?.find(child => child.path?.startsWith('confirmation'));
       expect(confirmationRoute).toBeDefined();
     });
 

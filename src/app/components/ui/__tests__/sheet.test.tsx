@@ -17,10 +17,8 @@ import React from 'react';
 import { renderWithRouter } from '@/test/helpers';
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,

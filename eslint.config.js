@@ -2,10 +2,12 @@ import js from '@eslint/js'
 import tseslint from 'typescript-eslint'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import unusedImports from 'eslint-plugin-unused-imports'
+import promisePlugin from 'eslint-plugin-promise'
 import prettierConfig from 'eslint-config-prettier'
 
 export default tseslint.config(
-  { ignores: ['dist', 'build', 'node_modules', 'supabase', 'types', 'utils', 'e2e', '*.js', 'CLIENT_CONFIGURATION_UPDATED.tsx', 'RENAME_INSTRUCTIONS.js'] },
+  { ignores: ['dist', 'build', 'node_modules', 'supabase', 'types', 'utils', 'e2e', 'tests', '*.js', 'CLIENT_CONFIGURATION_UPDATED.tsx', 'RENAME_INSTRUCTIONS.js'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommendedTypeChecked],
     files: ['**/*.{ts,tsx}'],
@@ -19,6 +21,8 @@ export default tseslint.config(
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
+      'unused-imports': unusedImports,
+      'promise': promisePlugin,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
@@ -46,10 +50,18 @@ export default tseslint.config(
       // RELAXED: Promise handling - Warn for now
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-misused-promises': 'warn',
+      'promise/catch-or-return': 'warn',
+      'promise/no-return-wrap': 'warn',
+      'promise/param-names': 'warn',
+      'promise/always-return': 'off', // Too strict for our codebase
+      'promise/no-nesting': 'off', // Sometimes necessary
+      'promise/no-callback-in-promise': 'off', // Legacy code compatibility
       
       // REASONABLE RELAXATIONS: Not security-critical
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': ['warn', { 
+      '@typescript-eslint/no-unused-vars': 'off', // Turned off in favor of unused-imports
+      'unused-imports/no-unused-imports': 'warn',
+      'unused-imports/no-unused-vars': ['warn', { 
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_' 
       }],

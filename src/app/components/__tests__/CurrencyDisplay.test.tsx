@@ -14,8 +14,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { CurrencyDisplay, useCurrency } from '../CurrencyDisplay';
-import { useSite } from '../../hooks/useSite';
-import { formatCurrency, convertCurrency } from '../../utils/countries';
 
 vi.mock('../../hooks/useSite', () => ({
   useSite: vi.fn((siteId) => ({

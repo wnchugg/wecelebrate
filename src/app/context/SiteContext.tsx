@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { clientApi, siteApi, apiRequest } from '../utils/api';
 import { useAdmin } from './AdminContext';
 import { logger } from '../utils/logger';
@@ -282,6 +282,10 @@ export interface Site extends Omit<GlobalSite, 'settings'> {
   ssoProvider?: string;
   ssoClientOfficeName?: string;
 
+  // Draft/Live Mode Flags
+  _hasUnpublishedChanges?: boolean; // True when draft_settings is populated
+  _draftSettings?: any; // Copy of draft_settings for reference
+
   createdAt: string;
   updatedAt: string;
 }
@@ -300,6 +304,10 @@ export interface SiteContextType {
   deleteClient: (id: string) => Promise<void>;
   addSite: (site: Partial<Site>) => Promise<Site>;
   updateSite: (id: string, updates: Partial<Site>) => Promise<void>;
+  saveSiteDraft: (id: string, updates: Partial<Site>) => Promise<void>;
+  publishSite: (id: string) => Promise<void>;
+  discardSiteDraft: (id: string) => Promise<void>;
+  getSiteLive: (id: string) => Promise<Site>;
   deleteSite: (id: string) => Promise<void>;
   getSitesByClient: (clientId: string) => Site[];
   getClientById: (clientId: string) => Client | undefined;
@@ -312,17 +320,74 @@ export interface SiteContextType {
 
 export const SiteContext = createContext<SiteContextType | undefined>(undefined);
 
+// ============================================================================
+// SITE SELECTION PERSISTENCE UTILITIES
+// ============================================================================
+
+const SITE_SELECTION_STORAGE_KEY = 'admin_selected_site_id';
+
+/**
+ * Persist site ID to localStorage
+ */
+function persistSiteSelection(siteId: string): void {
+  try {
+    localStorage.setItem(SITE_SELECTION_STORAGE_KEY, siteId);
+    logger.info('[SiteContext] Persisted site selection', { siteId });
+  } catch (error) {
+    logger.error('[SiteContext] Failed to persist site selection', { error });
+    // Continue operation - persistence failure should not break functionality
+  }
+}
+
+/**
+ * Retrieve persisted site ID from localStorage
+ */
+function getPersistedSiteSelection(): string | null {
+  try {
+    return localStorage.getItem(SITE_SELECTION_STORAGE_KEY);
+  } catch (error) {
+    logger.error('[SiteContext] Failed to read persisted site selection', { error });
+    return null;
+  }
+}
+
+/**
+ * Clear persisted site selection from localStorage
+ */
+function clearPersistedSiteSelection(): void {
+  try {
+    localStorage.removeItem(SITE_SELECTION_STORAGE_KEY);
+    logger.info('[SiteContext] Cleared persisted site selection');
+  } catch (error) {
+    logger.error('[SiteContext] Failed to clear persisted site selection', { error });
+  }
+}
+
+// ============================================================================
+
 export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   console.warn('[SiteProvider] Component rendering');
   
   const [clients, setClients] = useState<Client[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [sites, setSites] = useState<Site[]>([]);
-  const [currentSite, setCurrentSite] = useState<Site | null>(null);
+  const [currentSiteState, setCurrentSiteState] = useState<Site | null>(null);
   const [currentClient, setCurrentClient] = useState<Client | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { isAdminAuthenticated, isLoading: adminLoading } = useAdmin();
   const hasLoadedRef = useRef(false);
+
+  // Wrapped setCurrentSite with persistence logic
+  const setCurrentSite = (site: Site | null) => {
+    setCurrentSiteState(site);
+    if (site) {
+      persistSiteSelection(site.id);
+    } else {
+      clearPersistedSiteSelection();
+    }
+  };
+
+  const currentSite = currentSiteState;
 
   console.warn('[SiteProvider] State:', {
     isAdminAuthenticated,
@@ -336,6 +401,10 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (!isAdminAuthenticated) {
       hasLoadedRef.current = false;
+      // Clear persisted site selection on logout
+      clearPersistedSiteSelection();
+      setCurrentSite(null);
+      setCurrentClient(null);
     }
   }, [isAdminAuthenticated]);
 
@@ -404,23 +473,66 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
           clientsResponse: clientsResponse,
           sitesSuccess: sitesResponse?.success,
           sitesDataLength: sitesResponse?.data?.length,
+          sitesData: sitesResponse?.data,
           clientsSuccess: clientsResponse?.success,
-          clientsDataLength: clientsResponse?.data?.length
+          clientsDataLength: clientsResponse?.data?.length,
+          clientsData: clientsResponse?.data
+        });
+
+        console.warn('[SiteContext] Setting sites and clients:', {
+          sitesArray: sitesResponse.data,
+          clientsArray: clientsResponse.data
         });
 
         setSites((sitesResponse.data || []) as Site[]);
         setClients((clientsResponse.data || []) as Client[]);
 
-        // Auto-select first active site if none selected
-        if (sitesResponse.data && sitesResponse.data.length > 0) {
-          const firstActiveSite = sitesResponse.data.find((s: Site) => s.status === 'active') || sitesResponse.data[0];
-          setCurrentSite(firstActiveSite as Site);
+        // Try to restore persisted site selection first
+        const persistedSiteId = getPersistedSiteSelection();
+        let siteToSelect: Site | null = null;
+
+        if (persistedSiteId && sitesResponse.data) {
+          // Check if persisted site still exists in loaded sites
+          const persistedSite = sitesResponse.data.find((s: Site) => s.id === persistedSiteId);
+          if (persistedSite) {
+            logger.info('[SiteContext] Restoring persisted site selection', { siteId: persistedSiteId });
+            siteToSelect = persistedSite as Site;
+          } else {
+            logger.info('[SiteContext] Persisted site not found, clearing stale value', { siteId: persistedSiteId });
+            clearPersistedSiteSelection();
+          }
+        }
+
+        // Fall back to auto-selection if no valid persisted site
+        if (!siteToSelect && sitesResponse.data && sitesResponse.data.length > 0) {
+          logger.info('[SiteContext] No persisted site, auto-selecting first active site');
+          siteToSelect = (sitesResponse.data.find((s: Site) => s.status === 'active') || sitesResponse.data[0]) as Site;
+        }
+
+        // Set the selected site (this will also persist it via the wrapped setter)
+        if (siteToSelect) {
+          console.warn('[SiteContext] Setting selected site:', {
+            siteId: siteToSelect.id,
+            siteName: siteToSelect.name,
+            clientId: siteToSelect.clientId
+          });
+          setCurrentSite(siteToSelect);
 
           // Set corresponding client
-          if (firstActiveSite && clientsResponse.data) {
-            const siteClient = clientsResponse.data.find((c: Client) => c.id === firstActiveSite.clientId);
+          if (clientsResponse.data) {
+            const siteClient = clientsResponse.data.find((c: Client) => c.id === siteToSelect.clientId);
+            console.warn('[SiteContext] Looking for client:', {
+              lookingForClientId: siteToSelect.clientId,
+              foundClient: siteClient ? { id: siteClient.id, name: siteClient.name } : null,
+              availableClients: clientsResponse.data.map((c: Client) => ({ id: c.id, name: c.name }))
+            });
             if (siteClient) {
               setCurrentClient(siteClient as Client);
+            } else {
+              console.error('[SiteContext] Client not found for site!', {
+                siteClientId: siteToSelect.clientId,
+                availableClientIds: clientsResponse.data.map((c: Client) => c.id)
+              });
             }
           }
         }
@@ -437,7 +549,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    loadData();
+    void loadData();
   }, [isAdminAuthenticated, adminLoading]); // Removed currentSite from dependencies
 
   const addClient = async (client: Partial<Client>): Promise<Client> => {
@@ -447,7 +559,29 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateClient = async (id: string, updates: Partial<Client>): Promise<void> => {
-    setClients(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
+    try {
+      // Make API call to update client in backend
+      const response = await apiRequest(`/v2/clients/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(updates)
+      });
+      
+      if (!(response as Response).ok) {
+        const error = await (response as Response).json();
+        throw new Error(error.message || 'Failed to update client');
+      }
+      
+      // Update local state
+      setClients(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
+      
+      // Update currentClient if it's the one being updated
+      if (currentClient?.id === id) {
+        setCurrentClient(prev => prev ? { ...prev, ...updates } : null);
+      }
+    } catch (error) {
+      console.error('Failed to update client:', error);
+      throw error;
+    }
   };
 
   const deleteClient = async (id: string): Promise<void> => {
@@ -463,25 +597,116 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateSite = async (id: string, updates: Partial<Site>): Promise<void> => {
     try {
       // Make API call to update site in backend
-      const response = await apiRequest(`/sites/${id}`, {
+      // apiRequest returns parsed JSON data, not a Response object
+      const result = await apiRequest<{ success: boolean; data: Site; message?: string }>(`/v2/sites/${id}`, {
         method: 'PUT',
         body: JSON.stringify(updates)
       });
       
-      if (!(response as Response).ok) {
-        const error = await (response as Response).json();
-        throw new Error(error.message || 'Failed to update site');
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to update site');
       }
       
-      // Update local state
-      setSites(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
+      // Update local state with the returned data from backend
+      setSites(prev => prev.map(s => s.id === id ? { ...s, ...result.data } : s));
       
       // Update currentSite if it's the one being updated
       if (currentSite?.id === id) {
-        setCurrentSite(prev => prev ? { ...prev, ...updates } : null);
+        setCurrentSite({ ...currentSite, ...result.data });
       }
     } catch (error) {
       console.error('Failed to update site:', error);
+      throw error;
+    }
+  };
+
+  const saveSiteDraft = async (id: string, updates: Partial<Site>): Promise<void> => {
+    try {
+      // Save changes to draft_settings column
+      const result = await apiRequest<{ success: boolean; data: Site; message?: string }>(`/v2/sites/${id}/draft`, {
+        method: 'PATCH',
+        body: JSON.stringify(updates)
+      });
+      
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to save draft');
+      }
+      
+      // Update local state with merged draft data
+      setSites(prev => prev.map(s => s.id === id ? { ...s, ...result.data } : s));
+      
+      // Update currentSite if it's the one being updated
+      if (currentSite?.id === id) {
+        setCurrentSite({ ...currentSite, ...result.data });
+      }
+    } catch (error) {
+      console.error('Failed to save draft:', error);
+      throw error;
+    }
+  };
+
+  const publishSite = async (id: string): Promise<void> => {
+    try {
+      // Merge draft_settings into live columns and clear draft
+      const result = await apiRequest<{ success: boolean; data: Site; message?: string }>(`/v2/sites/${id}/publish`, {
+        method: 'POST'
+      });
+      
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to publish site');
+      }
+      
+      // Update local state with published data
+      setSites(prev => prev.map(s => s.id === id ? { ...s, ...result.data } : s));
+      
+      // Update currentSite if it's the one being published
+      if (currentSite?.id === id) {
+        setCurrentSite({ ...currentSite, ...result.data });
+      }
+    } catch (error) {
+      console.error('Failed to publish site:', error);
+      throw error;
+    }
+  };
+
+  const discardSiteDraft = async (id: string): Promise<void> => {
+    try {
+      // Clear draft_settings column
+      const result = await apiRequest<{ success: boolean; data: Site; message?: string }>(`/v2/sites/${id}/draft`, {
+        method: 'DELETE'
+      });
+      
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to discard draft');
+      }
+      
+      // Update local state with live-only data
+      setSites(prev => prev.map(s => s.id === id ? { ...s, ...result.data } : s));
+      
+      // Update currentSite if it's the one being updated
+      if (currentSite?.id === id) {
+        setCurrentSite({ ...currentSite, ...result.data });
+      }
+    } catch (error) {
+      console.error('Failed to discard draft:', error);
+      throw error;
+    }
+  };
+
+  const getSiteLive = async (id: string): Promise<Site> => {
+    try {
+      // Get only live data (no draft merged)
+      const result = await apiRequest<{ success: boolean; data: Site; message?: string }>(`/v2/sites/${id}/live`, {
+        method: 'GET'
+      });
+      
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to get live site data');
+      }
+      
+      return result.data;
+    } catch (error) {
+      console.error('Failed to get live site data:', error);
       throw error;
     }
   };
@@ -540,6 +765,10 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       deleteClient,
       addSite,
       updateSite,
+      saveSiteDraft,
+      publishSite,
+      discardSiteDraft,
+      getSiteLive,
       deleteSite,
       getSitesByClient,
       getClientById,

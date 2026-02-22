@@ -289,7 +289,7 @@ export function EmployeeImportModal({ open, onClose, validationType, onImport }:
                 ref={fileInputRef}
                 type="file"
                 accept=".csv,.xlsx,.xls"
-                onChange={handleFileUpload}
+                onChange={() => void handleFileUpload()}
                 className="hidden"
                 id="file-upload"
               />
@@ -307,7 +307,7 @@ export function EmployeeImportModal({ open, onClose, validationType, onImport }:
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                onClick={downloadTemplate}
+                onClick={() => void downloadTemplate()}
                 className="flex-1"
               >
                 <Download className="w-4 h-4 mr-2" />

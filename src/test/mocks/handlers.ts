@@ -1,7 +1,5 @@
 import { http, HttpResponse } from 'msw';
 import {
-  mockCatalogs,
-  mockSiteConfigs,
   filterCatalogs,
   getCatalogById,
   getSiteConfigBySiteId,

@@ -1,4 +1,4 @@
-import { Terminal, Copy, CheckCircle, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
+import { Terminal, Copy, CheckCircle, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';
 import { copyToClipboard as copyToClipboardUtil, selectTextInElement as selectTextUtil } from '../utils/clipboard';
@@ -84,7 +84,7 @@ export function BackendDeploymentGuide() {
                 <h4 className="font-semibold text-gray-900 text-sm">{cmd.title}</h4>
               </div>
               <button
-                onClick={() => copyToClipboard(cmd.command, index)}
+                onClick={() => void copyToClipboard(cmd.command, index)}
                 className="p-1.5 hover:bg-gray-100 rounded transition-colors"
                 title="Copy command"
               >

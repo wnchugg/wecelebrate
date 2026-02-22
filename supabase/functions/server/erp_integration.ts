@@ -485,8 +485,8 @@ export async function getSyncLogs(erpConnectionId: string, limit: number = 50): 
 /**
  * Helper: Map fields from our format to ERP format
  */
-function mapFields(source: any, mapping: Record<string, string>): any {
-  const result: any = {};
+function mapFields(source: Record<string, unknown>, mapping: Record<string, string>): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
   
   for (const [ourField, erpField] of Object.entries(mapping)) {
     const value = getNestedValue(source, ourField);
@@ -501,8 +501,8 @@ function mapFields(source: any, mapping: Record<string, string>): any {
 /**
  * Helper: Map fields from ERP format to our format (reverse mapping)
  */
-function reverseMapFields(source: any, mapping: Record<string, string>): any {
-  const result: any = {};
+function reverseMapFields(source: Record<string, unknown>, mapping: Record<string, string>): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
   
   for (const [ourField, erpField] of Object.entries(mapping)) {
     const value = getNestedValue(source, erpField);

@@ -33,6 +33,10 @@ interface ImportMetaEnv {
   readonly PROD: boolean;
   readonly DEV: boolean;
   readonly SSR: boolean;
+
+  //Vite DB Testings integration
+DATABASE_URL=postgresql://postgres:74rRtfqMw0BHCyXo@db.wjfcqqrlhwdvvjmefxky.supabase.co:5432/postgres
+
 }
 
 interface ImportMeta {

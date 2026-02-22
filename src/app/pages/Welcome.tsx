@@ -3,12 +3,12 @@ import { useNavigate, useParams } from 'react-router';
 import { usePublicSite } from '../context/PublicSiteContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
-import { ArrowRight, Play, Heart, MessageCircle } from 'lucide-react';
+import { useSiteContent } from '../hooks/useSiteContent';
+import { ArrowRight, Play, MessageCircle } from 'lucide-react';
 import { CelebrationMessage, ECARD_TEMPLATES } from '../types/celebration';
 import { ECard } from '../components/ECard';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';
 import { publicAnonKey } from '../../../utils/supabase/info';
-import { toast } from 'sonner';
 import { logger } from '../utils/logger';
 
 export function Welcome() {
@@ -17,6 +17,7 @@ export function Welcome() {
   const { currentSite } = usePublicSite();
   const { t } = useLanguage();
   const { user } = useAuth();
+  const { getTranslatedContent } = useSiteContent();
   const [videoPlaying, setVideoPlaying] = useState(false);
   const [celebrationMessages, setCelebrationMessages] = useState<CelebrationMessage[]>([]);
   const [loading, setLoading] = useState(false);
@@ -52,7 +53,7 @@ export function Welcome() {
         // If no sites exist, redirect to initialize database
         if (data.success && data.sites === 0 && data.admins === 0) {
           // Database appears empty, redirecting to initialization
-          navigate('/initialize-database');
+          void navigate('/initialize-database');
           return;
         }
         
@@ -78,11 +79,11 @@ export function Welcome() {
     if (currentSite) {
       // Check if welcome page is explicitly disabled
       // If not set or set to true, show welcome page (backward compatibility)
-      const enableWelcomePage = currentSite.settings.enableWelcomePage;
+      const enableWelcomePage = currentSite.settings?.enableWelcomePage;
       
       logger.log('[Welcome] Welcome page setting:', {
         enableWelcomePage,
-        rawSetting: currentSite.settings.enableWelcomePage,
+        rawSetting: currentSite.settings?.enableWelcomePage,
         willRedirect: enableWelcomePage === false,
         siteId,
         currentPath: window.location.pathname,
@@ -95,7 +96,7 @@ export function Welcome() {
           to: siteId ? '../gift-selection' : '/gift-selection'
         });
         // Navigate to gift-selection (sibling route) immediately
-        navigate(siteId ? '../gift-selection' : '/gift-selection', { replace: true });
+        void navigate(siteId ? '../gift-selection' : '/gift-selection', { replace: true });
         return; // Exit early to prevent rendering
       }
     }
@@ -158,7 +159,7 @@ export function Welcome() {
 
   const handleContinue = () => {
     // Use parent-relative path to navigate to sibling route
-    navigate(siteId ? '../gift-selection' : '/gift-selection');
+    void navigate(siteId ? '../gift-selection' : '/gift-selection');
   };
 
   const defaultTitle = t('welcome.defaultTitle') || 'Congratulations on Your Anniversary!';
@@ -166,6 +167,11 @@ export function Welcome() {
 
 As a token of our appreciation for your continued service, we invite you to select a special gift. Thank you for being such an important part of our success.`;
   const defaultCtaText = t('welcome.defaultCta') || 'Choose Your Gift';
+
+  // Get translated content with fallbacks
+  const title = getTranslatedContent('welcomePage.title', welcomeContent?.title || defaultTitle);
+  const message = getTranslatedContent('welcomePage.message', welcomeContent?.message || defaultMessage);
+  const buttonText = getTranslatedContent('welcomePage.buttonText', welcomeContent?.ctaText || defaultCtaText);
 
   // Early return if currentSite is null - prevents rendering before redirect
   if (!currentSite) {
@@ -180,7 +186,7 @@ As a token of our appreciation for your continued service, we invite you to sele
   }
 
   // Early return if welcome page is disabled - prevents flash of content before redirect
-  if (currentSite.settings.enableWelcomePage === false) {
+  if (currentSite.settings?.enableWelcomePage === false) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -260,13 +266,13 @@ As a token of our appreciation for your continued service, we invite you to sele
                   className="text-3xl md:text-4xl font-bold mb-6"
                   style={{ color: primaryColor }}
                 >
-                  {welcomeContent?.title || defaultTitle}
+                  {title}
                 </h1>
 
                 {/* Letter Message */}
                 <div className="prose prose-lg max-w-none mb-8">
                   <p className="text-gray-700 text-base md:text-lg leading-relaxed whitespace-pre-wrap">
-                    {welcomeContent?.message || defaultMessage}
+                    {message}
                   </p>
                 </div>
 
@@ -366,7 +372,7 @@ As a token of our appreciation for your continued service, we invite you to sele
           {/* View All Messages Link */}
           <div className="text-center">
             <button
-              onClick={() => navigate('/celebration')}
+              onClick={() => void navigate('/celebration')}
               className="inline-flex items-center gap-2 text-lg font-semibold hover:gap-3 transition-all"
               style={{ color: primaryColor }}
             >
@@ -398,7 +404,7 @@ As a token of our appreciation for your continued service, we invite you to sele
               boxShadow: `0 4px 14px ${primaryColor}40`
             }}
           >
-            <span className="text-white">{welcomeContent?.ctaText || defaultCtaText}</span>
+            <span className="text-white">{buttonText}</span>
             <ArrowRight className="w-5 h-5 text-white transition-transform group-hover:translate-x-1" />
           </button>
         </div>

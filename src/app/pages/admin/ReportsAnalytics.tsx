@@ -9,14 +9,12 @@ import {
   ShoppingCart,
   RefreshCw,
   BarChart3,
-  PieChart as PieChartIcon,
   Building2,
   Gift,
   CheckCircle,
   Clock,
   Truck,
   XCircle,
-  Filter,
   Eye
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
@@ -35,17 +33,14 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  Legend, 
   ResponsiveContainer,
   Area,
   AreaChart
 } from 'recharts';
-import type { TooltipProps } from 'recharts';
-import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { apiRequest } from '../../utils/api';
 import { showErrorToast, showSuccessToast } from '../../utils/errorHandling';
 import { logger } from '../../utils/logger';
+import { useDateFormat } from '../../hooks/useDateFormat';
 
 interface Order {
   id: string;
@@ -149,6 +144,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export function ReportsAnalytics() {
+  const { formatShortDate, formatDate } = useDateFormat();
   const [orders, setOrders] = useState<Order[]>([]);
   const [gifts, setGifts] = useState<Gift[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -336,7 +332,7 @@ export function ReportsAnalytics() {
     const dailyRevenue: Record<string, number> = {};
     
     filteredOrders.forEach(order => {
-      const date = new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const date = formatShortDate(order.createdAt);
       dailyOrders[date] = (dailyOrders[date] || 0) + 1;
       dailyRevenue[date] = (dailyRevenue[date] || 0) + (order.totalAmount || 0);
     });
@@ -349,7 +345,7 @@ export function ReportsAnalytics() {
       }))
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .slice(-14); // Last 14 days
-  }, [filteredOrders]);
+  }, [filteredOrders, formatShortDate]);
 
   // Top Gifts by Orders
   const topGiftsByOrders = useMemo(() => {
@@ -400,7 +396,8 @@ export function ReportsAnalytics() {
     const monthlyEmployees: Record<string, number> = {};
     
     employees.forEach(emp => {
-      const month = new Date(emp.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+      const date = new Date(emp.createdAt);
+      const month = formatDate(date, { year: 'numeric', month: 'short' });
       monthlyEmployees[month] = (monthlyEmployees[month] || 0) + 1;
     });
 
@@ -408,7 +405,7 @@ export function ReportsAnalytics() {
       .map(([month, count]) => ({ month, employees: count }))
       .sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime())
       .slice(-6); // Last 6 months
-  }, [employees]);
+  }, [employees, formatDate]);
 
   // Department Distribution
   const departmentDistribution = useMemo(() => {
@@ -501,14 +498,14 @@ export function ReportsAnalytics() {
           <Button
             variant="outline"
             size="sm"
-            onClick={loadAllData}
+            onClick={() => void loadAllData()}
             className="gap-2"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
           </Button>
           <Button
-            onClick={() => handleExport('csv')}
+            onClick={() => void handleExport('csv')}
             className="bg-[#D91C81] hover:bg-[#B01669] text-white gap-2"
             size="sm"
           >

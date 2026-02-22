@@ -3,9 +3,7 @@ import { useNavigate, useParams } from 'react-router';
 import { useLanguage } from '../context/LanguageContext';
 import { useOrder } from '../context/OrderContext';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, ArrowRight, Package, MapPin, User, CreditCard, Edit, CheckCircle } from 'lucide-react';
-import { LanguageSelector } from '../components/LanguageSelector';
-import Logo from '../../imports/Logo';
+import { Package, MapPin, Edit, CheckCircle } from 'lucide-react';
 import { getCurrentEnvironment, buildApiUrl } from '../config/deploymentEnvironments';
 import { toast } from 'sonner';
 import { logger } from '../utils/logger';
@@ -30,14 +28,14 @@ export function ReviewOrder() {
 
   useEffect(() => {
     if (!selectedGift || !shippingAddress) {
-      navigate('../gift-selection');
+      void navigate('../gift-selection');
     }
   }, [selectedGift, shippingAddress, navigate]);
 
   const handleSubmitOrder = async () => {
     if (!selectedGift || !shippingAddress) {
-      setError('Missing required information');
-      toast.error('Missing required information');
+      setError(t('notification.error.missingInformation'));
+      toast.error(t('notification.error.missingInformation'));
       return;
     }
 
@@ -49,8 +47,8 @@ export function ReviewOrder() {
       const sessionToken = sessionStorage.getItem('employee_session');
       
       if (!sessionToken) {
-        toast.error('Session expired. Please log in again.');
-        navigate('../access');
+        toast.error(t('notification.error.sessionExpired'));
+        void navigate('../access');
         return;
       }
       
@@ -93,16 +91,16 @@ export function ReviewOrder() {
       }
       
       // Order created successfully!
-      toast.success('Order placed successfully! 🎉');
+      toast.success(t('notification.success.orderPlaced'));
       
       setIsSubmitting(false);
       
-      // Navigate to confirmation page with order ID
-      navigate(`/confirmation/${data.order.id}`);
+      // Navigate to confirmation page with order ID (relative path preserves siteId context)
+      void navigate(`../confirmation/${data.order.id}`);
     } catch (error: unknown) {
       logger.error('Failed to submit order:', error);
-      setError(error instanceof Error ? error.message : 'Failed to submit order. Please try again.');
-      toast.error(error instanceof Error ? error.message : 'Failed to submit order');
+      setError(error instanceof Error ? error.message : t('notification.error.failedToSubmitOrder'));
+      toast.error(error instanceof Error ? error.message : t('notification.error.failedToSubmitOrder'));
       setIsSubmitting(false);
     }
   };
@@ -138,7 +136,7 @@ export function ReviewOrder() {
                 {t('review.selectedGift')}
               </h2>
               <button
-                onClick={() => navigate('../gift-selection')}
+                onClick={() => void navigate('../gift-selection')}
                 className="flex items-center gap-2 text-[#D91C81] hover:text-[#B71569] font-medium text-sm"
               >
                 <Edit className="w-4 h-4" />
@@ -179,7 +177,7 @@ export function ReviewOrder() {
                 {t('review.shippingInformation')}
               </h2>
               <button
-                onClick={() => navigate('../shipping-information')}
+                onClick={() => void navigate('../shipping-information')}
                 className="flex items-center gap-2 text-[#D91C81] hover:text-[#B71569] font-medium text-sm"
               >
                 <Edit className="w-4 h-4" />
@@ -231,7 +229,7 @@ export function ReviewOrder() {
           {/* Submit Button */}
           <div className="flex justify-center pt-4">
             <button
-              onClick={handleSubmitOrder}
+              onClick={() => void handleSubmitOrder()}
               disabled={isSubmitting}
               className="flex items-center gap-3 bg-gradient-to-r from-[#D91C81] to-[#B71569] text-white px-12 py-5 rounded-xl font-bold text-lg transition-all disabled:bg-gray-300 disabled:cursor-not-allowed"
               style={{ boxShadow: '0 4px 12px rgba(217, 28, 129, 0.3)' }}

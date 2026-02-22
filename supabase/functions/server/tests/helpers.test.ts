@@ -30,6 +30,12 @@ Deno.test('snakeToCamel - converts snake_case to camelCase', () => {
   assertEquals(snakeToCamel('name'), 'name'); // No change for single word
 });
 
+Deno.test('snakeToCamel - preserves underscore-prefixed properties', () => {
+  assertEquals(snakeToCamel('_hasUnpublishedChanges'), '_hasUnpublishedChanges');
+  assertEquals(snakeToCamel('_draftSettings'), '_draftSettings');
+  assertEquals(snakeToCamel('_internalFlag'), '_internalFlag');
+});
+
 Deno.test('objectToSnakeCase - converts object keys', () => {
   const input = {
     firstName: 'John',
@@ -104,4 +110,109 @@ Deno.test('generateToken - only contains hex characters', () => {
   const token = generateToken();
   const hexRegex = /^[0-9a-f]+$/;
   assertEquals(hexRegex.test(token), true);
+});
+
+// ===== Draft Settings Merge Tests =====
+
+import { mergeDraftSettings } from '../helpers.ts';
+
+Deno.test('mergeDraftSettings - sets _hasUnpublishedChanges to false when draft_settings is null', () => {
+  const site = {
+    id: '123',
+    name: 'Test Site',
+    slug: 'test-site',
+    draft_settings: null,
+  };
+  
+  const result = mergeDraftSettings(site);
+  
+  assertEquals(result._hasUnpublishedChanges, false);
+  assertEquals(result.id, '123');
+  assertEquals(result.name, 'Test Site');
+});
+
+Deno.test('mergeDraftSettings - sets _hasUnpublishedChanges to false when draft_settings is undefined', () => {
+  const site = {
+    id: '123',
+    name: 'Test Site',
+    slug: 'test-site',
+  };
+  
+  const result = mergeDraftSettings(site);
+  
+  assertEquals(result._hasUnpublishedChanges, false);
+  assertEquals(result.id, '123');
+  assertEquals(result.name, 'Test Site');
+});
+
+Deno.test('mergeDraftSettings - sets _hasUnpublishedChanges to true when draft_settings is populated', () => {
+  const site = {
+    id: '123',
+    name: 'Test Site',
+    slug: 'test-site',
+    draft_settings: {
+      name: 'Updated Test Site',
+      status: 'active',
+    },
+  };
+  
+  const result = mergeDraftSettings(site);
+  
+  assertEquals(result._hasUnpublishedChanges, true);
+  assertEquals(result._draftSettings, site.draft_settings);
+});
+
+Deno.test('mergeDraftSettings - merges draft values over live values', () => {
+  const site = {
+    id: '123',
+    name: 'Test Site',
+    slug: 'test-site',
+    status: 'inactive',
+    draft_settings: {
+      name: 'Updated Test Site',
+      status: 'active',
+    },
+  };
+  
+  const result = mergeDraftSettings(site);
+  
+  // Draft values should override live values
+  assertEquals(result.name, 'Updated Test Site');
+  assertEquals(result.status, 'active');
+  assertEquals(result.slug, 'test-site'); // Unchanged field
+  assertEquals(result._hasUnpublishedChanges, true);
+});
+
+Deno.test('mergeDraftSettings - preserves original draft_settings in _draftSettings', () => {
+  const draftSettings = {
+    name: 'Updated Test Site',
+    status: 'active',
+  };
+  
+  const site = {
+    id: '123',
+    name: 'Test Site',
+    slug: 'test-site',
+    draft_settings: draftSettings,
+  };
+  
+  const result = mergeDraftSettings(site);
+  
+  assertEquals(result._draftSettings, draftSettings);
+  assertEquals(result._hasUnpublishedChanges, true);
+});
+
+Deno.test('mergeDraftSettings - handles empty object as draft_settings', () => {
+  const site = {
+    id: '123',
+    name: 'Test Site',
+    slug: 'test-site',
+    draft_settings: {},
+  };
+  
+  const result = mergeDraftSettings(site);
+  
+  // Empty object is still considered "populated"
+  assertEquals(result._hasUnpublishedChanges, true);
+  assertEquals(result._draftSettings, {});
 });

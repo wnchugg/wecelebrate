@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy } from 'react';
 import { createBrowserRouter } from 'react-router';
 import { Root } from './pages/Root';
 import { AdminRoot } from './pages/admin/AdminRoot';
@@ -88,7 +88,6 @@ const ERPConnectionManagement = lazy(() => import('./pages/admin/ERPConnectionMa
 const ClientSiteERPAssignment = lazy(() => import('./pages/admin/ClientSiteERPAssignment').then(m => ({ default: m.ClientSiteERPAssignment })));
 const CatalogManagement = lazy(() => import('./pages/admin/CatalogManagement').then(m => ({ default: m.default })));
 const CatalogEdit = lazy(() => import('./pages/admin/CatalogEdit').then(m => ({ default: m.default })));
-const CatalogMigration = lazy(() => import('./pages/admin/CatalogMigration').then(m => ({ default: m.default })));
 const SiteCatalogConfiguration = lazy(() => import('./pages/admin/SiteCatalogConfiguration').then(m => ({ default: m.default })));
 const ImportExportSettings = lazy(() => import('./pages/admin/ImportExportSettings').then(m => ({ default: m.ImportExportSettings })));
 const Analytics = lazy(() => import('./pages/admin/Analytics').then(m => ({ default: m.Analytics })));
@@ -112,20 +111,22 @@ const GlobalTemplateLibrary = lazy(() => import('./pages/admin/GlobalTemplateLib
 const EmailServiceTest = lazy(() => import('./pages/admin/EmailServiceTest').then(m => ({ default: m.EmailServiceTest })));
 const ShippingConfiguration = lazy(() => import('./pages/admin/ShippingConfiguration').then(m => ({ default: m.ShippingConfiguration })));
 const AccessManagement = lazy(() => import('./pages/admin/AccessManagement').then(m => ({ default: m.AccessManagement })));
-const HomePageEditor = lazy(() => import('./pages/admin/HomePageEditor'));
+const HomePageEditor = lazy(() => import('./pages/admin/HomePageEditorNew'));
 const AuthSync = lazy(() => import('./pages/admin/AuthSync'));
 
 // New UX Enhancement Pages
 const HeaderFooterConfiguration = lazy(() => import('./pages/admin/HeaderFooterConfiguration').then(m => ({ default: m.HeaderFooterConfiguration })));
 const BrandingConfiguration = lazy(() => import('./pages/admin/BrandingConfiguration').then(m => ({ default: m.BrandingConfiguration })));
 const GiftSelectionConfiguration = lazy(() => import('./pages/admin/GiftSelectionConfiguration').then(m => ({ default: m.GiftSelectionConfiguration })));
+const BrandsManagement = lazy(() => import('./pages/admin/BrandsManagement').then(m => ({ default: m.BrandsManagement })));
+const BrandEdit = lazy(() => import('./pages/admin/BrandEdit').then(m => ({ default: m.BrandEdit })));
+const EmailTemplatesManagement = lazy(() => import('./pages/admin/EmailTemplatesManagement').then(m => ({ default: m.EmailTemplatesManagement })));
 
 const AuditLogs = lazy(() => import('./pages/admin/AuditLogs').then(m => ({ default: m.AuditLogs })));
 const SecurityDashboard = lazy(() => import('./pages/admin/SecurityDashboard').then(m => ({ default: m.SecurityDashboard })));
 const AdminUserManagement = lazy(() => import('./pages/admin/AdminUserManagement').then(m => ({ default: m.AdminUserManagement })));
 const RoleManagement = lazy(() => import('./pages/admin/RoleManagement').then(m => ({ default: m.RoleManagement })));
 const AccessGroupManagement = lazy(() => import('./pages/admin/AccessGroupManagement').then(m => ({ default: m.AccessGroupManagement })));
-const RBACOverview = lazy(() => import('./pages/admin/RBACOverview').then(m => ({ default: m.RBACOverview })));
 const SessionExpired = lazy(() => import('./pages/admin/SessionExpired').then(m => ({ default: m.SessionExpired })));
 const DeveloperTools = lazy(() => import('./pages/admin/DeveloperTools').then(m => ({ default: m.DeveloperTools })));
 const TestingDashboard = lazy(() => import('./pages/admin/TestingDashboard').then(m => ({ default: m.TestingDashboard })));
@@ -146,8 +147,8 @@ const ConnectionTest = lazy(() => import('./pages/admin/ConnectionTest').then(m 
 const DataDiagnostic = lazy(() => import('./pages/admin/DataDiagnostic').then(m => ({ default: m.DataDiagnostic })));
 const ApplicationDocumentation = lazy(() => import('./pages/admin/ApplicationDocumentation').then(m => ({ default: m.ApplicationDocumentation })));
 const DevelopmentDocumentation = lazy(() => import('./pages/admin/DevelopmentDocumentation').then(m => ({ default: m.DevelopmentDocumentation })));
-const LandingPageEditor = lazy(() => import('./pages/admin/LandingPageEditor').then(m => ({ default: m.LandingPageEditor })));
-const WelcomePageEditor = lazy(() => import('./pages/admin/WelcomePageEditor').then(m => ({ default: m.WelcomePageEditor })));
+const LandingPageEditor = lazy(() => import('./pages/admin/LandingPageEditorNew').then(m => ({ default: m.LandingPageEditorNew })));
+const WelcomePageEditor = lazy(() => import('./pages/admin/WelcomePageEditorNew').then(m => ({ default: m.WelcomePageEditorNew })));
 const PerformanceDashboard = lazy(() => import('./pages/admin/PerformanceDashboard').then(m => ({ default: m.PerformanceDashboard })));
 
 // Loading fallback component
@@ -206,7 +207,7 @@ export const router = createBrowserRouter([
       { path: "shipping-information", Component: ShippingInformation, HydrateFallback: LoadingFallback },
       { path: "select-shipping", Component: SelectShipping, HydrateFallback: LoadingFallback },
       { path: "review-order", Component: ReviewOrder, HydrateFallback: LoadingFallback },
-      { path: "confirmation", Component: Confirmation, HydrateFallback: LoadingFallback },
+      { path: "confirmation/:orderId", Component: Confirmation, HydrateFallback: LoadingFallback },
       { path: "order-history", Component: OrderHistory, HydrateFallback: LoadingFallback },
       { path: "order-tracking", Component: OrderTracking, HydrateFallback: LoadingFallback },
       { path: "events", Component: Events, HydrateFallback: LoadingFallback },
@@ -241,7 +242,7 @@ export const router = createBrowserRouter([
           { path: "shipping-information", Component: ShippingInformation, HydrateFallback: LoadingFallback },
           { path: "select-shipping", Component: SelectShipping, HydrateFallback: LoadingFallback },
           { path: "review-order", Component: ReviewOrder, HydrateFallback: LoadingFallback },
-          { path: "confirmation", Component: Confirmation, HydrateFallback: LoadingFallback },
+          { path: "confirmation/:orderId", Component: Confirmation, HydrateFallback: LoadingFallback },
           { path: "*", Component: NotFound, HydrateFallback: LoadingFallback },
         ],
       },
@@ -315,7 +316,6 @@ export const router = createBrowserRouter([
           { path: "catalogs", Component: CatalogManagement, HydrateFallback: LoadingFallback },
           { path: "catalogs/create", Component: CatalogEdit, HydrateFallback: LoadingFallback },
           { path: "catalogs/:catalogId", Component: CatalogEdit, HydrateFallback: LoadingFallback },
-          { path: "catalogs/migrate", Component: CatalogMigration, HydrateFallback: LoadingFallback },
           { path: "site-catalog-configuration", Component: SiteCatalogConfiguration, HydrateFallback: LoadingFallback },
           { path: "import-export-settings", Component: ImportExportSettings, HydrateFallback: LoadingFallback },
           { path: "orders", Component: OrderManagement, HydrateFallback: LoadingFallback },
@@ -332,9 +332,12 @@ export const router = createBrowserRouter([
           { path: "celebration-analytics", Component: CelebrationAnalytics, HydrateFallback: LoadingFallback },
           { path: "executive-dashboard", Component: ExecutiveDashboard, HydrateFallback: LoadingFallback },
           { path: "brands", Component: BrandManagement, HydrateFallback: LoadingFallback },
+          { path: "brands-management", Component: BrandsManagement, HydrateFallback: LoadingFallback },
+          { path: "brands/:id/edit", Component: BrandEdit, HydrateFallback: LoadingFallback },
           { path: "site-configuration", Component: SiteConfiguration, HydrateFallback: LoadingFallback },
           { path: "site-gifts", Component: SiteGiftConfiguration, HydrateFallback: LoadingFallback },
           { path: "email-templates", Component: EmailTemplates, HydrateFallback: LoadingFallback },
+          { path: "email-templates-management", Component: EmailTemplatesManagement, HydrateFallback: LoadingFallback },
           { path: "email-notification-configuration", Component: EmailNotificationConfiguration, HydrateFallback: LoadingFallback },
           { path: "email-history", Component: EmailHistory, HydrateFallback: LoadingFallback },
           { path: "global-template-library", Component: GlobalTemplateLibrary, HydrateFallback: LoadingFallback },

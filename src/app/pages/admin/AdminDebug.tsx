@@ -6,19 +6,15 @@ import {
   Server, 
   CheckCircle, 
   XCircle, 
-  AlertTriangle, 
   Copy, 
-  RefreshCw, 
-  Terminal,
+  RefreshCw,
   Globe,
   Key,
   CheckCheck,
   LogOut,
   AlertCircle
 } from 'lucide-react';
-import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
-import { Badge } from '../../components/ui/badge';
 import { logger } from '../../utils/logger';
 import { projectId, publicAnonKey } from '../../../../utils/supabase/info';
 import { getCurrentEnvironment } from '../../config/deploymentEnvironments';
@@ -260,7 +256,7 @@ export function AdminDebug() {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={copyToClipboard}
+            onClick={() => void copyToClipboard()}
             className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
             disabled={!debugInfo}
           >
@@ -277,7 +273,7 @@ export function AdminDebug() {
             )}
           </button>
           <button
-            onClick={runDiagnostics}
+            onClick={() => void runDiagnostics()}
             className="flex items-center gap-2 px-4 py-2 bg-[#D91C81] hover:bg-[#B91670] text-white rounded-lg transition-colors"
             disabled={loading}
           >
@@ -285,7 +281,7 @@ export function AdminDebug() {
             <span className="text-sm font-medium">Refresh</span>
           </button>
           <button
-            onClick={() => navigate('/admin/logout')}
+            onClick={() => void navigate('/admin/logout')}
             className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
           >
             <LogOut className="w-4 h-4" />

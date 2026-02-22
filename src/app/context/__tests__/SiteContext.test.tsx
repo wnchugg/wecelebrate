@@ -322,9 +322,9 @@ describe('SiteContext', () => {
     });
 
     it('should update a site', async () => {
-      // siteApi is mocked
+      // apiRequest is mocked to return the parsed JSON directly
       const updatedSite = { ...mockSite, name: 'Updated Site' };
-      vi.mocked(siteApi.update).mockResolvedValue({ data: updatedSite });
+      vi.mocked(apiRequest).mockResolvedValue({ success: true, data: updatedSite });
       
       const { result } = renderHook(() => useSite(), { wrapper });
       

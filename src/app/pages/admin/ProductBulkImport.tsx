@@ -22,10 +22,6 @@ import { Card } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Progress } from '../../components/ui/progress';
 import { ScrollArea } from '../../components/ui/scroll-area';
-import { Tabs, TabsList, TabsContent } from '../../components/ui/tabs';
-import { apiRequest } from '../../utils/api';
-import { showSuccessToast, showErrorToast } from '../../utils/errorHandling';
-import { logger } from '../../utils/logger';
 import { 
   parseCSVFile, 
   parseExcelFile, 
@@ -33,8 +29,6 @@ import {
   detectFieldMapping, 
   validateProductData,
   downloadTemplate,
-  ProductData,
-  ValidationError,
   ImportResult,
   FIELD_MAPPINGS
 } from '../../utils/bulkImport';
@@ -82,7 +76,7 @@ export function ProductBulkImport() {
     setIsProcessing(true);
 
     try {
-      let data: any[];
+      let data: Record<string, unknown>[];
       
       if (fileExtension === 'csv') {
         data = await parseCSVFile(selectedFile);
@@ -272,7 +266,7 @@ export function ProductBulkImport() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate('/admin/gifts')}
+                onClick={() => void navigate('/admin/gifts')}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Products
@@ -359,7 +353,7 @@ export function ProductBulkImport() {
                 ref={fileInputRef}
                 type="file"
                 accept=".csv,.xlsx,.xls,.txt"
-                onChange={handleFileSelect}
+                onChange={() => void handleFileSelect()}
                 className="hidden"
                 id="file-upload"
               />
@@ -605,7 +599,7 @@ export function ProductBulkImport() {
                 Back to Mapping
               </Button>
               <Button 
-                onClick={handleImport}
+                onClick={() => void handleImport()}
                 disabled={validationResult.successCount === 0 || !selectedSite}
                 className="bg-gradient-to-r from-[#D91C81] to-[#B71569] text-white"
               >
@@ -692,7 +686,7 @@ export function ProductBulkImport() {
                   Import More Products
                 </Button>
                 <Button
-                  onClick={() => navigate('/admin/gifts')}
+                  onClick={() => void navigate('/admin/gifts')}
                   className="bg-gradient-to-r from-[#D91C81] to-[#B71569] text-white"
                 >
                   View Products

@@ -4,16 +4,12 @@ import { toast } from 'sonner';
 import { 
   Shield, 
   Lock, 
-  Key, 
   Eye, 
-  EyeOff, 
   AlertTriangle, 
-  RefreshCw, 
   CheckCircle, 
   XCircle,
   Activity
 } from 'lucide-react';
-import { getCurrentEnvironment } from '../../config/deploymentEnvironments';
 
 interface SecurityEvent {
   id: string;

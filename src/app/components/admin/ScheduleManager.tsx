@@ -279,7 +279,7 @@ export function ScheduleManager({ erpConnectionId, erpConnectionName, onClose }:
                 {/* Actions */}
                 <div className="flex items-center gap-2 ml-4">
                   <button
-                    onClick={() => handleToggleSchedule(schedule)}
+                    onClick={() => void handleToggleSchedule(schedule)}
                     className="p-2 text-gray-600 hover:text-[#D91C81] hover:bg-pink-50 rounded-lg transition-colors"
                     title={schedule.enabled ? 'Disable' : 'Enable'}
                   >
@@ -290,7 +290,7 @@ export function ScheduleManager({ erpConnectionId, erpConnectionName, onClose }:
                     )}
                   </button>
                   <button
-                    onClick={() => handleExecuteNow(schedule)}
+                    onClick={() => void handleExecuteNow(schedule)}
                     className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                     title="Execute Now"
                   >
@@ -314,7 +314,7 @@ export function ScheduleManager({ erpConnectionId, erpConnectionName, onClose }:
                     <Edit2 className="w-5 h-5" />
                   </button>
                   <button
-                    onClick={() => handleDeleteSchedule(schedule.id)}
+                    onClick={() => void handleDeleteSchedule(schedule.id)}
                     className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     title="Delete"
                   >
@@ -448,7 +448,7 @@ function ScheduleFormModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={() => void handleSubmit()} className="p-6 space-y-6">
           {/* Basic Info */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">

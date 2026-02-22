@@ -17,7 +17,7 @@
  */
 
 import { screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { renderWithRouter } from '@/test/helpers';
 import { ConfigurableHeader } from '../ConfigurableHeader';
 import { SiteContext } from '../../../context/SiteContext';

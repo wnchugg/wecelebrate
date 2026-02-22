@@ -3,13 +3,12 @@
  * Shows latest deployment testing results and quality metrics
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   TestTube2, 
   CheckCircle, 
   XCircle, 
   AlertCircle,
-  TrendingUp,
   Clock,
   Activity,
   BarChart3,
@@ -206,7 +205,7 @@ export function TestingDashboard() {
         </div>
         
         <Button
-          onClick={handleRefresh}
+          onClick={() => void handleRefresh()}
           disabled={isRefreshing}
           variant="outline"
           className="gap-2"

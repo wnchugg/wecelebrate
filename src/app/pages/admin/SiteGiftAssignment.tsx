@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router';
 import { 
   Package, 
@@ -8,7 +8,6 @@ import {
   DollarSign, 
   XCircle, 
   CheckSquare,
-  Tag,
   Grid,
   AlertCircle,
   Plus,
@@ -25,7 +24,7 @@ import { Badge } from '../../components/ui/badge';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Checkbox } from '../../components/ui/checkbox';
-import { apiRequest, siteApi, giftApi } from '../../utils/api';
+import { siteApi, giftApi } from '../../utils/api';
 import { showErrorToast, showSuccessToast } from '../../utils/errorHandling';
 import { GIFT_CATEGORIES } from '../../context/GiftContext';
 import { DraggableGiftCard } from '../../components/DraggableGiftCard';
@@ -60,7 +59,7 @@ export function SiteGiftAssignment() {
 
   useEffect(() => {
     if (siteId) {
-      loadData();
+      void loadData();
     }
   }, [siteId]);
 
@@ -278,7 +277,7 @@ export function SiteGiftAssignment() {
       <div className="flex flex-col items-center justify-center min-h-screen">
         <Package className="w-16 h-16 text-gray-300 mb-4" />
         <p className="text-gray-600 text-lg mb-4">Site not found</p>
-        <Button onClick={() => navigate('/admin/sites')}>
+        <Button onClick={() => void navigate('/admin/sites')}>
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Sites
         </Button>
@@ -296,7 +295,7 @@ export function SiteGiftAssignment() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate('/admin/sites')}
+                onClick={() => void navigate('/admin/sites')}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
@@ -308,7 +307,7 @@ export function SiteGiftAssignment() {
             </p>
           </div>
           <Button
-            onClick={handleSave}
+            onClick={() => void handleSave()}
             disabled={isSaving}
             className="bg-[#D91C81] hover:bg-[#B01669] text-white"
           >

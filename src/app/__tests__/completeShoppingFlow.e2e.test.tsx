@@ -4,8 +4,8 @@
  * Tests for end-to-end shopping user journeys
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes, useNavigate } from 'react-router';
 import { CartProvider, useCart } from '../context/CartContext';
@@ -34,9 +34,9 @@ function HomePage() {
   return (
     <div>
       <h1>Welcome to wecelebrate</h1>
-      <button onClick={() => navigate('/products')}>Browse Products</button>
-      <button onClick={() => navigate('/login')}>Login</button>
-      <button onClick={() => navigate('/cart')}>View Cart</button>
+      <button onClick={() => void navigate('/products')}>Browse Products</button>
+      <button onClick={() => void navigate('/login')}>Login</button>
+      <button onClick={() => void navigate('/cart')}>View Cart</button>
     </div>
   );
 }
@@ -51,12 +51,12 @@ function ProductsPage() {
         <div key={product.id} data-testid={`product-${product.id}`}>
           <h3>{product.name}</h3>
           <p>${product.price}</p>
-          <button onClick={() => navigate(`/products/${product.id}`)}>
+          <button onClick={() => void navigate(`/products/${product.id}`)}>
             View Details
           </button>
         </div>
       ))}
-      <button onClick={() => navigate('/')}>Back to Home</button>
+      <button onClick={() => void navigate('/')}>Back to Home</button>
     </div>
   );
 }
@@ -67,7 +67,7 @@ function ProductDetailPage() {
   
   const handleAddToCart = () => {
     addToCart(mockProducts[0]);
-    navigate('/cart');
+    void navigate('/cart');
   };
   
   return (
@@ -76,7 +76,7 @@ function ProductDetailPage() {
       <h2>{mockProducts[0].name}</h2>
       <p>${mockProducts[0].price}</p>
       <button onClick={handleAddToCart}>Add to Cart</button>
-      <button onClick={() => navigate('/products')}>Back to Products</button>
+      <button onClick={() => void navigate('/products')}>Back to Products</button>
     </div>
   );
 }
@@ -108,10 +108,10 @@ function CartPage() {
             ))}
           </div>
           <p data-testid="cart-total">Total: ${totalPrice.toFixed(2)}</p>
-          <button onClick={() => navigate('/checkout')}>Proceed to Checkout</button>
+          <button onClick={() => void navigate('/checkout')}>Proceed to Checkout</button>
         </>
       )}
-      <button onClick={() => navigate('/products')}>Continue Shopping</button>
+      <button onClick={() => void navigate('/products')}>Continue Shopping</button>
     </div>
   );
 }
@@ -126,14 +126,14 @@ function LoginPage() {
       email: 'user@example.com',
       name: 'Test User',
     });
-    navigate('/');
+    void navigate('/');
   };
   
   return (
     <div>
       <h1>Login</h1>
       <button onClick={handleLogin}>Login with Email</button>
-      <button onClick={() => navigate('/')}>Back to Home</button>
+      <button onClick={() => void navigate('/')}>Back to Home</button>
     </div>
   );
 }
@@ -148,7 +148,7 @@ function CheckoutPage() {
       <div>
         <h1>Checkout</h1>
         <p>Please login to continue</p>
-        <button onClick={() => navigate('/login')}>Go to Login</button>
+        <button onClick={() => void navigate('/login')}>Go to Login</button>
       </div>
     );
   }
@@ -158,14 +158,14 @@ function CheckoutPage() {
       <div>
         <h1>Checkout</h1>
         <p>Your cart is empty</p>
-        <button onClick={() => navigate('/products')}>Browse Products</button>
+        <button onClick={() => void navigate('/products')}>Browse Products</button>
       </div>
     );
   }
   
   const handleCheckout = () => {
     clearCart();
-    navigate('/confirmation');
+    void navigate('/confirmation');
   };
   
   return (
@@ -182,7 +182,7 @@ function CheckoutPage() {
           <button onClick={handleCheckout}>Complete Order</button>
         </>
       )}
-      <button onClick={() => navigate('/cart')}>Back to Cart</button>
+      <button onClick={() => void navigate('/cart')}>Back to Cart</button>
     </div>
   );
 }
@@ -194,8 +194,8 @@ function ConfirmationPage() {
     <div>
       <h1>Order Confirmed</h1>
       <p>Thank you for your order!</p>
-      <button onClick={() => navigate('/')}>Return to Home</button>
-      <button onClick={() => navigate('/products')}>Continue Shopping</button>
+      <button onClick={() => void navigate('/')}>Return to Home</button>
+      <button onClick={() => void navigate('/products')}>Continue Shopping</button>
     </div>
   );
 }

@@ -70,7 +70,7 @@ declare module 'react-responsive-masonry' {
 
 // ==================== React DnD ====================
 declare module 'react-dnd' {
-  import { ReactNode, ComponentType } from 'react';
+  import { ReactNode } from 'react';
 
   export interface DndContextProps {
     children?: ReactNode;
@@ -96,7 +96,7 @@ declare module 'react-dnd' {
 }
 
 declare module 'react-dnd-html5-backend' {
-  const HTML5Backend: any;
+  const HTML5Backend: unknown;
   export { HTML5Backend };
 }
 

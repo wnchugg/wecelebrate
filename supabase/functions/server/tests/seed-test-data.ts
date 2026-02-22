@@ -77,49 +77,109 @@ async function createTestClient() {
 }
 
 /**
- * Create test site
+ * Create test sites (multiple for better testing)
  */
-async function createTestSite() {
-  console.log('🏢 Creating test site...');
+async function createTestSites() {
+  console.log('🏢 Creating test sites...');
   
-  try {
-    const site = await apiRequest('/sites', {
-      method: 'POST',
-      body: JSON.stringify({
-        id: 'test-site-123',
-        name: 'Test Site for Dashboard',
-        clientId: 'test-client-001',
-        domain: 'test-dashboard.jala.com',
-        status: 'active',
-        branding: {
-          primaryColor: '#D91C81',
-          secondaryColor: '#1B2A5E',
-          tertiaryColor: '#00B4CC',
-        },
-        settings: {
-          validationMethod: 'email',
-          allowQuantitySelection: false,
-          showPricing: false,
-          giftsPerUser: 1,
-          shippingMode: 'employee',
-          defaultLanguage: 'en',
-          enableLanguageSelector: true,
-          defaultCurrency: 'USD',
-          allowedCountries: ['US'],
-          defaultCountry: 'US',
-        },
-      }),
-    });
-    
-    console.log('✅ Test site created:', site.site?.id);
-    return site.site;
-  } catch (error) {
-    if (error.message.includes('already exists')) {
-      console.log('⚠️  Test site already exists (skipping)');
-      return { id: 'test-site-123' };
+  const sites = [
+    {
+      id: '00000000-0000-0000-0000-000000000001',
+      name: 'TechCorp Employee Gifts 2026',
+      client_id: 'test-client-001',
+      slug: 'techcorp-gifts-2026',
+      status: 'active',
+      branding: {
+        primaryColor: '#D91C81',
+        secondaryColor: '#1B2A5E',
+        tertiaryColor: '#00B4CC',
+      },
+      settings: {
+        validationMethod: 'email',
+        allowQuantitySelection: false,
+        showPricing: false,
+        giftsPerUser: 1,
+        shippingMode: 'employee',
+        defaultLanguage: 'en',
+        enableLanguageSelector: true,
+        defaultCurrency: 'USD',
+        allowedCountries: ['US'],
+        defaultCountry: 'US',
+      },
+    },
+    {
+      id: '00000000-0000-0000-0000-000000000002',
+      name: 'TechCorp EU Recognition',
+      client_id: 'test-client-001',
+      slug: 'techcorp-eu-recognition',
+      status: 'active',
+      branding: {
+        primaryColor: '#D91C81',
+        secondaryColor: '#1B2A5E',
+        tertiaryColor: '#00B4CC',
+      },
+      settings: {
+        validationMethod: 'email',
+        allowQuantitySelection: false,
+        showPricing: false,
+        giftsPerUser: 1,
+        shippingMode: 'employee',
+        defaultLanguage: 'en',
+        enableLanguageSelector: true,
+        defaultCurrency: 'EUR',
+        allowedCountries: ['DE', 'FR', 'IT', 'ES', 'GB'],
+        defaultCountry: 'DE',
+      },
+    },
+    {
+      id: '00000000-0000-0000-0000-000000000003',
+      name: 'TechCorp Asia Pacific',
+      client_id: 'test-client-001',
+      slug: 'techcorp-apac',
+      status: 'active',
+      branding: {
+        primaryColor: '#FF6B35',
+        secondaryColor: '#004E89',
+        tertiaryColor: '#1AE5BE',
+      },
+      settings: {
+        validationMethod: 'employeeId',
+        allowQuantitySelection: true,
+        showPricing: false,
+        giftsPerUser: 2,
+        shippingMode: 'company',
+        defaultShippingAddress: '789 Pacific Tower, Singapore 018956',
+        defaultLanguage: 'en',
+        enableLanguageSelector: true,
+        defaultCurrency: 'SGD',
+        allowedCountries: ['SG', 'JP', 'AU', 'HK'],
+        defaultCountry: 'SG',
+      },
+    },
+  ];
+
+  let created = 0;
+  let skipped = 0;
+
+  for (const site of sites) {
+    try {
+      await apiRequest('/sites', {
+        method: 'POST',
+        body: JSON.stringify(site),
+      });
+      console.log(`  ✓ Created site: ${site.name}`);
+      created++;
+    } catch (error) {
+      if (error.message.includes('already exists')) {
+        console.log(`  ⚠️  Site ${site.name} already exists (skipping)`);
+        skipped++;
+      } else {
+        console.error(`  ✗ Failed to create site ${site.name}:`, error.message);
+      }
     }
-    throw error;
   }
+
+  console.log(`✅ Created ${created} sites, skipped ${skipped}`);
 }
 
 /**
@@ -131,7 +191,7 @@ async function createTestEmployees() {
   const employees = [
     {
       id: 'test-emp-001',
-      siteId: 'test-site-123',
+      siteId: '00000000-0000-0000-0000-000000000001',
       firstName: 'John',
       lastName: 'Doe',
       email: 'john.doe@testcorp.com',
@@ -141,7 +201,7 @@ async function createTestEmployees() {
     },
     {
       id: 'test-emp-002',
-      siteId: 'test-site-123',
+      siteId: '00000000-0000-0000-0000-000000000001',
       firstName: 'Jane',
       lastName: 'Smith',
       email: 'jane.smith@testcorp.com',
@@ -151,7 +211,7 @@ async function createTestEmployees() {
     },
     {
       id: 'test-emp-003',
-      siteId: 'test-site-123',
+      siteId: '00000000-0000-0000-0000-000000000002',
       firstName: 'Bob',
       lastName: 'Johnson',
       email: 'bob.johnson@testcorp.com',
@@ -161,7 +221,7 @@ async function createTestEmployees() {
     },
     {
       id: 'test-emp-004',
-      siteId: 'test-site-123',
+      siteId: '00000000-0000-0000-0000-000000000002',
       firstName: 'Alice',
       lastName: 'Williams',
       email: 'alice.williams@testcorp.com',
@@ -171,7 +231,7 @@ async function createTestEmployees() {
     },
     {
       id: 'test-emp-005',
-      siteId: 'test-site-123',
+      siteId: '00000000-0000-0000-0000-000000000003',
       firstName: 'Charlie',
       lastName: 'Brown',
       email: 'charlie.brown@testcorp.com',
@@ -304,7 +364,7 @@ async function createTestOrders() {
   const orders = [
     {
       id: 'test-order-001',
-      siteId: 'test-site-123',
+      siteId: '00000000-0000-0000-0000-000000000001',
       employeeId: 'test-emp-001',
       giftId: 'test-gift-001',
       status: 'pending',
@@ -323,7 +383,7 @@ async function createTestOrders() {
     },
     {
       id: 'test-order-002',
-      siteId: 'test-site-123',
+      siteId: '00000000-0000-0000-0000-000000000001',
       employeeId: 'test-emp-002',
       giftId: 'test-gift-002',
       status: 'shipped',
@@ -342,7 +402,7 @@ async function createTestOrders() {
     },
     {
       id: 'test-order-003',
-      siteId: 'test-site-123',
+      siteId: '00000000-0000-0000-0000-000000000002',
       employeeId: 'test-emp-003',
       giftId: 'test-gift-003',
       status: 'delivered',
@@ -361,7 +421,7 @@ async function createTestOrders() {
     },
     {
       id: 'test-order-004',
-      siteId: 'test-site-123',
+      siteId: '00000000-0000-0000-0000-000000000003',
       employeeId: 'test-emp-005',
       giftId: 'test-gift-004',
       status: 'pending',
@@ -380,7 +440,7 @@ async function createTestOrders() {
     },
     {
       id: 'test-order-005',
-      siteId: 'test-site-123',
+      siteId: '00000000-0000-0000-0000-000000000001',
       employeeId: 'test-emp-001',
       giftId: 'test-gift-005',
       status: 'shipped',
@@ -430,7 +490,7 @@ async function seedTestData() {
 
   try {
     await createTestClient();
-    await createTestSite();
+    await createTestSites(); // Updated to create multiple sites
     await createTestEmployees();
     await createTestGifts();
     await createTestOrders();
@@ -440,7 +500,7 @@ async function seedTestData() {
     console.log('');
     console.log('📊 Summary:');
     console.log('  - Client: test-client-001');
-    console.log('  - Site: test-site-123');
+    console.log('  - Sites: 3 (all with client_id set)');
     console.log('  - Employees: 5');
     console.log('  - Gifts: 5');
     console.log('  - Orders: 5');

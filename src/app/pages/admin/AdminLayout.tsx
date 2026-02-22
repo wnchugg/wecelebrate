@@ -7,8 +7,6 @@ import {
   LayoutDashboard,
   Settings,
   Mail,
-  Package,
-  Truck,
   Users,
   ShoppingCart,
   X,
@@ -19,28 +17,20 @@ import {
   Building2,
   Globe,
   Shield,
-  AlertTriangle,
-  Sliders,
   BarChart3,
-  Tag,
   Layout,
   Database,
-  Server,
   Activity,
-  Stethoscope,
   Wrench,
   Gift,
   FileText,
   ArrowDownToLine,
-  ArrowUpFromLine,
   Bell,
   FolderOpen,
-  GitBranch,
   TestTube2,
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import haloLogo from 'figma:asset/212120daf4ca7893a2036877eb5d3cdd4c0ad83f.png';
-import { EnvironmentBadge } from '../../components/EnvironmentBadge';
 
 const clientNavigation = [
   { name: 'Dashboard', href: '/admin/client-dashboard', icon: LayoutDashboard },
@@ -53,14 +43,12 @@ const clientNavigation = [
 const globalNavigation = [
   { name: 'Gift Catalog', href: '/admin/gifts', icon: Gift },
   { name: 'Catalog Management', href: '/admin/catalogs', icon: FolderOpen },
-  { name: 'Catalog Migration', href: '/admin/catalogs/migrate', icon: GitBranch },
   { name: 'Home Page Editor', href: '/admin/home-editor', icon: Layout },
   { name: 'Global Template Library', href: '/admin/global-template-library', icon: Mail },
   { name: 'Email Service Test', href: '/admin/email-service-test', icon: Mail },
   { name: 'ERP Integrations', href: '/admin/erp', icon: Database },
   { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
   { name: 'Admin Users', href: '/admin/user-management', icon: Shield },
-  { name: 'RBAC Overview', href: '/admin/rbac-overview', icon: Shield },
   { name: 'Roles', href: '/admin/roles', icon: Shield },
   { name: 'Access Groups', href: '/admin/access-groups', icon: Users },
   { name: 'Import/Export Settings', href: '/admin/import-export-settings', icon: ArrowDownToLine },
@@ -92,6 +80,19 @@ export function AdminLayout() {
   const { currentSite, currentClient, sites, clients, setCurrentSite, setCurrentClient, getClientById, isLoading } = useSite();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showSiteSelector, setShowSiteSelector] = useState(false);
+  
+  // Debug logging
+  useEffect(() => {
+    console.warn('[AdminLayout] Sites/Clients state:', {
+      sitesCount: sites.length,
+      clientsCount: clients.length,
+      currentSite: currentSite?.name,
+      currentClient: currentClient?.name,
+      isLoading,
+      sites: sites.map(s => ({ id: s.id, name: s.name, clientId: s.clientId })),
+      clients: clients.map(c => ({ id: c.id, name: c.name }))
+    });
+  }, [sites, clients, currentSite, currentClient, isLoading]);
   const [showClientSelector, setShowClientSelector] = useState(false);
   const [showClientFilter, setShowClientFilter] = useState<string>('all');
   const [siteSettingsOpen, setSiteSettingsOpen] = useState(true);
@@ -105,7 +106,7 @@ export function AdminLayout() {
 
   const handleLogout = () => {
     adminLogout();
-    navigate('/admin/login');
+    void navigate('/admin/login');
   };
 
   const isActivePath = (path: string) => {
@@ -152,6 +153,19 @@ export function AdminLayout() {
   const filteredSites = showClientFilter === 'all' 
     ? sites 
     : sites.filter(s => s.clientId === showClientFilter);
+
+  // Debug logging for filtered sites
+  useEffect(() => {
+    if (showSiteSelector) {
+      console.warn('[AdminLayout] Site selector opened:', {
+        showClientFilter,
+        sitesCount: sites.length,
+        filteredSitesCount: filteredSites.length,
+        sites: sites.map(s => ({ id: s.id, name: s.name, clientId: s.clientId })),
+        filteredSites: filteredSites.map(s => ({ id: s.id, name: s.name, clientId: s.clientId }))
+      });
+    }
+  }, [showSiteSelector, sites, filteredSites, showClientFilter]);
 
   const allNavigation = [...clientNavigation, ...globalNavigation, ...developerToolsNavigation, ...siteSpecificNavigation];
 
@@ -217,7 +231,7 @@ export function AdminLayout() {
                     siteSettingsOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
                   }`}
                 >
-                  <nav className="px-2 space-y-1 mb-4">
+                  <nav className="px-2 pt-1 space-y-1 mb-4">
                     {siteSpecificNavigation.map((item) => {
                       const isActive = isActivePath(item.href);
                       return (
@@ -279,11 +293,11 @@ export function AdminLayout() {
                 clientSettingsOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
               }`}
             >
-              <nav className="px-2 space-y-1 mb-4">
+              <nav className="px-2 pt-1 space-y-1 mb-4">
                 {clientNavigation.map((item) => {
                   // For "Client Settings", link to current client's detail page if available
                   const href = item.name === 'Client Settings' && currentClient 
-                    ? `/admin/clients/${currentClient.id}` 
+                    ? `/admin/clients/${currentClient.clientCode || currentClient.id}` 
                     : item.href;
                   
                   // Special handling for "All Clients" to only be active on exact /admin/clients path
@@ -338,7 +352,7 @@ export function AdminLayout() {
                 globalSettingsOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
               }`}
             >
-              <nav className="px-2 space-y-1 mb-4">
+              <nav className="px-2 pt-1 space-y-1 mb-4">
                 {globalNavigation.map((item) => {
                   const isActive = isActivePath(item.href);
                   return (
@@ -383,7 +397,7 @@ export function AdminLayout() {
                 developerToolsOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
               }`}
             >
-              <nav className="px-2 space-y-1 mb-4">
+              <nav className="px-2 pt-1 space-y-1 mb-4">
                 {developerToolsNavigation.map((item) => {
                   const isActive = isActivePath(item.href);
                   return (
@@ -472,14 +486,14 @@ export function AdminLayout() {
                     <>
                       <div 
                         className="w-6 h-6 rounded flex items-center justify-center bg-white text-xs font-bold"
-                        style={{ color: currentSite.branding.primaryColor }}
+                        style={{ color: currentSite.branding?.primaryColor || '#D91C81' }}
                         aria-hidden="true"
                       >
-                        {currentClient.name.substring(0, 2).toUpperCase()}
+                        {currentClient?.name?.substring(0, 2).toUpperCase()}
                       </div>
                       <div className="hidden sm:flex flex-col items-start">
-                        <span className="text-xs font-medium opacity-90">{currentClient.name}</span>
-                        <span className="text-sm font-bold">{currentSite.name}</span>
+                        <span className="text-xs font-medium opacity-90">{currentClient?.name}</span>
+                        <span className="text-sm font-bold">{currentSite?.name}</span>
                       </div>
                       <ChevronDown className="w-4 h-4 ml-1" aria-hidden="true" />
                     </>
@@ -540,7 +554,17 @@ export function AdminLayout() {
 
                       {/* Sites List */}
                       <div className="flex-1 overflow-y-auto p-2">
-                        {filteredSites.length === 0 ? (
+                        {/* Debug info */}
+                        <div className="mb-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
+                          <strong>Debug:</strong> isLoading={String(isLoading)}, sites.length={sites.length}, filteredSites.length={filteredSites.length}
+                        </div>
+                        
+                        {isLoading ? (
+                          <div className="text-center py-8">
+                            <div className="w-12 h-12 border-4 border-[#D91C81] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                            <p className="text-sm font-medium text-gray-600">Loading sites...</p>
+                          </div>
+                        ) : filteredSites.length === 0 ? (
                           <div className="text-center py-8">
                             <Globe className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                             <p className="text-sm font-medium text-gray-600">No sites available</p>
@@ -572,7 +596,7 @@ export function AdminLayout() {
                                 >
                                   <div 
                                     className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold flex-shrink-0 shadow-sm"
-                                    style={{ backgroundColor: site.branding.primaryColor }}
+                                    style={{ backgroundColor: site?.branding?.primaryColor }}
                                     aria-hidden="true"
                                   >
                                     {siteClient ? siteClient.name.substring(0, 2).toUpperCase() : 'NA'}

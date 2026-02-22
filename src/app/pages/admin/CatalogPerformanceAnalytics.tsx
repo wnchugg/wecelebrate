@@ -33,8 +33,8 @@ import {
   PolarRadiusAxis,
   Radar
 } from 'recharts';
-import type { TooltipProps } from 'recharts';
-import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
+import { CurrencyDisplay } from '../../components/CurrencyDisplay';
+import { useNumberFormat } from '../../hooks/useNumberFormat';
 
 interface CatalogMetrics {
   catalogId: string;
@@ -61,6 +61,7 @@ export default function CatalogPerformanceAnalytics() {
   const [selectedCatalog, setSelectedCatalog] = useState<string>('all');
   const [selectedERPSource, setSelectedERPSource] = useState<string>('all');
   const [loading, setLoading] = useState(true);
+  const { formatInteger } = useNumberFormat();
 
   useEffect(() => {
     // Simulate loading
@@ -285,7 +286,7 @@ export default function CatalogPerformanceAnalytics() {
             <h3 className="text-sm font-medium text-gray-600">Catalog Revenue</h3>
             <DollarSign className="w-5 h-5 text-[#F47BB6]" />
           </div>
-          <p className="text-3xl font-bold text-gray-900">$360.7K</p>
+          <p className="text-3xl font-bold text-gray-900"><CurrencyDisplay amount={360700} /></p>
           <div className="flex items-center gap-1 mt-2">
             <ArrowUpRight className="w-4 h-4 text-green-600" />
             <span className="text-sm font-medium text-green-600">+15.2%</span>
@@ -348,13 +349,13 @@ export default function CatalogPerformanceAnalytics() {
                     {catalog.activeProducts} / {catalog.totalProducts}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {catalog.totalOrders.toLocaleString()}
+                    {formatInteger(catalog.totalOrders)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    ${(catalog.revenue / 1000).toFixed(1)}K
+                    <CurrencyDisplay amount={catalog.revenue} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${catalog.avgOrderValue.toFixed(2)}
+                    <CurrencyDisplay amount={catalog.avgOrderValue} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {catalog.conversionRate}%

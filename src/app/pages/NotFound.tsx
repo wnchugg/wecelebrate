@@ -1,10 +1,13 @@
-import { Link, useLocation } from 'react-router';
-import { Home, ArrowLeft, AlertCircle } from 'lucide-react';
+import { useLocation } from 'react-router';
 import { Standard404 } from '../components/Standard404';
+import { useSiteContent } from '../hooks/useSiteContent';
+import { useLanguage } from '../context/LanguageContext';
 
 export function NotFound() {
   const location = useLocation();
   const path = location.pathname;
+  const { getTranslatedContent } = useSiteContent();
+  const { t } = useLanguage();
 
   // Detect common typos and suggest corrections
   const getSuggestion = (path: string): string | null => {
@@ -25,18 +28,26 @@ export function NotFound() {
 
   const suggestion = getSuggestion(path);
 
+  // Get translated content
+  const title = getTranslatedContent('notFoundPage.title', t('notFound.title') || 'Page Not Found');
+  const message = getTranslatedContent('notFoundPage.message', 
+    suggestion 
+      ? `This page doesn't exist. Did you mean ${suggestion}?`
+      : t('notFound.message') || "Sorry, the page you're looking for doesn't exist or has been moved."
+  );
+  const homeButton = getTranslatedContent('notFoundPage.homeButton', t('notFound.homeButton') || 'Home');
+  const adminLoginButton = getTranslatedContent('notFoundPage.adminLoginButton', t('notFound.adminLoginButton') || 'Admin Login');
+  const clientPortalButton = getTranslatedContent('notFoundPage.clientPortalButton', t('notFound.clientPortalButton') || 'Client Portal');
+
   // Use the new Standard404 component
   return (
     <Standard404
-      title="Page Not Found"
-      message={suggestion 
-        ? `This page doesn't exist. Did you mean ${suggestion}?`
-        : "Sorry, the page you're looking for doesn't exist or has been moved."
-      }
+      title={title}
+      message={message}
       suggestions={[
-        { label: 'Home', path: '/', description: 'Return to homepage' },
-        { label: 'Admin Login', path: '/admin/login', description: 'Access admin portal' },
-        { label: 'Client Portal', path: '/client-portal', description: 'View your sites' },
+        { label: homeButton, path: '/', description: 'Return to homepage' },
+        { label: adminLoginButton, path: '/admin/login', description: 'Access admin portal' },
+        { label: clientPortalButton, path: '/client-portal', description: 'View your sites' },
         { label: 'Platform Review', path: '/stakeholder-review', description: 'Learn about wecelebrate' },
       ]}
     />

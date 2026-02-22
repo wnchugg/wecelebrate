@@ -3,8 +3,6 @@ import type {
   Site,
   Client,
   SiteGiftConfiguration,
-  Catalog,
-  SiteCatalogConfiguration,
   AdminUser,
 } from '../../types';
 import type {
@@ -30,6 +28,7 @@ type UpdateScheduleRequest = Partial<Omit<SyncSchedule, 'id'>>;
 export interface PublicSite {
   id: string;
   name: string;
+  slug?: string;
   clientId: string;
   domain: string;
   status: 'active' | 'inactive';
@@ -212,6 +211,20 @@ export function setAccessToken(token: string | null): void {
       tokenPreview: token.substring(0, 50) + '...',
       tokenLength: token.length
     });
+    
+    // CRITICAL DEBUG: Decode token header to see what algorithm it uses
+    try {
+      const parts = token.split('.');
+      if (parts.length === 3) {
+        const header = JSON.parse(atob(parts[0]));
+        logger.info('[setAccessToken] Token header decoded', {
+          algorithm: header.alg,
+          type: header.typ
+        });
+      }
+    } catch (e) {
+      logger.error('[setAccessToken] Failed to decode token header', { error: e });
+    }
     
     // Validate token format before storing
     if (!isValidTokenFormat(token)) {
@@ -718,7 +731,7 @@ export const authApi = {
 // Export a publicSiteApi object for public endpoints (no authentication required)
 export const publicSiteApi = {
   async getActiveSites() {
-    return apiRequest<{ sites: PublicSite[] }>('/public/sites', {
+    return apiRequest<{ sites: PublicSite[] }>('/v2/public/sites', {
       method: 'GET',
     });
   },
@@ -727,6 +740,12 @@ export const publicSiteApi = {
     return apiRequest<{ site: PublicSite }>(`/public/sites/${siteId}`, {
       method: 'GET',
     });
+  },
+  
+  async getSiteBySlug(slug: string) {
+    return apiRequest<{ success: boolean; data: PublicSite }>(`/v2/public/sites/slug/${slug}`, {
+      method: 'GET',
+    }).then(response => ({ site: response.data }));
   },
   
   async getSiteGifts(siteId: string) {
@@ -811,21 +830,21 @@ export const siteApi = {
   },
   
   async create(siteData: Partial<Site>) {
-    return apiRequest<{ data: Site }>('/v2/sites', {
+    return apiRequest<{ data: Site }>('/sites', {
       method: 'POST',
       body: JSON.stringify(siteData),
     });
   },
   
   async update(id: string, updates: Partial<Site>) {
-    return apiRequest<{ data: Site }>(`/v2/sites/${id}`, {
+    return apiRequest<{ data: Site }>(`/sites/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updates),
     });
   },
   
   async delete(id: string) {
-    return apiRequest<{ success: boolean }>(`/v2/sites/${id}`, {
+    return apiRequest<{ success: boolean }>(`/sites/${id}`, {
       method: 'DELETE',
     });
   },
@@ -865,21 +884,21 @@ export const clientApi = {
   },
   
   async create(clientData: Partial<Client>) {
-    return apiRequest<{ data: Client }>('/v2/clients', {
+    return apiRequest<{ data: Client }>('/clients', {
       method: 'POST',
       body: JSON.stringify(clientData),
     });
   },
   
   async update(id: string, updates: Partial<Client>) {
-    return apiRequest<{ data: Client }>(`/v2/clients/${id}`, {
+    return apiRequest<{ data: Client }>(`/clients/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updates),
     });
   },
   
   async delete(id: string) {
-    return apiRequest<{ success: boolean }>(`/v2/clients/${id}`, {
+    return apiRequest<{ success: boolean }>(`/clients/${id}`, {
       method: 'DELETE',
     });
   },
@@ -914,45 +933,45 @@ export const clientApi = {
 // Export an orderApi object for order management
 export const orderApi = {
   async getAll() {
-    return apiRequest<{ orders: any[] }>('/v2/orders', {
+    return apiRequest<{ orders: any[] }>('/orders', {
       method: 'GET',
     });
   },
   
   async getById(id: string) {
-    return apiRequest<{ order: any }>(`/v2/orders/${id}`, {
+    return apiRequest<{ order: any }>(`/orders/${id}`, {
       method: 'GET',
     });
   },
   
   async create(orderData: any) {
-    return apiRequest<{ order: any }>('/v2/orders', {
+    return apiRequest<{ order: any }>('/orders', {
       method: 'POST',
       body: JSON.stringify(orderData),
     });
   },
   
   async update(id: string, updates: any) {
-    return apiRequest<{ order: any }>(`/v2/orders/${id}`, {
+    return apiRequest<{ order: any }>(`/orders/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updates),
     });
   },
   
   async delete(id: string) {
-    return apiRequest<{ success: boolean }>(`/v2/orders/${id}`, {
+    return apiRequest<{ success: boolean }>(`/orders/${id}`, {
       method: 'DELETE',
     });
   },
   
   async getUserOrders(userId: string) {
-    return apiRequest<{ orders: any[] }>(`/v2/orders?user_id=${userId}`, {
+    return apiRequest<{ orders: any[] }>(`/orders?user_id=${userId}`, {
       method: 'GET',
     });
   },
   
   async updateStatus(id: string, status: string) {
-    return apiRequest<{ order: any }>(`/v2/orders/${id}`, {
+    return apiRequest<{ order: any }>(`/orders/${id}`, {
       method: 'PUT',
       body: JSON.stringify({ status }),
     });

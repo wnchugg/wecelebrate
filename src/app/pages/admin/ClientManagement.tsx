@@ -7,64 +7,90 @@ import { useAdmin } from '../../context/AdminContext';
 import { projectId, publicAnonKey } from '../../../../utils/supabase/info';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../components/ui/dialog';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { Textarea } from '../../components/ui/textarea';
-import { Switch } from '../../components/ui/switch';
+import type { Client as ApiClient } from '../../types/api.types';
+import { ClientModal } from './ClientModal';
 
-interface Client {
-  id: string;
-  name: string;
+// ===== Validation Utilities =====
+
+/**
+ * Validates email format
+ * Requirements: 4.1, 4.2, 4.3, 4.4
+ */
+export function validateEmail(email: string): { valid: boolean; error?: string } {
+  if (!email || email.trim() === '') {
+    return { valid: true }; // Empty is valid for optional fields
+  }
+  
+  // More permissive regex that accepts special characters in local part per RFC 5322
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return { valid: false, error: 'Please enter a valid email address' };
+  }
+  
+  return { valid: true };
+}
+
+/**
+ * Validates phone format
+ * Accepts digits, spaces, hyphens, parentheses, and plus sign
+ */
+export function validatePhone(phone: string): { valid: boolean; error?: string } {
+  if (!phone || phone.trim() === '') {
+    return { valid: true }; // Empty is valid for optional fields
+  }
+  
+  const phoneRegex = /^[\d\s\-()+]+$/;
+  if (!phoneRegex.test(phone)) {
+    return { valid: false, error: 'Please enter a valid phone number' };
+  }
+  
+  // Check minimum length (at least 7 digits)
+  const digitCount = phone.replace(/\D/g, '').length;
+  if (digitCount < 7) {
+    return { valid: false, error: 'Phone number must contain at least 7 digits' };
+  }
+  
+  return { valid: true };
+}
+
+/**
+ * Validates URL format
+ * Must start with http:// or https://
+ */
+export function validateUrl(url: string): { valid: boolean; error?: string } {
+  if (!url || url.trim() === '') {
+    return { valid: true }; // Empty is valid for optional fields
+  }
+  
+  try {
+    const urlObj = new URL(url);
+    if (!urlObj.protocol.startsWith('http')) {
+      return { valid: false, error: 'Please enter a valid URL (must start with http:// or https://)' };
+    }
+    return { valid: true };
+  } catch {
+    return { valid: false, error: 'Please enter a valid URL (must start with http:// or https://)' };
+  }
+}
+
+/**
+ * Validates required fields
+ * Checks that the field is not empty
+ */
+export function validateRequired(value: string | undefined | null, fieldName: string): { valid: boolean; error?: string } {
+  if (!value || value.trim() === '') {
+    return { valid: false, error: `${fieldName} is required` };
+  }
+  
+  return { valid: true };
+}
+
+// Use the API Client type with additional UI fields
+interface Client extends ApiClient {
+  isActive?: boolean; // Legacy field for backward compatibility (optional)
   description?: string;
-  contactEmail?: string;
   contactPhone?: string;
   address?: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  
-  // Client Settings
-  clientCode?: string;
-  clientRegion?: string;
-  clientSourceCode?: string;
-  contactName?: string;
-  taxId?: string;
-  
-  // Client Address
-  addressLine1?: string;
-  addressLine2?: string;
-  addressLine3?: string;
-  city?: string;
-  postalCode?: string;
-  countryState?: string;
-  country?: string;
-  
-  // Account Settings
-  accountManager?: string;
-  accountManagerEmail?: string;
-  implementationManager?: string;
-  implementationManagerEmail?: string;
-  technologyOwner?: string;
-  technologyOwnerEmail?: string;
-  
-  // Client App Settings
-  clientUrl?: string;
-  allowSessionTimeoutExtend?: boolean;
-  authenticationMethod?: string;
-  customUrl?: string;
-  hasEmployeeData?: boolean;
-  
-  // Client Billing Settings
-  invoiceType?: string;
-  invoiceTemplateType?: string;
-  poType?: string;
-  poNumber?: string;
-  
-  // Client Integrations
-  erpSystem?: string;
-  sso?: string;
-  hrisSystem?: string;
 }
 
 interface Site {
@@ -72,6 +98,11 @@ interface Site {
   name: string;
   clientId: string;
   status: string;
+}
+
+// Helper function to generate client URL using slug or ID
+function getClientUrl(client: Client): string {
+  return `/admin/clients/${client.clientCode || client.id}`;
 }
 
 export function ClientManagement() {
@@ -92,7 +123,7 @@ export function ClientManagement() {
     // 1. Auth check is complete (not loading)
     // 2. User is authenticated
     if (!isAuthLoading && isAdminAuthenticated) {
-      loadData();
+      void loadData();
     } else if (!isAuthLoading && !isAdminAuthenticated) {
       // Auth check complete but not authenticated - don't load data
       setIsLoading(false);
@@ -119,14 +150,26 @@ export function ClientManagement() {
       setSites(sitesRes.data || []);
     } catch (error: unknown) {
       console.error('[ClientManagement] Load error:', error);
-      // Don't show error toast for 401 errors (not authenticated)
-      // The AdminLayoutWrapper will redirect to login
+      
+      // Handle network errors gracefully
+      // Requirements: 4.6, 6.6, 7.6
       const hasStatus = typeof error === 'object' && error !== null && ('code' in error || 'status' in error);
       const errorCode = hasStatus && 'code' in error ? (error as { code: number }).code : undefined;
       const errorStatus = hasStatus && 'status' in error ? (error as { status: number }).status : undefined;
       
+      // Don't show error toast for 401 errors (not authenticated)
+      // The AdminLayoutWrapper will redirect to login
       if (errorCode !== 401 && errorStatus !== 401) {
-        showErrorToast(error, { operation: 'load data' });
+        // Check if it's a network error
+        if (error instanceof TypeError && error.message.includes('fetch')) {
+          showErrorToast('Network error: Unable to connect to the server. Please check your connection and try again.');
+        } else if (error && typeof error === 'object' && 'error' in error) {
+          // Handle structured error response
+          const structuredError = error.error as { code?: string; message?: string };
+          showErrorToast(structuredError.message || 'Failed to load data');
+        } else {
+          showErrorToast(error, { operation: 'load data' });
+        }
       }
     } finally {
       setIsLoading(false);
@@ -140,9 +183,13 @@ export function ClientManagement() {
   const filteredClients = clients.filter(client => {
     const matchesSearch = client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          client.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Check status field first, fallback to isActive for backward compatibility
+    const isClientActive = client.status === 'active' || (client.status === undefined && client.isActive);
+    
     const matchesFilter = filterStatus === 'all' || 
-                         (filterStatus === 'active' && client.isActive) ||
-                         (filterStatus === 'inactive' && !client.isActive);
+                         (filterStatus === 'active' && isClientActive) ||
+                         (filterStatus === 'inactive' && !isClientActive);
     return matchesSearch && matchesFilter;
   });
 
@@ -166,15 +213,15 @@ export function ClientManagement() {
       return;
     }
     
-    if (!confirm(`Are you sure you want to delete \"${clientName}\"? This action cannot be undone.`)) {
+    if (!confirm(`Are you sure you want to delete "${clientName}"? This action cannot be undone.`)) {
       return;
     }
 
     setIsDeleting(true);
     try {
-      await apiRequest(`/clients/${clientId}`, { method: 'DELETE' });
+      await apiRequest(`/v2/clients/${clientId}`, { method: 'DELETE' });
       showSuccessToast('Client deleted successfully');
-      loadData();
+      void loadData();
     } catch (error: unknown) {
       showErrorToast('Failed to delete client', error instanceof Error ? error.message : 'Unknown error');
     } finally {
@@ -185,32 +232,92 @@ export function ClientManagement() {
   const handleSaveClient = async (clientData: Partial<Client>) => {
     try {
       if (editingClient) {
-        // Update existing client
-        await apiRequest(`/clients/${editingClient.id}`, {
+        // Update existing client - send only changed fields
+        // Filter out undefined/null values but keep empty strings and false booleans
+        const changedFields = Object.entries(clientData).reduce((acc, [key, value]) => {
+          if (value !== undefined && value !== null) {
+            acc[key] = value;
+          }
+          return acc;
+        }, {} as Record<string, any>);
+        
+        await apiRequest(`/v2/clients/${editingClient.id}`, {
           method: 'PUT',
-          body: JSON.stringify(clientData)
+          body: JSON.stringify(changedFields)
         });
         showSuccessToast('Client updated successfully');
       } else {
-        // Create new client
+        // Create new client - send all populated fields
+        // Filter out undefined/null values but keep empty strings and false booleans
+        const populatedFields = Object.entries(clientData).reduce((acc, [key, value]) => {
+          if (value !== undefined && value !== null) {
+            acc[key] = value;
+          }
+          return acc;
+        }, {} as Record<string, any>);
+        
         await apiRequest('/v2/clients', {
           method: 'POST',
-          body: JSON.stringify(clientData)
+          body: JSON.stringify(populatedFields)
         });
         showSuccessToast('Client created successfully');
       }
       setShowClientModal(false);
-      loadData();
+      void loadData();
     } catch (error: unknown) {
-      showErrorToast(
-        editingClient ? 'Failed to update client' : 'Failed to create client',
-        error instanceof Error ? error.message : 'Unknown error'
-      );
+      // Handle structured error responses from backend
+      // Requirements: 4.6, 6.6, 7.6
+      if (error && typeof error === 'object') {
+        // Check for structured error response with error object
+        if ('error' in error && typeof error.error === 'object' && error.error !== null) {
+          const structuredError = error.error as { code?: string; message?: string; field?: string; details?: any };
+          
+          // Build user-friendly error message
+          let errorMessage = structuredError.message || 'An error occurred';
+          
+          if (structuredError.field) {
+            errorMessage = `${structuredError.field}: ${errorMessage}`;
+          }
+          
+          // Add error code for debugging if available
+          if (structuredError.code) {
+            console.error(`[ClientManagement] API Error Code: ${structuredError.code}`, structuredError.details);
+          }
+          
+          showErrorToast(errorMessage);
+        } 
+        // Fallback for legacy error format
+        else if ('error' in error && typeof error.error === 'string') {
+          const apiError = error as { error: string; message?: string; field?: string };
+          const errorMessage = apiError.field 
+            ? `${apiError.field}: ${apiError.message || apiError.error}`
+            : apiError.message || apiError.error;
+          showErrorToast(errorMessage);
+        }
+        // Handle network errors
+        else if ('message' in error && typeof error.message === 'string') {
+          showErrorToast(
+            editingClient ? 'Failed to update client' : 'Failed to create client',
+            error.message
+          );
+        }
+        else {
+          showErrorToast(
+            editingClient ? 'Failed to update client' : 'Failed to create client',
+            'Unknown error'
+          );
+        }
+      } else {
+        showErrorToast(
+          editingClient ? 'Failed to update client' : 'Failed to create client',
+          error instanceof Error ? error.message : 'Unknown error'
+        );
+      }
     }
   };
 
   const handleViewClientSites = (clientId: string) => {
-    navigate(`/admin/sites?client=${clientId}`);
+    void navigate(`/admin/sites?client=${clientId}`);
   };
 
   const handleSeedDatabase = async () => {
@@ -291,7 +398,7 @@ export function ClientManagement() {
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {clients.filter(c => c.isActive).length}
+            {clients.filter(c => c.status === 'active' || (c.status === undefined && c.isActive)).length}
           </p>
           <p className="text-sm text-gray-600">Active Clients</p>
         </div>
@@ -309,7 +416,7 @@ export function ClientManagement() {
             <XCircle className="w-8 h-8 text-gray-400" />
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {clients.filter(c => !c.isActive).length}
+            {clients.filter(c => c.status === 'inactive' || (c.status === undefined && !c.isActive)).length}
           </p>
           <p className="text-sm text-gray-600">Inactive Clients</p>
         </div>
@@ -371,7 +478,7 @@ export function ClientManagement() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                   <Button
-                    onClick={handleSeedDatabase}
+                    onClick={() => void handleSeedDatabase()}
                     disabled={isSeeding}
                     className="bg-amber-500 hover:bg-amber-600 text-white"
                   >
@@ -437,15 +544,15 @@ export function ClientManagement() {
                         <div>
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => navigate(`/admin/clients/${client.id}`)}
+                              onClick={() => void navigate(getClientUrl(client))}
                               className="text-lg font-bold text-gray-900 hover:text-[#D91C81] transition-colors"
                             >
                               {client.name}
                             </button>
-                            {client.isActive ? (
-                              <Badge className="bg-green-100 text-green-800">Active</Badge>
+                            {(client.status === 'active' || (client.status === undefined && client.isActive)) ? (
+                              <Badge className="bg-green-100 text-green-800 border border-green-200">Active</Badge>
                             ) : (
-                              <Badge className="bg-gray-100 text-gray-800">Inactive</Badge>
+                              <Badge className="bg-gray-100 text-gray-800 border border-gray-200">Inactive</Badge>
                             )}
                           </div>
                           {client.description && (
@@ -493,14 +600,14 @@ export function ClientManagement() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => navigate(`/admin/clients/${client.id}`)}
+                        onClick={() => void navigate(getClientUrl(client))}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDeleteClient(client.id, client.name)}
+                        onClick={() => void handleDeleteClient(client.id, client.name)}
                         className="text-red-600 hover:text-red-700 hover:bg-red-50"
                         disabled={isDeleting}
                       >
@@ -545,247 +652,9 @@ export function ClientManagement() {
       <ClientModal
         open={showClientModal}
         onClose={() => setShowClientModal(false)}
-        client={editingClient}
-        onSave={handleSaveClient}
+        client={editingClient as any}
+        onSave={() => void handleSaveClient()}
       />
     </div>
-  );
-}
-
-interface ClientModalProps {
-  open: boolean;
-  onClose: () => void;
-  client: Client | null;
-  onSave: (client: Partial<Client>) => void;
-}
-
-function ClientModal({ open, onClose, client, onSave }: ClientModalProps) {
-  const [formData, setFormData] = useState<Partial<Client>>({
-    name: '',
-    description: '',
-    contactEmail: '',
-    contactPhone: '',
-    address: '',
-    isActive: true,
-    // Client Settings
-    clientCode: '',
-    clientRegion: '',
-    clientSourceCode: '',
-    contactName: '',
-    taxId: '',
-    // Client Address
-    addressLine1: '',
-    addressLine2: '',
-    addressLine3: '',
-    city: '',
-    postalCode: '',
-    countryState: '',
-    country: '',
-    // Account Settings
-    accountManager: '',
-    accountManagerEmail: '',
-    implementationManager: '',
-    implementationManagerEmail: '',
-    technologyOwner: '',
-    technologyOwnerEmail: '',
-    // Client App Settings
-    clientUrl: '',
-    allowSessionTimeoutExtend: false,
-    authenticationMethod: '',
-    customUrl: '',
-    hasEmployeeData: false,
-    // Client Billing Settings
-    invoiceType: '',
-    invoiceTemplateType: '',
-    poType: '',
-    poNumber: '',
-    // Client Integrations
-    erpSystem: '',
-    sso: '',
-    hrisSystem: '',
-  });
-  const [isSaving, setIsSaving] = useState(false);
-
-  // Update form data when client prop changes
-  useEffect(() => {
-    if (client) {
-      setFormData({
-        name: client.name,
-        description: client.description,
-        contactEmail: client.contactEmail,
-        contactPhone: client.contactPhone,
-        address: client.address,
-        isActive: client.isActive,
-        // Client Settings
-        clientCode: client.clientCode,
-        clientRegion: client.clientRegion,
-        clientSourceCode: client.clientSourceCode,
-        contactName: client.contactName,
-        taxId: client.taxId,
-        // Client Address
-        addressLine1: client.addressLine1,
-        addressLine2: client.addressLine2,
-        addressLine3: client.addressLine3,
-        city: client.city,
-        postalCode: client.postalCode,
-        countryState: client.countryState,
-        country: client.country,
-        // Account Settings
-        accountManager: client.accountManager,
-        accountManagerEmail: client.accountManagerEmail,
-        implementationManager: client.implementationManager,
-        implementationManagerEmail: client.implementationManagerEmail,
-        technologyOwner: client.technologyOwner,
-        technologyOwnerEmail: client.technologyOwnerEmail,
-        // Client App Settings
-        clientUrl: client.clientUrl,
-        allowSessionTimeoutExtend: client.allowSessionTimeoutExtend,
-        authenticationMethod: client.authenticationMethod,
-        customUrl: client.customUrl,
-        hasEmployeeData: client.hasEmployeeData,
-        // Client Billing Settings
-        invoiceType: client.invoiceType,
-        invoiceTemplateType: client.invoiceTemplateType,
-        poType: client.poType,
-        poNumber: client.poNumber,
-        // Client Integrations
-        erpSystem: client.erpSystem,
-        sso: client.sso,
-        hrisSystem: client.hrisSystem,
-      });
-    } else {
-      setFormData({
-        name: '',
-        description: '',
-        contactEmail: '',
-        contactPhone: '',
-        address: '',
-        isActive: true,
-      });
-    }
-  }, [client, open]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.name?.trim()) {
-      showErrorToast('Please enter a client name');
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      onSave(formData);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {client ? 'Edit Client' : 'Add New Client'}
-          </DialogTitle>
-          <DialogDescription>
-            {client ? 'Edit the details of this client.' : 'Add a new client to your system.'}
-          </DialogDescription>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Basic Information */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-gray-900">Basic Information</h3>
-            
-            <div>
-              <Label htmlFor="name">Client Name *</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="e.g., Acme Corporation"
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Brief description of the client..."
-                rows={3}
-              />
-            </div>
-          </div>
-
-          {/* Contact Information */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-gray-900">Contact Information</h3>
-            
-            <div>
-              <Label htmlFor="contactEmail">Email</Label>
-              <Input
-                id="contactEmail"
-                type="email"
-                value={formData.contactEmail}
-                onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
-                placeholder="contact@client.com"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="contactPhone">Phone</Label>
-              <Input
-                id="contactPhone"
-                type="tel"
-                value={formData.contactPhone}
-                onChange={(e) => setFormData({ ...formData, contactPhone: e.target.value })}
-                placeholder="(555) 123-4567"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="address">Address</Label>
-              <Textarea
-                id="address"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                placeholder="Street address, city, state, postal code"
-                rows={2}
-              />
-            </div>
-          </div>
-
-          {/* Status */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div>
-              <Label htmlFor="isActive" className="font-semibold">Active Status</Label>
-              <p className="text-sm text-gray-600">Enable or disable this client</p>
-            </div>
-            <Switch
-              id="isActive"
-              checked={formData.isActive}
-              onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
-            />
-          </div>
-
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose} disabled={isSaving}>
-              Cancel
-            </Button>
-            <Button 
-              type="submit" 
-              className="bg-[#D91C81] hover:bg-[#B01669] text-white"
-              disabled={isSaving}
-            >
-              {isSaving ? 'Saving...' : (client ? 'Update Client' : 'Create Client')}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
   );
 }

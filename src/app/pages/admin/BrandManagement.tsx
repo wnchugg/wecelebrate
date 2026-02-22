@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Search, Edit, Trash2, Building2, Tag, CheckCircle, XCircle, Eye } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Building2, Tag, CheckCircle, Eye } from 'lucide-react';
 import { useSite, Brand } from '../../context/SiteContext';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';

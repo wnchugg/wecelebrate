@@ -103,7 +103,7 @@ export function useQuery<T>(
 
   useEffect(() => {
     if (refetchOnMount) {
-      fetchData();
+      void fetchData();
     }
   }, [fetchData, refetchOnMount]);
 

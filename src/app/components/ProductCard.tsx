@@ -1,7 +1,10 @@
 import { Link } from 'react-router';
-import { ShoppingCart, Package } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { Product } from '../data/products';
 import { useCart } from '../context/CartContext';
+import { CurrencyDisplay } from './CurrencyDisplay';
+import { useNumberFormat } from '../hooks/useNumberFormat';
+import { useUnits } from '../hooks/useUnits';
 
 export interface ProductCardProps {
   product: Product;
@@ -9,6 +12,8 @@ export interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
+  const { formatInteger } = useNumberFormat();
+  const { formatWeight } = useUnits();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -39,11 +44,16 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
         <p className="text-gray-600 text-sm mb-4 line-clamp-2">{product.description}</p>
+        {product.weight && (
+          <p className="text-gray-500 text-xs mb-2">Weight: {formatWeight(product.weight)}</p>
+        )}
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-2xl font-bold text-gray-900">${product.price}</p>
+            <p className="text-2xl font-bold text-gray-900">
+              <CurrencyDisplay amount={product.price} />
+            </p>
             {product.points && (
-              <p className="text-sm text-gray-500">{product.points.toLocaleString()} points</p>
+              <p className="text-sm text-gray-500">{formatInteger(product.points)} points</p>
             )}
           </div>
           <button

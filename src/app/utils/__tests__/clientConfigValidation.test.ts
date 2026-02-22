@@ -89,7 +89,8 @@ describe('Client Configuration Validation', () => {
     it('should require client name', () => {
       const result = validateClientConfiguration({
         clientName: '',
-        isActive: true
+        contactEmail: 'test@example.com',
+        status: 'active'
       });
       
       expect(result.valid).toBe(false);
@@ -100,7 +101,8 @@ describe('Client Configuration Validation', () => {
     it('should enforce minimum length (2 characters)', () => {
       const result = validateClientConfiguration({
         clientName: 'A',
-        isActive: true
+        contactEmail: 'test@example.com',
+        status: 'active'
       });
       
       expect(result.valid).toBe(false);
@@ -111,7 +113,8 @@ describe('Client Configuration Validation', () => {
     it('should enforce maximum length (100 characters)', () => {
       const result = validateClientConfiguration({
         clientName: 'A'.repeat(101),
-        isActive: true
+        contactEmail: 'test@example.com',
+        status: 'active'
       });
       
       expect(result.valid).toBe(false);
@@ -122,7 +125,8 @@ describe('Client Configuration Validation', () => {
     it('should reject invalid characters', () => {
       const result = validateClientConfiguration({
         clientName: 'Client@Name#123',
-        isActive: true
+        contactEmail: 'test@example.com',
+        status: 'active'
       });
       
       expect(result.valid).toBe(false);
@@ -140,7 +144,8 @@ describe('Client Configuration Validation', () => {
       validNames.forEach(name => {
         const result = validateClientConfiguration({
           clientName: name,
-          isActive: true
+          contactEmail: 'test@example.com',
+          status: 'active'
         });
         
         expect(result.valid).toBe(true);
@@ -156,7 +161,8 @@ describe('Client Configuration Validation', () => {
       const result = validateClientConfiguration({
         clientName: 'Valid Client',
         clientCode: '',
-        isActive: true
+        contactEmail: 'test@example.com',
+        status: 'active'
       });
       
       expect(result.valid).toBe(true);
@@ -167,7 +173,8 @@ describe('Client Configuration Validation', () => {
       const result = validateClientConfiguration({
         clientName: 'Valid Client',
         clientCode: 'INVALID CODE!',
-        isActive: true
+        contactEmail: 'test@example.com',
+        status: 'active'
       });
       
       expect(result.valid).toBe(false);
@@ -178,7 +185,8 @@ describe('Client Configuration Validation', () => {
       const result = validateClientConfiguration({
         clientName: 'Valid Client',
         clientCode: 'A'.repeat(51),
-        isActive: true
+        contactEmail: 'test@example.com',
+        status: 'active'
       });
       
       expect(result.valid).toBe(false);
@@ -191,8 +199,8 @@ describe('Client Configuration Validation', () => {
   describe('Email Validation', () => {
     const emailFields = [
       'contactEmail',
-      'accountManagerEmail',
-      'implementationManagerEmail',
+      'clientAccountManagerEmail',
+      'clientImplementationManagerEmail',
       'technologyOwnerEmail'
     ];
     
@@ -201,7 +209,8 @@ describe('Client Configuration Validation', () => {
         it('should accept empty email', () => {
           const data: any = {
             clientName: 'Valid Client',
-            isActive: true,
+            contactEmail: 'test@example.com',
+            status: 'active',
             [field]: ''
           };
           
@@ -212,7 +221,8 @@ describe('Client Configuration Validation', () => {
         it('should validate email format', () => {
           const data: any = {
             clientName: 'Valid Client',
-            isActive: true,
+            contactEmail: field === 'contactEmail' ? 'invalid-email' : 'test@example.com',
+            status: 'active',
             [field]: 'invalid-email'
           };
           
@@ -224,7 +234,8 @@ describe('Client Configuration Validation', () => {
         it('should accept valid email', () => {
           const data: any = {
             clientName: 'Valid Client',
-            isActive: true,
+            contactEmail: 'test@example.com',
+            status: 'active',
             [field]: 'user@example.com'
           };
           
@@ -241,8 +252,9 @@ describe('Client Configuration Validation', () => {
     it('should accept empty phone', () => {
       const result = validateClientConfiguration({
         clientName: 'Valid Client',
-        contactPhone: '',
-        isActive: true
+        clientContactPhone: '',
+        contactEmail: 'test@example.com',
+        status: 'active'
       });
       
       expect(result.valid).toBe(true);
@@ -251,12 +263,13 @@ describe('Client Configuration Validation', () => {
     it('should validate phone format', () => {
       const result = validateClientConfiguration({
         clientName: 'Valid Client',
-        contactPhone: '123',
-        isActive: true
+        clientContactPhone: '123',
+        contactEmail: 'test@example.com',
+        status: 'active'
       });
       
       expect(result.valid).toBe(false);
-      expect(result.fieldErrors.contactPhone).toContain('Invalid phone');
+      expect(result.fieldErrors.clientContactPhone).toContain('Invalid phone');
     });
     
     it('should accept valid phone numbers', () => {
@@ -269,11 +282,12 @@ describe('Client Configuration Validation', () => {
       validPhones.forEach(phone => {
         const result = validateClientConfiguration({
           clientName: 'Valid Client',
-          contactPhone: phone,
-          isActive: true
+          clientContactPhone: phone,
+          contactEmail: 'test@example.com',
+          status: 'active'
         });
         
-        expect(result.fieldErrors.contactPhone).toBeUndefined();
+        expect(result.fieldErrors.clientContactPhone).toBeUndefined();
       });
     });
   });
@@ -281,14 +295,15 @@ describe('Client Configuration Validation', () => {
   // ========== URL VALIDATIONS ==========
   
   describe('URL Validation', () => {
-    const urlFields = ['clientUrl', 'customUrl'];
+    const urlFields = ['clientUrl', 'clientCustomUrl'];
     
     urlFields.forEach(field => {
       describe(`${field}`, () => {
         it('should accept empty URL', () => {
           const data: any = {
             clientName: 'Valid Client',
-            isActive: true,
+            contactEmail: 'test@example.com',
+            status: 'active',
             [field]: ''
           };
           
@@ -299,7 +314,8 @@ describe('Client Configuration Validation', () => {
         it('should validate URL format', () => {
           const data: any = {
             clientName: 'Valid Client',
-            isActive: true,
+            contactEmail: 'test@example.com',
+            status: 'active',
             [field]: 'not-a-url'
           };
           
@@ -311,7 +327,8 @@ describe('Client Configuration Validation', () => {
         it('should enforce maximum length (255 characters)', () => {
           const data: any = {
             clientName: 'Valid Client',
-            isActive: true,
+            contactEmail: 'test@example.com',
+            status: 'active',
             [field]: 'https://example.com/' + 'a'.repeat(250)
           };
           
@@ -323,7 +340,8 @@ describe('Client Configuration Validation', () => {
         it('should accept valid URLs', () => {
           const data: any = {
             clientName: 'Valid Client',
-            isActive: true,
+            contactEmail: 'test@example.com',
+            status: 'active',
             [field]: 'https://www.example.com'
           };
           
@@ -339,12 +357,12 @@ describe('Client Configuration Validation', () => {
   describe('Text Length Validation', () => {
     const textFields = [
       { name: 'description', maxLength: 500 },
-      { name: 'contactName', maxLength: 100 },
-      { name: 'addressLine1', maxLength: 100 },
-      { name: 'addressLine2', maxLength: 100 },
-      { name: 'addressLine3', maxLength: 100 },
-      { name: 'city', maxLength: 100 },
-      { name: 'countryState', maxLength: 100 }
+      { name: 'clientContactName', maxLength: 100 },
+      { name: 'clientAddressLine1', maxLength: 100 },
+      { name: 'clientAddressLine2', maxLength: 100 },
+      { name: 'clientAddressLine3', maxLength: 100 },
+      { name: 'clientCity', maxLength: 100 },
+      { name: 'clientCountryState', maxLength: 100 }
     ];
     
     textFields.forEach(({ name, maxLength }) => {
@@ -352,7 +370,8 @@ describe('Client Configuration Validation', () => {
         it(`should enforce maximum length (${maxLength} characters)`, () => {
           const data: any = {
             clientName: 'Valid Client',
-            isActive: true,
+            contactEmail: 'test@example.com',
+            status: 'active',
             [name]: 'A'.repeat(maxLength + 1)
           };
           
@@ -364,7 +383,8 @@ describe('Client Configuration Validation', () => {
         it('should accept text within limit', () => {
           const data: any = {
             clientName: 'Valid Client',
-            isActive: true,
+            contactEmail: 'test@example.com',
+            status: 'active',
             [name]: 'A'.repeat(maxLength)
           };
           
@@ -381,9 +401,10 @@ describe('Client Configuration Validation', () => {
     it('should warn when manager name is set but email is missing', () => {
       const result = validateClientConfiguration({
         clientName: 'Valid Client',
-        accountManager: 'John Doe',
-        accountManagerEmail: '',
-        isActive: true
+        clientAccountManager: 'John Doe',
+        clientAccountManagerEmail: '',
+        contactEmail: 'test@example.com',
+        status: 'active'
       });
       
       expect(result.warnings).toContain('Account manager name is set but email is missing');
@@ -392,9 +413,10 @@ describe('Client Configuration Validation', () => {
     it('should warn when PO type is set but PO number is missing', () => {
       const result = validateClientConfiguration({
         clientName: 'Valid Client',
-        poType: 'Standard',
-        poNumber: '',
-        isActive: true
+        clientPoType: 'Standard',
+        clientPoNumber: '',
+        contactEmail: 'test@example.com',
+        status: 'active'
       });
       
       expect(result.warnings).toContain('PO type is set but PO number is missing');
@@ -403,8 +425,9 @@ describe('Client Configuration Validation', () => {
     it('should warn for non-standard ERP systems', () => {
       const result = validateClientConfiguration({
         clientName: 'Valid Client',
-        erpSystem: 'CustomERP',
-        isActive: true
+        clientErpSystem: 'CustomERP',
+        contactEmail: 'test@example.com',
+        status: 'active'
       });
       
       expect(result.warnings.some(w => w.includes('not in the standard list'))).toBe(true);
@@ -433,8 +456,8 @@ describe('Client Configuration Validation', () => {
     });
     
     it('should validate phone field', () => {
-      expect(validateField('contactPhone', '123')).toBe('Invalid phone format');
-      expect(validateField('contactPhone', '(555) 123-4567')).toBeNull();
+      expect(validateField('clientContactPhone', '123')).toBe('Invalid phone format');
+      expect(validateField('clientContactPhone', '(555) 123-4567')).toBeNull();
     });
     
     it('should validate URL fields', () => {
@@ -450,27 +473,27 @@ describe('Client Configuration Validation', () => {
       const completeConfig: ClientConfigData = {
         clientName: 'Acme Corporation',
         description: 'Leading technology company',
-        isActive: true,
+        contactEmail: 'contact@acme.com',
+        status: 'active',
         clientCode: 'ACME-2026',
         clientRegion: 'US/CA',
         clientSourceCode: 'SRC-ACME-001',
-        contactName: 'John Smith',
-        contactEmail: 'john@acme.com',
-        contactPhone: '(555) 123-4567',
-        taxId: '12-3456789',
-        addressLine1: '123 Main Street',
-        city: 'San Francisco',
-        postalCode: '94102',
-        countryState: 'CA',
-        country: 'US',
-        accountManager: 'Sarah Williams',
-        accountManagerEmail: 'sarah@halo.com',
+        clientContactName: 'John Smith',
+        clientContactPhone: '(555) 123-4567',
+        clientTaxId: '12-3456789',
+        clientAddressLine1: '123 Main Street',
+        clientCity: 'San Francisco',
+        clientPostalCode: '94102',
+        clientCountryState: 'CA',
+        clientCountry: 'US',
+        clientAccountManager: 'Sarah Williams',
+        clientAccountManagerEmail: 'sarah@halo.com',
         clientUrl: 'https://www.acme.com',
-        allowSessionTimeoutExtend: true,
-        authenticationMethod: 'SSO',
-        invoiceType: 'Client',
-        erpSystem: 'SAP',
-        sso: 'Azure AD'
+        clientAllowSessionTimeoutExtend: true,
+        clientAuthenticationMethod: 'SSO',
+        clientInvoiceType: 'Client',
+        clientErpSystem: 'SAP',
+        clientSso: 'Azure'
       };
       
       const result = validateClientConfiguration(completeConfig);
@@ -483,11 +506,11 @@ describe('Client Configuration Validation', () => {
     it('should collect multiple errors', () => {
       const invalidConfig: ClientConfigData = {
         clientName: 'A', // Too short
-        isActive: true,
         contactEmail: 'invalid-email',
-        contactPhone: '123', // Too short
+        status: 'active',
+        clientContactPhone: '123', // Too short
         clientUrl: 'not-a-url',
-        accountManagerEmail: 'also-invalid'
+        clientAccountManagerEmail: 'also-invalid'
       };
       
       const result = validateClientConfiguration(invalidConfig);

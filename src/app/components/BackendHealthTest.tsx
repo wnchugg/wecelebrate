@@ -9,7 +9,11 @@ export function BackendHealthTest() {
   const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {
-    checkHealth();
+    void checkHealth().catch((error) => {
+      console.error('Error checking backend health:', error);
+      setStatus('error');
+      setMessage('Failed to check backend health');
+    });
   }, []);
 
   const checkHealth = async () => {
@@ -94,7 +98,7 @@ export function BackendHealthTest() {
           
           <div className="flex items-start gap-1">
             <button
-              onClick={checkHealth}
+              onClick={() => void checkHealth()}
               className="p-1 hover:bg-white/50 rounded transition-colors"
               title="Recheck connection"
             >

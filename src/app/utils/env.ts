@@ -6,7 +6,7 @@
  */
 
 // Safe helper to access import.meta.env
-function safeGetEnv(key?: keyof ImportMetaEnv): any {
+function safeGetEnv(key?: keyof ImportMetaEnv): string | boolean | ImportMetaEnv | undefined {
   try {
     if (key) {
       return import.meta.env[key];

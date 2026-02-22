@@ -12,6 +12,7 @@ import type {
   Catalog, CreateCatalogInput, UpdateCatalogInput, CatalogFilters,
   Product, CreateProductInput, UpdateProductInput, ProductFilters,
   Employee, CreateEmployeeInput, UpdateEmployeeInput, EmployeeFilters,
+  SiteUser, CreateSiteUserInput, UpdateSiteUserInput, SiteUserFilters,
   Order, CreateOrderInput, UpdateOrderInput, OrderFilters,
 } from './types.ts';
 
@@ -25,6 +26,9 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
 
 // Initialize Supabase client
 const supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+// Export the supabase client for use in other modules
+export { supabase };
 
 // ==================== Helper Functions ====================
 
@@ -59,6 +63,13 @@ export async function getClients(filters?: ClientFilters): Promise<Client[]> {
     const { data, error } = await query.order('created_at', { ascending: false });
     
     if (error) handleError('getClients', error);
+    
+    // Debug logging
+    console.log('[DB] getClients returned:', data?.length || 0, 'clients');
+    if (data && data.length > 0) {
+      console.log('[DB] First client ID:', data[0].id, 'Name:', data[0].name);
+    }
+    
     return data || [];
   } catch (error) {
     handleError('getClients', error);
@@ -602,6 +613,110 @@ export async function deleteEmployee(id: string): Promise<void> {
   }
 }
 
+// ==================== Site Users (Advanced Auth) ====================
+
+export async function getSiteUsers(filters?: SiteUserFilters): Promise<SiteUser[]> {
+  try {
+    let query = supabase.from('site_users').select('*');
+    
+    if (filters?.site_id) {
+      query = query.eq('site_id', filters.site_id);
+    }
+    
+    if (filters?.status) {
+      query = query.eq('status', filters.status);
+    }
+    
+    if (filters?.role) {
+      query = query.eq('role', filters.role);
+    }
+    
+    if (filters?.search) {
+      query = query.or(`first_name.ilike.%${filters.search}%,last_name.ilike.%${filters.search}%,email.ilike.%${filters.search}%,employee_id.ilike.%${filters.search}%`);
+    }
+    
+    if (filters?.limit) {
+      query = query.limit(filters.limit);
+    }
+    
+    if (filters?.offset) {
+      query = query.range(filters.offset, filters.offset + (filters.limit || 50) - 1);
+    }
+    
+    const { data, error } = await query.order('created_at', { ascending: false });
+    
+    if (error) handleError('getSiteUsers', error);
+    return data || [];
+  } catch (error) {
+    handleError('getSiteUsers', error);
+  }
+}
+
+export async function getSiteUserById(id: string): Promise<SiteUser | null> {
+  try {
+    const { data, error } = await supabase
+      .from('site_users')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error) {
+      if (error.code === 'PGRST116') return null;
+      handleError('getSiteUserById', error);
+    }
+    
+    return data;
+  } catch (error) {
+    handleError('getSiteUserById', error);
+  }
+}
+
+export async function createSiteUser(input: CreateSiteUserInput): Promise<SiteUser> {
+  try {
+    const { data, error } = await supabase
+      .from('site_users')
+      .insert({
+        ...input,
+        id: crypto.randomUUID(),
+      })
+      .select()
+      .single();
+    
+    if (error) handleError('createSiteUser', error);
+    return data;
+  } catch (error) {
+    handleError('createSiteUser', error);
+  }
+}
+
+export async function updateSiteUser(id: string, input: UpdateSiteUserInput): Promise<SiteUser> {
+  try {
+    const { data, error } = await supabase
+      .from('site_users')
+      .update(input)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) handleError('updateSiteUser', error);
+    return data;
+  } catch (error) {
+    handleError('updateSiteUser', error);
+  }
+}
+
+export async function deleteSiteUser(id: string): Promise<void> {
+  try {
+    const { error } = await supabase
+      .from('site_users')
+      .delete()
+      .eq('id', id);
+    
+    if (error) handleError('deleteSiteUser', error);
+  } catch (error) {
+    handleError('deleteSiteUser', error);
+  }
+}
 
 // ==================== Orders ====================
 

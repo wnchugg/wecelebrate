@@ -1,78 +1,95 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import { 
   Save, Settings, Globe, Mail, Building2, Package, CreditCard, 
-  Link2, Users, MapPin, Check, AlertCircle, ArrowLeft, Loader2, Clock
+  Link2, Users, MapPin, ArrowLeft, Loader2, ExternalLink, Server
 } from 'lucide-react';
-import { Alert, AlertDescription } from '../../components/ui/alert';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Badge } from '../../components/ui/badge';
+import { PhoneInput } from '../../components/ui/phone-input';
+import { AddressInput, AddressData } from '../../components/ui/address-input';
+import { SFTPConfiguration } from '../../components/admin/SFTPConfiguration';
 import { apiRequest } from '../../utils/api';
 import { showErrorToast, showSuccessToast } from '../../utils/errorHandling';
 import { validateClientConfiguration } from '../../utils/clientConfigValidation';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface Client {
   id: string;
   name: string;
   description?: string;
-  contactEmail?: string;
-  contactPhone?: string;
-  address?: string;
-  isActive: boolean;
+  contactEmail: string;
+  status: 'active' | 'inactive';
   
   // Client Settings
   clientCode?: string;
   clientRegion?: string;
   clientSourceCode?: string;
-  contactName?: string;
-  taxId?: string;
+  clientContactName?: string;
+  clientContactPhone?: string;
+  clientTaxId?: string;
   
   // Client Address
-  addressLine1?: string;
-  addressLine2?: string;
-  addressLine3?: string;
-  city?: string;
-  postalCode?: string;
-  countryState?: string;
-  country?: string;
+  clientAddressLine1?: string;
+  clientAddressLine2?: string;
+  clientAddressLine3?: string;
+  clientCity?: string;
+  clientPostalCode?: string;
+  clientCountryState?: string;
+  clientCountry?: string;
   
   // Account Settings
-  accountManager?: string;
-  accountManagerEmail?: string;
-  implementationManager?: string;
-  implementationManagerEmail?: string;
+  clientAccountManager?: string;
+  clientAccountManagerEmail?: string;
+  clientImplementationManager?: string;
+  clientImplementationManagerEmail?: string;
   technologyOwner?: string;
   technologyOwnerEmail?: string;
   
   // Client App Settings
   clientUrl?: string;
-  allowSessionTimeoutExtend?: boolean;
-  authenticationMethod?: string;
-  customUrl?: string;
-  hasEmployeeData?: boolean;
+  clientAllowSessionTimeoutExtend?: boolean;
+  clientAuthenticationMethod?: string;
+  clientCustomUrl?: string;
+  clientHasEmployeeData?: boolean;
   
   // Client Billing Settings
-  invoiceType?: string;
-  invoiceTemplateType?: string;
-  poType?: string;
-  poNumber?: string;
+  clientInvoiceType?: string;
+  clientInvoiceTemplateType?: string;
+  clientPoType?: string;
+  clientPoNumber?: string;
   
   // Client Integrations
-  erpSystem?: string;
-  sso?: string;
-  hrisSystem?: string;
+  clientErpSystem?: string;
+  clientSso?: string;
   
   createdAt?: string;
   updatedAt?: string;
 }
 
-export function ClientConfiguration() {
-  const { clientId } = useParams<{ clientId: string }>();
+interface ClientConfigurationProps {
+  clientIdProp?: string;
+  embedded?: boolean;
+  activeTab?: string;
+  onSaveSuccess?: () => void;
+  sites?: Array<{ id: string; name: string; clientId: string; status: string; isActive: boolean }>;
+}
+
+export function ClientConfiguration({ 
+  clientIdProp, 
+  embedded = false, 
+  activeTab,
+  onSaveSuccess,
+  sites = []
+}: ClientConfigurationProps = {}) {
+  const { clientId: routeClientId } = useParams<{ clientId: string }>();
+  const clientId = clientIdProp || routeClientId;
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
@@ -83,113 +100,148 @@ export function ClientConfiguration() {
   // Client Basic Info
   const [clientName, setClientName] = useState('');
   const [description, setDescription] = useState('');
-  const [isActive, setIsActive] = useState(true);
+  const [contactEmail, setContactEmail] = useState('');
+  const [status, setStatus] = useState<'active' | 'inactive'>('active');
   
   // Client Settings
   const [clientCode, setClientCode] = useState('');
   const [clientRegion, setClientRegion] = useState('');
   const [clientSourceCode, setClientSourceCode] = useState('');
-  const [contactName, setContactName] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
-  const [contactPhone, setContactPhone] = useState('');
-  const [taxId, setTaxId] = useState('');
+  const [clientContactName, setClientContactName] = useState('');
+  const [clientContactPhone, setClientContactPhone] = useState('');
+  const [clientTaxId, setClientTaxId] = useState('');
   
-  // Client Address
-  const [addressLine1, setAddressLine1] = useState('');
-  const [addressLine2, setAddressLine2] = useState('');
-  const [addressLine3, setAddressLine3] = useState('');
-  const [city, setCity] = useState('');
-  const [postalCode, setPostalCode] = useState('');
-  const [countryState, setCountryState] = useState('');
-  const [country, setCountry] = useState('');
+  // Client Address (using AddressData format)
+  const [clientAddress, setClientAddress] = useState<AddressData>({
+    line1: '',
+    line2: '',
+    line3: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    country: 'United States',
+  });
   
   // Account Settings
-  const [accountManager, setAccountManager] = useState('');
-  const [accountManagerEmail, setAccountManagerEmail] = useState('');
-  const [implementationManager, setImplementationManager] = useState('');
-  const [implementationManagerEmail, setImplementationManagerEmail] = useState('');
+  const [clientAccountManager, setClientAccountManager] = useState('');
+  const [clientAccountManagerEmail, setClientAccountManagerEmail] = useState('');
+  const [clientImplementationManager, setClientImplementationManager] = useState('');
+  const [clientImplementationManagerEmail, setClientImplementationManagerEmail] = useState('');
   const [technologyOwner, setTechnologyOwner] = useState('');
   const [technologyOwnerEmail, setTechnologyOwnerEmail] = useState('');
   
   // Client App Settings
   const [clientUrl, setClientUrl] = useState('');
-  const [allowSessionTimeoutExtend, setAllowSessionTimeoutExtend] = useState(false);
-  const [authenticationMethod, setAuthenticationMethod] = useState('');
-  const [customUrl, setCustomUrl] = useState('');
-  const [hasEmployeeData, setHasEmployeeData] = useState(false);
+  const [clientAllowSessionTimeoutExtend, setClientAllowSessionTimeoutExtend] = useState(false);
+  const [clientAuthenticationMethod, setClientAuthenticationMethod] = useState('');
+  const [clientCustomUrl, setClientCustomUrl] = useState('');
+  const [clientHasEmployeeData, setClientHasEmployeeData] = useState(false);
   
   // Client Billing Settings
-  const [invoiceType, setInvoiceType] = useState('');
-  const [invoiceTemplateType, setInvoiceTemplateType] = useState('');
-  const [poType, setPoType] = useState('');
-  const [poNumber, setPoNumber] = useState('');
+  const [clientInvoiceType, setClientInvoiceType] = useState('');
+  const [clientInvoiceTemplateType, setClientInvoiceTemplateType] = useState('');
+  const [clientPoType, setClientPoType] = useState('');
+  const [clientPoNumber, setClientPoNumber] = useState('');
   
   // Client Integrations
-  const [erpSystem, setErpSystem] = useState('');
-  const [sso, setSso] = useState('');
-  const [hrisSystem, setHrisSystem] = useState('');
+  const [clientErpSystem, setClientErpSystem] = useState('');
+  const [clientSso, setClientSso] = useState('');
 
   // Load client data
   useEffect(() => {
     if (clientId) {
-      loadClient();
+      void loadClient();
     }
   }, [clientId]);
 
   const loadClient = async () => {
     setIsLoading(true);
     try {
-      const response = await apiRequest<{ success: boolean; data: Client }>(`/clients/${clientId}`);
+      let actualClientId = clientId;
+      
+      // Check if clientId is a valid UUID format
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const isUUID = uuidRegex.test(clientId || '');
+      
+      // If it's not a UUID, treat it as a slug and resolve it to an ID
+      if (!isUUID) {
+        try {
+          // Fetch all clients to find the one with matching slug
+          const allClientsRes = await apiRequest<{ success: boolean; data: Client[] }>('/v2/clients');
+          
+          // Try to match by clientCode (slug)
+          const matchingClient = allClientsRes.data.find(c => 
+            c.clientCode?.toLowerCase() === clientId?.toLowerCase()
+          );
+          
+          if (matchingClient) {
+            actualClientId = matchingClient.id;
+          } else {
+            // No match found - show error
+            toast.error(`Client not found: "${clientId}". Please check the URL or client code.`);
+            setIsLoading(false);
+            return;
+          }
+        } catch (slugError) {
+          console.error('Failed to resolve client slug:', slugError);
+          toast.error('Failed to load client. Please try again.');
+          setIsLoading(false);
+          return;
+        }
+      }
+      
+      const response = await apiRequest<{ success: boolean; data: Client }>(`/v2/clients/${actualClientId}`);
       const client = response.data;
       
       // Basic Info
       setClientName(client.name || '');
       setDescription(client.description || '');
-      setIsActive(client.isActive ?? true);
+      setContactEmail(client.contactEmail || '');
+      setStatus(client.status || 'active');
       
       // Client Settings
       setClientCode(client.clientCode || '');
       setClientRegion(client.clientRegion || '');
       setClientSourceCode(client.clientSourceCode || '');
-      setContactName(client.contactName || '');
-      setContactEmail(client.contactEmail || '');
-      setContactPhone(client.contactPhone || '');
-      setTaxId(client.taxId || '');
+      setClientContactName(client.clientContactName || '');
+      setClientContactPhone(client.clientContactPhone || '');
+      setClientTaxId(client.clientTaxId || '');
       
       // Client Address
-      setAddressLine1(client.addressLine1 || '');
-      setAddressLine2(client.addressLine2 || '');
-      setAddressLine3(client.addressLine3 || '');
-      setCity(client.city || '');
-      setPostalCode(client.postalCode || '');
-      setCountryState(client.countryState || '');
-      setCountry(client.country || '');
+      setClientAddress({
+        line1: client.clientAddressLine1 || '',
+        line2: client.clientAddressLine2 || '',
+        line3: client.clientAddressLine3 || '',
+        city: client.clientCity || '',
+        state: client.clientCountryState || '',
+        postalCode: client.clientPostalCode || '',
+        country: client.clientCountry || 'United States',
+      });
       
       // Account Settings
-      setAccountManager(client.accountManager || '');
-      setAccountManagerEmail(client.accountManagerEmail || '');
-      setImplementationManager(client.implementationManager || '');
-      setImplementationManagerEmail(client.implementationManagerEmail || '');
+      setClientAccountManager(client.clientAccountManager || '');
+      setClientAccountManagerEmail(client.clientAccountManagerEmail || '');
+      setClientImplementationManager(client.clientImplementationManager || '');
+      setClientImplementationManagerEmail(client.clientImplementationManagerEmail || '');
       setTechnologyOwner(client.technologyOwner || '');
       setTechnologyOwnerEmail(client.technologyOwnerEmail || '');
       
       // Client App Settings
       setClientUrl(client.clientUrl || '');
-      setAllowSessionTimeoutExtend(client.allowSessionTimeoutExtend ?? false);
-      setAuthenticationMethod(client.authenticationMethod || '');
-      setCustomUrl(client.customUrl || '');
-      setHasEmployeeData(client.hasEmployeeData ?? false);
+      setClientAllowSessionTimeoutExtend(client.clientAllowSessionTimeoutExtend ?? false);
+      setClientAuthenticationMethod(client.clientAuthenticationMethod || '');
+      setClientCustomUrl(client.clientCustomUrl || '');
+      setClientHasEmployeeData(client.clientHasEmployeeData ?? false);
       
       // Client Billing Settings
-      setInvoiceType(client.invoiceType || '');
-      setInvoiceTemplateType(client.invoiceTemplateType || '');
-      setPoType(client.poType || '');
-      setPoNumber(client.poNumber || '');
+      setClientInvoiceType(client.clientInvoiceType || '');
+      setClientInvoiceTemplateType(client.clientInvoiceTemplateType || '');
+      setClientPoType(client.clientPoType || '');
+      setClientPoNumber(client.clientPoNumber || '');
       
       // Client Integrations
-      setErpSystem(client.erpSystem || '');
-      setSso(client.sso || '');
-      setHrisSystem(client.hrisSystem || '');
+      setClientErpSystem(client.clientErpSystem || '');
+      setClientSso(client.clientSso || '');
       
     } catch (error: any) {
       showErrorToast(error, { operation: 'load client configuration' });
@@ -206,61 +258,63 @@ export function ClientConfiguration() {
 
     setIsSaving(true);
     try {
-      await apiRequest(`/clients/${clientId}`, {
+      await apiRequest(`/v2/clients/${clientId}`, {
         method: 'PUT',
         body: JSON.stringify({
           name: clientName,
           description,
-          isActive,
+          contactEmail,
+          status,
           
           // Client Settings
           clientCode,
           clientRegion,
           clientSourceCode,
-          contactName,
-          contactEmail,
-          contactPhone,
-          taxId,
+          clientContactName,
+          clientContactPhone,
+          clientTaxId,
           
-          // Client Address
-          addressLine1,
-          addressLine2,
-          addressLine3,
-          city,
-          postalCode,
-          countryState,
-          country,
+          // Client Address (map from AddressData to API format)
+          clientAddressLine1: clientAddress.line1,
+          clientAddressLine2: clientAddress.line2,
+          clientAddressLine3: clientAddress.line3,
+          clientCity: clientAddress.city,
+          clientPostalCode: clientAddress.postalCode,
+          clientCountryState: clientAddress.state,
+          clientCountry: clientAddress.country,
           
           // Account Settings
-          accountManager,
-          accountManagerEmail,
-          implementationManager,
-          implementationManagerEmail,
+          clientAccountManager,
+          clientAccountManagerEmail,
+          clientImplementationManager,
+          clientImplementationManagerEmail,
           technologyOwner,
           technologyOwnerEmail,
           
           // Client App Settings
           clientUrl,
-          allowSessionTimeoutExtend,
-          authenticationMethod,
-          customUrl,
-          hasEmployeeData,
+          clientAllowSessionTimeoutExtend,
+          clientAuthenticationMethod,
+          clientCustomUrl,
+          clientHasEmployeeData,
           
           // Client Billing Settings
-          invoiceType,
-          invoiceTemplateType,
-          poType,
-          poNumber,
+          clientInvoiceType,
+          clientInvoiceTemplateType,
+          clientPoType,
+          clientPoNumber,
           
           // Client Integrations
-          erpSystem,
-          sso,
-          hrisSystem,
+          clientErpSystem,
+          clientSso,
         })
       });
       
       showSuccessToast('Client configuration saved successfully');
       setHasChanges(false);
+      if (onSaveSuccess) {
+        onSaveSuccess();
+      }
     } catch (error: any) {
       showErrorToast(error, { operation: 'save client configuration' });
     } finally {
@@ -276,56 +330,55 @@ export function ClientConfiguration() {
 
     setIsAutoSaving(true);
     try {
-      await apiRequest(`/clients/${clientId}`, {
+      await apiRequest(`/v2/clients/${clientId}`, {
         method: 'PUT',
         body: JSON.stringify({
           name: clientName,
           description,
-          isActive,
+          contactEmail,
+          status,
           
           // Client Settings
           clientCode,
           clientRegion,
           clientSourceCode,
-          contactName,
-          contactEmail,
-          contactPhone,
-          taxId,
+          clientContactName,
+          clientContactPhone,
+          clientTaxId,
           
-          // Client Address
-          addressLine1,
-          addressLine2,
-          addressLine3,
-          city,
-          postalCode,
-          countryState,
-          country,
+          // Client Address (map from AddressData to API format)
+          clientAddressLine1: clientAddress.line1,
+          clientAddressLine2: clientAddress.line2,
+          clientAddressLine3: clientAddress.line3,
+          clientCity: clientAddress.city,
+          clientPostalCode: clientAddress.postalCode,
+          clientCountryState: clientAddress.state,
+          clientCountry: clientAddress.country,
           
           // Account Settings
-          accountManager,
-          accountManagerEmail,
-          implementationManager,
-          implementationManagerEmail,
+          clientAccountManager,
+          clientAccountManagerEmail,
+          clientImplementationManager,
+          clientImplementationManagerEmail,
           technologyOwner,
           technologyOwnerEmail,
           
           // Client App Settings
           clientUrl,
-          allowSessionTimeoutExtend,
-          authenticationMethod,
-          customUrl,
-          hasEmployeeData,
+          clientAllowSessionTimeoutExtend,
+          clientAuthenticationMethod,
+          clientCustomUrl,
+          clientHasEmployeeData,
           
           // Client Billing Settings
-          invoiceType,
-          invoiceTemplateType,
-          poType,
-          poNumber,
+          clientInvoiceType,
+          clientInvoiceTemplateType,
+          clientPoType,
+          clientPoNumber,
           
           // Client Integrations
-          erpSystem,
-          sso,
-          hrisSystem,
+          clientErpSystem,
+          clientSso,
         })
       });
       
@@ -343,45 +396,44 @@ export function ClientConfiguration() {
     const validationErrors = validateClientConfiguration({
       clientName,
       description,
-      isActive,
+      contactEmail,
+      status,
       clientCode,
       clientRegion,
       clientSourceCode,
-      contactName,
-      contactEmail,
-      contactPhone,
-      taxId,
-      addressLine1,
-      addressLine2,
-      addressLine3,
-      city,
-      postalCode,
-      countryState,
-      country,
-      accountManager,
-      accountManagerEmail,
-      implementationManager,
-      implementationManagerEmail,
+      clientContactName,
+      clientContactPhone,
+      clientTaxId,
+      clientAddressLine1: clientAddress.line1,
+      clientAddressLine2: clientAddress.line2,
+      clientAddressLine3: clientAddress.line3,
+      clientCity: clientAddress.city,
+      clientPostalCode: clientAddress.postalCode,
+      clientCountryState: clientAddress.state,
+      clientCountry: clientAddress.country,
+      clientAccountManager,
+      clientAccountManagerEmail,
+      clientImplementationManager,
+      clientImplementationManagerEmail,
       technologyOwner,
       technologyOwnerEmail,
       clientUrl,
-      allowSessionTimeoutExtend,
-      authenticationMethod,
-      customUrl,
-      hasEmployeeData,
-      invoiceType,
-      invoiceTemplateType,
-      poType,
-      poNumber,
-      erpSystem,
-      sso,
-      hrisSystem,
+      clientAllowSessionTimeoutExtend,
+      clientAuthenticationMethod,
+      clientCustomUrl,
+      clientHasEmployeeData,
+      clientInvoiceType,
+      clientInvoiceTemplateType,
+      clientPoType,
+      clientPoNumber,
+      clientErpSystem,
+      clientSso,
     });
 
     setErrors(validationErrors.fieldErrors);
 
     if (Object.keys(validationErrors.fieldErrors).length === 0) {
-      handleSave();
+      void handleSave();
     }
   };
 
@@ -399,86 +451,120 @@ export function ClientConfiguration() {
   return (
     <div className="space-y-6 pb-12">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(`/admin/clients/${clientId}`)}
-            className="p-2"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Client Configuration</h1>
-            <p className="text-gray-600 mt-1">{clientName}</p>
+      {!embedded && (
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              onClick={() => void navigate(`/admin/clients/${clientCode || clientId}`)}
+              className="p-2"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Client Configuration</h1>
+              <p className="text-gray-600 mt-1">{clientName}</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            {hasChanges && (
+              <Badge variant="outline" className="border-amber-500 text-amber-700">
+                Unsaved Changes
+              </Badge>
+            )}
+            <Button
+              onClick={validateAndSave}
+              disabled={isSaving || !hasChanges}
+              className="bg-[#D91C81] hover:bg-[#B01669] text-white"
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Changes
+                </>
+              )}
+            </Button>
           </div>
         </div>
-        
-        <div className="flex items-center gap-3">
-          {hasChanges && (
-            <Badge variant="outline" className="border-amber-500 text-amber-700">
-              Unsaved Changes
-            </Badge>
-          )}
-          <Button
-            onClick={validateAndSave}
-            disabled={isSaving || !hasChanges}
-            className="bg-[#D91C81] hover:bg-[#B01669] text-white"
-          >
-            {isSaving ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
-              </>
-            )}
-          </Button>
-        </div>
-      </div>
+      )}
 
       {/* Configuration Tabs */}
-      <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="bg-white border border-gray-200">
-          <TabsTrigger value="general">
-            <Building2 className="w-4 h-4 mr-2" />
-            General
-          </TabsTrigger>
-          <TabsTrigger value="address">
-            <MapPin className="w-4 h-4 mr-2" />
-            Address
-          </TabsTrigger>
-          <TabsTrigger value="account">
-            <Users className="w-4 h-4 mr-2" />
-            Account Team
-          </TabsTrigger>
-          <TabsTrigger value="app-settings">
-            <Settings className="w-4 h-4 mr-2" />
-            App Settings
-          </TabsTrigger>
-          <TabsTrigger value="billing">
-            <CreditCard className="w-4 h-4 mr-2" />
-            Billing
-          </TabsTrigger>
-          <TabsTrigger value="integrations">
-            <Link2 className="w-4 h-4 mr-2" />
-            Integrations
-          </TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue={embedded ? activeTab : "general"} value={embedded ? activeTab : undefined} className="space-y-6">
+        {!embedded && (
+          <TabsList className="bg-white border border-gray-200">
+            <TabsTrigger value="general">
+              <Building2 className="w-4 h-4 mr-2" />
+              General
+            </TabsTrigger>
+            <TabsTrigger value="address">
+              <MapPin className="w-4 h-4 mr-2" />
+              Address
+            </TabsTrigger>
+            <TabsTrigger value="account">
+              <Users className="w-4 h-4 mr-2" />
+              Account Team
+            </TabsTrigger>
+            <TabsTrigger value="app-settings">
+              <Settings className="w-4 h-4 mr-2" />
+              App Settings
+            </TabsTrigger>
+            <TabsTrigger value="billing">
+              <CreditCard className="w-4 h-4 mr-2" />
+              Billing
+            </TabsTrigger>
+            <TabsTrigger value="integrations">
+              <Link2 className="w-4 h-4 mr-2" />
+              Integrations
+            </TabsTrigger>
+            <TabsTrigger value="sftp">
+              <Server className="w-4 h-4 mr-2" />
+              SFTP
+            </TabsTrigger>
+          </TabsList>
+        )}
 
         {/* General Tab */}
         <TabsContent value="general" className="space-y-6">
           <div className="bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl p-4 border border-pink-100">
-            <div className="flex items-start gap-3">
-              <Building2 className="w-5 h-5 text-pink-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1">Client General Information</h3>
-                <p className="text-sm text-gray-700">
-                  Configure basic client details, contact information, and regional settings
-                </p>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <Building2 className="w-5 h-5 text-pink-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Client General Information</h3>
+                  <p className="text-sm text-gray-700">
+                    Configure basic client details, contact information, and regional settings
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                {hasChanges && (
+                  <Badge variant="outline" className="border-amber-500 text-amber-700">
+                    Unsaved Changes
+                  </Badge>
+                )}
+                <Button
+                  onClick={validateAndSave}
+                  disabled={isSaving || !hasChanges}
+                  className="bg-[#D91C81] hover:bg-[#B01669] text-white"
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Changes
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
           </div>
@@ -510,7 +596,7 @@ export function ClientConfiguration() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Client Code <span className="text-gray-400 font-normal ml-1">(Optional)</span>
+                    URL Slug <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
                     value={clientCode}
@@ -518,9 +604,11 @@ export function ClientConfiguration() {
                       setClientCode(e.target.value);
                       setHasChanges(true);
                     }}
-                    placeholder="ACME-2026"
+                    placeholder="techcorp"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Used in URLs and identifiers</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Used in URLs (e.g., /clients/techcorp). Use lowercase letters, numbers, and hyphens only.
+                  </p>
                 </div>
 
                 <div className="col-span-2">
@@ -581,9 +669,9 @@ export function ClientConfiguration() {
                     Tax ID <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
-                    value={taxId}
+                    value={clientTaxId}
                     onChange={(e) => {
-                      setTaxId(e.target.value);
+                      setClientTaxId(e.target.value);
                       setHasChanges(true);
                     }}
                     placeholder="12-3456789"
@@ -610,9 +698,9 @@ export function ClientConfiguration() {
                     Contact Name
                   </label>
                   <Input
-                    value={contactName}
+                    value={clientContactName}
                     onChange={(e) => {
-                      setContactName(e.target.value);
+                      setClientContactName(e.target.value);
                       setHasChanges(true);
                     }}
                     placeholder="John Smith"
@@ -638,14 +726,14 @@ export function ClientConfiguration() {
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Contact Phone
                   </label>
-                  <Input
-                    type="tel"
-                    value={contactPhone}
-                    onChange={(e) => {
-                      setContactPhone(e.target.value);
+                  <PhoneInput
+                    value={clientContactPhone}
+                    onChange={(value) => {
+                      setClientContactPhone(value);
                       setHasChanges(true);
                     }}
-                    placeholder="(555) 123-4567"
+                    defaultCountry="US"
+                    placeholder={t('form.enterPhone')}
                   />
                 </div>
               </div>
@@ -659,26 +747,27 @@ export function ClientConfiguration() {
                 <Settings className="w-5 h-5 text-purple-600" />
                 Client Status
               </CardTitle>
-              <CardDescription>Enable or disable this client</CardDescription>
+              <CardDescription>Current operational status of this client</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div className="space-y-4">
                 <div>
-                  <p className="font-semibold text-gray-900">Active Status</p>
-                  <p className="text-sm text-gray-600">When disabled, all sites under this client will be inaccessible</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox"
-                    checked={isActive}
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Status
+                  </label>
+                  <select
+                    value={status}
                     onChange={(e) => {
-                      setIsActive(e.target.checked);
+                      setStatus(e.target.value as 'active' | 'inactive');
                       setHasChanges(true);
                     }}
-                    className="sr-only peer" 
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81]"></div>
-                </label>
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">When inactive, all sites under this client will be inaccessible</p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -687,13 +776,39 @@ export function ClientConfiguration() {
         {/* Address Tab */}
         <TabsContent value="address" className="space-y-6">
           <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-100">
-            <div className="flex items-start gap-3">
-              <MapPin className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1">Client Address Information</h3>
-                <p className="text-sm text-gray-700">
-                  Complete address details for shipping, billing, and correspondence
-                </p>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <MapPin className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Client Address Information</h3>
+                  <p className="text-sm text-gray-700">
+                    Complete address details for shipping, billing, and correspondence
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                {hasChanges && (
+                  <Badge variant="outline" className="border-amber-500 text-amber-700">
+                    Unsaved Changes
+                  </Badge>
+                )}
+                <Button
+                  onClick={validateAndSave}
+                  disabled={isSaving || !hasChanges}
+                  className="bg-[#D91C81] hover:bg-[#B01669] text-white"
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Changes
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
           </div>
@@ -706,108 +821,15 @@ export function ClientConfiguration() {
               </CardTitle>
               <CardDescription>Main business address for this client</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Address Line 1
-                </label>
-                <Input
-                  value={addressLine1}
-                  onChange={(e) => {
-                    setAddressLine1(e.target.value);
-                    setHasChanges(true);
-                  }}
-                  placeholder="123 Main Street"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Address Line 2 <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                </label>
-                <Input
-                  value={addressLine2}
-                  onChange={(e) => {
-                    setAddressLine2(e.target.value);
-                    setHasChanges(true);
-                  }}
-                  placeholder="Suite 100"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Address Line 3 <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                </label>
-                <Input
-                  value={addressLine3}
-                  onChange={(e) => {
-                    setAddressLine3(e.target.value);
-                    setHasChanges(true);
-                  }}
-                  placeholder="Building B"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    City
-                  </label>
-                  <Input
-                    value={city}
-                    onChange={(e) => {
-                      setCity(e.target.value);
-                      setHasChanges(true);
-                    }}
-                    placeholder="San Francisco"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    State/Province
-                  </label>
-                  <Input
-                    value={countryState}
-                    onChange={(e) => {
-                      setCountryState(e.target.value);
-                      setHasChanges(true);
-                    }}
-                    placeholder="CA"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Postal Code
-                  </label>
-                  <Input
-                    value={postalCode}
-                    onChange={(e) => {
-                      setPostalCode(e.target.value);
-                      setHasChanges(true);
-                    }}
-                    placeholder="94102"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Country
-                  </label>
-                  <Input
-                    value={country}
-                    onChange={(e) => {
-                      setCountry(e.target.value.toUpperCase());
-                      setHasChanges(true);
-                    }}
-                    placeholder="US"
-                    maxLength={2}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">2-letter ISO code (US, CA, GB)</p>
-                </div>
-              </div>
+            <CardContent>
+              <AddressInput
+                value={clientAddress}
+                onChange={(address) => {
+                  setClientAddress(address);
+                  setHasChanges(true);
+                }}
+                defaultCountry="US"
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -815,13 +837,39 @@ export function ClientConfiguration() {
         {/* Account Team Tab */}
         <TabsContent value="account" className="space-y-6">
           <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100">
-            <div className="flex items-start gap-3">
-              <Users className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1">Account Team</h3>
-                <p className="text-sm text-gray-700">
-                  Key contacts managing this client relationship
-                </p>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <Users className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Account Team</h3>
+                  <p className="text-sm text-gray-700">
+                    Key contacts managing this client relationship
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                {hasChanges && (
+                  <Badge variant="outline" className="border-amber-500 text-amber-700">
+                    Unsaved Changes
+                  </Badge>
+                )}
+                <Button
+                  onClick={validateAndSave}
+                  disabled={isSaving || !hasChanges}
+                  className="bg-[#D91C81] hover:bg-[#B01669] text-white"
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Changes
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
           </div>
@@ -841,9 +889,9 @@ export function ClientConfiguration() {
                     Account Manager Name
                   </label>
                   <Input
-                    value={accountManager}
+                    value={clientAccountManager}
                     onChange={(e) => {
-                      setAccountManager(e.target.value);
+                      setClientAccountManager(e.target.value);
                       setHasChanges(true);
                     }}
                     placeholder="Sarah Williams"
@@ -856,9 +904,9 @@ export function ClientConfiguration() {
                   </label>
                   <Input
                     type="email"
-                    value={accountManagerEmail}
+                    value={clientAccountManagerEmail}
                     onChange={(e) => {
-                      setAccountManagerEmail(e.target.value);
+                      setClientAccountManagerEmail(e.target.value);
                       setHasChanges(true);
                     }}
                     placeholder="sarah@halo.com"
@@ -883,9 +931,9 @@ export function ClientConfiguration() {
                     Implementation Manager Name
                   </label>
                   <Input
-                    value={implementationManager}
+                    value={clientImplementationManager}
                     onChange={(e) => {
-                      setImplementationManager(e.target.value);
+                      setClientImplementationManager(e.target.value);
                       setHasChanges(true);
                     }}
                     placeholder="Michael Chen"
@@ -898,9 +946,9 @@ export function ClientConfiguration() {
                   </label>
                   <Input
                     type="email"
-                    value={implementationManagerEmail}
+                    value={clientImplementationManagerEmail}
                     onChange={(e) => {
-                      setImplementationManagerEmail(e.target.value);
+                      setClientImplementationManagerEmail(e.target.value);
                       setHasChanges(true);
                     }}
                     placeholder="michael@halo.com"
@@ -956,13 +1004,39 @@ export function ClientConfiguration() {
         {/* App Settings Tab */}
         <TabsContent value="app-settings" className="space-y-6">
           <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-100">
-            <div className="flex items-start gap-3">
-              <Settings className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1">Application Settings</h3>
-                <p className="text-sm text-gray-700">
-                  Configure URLs, authentication, and application behavior
-                </p>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <Settings className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Application Settings</h3>
+                  <p className="text-sm text-gray-700">
+                    Configure URLs, authentication, and application behavior
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                {hasChanges && (
+                  <Badge variant="outline" className="border-amber-500 text-amber-700">
+                    Unsaved Changes
+                  </Badge>
+                )}
+                <Button
+                  onClick={validateAndSave}
+                  disabled={isSaving || !hasChanges}
+                  className="bg-[#D91C81] hover:bg-[#B01669] text-white"
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Changes
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
           </div>
@@ -996,9 +1070,9 @@ export function ClientConfiguration() {
                   Custom Domain URL <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                 </label>
                 <Input
-                  value={customUrl}
+                  value={clientCustomUrl}
                   onChange={(e) => {
-                    setCustomUrl(e.target.value);
+                    setClientCustomUrl(e.target.value);
                     setHasChanges(true);
                   }}
                   placeholder="https://gifts.acme.com"
@@ -1022,9 +1096,9 @@ export function ClientConfiguration() {
                   Authentication Method
                 </label>
                 <select
-                  value={authenticationMethod}
+                  value={clientAuthenticationMethod}
                   onChange={(e) => {
-                    setAuthenticationMethod(e.target.value);
+                    setClientAuthenticationMethod(e.target.value);
                     setHasChanges(true);
                   }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -1047,9 +1121,9 @@ export function ClientConfiguration() {
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input 
                     type="checkbox"
-                    checked={allowSessionTimeoutExtend}
+                    checked={clientAllowSessionTimeoutExtend}
                     onChange={(e) => {
-                      setAllowSessionTimeoutExtend(e.target.checked);
+                      setClientAllowSessionTimeoutExtend(e.target.checked);
                       setHasChanges(true);
                     }}
                     className="sr-only peer" 
@@ -1077,9 +1151,9 @@ export function ClientConfiguration() {
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input 
                     type="checkbox"
-                    checked={hasEmployeeData}
+                    checked={clientHasEmployeeData}
                     onChange={(e) => {
-                      setHasEmployeeData(e.target.checked);
+                      setClientHasEmployeeData(e.target.checked);
                       setHasChanges(true);
                     }}
                     className="sr-only peer" 
@@ -1094,13 +1168,39 @@ export function ClientConfiguration() {
         {/* Billing Tab */}
         <TabsContent value="billing" className="space-y-6">
           <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl p-4 border border-amber-100">
-            <div className="flex items-start gap-3">
-              <CreditCard className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1">Billing Configuration</h3>
-                <p className="text-sm text-gray-700">
-                  Invoice settings and purchase order information
-                </p>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <CreditCard className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Billing Configuration</h3>
+                  <p className="text-sm text-gray-700">
+                    Invoice settings and purchase order information
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                {hasChanges && (
+                  <Badge variant="outline" className="border-amber-500 text-amber-700">
+                    Unsaved Changes
+                  </Badge>
+                )}
+                <Button
+                  onClick={validateAndSave}
+                  disabled={isSaving || !hasChanges}
+                  className="bg-[#D91C81] hover:bg-[#B01669] text-white"
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Changes
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
           </div>
@@ -1120,9 +1220,9 @@ export function ClientConfiguration() {
                     Invoice Type
                   </label>
                   <select
-                    value={invoiceType}
+                    value={clientInvoiceType}
                     onChange={(e) => {
-                      setInvoiceType(e.target.value);
+                      setClientInvoiceType(e.target.value);
                       setHasChanges(true);
                     }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -1145,9 +1245,9 @@ export function ClientConfiguration() {
                     Invoice Template Type
                   </label>
                   <select
-                    value={invoiceTemplateType}
+                    value={clientInvoiceTemplateType}
                     onChange={(e) => {
-                      setInvoiceTemplateType(e.target.value);
+                      setClientInvoiceTemplateType(e.target.value);
                       setHasChanges(true);
                     }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -1178,9 +1278,9 @@ export function ClientConfiguration() {
                     PO Type <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
-                    value={poType}
+                    value={clientPoType}
                     onChange={(e) => {
-                      setPoType(e.target.value);
+                      setClientPoType(e.target.value);
                       setHasChanges(true);
                     }}
                     placeholder="Standard, Blanket, etc."
@@ -1192,9 +1292,9 @@ export function ClientConfiguration() {
                     PO Number <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
-                    value={poNumber}
+                    value={clientPoNumber}
                     onChange={(e) => {
-                      setPoNumber(e.target.value);
+                      setClientPoNumber(e.target.value);
                       setHasChanges(true);
                     }}
                     placeholder="PO-2026-12345"
@@ -1208,13 +1308,39 @@ export function ClientConfiguration() {
         {/* Integrations Tab */}
         <TabsContent value="integrations" className="space-y-6">
           <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl p-4 border border-indigo-100">
-            <div className="flex items-start gap-3">
-              <Link2 className="w-5 h-5 text-indigo-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1">System Integrations</h3>
-                <p className="text-sm text-gray-700">
-                  Connect with ERP, SSO, and HRIS systems
-                </p>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <Link2 className="w-5 h-5 text-indigo-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">System Integrations</h3>
+                  <p className="text-sm text-gray-700">
+                    Connect with ERP, SSO, and HRIS systems
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                {hasChanges && (
+                  <Badge variant="outline" className="border-amber-500 text-amber-700">
+                    Unsaved Changes
+                  </Badge>
+                )}
+                <Button
+                  onClick={validateAndSave}
+                  disabled={isSaving || !hasChanges}
+                  className="bg-[#D91C81] hover:bg-[#B01669] text-white"
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Changes
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
           </div>
@@ -1233,15 +1359,15 @@ export function ClientConfiguration() {
                   ERP System
                 </label>
                 <select
-                  value={erpSystem}
+                  value={clientErpSystem}
                   onChange={(e) => {
-                    setErpSystem(e.target.value);
+                    setClientErpSystem(e.target.value);
                     setHasChanges(true);
                   }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
                 >
                   <option value="">Select ERP System</option>
-                  <option value="NAJ">NAJ</option>
+                  <option value="NXJ">NXJ</option>
                   <option value="Fourgen">Fourgen</option>
                   <option value="Netsuite">Netsuite</option>
                   <option value="GRS">GRS</option>
@@ -1268,9 +1394,9 @@ export function ClientConfiguration() {
                   SSO Provider <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                 </label>
                 <Input
-                  value={sso}
+                  value={clientSso}
                   onChange={(e) => {
-                    setSso(e.target.value);
+                    setClientSso(e.target.value);
                     setHasChanges(true);
                   }}
                   placeholder="Azure AD, Okta, OneLogin, etc."
@@ -1279,34 +1405,114 @@ export function ClientConfiguration() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-purple-600" />
-                HRIS Integration
-              </CardTitle>
-              <CardDescription>Human Resources Information System connection</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        {/* SFTP Tab */}
+        <TabsContent value="sftp" className="space-y-6">
+          <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-xl p-4 border border-cyan-100">
+            <div className="flex items-start gap-3">
+              <Server className="w-5 h-5 text-cyan-600 mt-0.5 flex-shrink-0" />
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  HRIS System <span className="text-gray-400 font-normal ml-1">(Optional)</span>
-                </label>
-                <Input
-                  value={hrisSystem}
-                  onChange={(e) => {
-                    setHrisSystem(e.target.value);
-                    setHasChanges(true);
-                  }}
-                  placeholder="Workday, ADP, BambooHR, etc."
-                />
-                <p className="text-xs text-gray-500 mt-1">HR system for employee data sync</p>
+                <h3 className="font-semibold text-gray-900 mb-1">SFTP Employee Data Import</h3>
+                <p className="text-sm text-gray-700">
+                  Configure automated employee data imports from your SFTP server. This setting applies to all sites under this client.
+                </p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+
+          <SFTPConfiguration 
+            client={{ id: clientId || '', name: clientName }}
+            onConfigUpdated={() => {
+              toast.success('SFTP configuration updated');
+            }}
+          />
         </TabsContent>
       </Tabs>
+
+      {/* Portal Tab - only in embedded mode */}
+      {embedded && activeTab === 'portal' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900 mb-1">Client Portal</h2>
+                  <p className="text-sm text-gray-600">View and manage the dedicated client portal page</p>
+                </div>
+                <div className="flex gap-3">
+                  <Button
+                    onClick={() => window.open('/client-portal', '_blank')}
+                    variant="outline"
+                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                  >
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    View Portal
+                  </Button>
+                  <Button
+                    onClick={() => void navigate('/client-portal')}
+                    className="bg-[#D91C81] hover:bg-[#B01669] text-white"
+                  >
+                    <Settings className="w-4 h-4 mr-2" />
+                    Edit Portal
+                  </Button>
+                </div>
+              </div>
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  The client portal is a dedicated page where clients can access their specific information, 
+                  reports, and resources. Use the editor to customize content, branding, and features.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+      {/* Sites Tab - only in embedded mode */}
+      {embedded && activeTab === 'sites' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900">Sites for {clientName}</h2>
+            <Button
+              onClick={() => void navigate(`/admin/sites?client=${clientId}`)}
+              className="bg-[#D91C81] hover:bg-[#B01669] text-white"
+            >
+              Manage Sites
+            </Button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {sites.length === 0 ? (
+              <div className="col-span-full text-center py-12 bg-white rounded-xl border border-gray-200">
+                <Globe className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Sites</h3>
+                <p className="text-gray-600 mb-6">This client doesn't have any sites yet.</p>
+                <Button
+                  onClick={() => void navigate(`/admin/sites?client=${clientId}`)}
+                  className="bg-[#D91C81] hover:bg-[#B01669] text-white"
+                >
+                  Add Site
+                </Button>
+              </div>
+            ) : (
+              sites.map((site) => (
+                <div
+                  key={site.id}
+                  className="bg-white rounded-xl border border-gray-200 p-4 hover:border-[#D91C81] transition-colors cursor-pointer"
+                  onClick={() => void navigate(`/admin/sites?site=${site.id}`)}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="font-semibold text-gray-900">{site.name}</h3>
+                    <div className={`w-2 h-2 rounded-full ${
+                      site.isActive ? 'bg-green-500' : 'bg-gray-400'
+                    }`} />
+                  </div>
+                  <p className="text-sm text-gray-600">Status: {site.status}</p>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

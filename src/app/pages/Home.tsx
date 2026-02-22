@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Building2, User, Gift, ArrowRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { Link } from 'react-router';

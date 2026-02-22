@@ -106,7 +106,7 @@ function sanitizeData(data: any): any {
     return data.replace(/\0/g, '').trim();
   }
   if (typeof data === 'object' && data !== null) {
-    const sanitized: any = Array.isArray(data) ? [] : {};
+    const sanitized: Record<string, unknown> | unknown[] = Array.isArray(data) ? [] : {};
     for (const key in data) {
       sanitized[key] = sanitizeData(data[key]);
     }

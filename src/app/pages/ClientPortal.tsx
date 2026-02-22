@@ -1,15 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router';
 import { 
-  Clock, 
-  Search, 
-  AlertCircle, 
-  Gift, 
   Calendar, 
-  Heart, 
-  MessageCircle, 
-  ChevronRight, 
-  Plus, 
   Loader2, 
   Lock, 
   Building2, 
@@ -19,9 +11,10 @@ import {
   ExternalLink 
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { logger } from '../utils/logger';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';
-import { projectId, publicAnonKey } from '../../../utils/supabase/info';
+import { publicAnonKey } from '../../../utils/supabase/info';
+import { useLanguage } from '../context/LanguageContext';
+import { useDateFormat } from '../hooks/useDateFormat';
 
 interface Site {
   id: string;
@@ -49,6 +42,8 @@ interface Client {
 export default function ClientPortal() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { t } = useLanguage();
+  const { formatShortDate } = useDateFormat();
   const [sites, setSites] = useState<Site[]>([]);
   const [client, setClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);
@@ -58,8 +53,8 @@ export default function ClientPortal() {
   // Check authentication - only client_admin role should access this
   useEffect(() => {
     if (!token) {
-      toast.error('Please log in to access the client portal');
-      navigate('/admin/login');
+      toast.error(t('notification.error.loginRequired'));
+      void navigate('/admin/login');
       return;
     }
 
@@ -122,7 +117,7 @@ export default function ClientPortal() {
       } catch (err: any) {
         console.error('Error fetching client data:', err);
         setError(err.message || 'Failed to load client data');
-        toast.error('Failed to load your sites');
+        toast.error(t('notification.error.failedToLoadSites'));
       } finally {
         setLoading(false);
       }
@@ -298,7 +293,7 @@ export default function ClientPortal() {
                     )}
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <Calendar className="w-4 h-4 flex-shrink-0" />
-                      <span>Created {new Date(site.createdAt).toLocaleDateString()}</span>
+                      <span>Created {formatShortDate(new Date(site.createdAt))}</span>
                     </div>
                   </div>
 

@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { ReactNode } from 'react';
 import { AuthProvider, useAuth, User } from '../AuthContext';
 import { logSecurityEvent, startSessionTimer, clearSessionTimer, resetSessionTimer } from '../../utils/security';

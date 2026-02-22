@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams, Link } from 'react-router';
 import { Shield, Lock, Eye, EyeOff, CheckCircle, Loader2, AlertCircle, XCircle } from 'lucide-react';
 import { EnvironmentBadge } from '../../components/EnvironmentBadge';
 import { BackendConnectionStatus } from '../../components/BackendConnectionStatus';
-import { sanitizeString, logSecurityEvent } from '../../utils/frontendSecurity';
+import { logSecurityEvent } from '../../utils/frontendSecurity';
 import { showErrorToast, showSuccessToast } from '../../utils/errorHandling';
 import { Alert } from '../../components/Alert';
 import { logger } from '../../utils/logger';
@@ -170,7 +170,7 @@ export default function ResetPassword() {
 
       // Redirect to login after 3 seconds
       setTimeout(() => {
-        navigate('/admin/login');
+        void navigate('/admin/login');
       }, 3000);
 
     } catch (err: any) {
@@ -331,7 +331,7 @@ export default function ResetPassword() {
         </div>
 
         {/* Reset Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={() => void handleSubmit()} className="space-y-6">
           {/* New Password Field */}
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">

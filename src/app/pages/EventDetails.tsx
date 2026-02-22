@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate, Link } from "react-router";
+import { useParams, Link } from "react-router";
 import { getEventById, getGiftsByEventId } from "../data/mockData";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
@@ -9,19 +9,14 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { ProductCard } from "../components/ProductCard";
 import { 
   Calendar, 
-  MapPin, 
   Users, 
   Gift, 
   DollarSign, 
   Share2, 
   Heart, 
   ArrowLeft,
-  CheckCircle,
-  Clock,
-  TrendingUp,
   Check
 } from "lucide-react";
 import { format } from "date-fns";
@@ -124,7 +119,7 @@ export function EventDetails() {
   };
 
   const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
+    void navigator.clipboard.writeText(window.location.href);
     toast.success("Link copied to clipboard!");
   };
 

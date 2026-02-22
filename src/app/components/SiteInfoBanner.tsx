@@ -30,7 +30,7 @@ export function SiteInfoBanner({
   };
 
   const handleChangeSite = () => {
-    navigate('/site-selection');
+    void navigate('/site-selection');
   };
 
   if (isDismissed) {

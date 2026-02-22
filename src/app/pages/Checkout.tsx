@@ -1,30 +1,54 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
 import { useCart } from '../context/CartContext';
-import { toast } from 'sonner';
+import { useSite } from '../context/SiteContext';
+import { useShippingConfig } from '../context/ShippingConfigContext';
 import { Trash2, ArrowLeft, CreditCard, Building2, User, Minus, Plus } from 'lucide-react';
-import { Button } from '../components/ui/button';
+import { PhoneInput } from '../components/ui/phone-input';
+import { AddressInput, AddressData } from '../components/ui/address-input';
+import { CurrencyDisplay } from '../components/CurrencyDisplay';
+import { useLanguage } from '../context/LanguageContext';
 
 export function Checkout() {
   const { items, removeFromCart, updateQuantity, totalPrice, clearCart, shippingType } = useCart();
+  const { currentSite } = useSite();
+  const { getConfigBySiteId } = useShippingConfig();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Get shipping config for current site
+  const shippingConfig = currentSite ? getConfigBySiteId(currentSite.id) : undefined;
+  const enableAutocomplete = shippingConfig?.addressValidation?.enableAutocomplete !== false; // Default to true
 
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
-    address: '',
+    companyName: shippingType === 'company' ? '' : undefined,
+  });
+
+  const [shippingAddress, setShippingAddress] = useState<AddressData>({
+    line1: '',
+    line2: '',
+    line3: '',
     city: '',
     state: '',
-    zipCode: '',
-    companyName: shippingType === 'company' ? '' : undefined,
+    postalCode: '',
+    country: 'United States',
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handlePhoneChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      phone: value,
     }));
   };
 
@@ -38,7 +62,7 @@ export function Checkout() {
     const orderId = Math.random().toString(36).substring(2, 9).toUpperCase();
     clearCart();
     setIsProcessing(false);
-    navigate(`/order-confirmation/${orderId}`);
+    void navigate(`/order-confirmation/${orderId}`);
   };
 
   if (items.length === 0) {
@@ -77,7 +101,7 @@ export function Checkout() {
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Form Section */}
         <div className="lg:col-span-2">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={() => void handleSubmit()} className="space-y-6">
             {/* Shipping Type */}
             {shippingType && (
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center gap-3">
@@ -133,13 +157,13 @@ export function Checkout() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Phone Number *
                   </label>
-                  <input
-                    type="tel"
+                  <PhoneInput
                     name="phone"
-                    required
                     value={formData.phone}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                    onChange={handlePhoneChange}
+                    defaultCountry="US"
+                    placeholder={t('form.enterPhone')}
+                    required
                   />
                 </div>
                 {shippingType === 'company' && (
@@ -163,62 +187,13 @@ export function Checkout() {
             {/* Shipping Address */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Shipping Address</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Street Address *
-                  </label>
-                  <input
-                    type="text"
-                    name="address"
-                    required
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                  />
-                </div>
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      City *
-                    </label>
-                    <input
-                      type="text"
-                      name="city"
-                      required
-                      value={formData.city}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      State *
-                    </label>
-                    <input
-                      type="text"
-                      name="state"
-                      required
-                      value={formData.state}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      ZIP Code *
-                    </label>
-                    <input
-                      type="text"
-                      name="zipCode"
-                      required
-                      value={formData.zipCode}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-              </div>
+              <AddressInput
+                value={shippingAddress}
+                onChange={setShippingAddress}
+                defaultCountry="US"
+                required={true}
+                enableAutocomplete={enableAutocomplete}
+              />
             </div>
 
             {/* Payment (Mock) */}
@@ -242,7 +217,11 @@ export function Checkout() {
               disabled={isProcessing}
               className="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {isProcessing ? 'Processing...' : `Place Order - $${finalTotal.toFixed(2)}`}
+              {isProcessing ? 'Processing...' : (
+                <>
+                  Place Order - <CurrencyDisplay amount={finalTotal} />
+                </>
+              )}
             </button>
           </form>
         </div>
@@ -262,7 +241,7 @@ export function Checkout() {
                   />
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-sm text-gray-900 truncate">{item.name}</h3>
-                    <p className="text-sm text-gray-600">${item.price}</p>
+                    <p className="text-sm text-gray-600"><CurrencyDisplay amount={item.price} /></p>
                     <div className="flex items-center gap-2 mt-2">
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
@@ -292,19 +271,19 @@ export function Checkout() {
             <div className="border-t border-gray-200 pt-4 space-y-2">
               <div className="flex justify-between text-gray-700">
                 <span>Subtotal</span>
-                <span>${totalPrice.toFixed(2)}</span>
+                <span><CurrencyDisplay amount={totalPrice} /></span>
               </div>
               <div className="flex justify-between text-gray-700">
                 <span>Shipping</span>
-                <span>{shippingCost === 0 ? 'FREE' : `$${shippingCost.toFixed(2)}`}</span>
+                <span>{shippingCost === 0 ? 'FREE' : <CurrencyDisplay amount={shippingCost} />}</span>
               </div>
               <div className="flex justify-between text-gray-700">
                 <span>Tax (8%)</span>
-                <span>${tax.toFixed(2)}</span>
+                <span><CurrencyDisplay amount={tax} /></span>
               </div>
               <div className="border-t border-gray-200 pt-2 flex justify-between font-bold text-lg text-gray-900">
                 <span>Total</span>
-                <span>${finalTotal.toFixed(2)}</span>
+                <span><CurrencyDisplay amount={finalTotal} /></span>
               </div>
             </div>
           </div>

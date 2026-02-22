@@ -6,23 +6,16 @@ import {
   Users, 
   Upload, 
   Download, 
-  Trash2, 
-  Filter, 
-  Search, 
-  UserPlus,
-  AlertCircle,
+  Search,
   MapPin,
   Server,
   Database,
-  FileText,
   Building2,
   RefreshCw
 } from 'lucide-react';
-import { toast } from 'sonner';
 import { useSite } from '../../context/SiteContext';
 import { apiRequest } from '../../utils/api';
 import { showSuccessToast, showErrorToast } from '../../utils/errorHandling';
-import { logger } from '../../utils/logger';
 import { ManualEmployeeUpload } from '../../components/admin/ManualEmployeeUpload';
 import { SFTPConfiguration } from '../../components/admin/SFTPConfiguration';
 import { HRISIntegrationTab } from '../../components/admin/HRISIntegrationTab';
@@ -193,7 +186,7 @@ export function EmployeeManagement() {
           <Button
             variant="outline"
             size="sm"
-            onClick={loadEmployees}
+            onClick={() => void loadEmployees()}
             className="gap-2"
           >
             <RefreshCw className="w-4 h-4" />
@@ -469,21 +462,21 @@ export function EmployeeManagement() {
         <SiteMappingRules 
           client={currentClient} 
           sites={sites} 
-          onRulesUpdated={loadEmployees}
+          onRulesUpdated={() => void loadEmployees()}
         />
       )}
 
       {activeTab === 'manual' && (
         <ManualEmployeeUpload 
           client={currentClient} 
-          onUploadComplete={loadEmployees}
+          onUploadComplete={() => void loadEmployees()}
         />
       )}
 
       {activeTab === 'sftp' && (
         <SFTPConfiguration 
           client={currentClient}
-          onConfigUpdated={loadEmployees}
+          onConfigUpdated={() => void loadEmployees()}
         />
       )}
 
@@ -491,7 +484,7 @@ export function EmployeeManagement() {
         <HRISIntegrationTab
           client={currentClient}
           sites={sites.map(s => ({ ...s, isActive: s.status === 'active' })) as any}
-          onSyncComplete={loadEmployees}
+          onSyncComplete={() => void loadEmployees()}
         />
       )}
     </div>

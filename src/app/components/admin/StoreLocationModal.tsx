@@ -4,9 +4,10 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Switch } from '../ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { PhoneInput } from '../ui/phone-input';
+import { AddressInput, AddressData } from '../ui/address-input';
 import { Store, MapPin } from 'lucide-react';
-import { countries } from '../../utils/countries';
+import { useLanguage } from '../../context/LanguageContext';
 
 // Local interface for this component (different from admin.ts StoreLocation)
 export interface StoreLocation {
@@ -22,8 +23,6 @@ export interface StoreLocation {
   isActive: boolean;
 }
 
-type StoreLocationValue = string | boolean;
-
 interface StoreLocationModalProps {
   open: boolean;
   onClose: () => void;
@@ -32,44 +31,82 @@ interface StoreLocationModalProps {
 }
 
 export function StoreLocationModal({ open, onClose, store, onSave }: StoreLocationModalProps) {
-  const [formData, setFormData] = useState<StoreLocation>({
+  const { t } = useLanguage();
+  const [formData, setFormData] = useState({
     id: '',
     name: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: 'US',
     phone: '',
     hours: '',
     isActive: true
   });
 
+  const [storeAddress, setStoreAddress] = useState<AddressData>({
+    line1: '',
+    line2: '',
+    line3: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    country: 'United States',
+  });
+
   useEffect(() => {
     if (store) {
-      setFormData(store);
+      setFormData({
+        id: store.id || '',
+        name: store.name,
+        phone: store.phone,
+        hours: store.hours || '',
+        isActive: store.isActive
+      });
+      setStoreAddress({
+        line1: store.address || '',
+        line2: '',
+        line3: '',
+        city: store.city || '',
+        state: store.state || '',
+        postalCode: store.zipCode || '',
+        country: store.country || 'United States',
+      });
     } else {
       setFormData({
         id: `store-${Date.now()}`,
         name: '',
-        address: '',
-        city: '',
-        state: '',
-        zipCode: '',
-        country: 'US',
         phone: '',
         hours: '',
         isActive: true
       });
+      setStoreAddress({
+        line1: '',
+        line2: '',
+        line3: '',
+        city: '',
+        state: '',
+        postalCode: '',
+        country: 'United States',
+      });
     }
   }, [store, open]);
 
-  const handleChange = (field: keyof StoreLocation, value: StoreLocationValue) => {
+  const handleChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = () => {
-    onSave(formData);
+    // Map AddressData back to StoreLocation format
+    const storeData: StoreLocation = {
+      id: formData.id,
+      name: formData.name,
+      address: storeAddress.line1,
+      city: storeAddress.city,
+      state: storeAddress.state || '',
+      zipCode: storeAddress.postalCode,
+      country: storeAddress.country,
+      phone: formData.phone,
+      hours: formData.hours,
+      isActive: formData.isActive
+    };
+    onSave(storeData);
     onClose();
   };
 
@@ -104,74 +141,15 @@ export function StoreLocationModal({ open, onClose, store, onSave }: StoreLocati
 
           {/* Address */}
           <div>
-            <Label htmlFor="address">
-              Street Address <span className="text-red-500">*</span>
+            <Label className="mb-2 block">
+              Store Address <span className="text-red-500">*</span>
             </Label>
-            <Input
-              id="address"
-              value={formData.address}
-              onChange={(e) => handleChange('address', e.target.value)}
-              placeholder="123 Main Street"
+            <AddressInput
+              value={storeAddress}
+              onChange={setStoreAddress}
+              defaultCountry="US"
+              required={true}
             />
-          </div>
-
-          {/* City, State, Zip */}
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="city">
-                City <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="city"
-                value={formData.city}
-                onChange={(e) => handleChange('city', e.target.value)}
-                placeholder="New York"
-              />
-            </div>
-            <div>
-              <Label htmlFor="state">
-                State/Province <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="state"
-                value={formData.state}
-                onChange={(e) => handleChange('state', e.target.value)}
-                placeholder="NY"
-              />
-            </div>
-            <div>
-              <Label htmlFor="zipCode">
-                Zip/Postal Code <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="zipCode"
-                value={formData.zipCode}
-                onChange={(e) => handleChange('zipCode', e.target.value)}
-                placeholder="10001"
-              />
-            </div>
-          </div>
-
-          {/* Country */}
-          <div>
-            <Label htmlFor="country">
-              Country <span className="text-red-500">*</span>
-            </Label>
-            <Select
-              value={formData.country}
-              onValueChange={(value) => handleChange('country', value)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {countries.map((country) => (
-                  <SelectItem key={country.code} value={country.code}>
-                    {country.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
 
           {/* Phone */}
@@ -179,12 +157,13 @@ export function StoreLocationModal({ open, onClose, store, onSave }: StoreLocati
             <Label htmlFor="phone">
               Phone Number <span className="text-red-500">*</span>
             </Label>
-            <Input
+            <PhoneInput
               id="phone"
-              type="tel"
               value={formData.phone}
-              onChange={(e) => handleChange('phone', e.target.value)}
-              placeholder="(555) 123-4567"
+              onChange={(value) => handleChange('phone', value)}
+              defaultCountry="US"
+              placeholder={t('form.enterPhone')}
+              required
             />
           </div>
 
@@ -225,9 +204,10 @@ export function StoreLocationModal({ open, onClose, store, onSave }: StoreLocati
                 {formData.name && (
                   <div className="space-y-1">
                     <p className="font-medium">{formData.name}</p>
-                    {formData.address && <p>{formData.address}</p>}
-                    {(formData.city || formData.state || formData.zipCode) && (
-                      <p>{formData.city}{formData.state ? `, ${formData.state}` : ''} {formData.zipCode}</p>
+                    {storeAddress.line1 && <p>{storeAddress.line1}</p>}
+                    {storeAddress.line2 && <p>{storeAddress.line2}</p>}
+                    {(storeAddress.city || storeAddress.state || storeAddress.postalCode) && (
+                      <p>{storeAddress.city}{storeAddress.state ? `, ${storeAddress.state}` : ''} {storeAddress.postalCode}</p>
                     )}
                     {formData.phone && <p>{formData.phone}</p>}
                     {formData.hours && <p className="text-xs mt-1">{formData.hours}</p>}
@@ -248,7 +228,7 @@ export function StoreLocationModal({ open, onClose, store, onSave }: StoreLocati
           <Button
             onClick={handleSubmit}
             className="bg-[#D91C81] hover:bg-[#B01669] text-white"
-            disabled={!formData.name || !formData.address || !formData.city || !formData.state || !formData.zipCode || !formData.phone}
+            disabled={!formData.name || !storeAddress.line1 || !storeAddress.city || !storeAddress.postalCode || !formData.phone}
           >
             {store ? 'Update Location' : 'Add Location'}
           </Button>

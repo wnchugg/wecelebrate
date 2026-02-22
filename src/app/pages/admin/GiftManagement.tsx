@@ -3,14 +3,12 @@ import { Link } from 'react-router';
 import { Gift } from '../../../types';
 import { apiRequest } from '../../utils/api';
 import { CreateGiftModal } from '../../components/admin/CreateGiftModal';
-import { GiftDetailModal } from '../../components/admin/GiftDetailModal';
-import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Checkbox } from '../../components/ui/checkbox';
-import { Package, Plus, Search, Filter, Grid, List, Edit2, Trash2, Eye, MoreVertical, RefreshCw, Loader2, X, Upload, CheckCircle, XCircle, DollarSign, Tag } from 'lucide-react';
-import { showErrorToast, showSuccessToast, showWarningToast } from '../../utils/errorHandling';
+import { Package, Plus, Search, Grid, List, Edit2, Trash2, Upload, CheckCircle, XCircle, DollarSign, Tag } from 'lucide-react';
+import { showErrorToast, showSuccessToast } from '../../utils/errorHandling';
 import { logger } from '../../utils/logger';
 import { parseError } from '../../utils/apiErrors';
 
@@ -332,7 +330,7 @@ export function GiftManagement() {
             <Button
               variant="destructive"
               size="sm"
-              onClick={handleBulkDelete}
+              onClick={() => void handleBulkDelete()}
               disabled={isDeletingBulk}
             >
               <Trash2 className="w-4 h-4 mr-2" />
@@ -437,7 +435,7 @@ export function GiftManagement() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleDelete(gift.id, gift.name)}
+                    onClick={() => void handleDelete(gift.id, gift.name)}
                     className="text-red-600 hover:text-red-700 hover:bg-red-50"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -518,7 +516,7 @@ export function GiftManagement() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDelete(gift.id, gift.name)}
+                        onClick={() => void handleDelete(gift.id, gift.name)}
                         className="text-red-600 hover:text-red-700 hover:bg-red-50"
                       >
                         <Trash2 className="w-4 h-4" />

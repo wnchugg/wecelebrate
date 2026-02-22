@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Shield, Lock, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { sanitizeInput } from '../../utils/security';
-import { showErrorToast, showSuccessToast } from '../../utils/errorHandling';
+import { showSuccessToast } from '../../utils/errorHandling';
 import { projectId, publicAnonKey } from '../../../../utils/supabase/info';
 
 export function BootstrapAdmin() {
@@ -69,7 +68,7 @@ export function BootstrapAdmin() {
       
       // Redirect to login after 1 second
       setTimeout(() => {
-        navigate('/admin/login');
+        void navigate('/admin/login');
       }, 1000);
     } catch (error: unknown) {
       console.error('Bootstrap error:', error);
@@ -112,7 +111,7 @@ export function BootstrapAdmin() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={() => void handleSubmit()} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Email Address
@@ -189,7 +188,7 @@ export function BootstrapAdmin() {
 
         <div className="mt-6 text-center">
           <button
-            onClick={() => navigate('/admin/login')}
+            onClick={() => void navigate('/admin/login')}
             className="text-[#D91C81] hover:text-[#B71569] text-sm font-medium"
           >
             ← Back to Login

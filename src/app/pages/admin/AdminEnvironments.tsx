@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
-import { Server, Globe, CheckCircle, RefreshCw, ArrowLeft } from 'lucide-react';
+import { Server, Globe, CheckCircle, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { DEPLOYMENT_ENVIRONMENTS, getCurrentEnvironment, setCurrentEnvironment } from '../../config/deploymentEnvironments';
 

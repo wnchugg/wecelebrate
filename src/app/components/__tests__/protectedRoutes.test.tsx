@@ -4,12 +4,11 @@
  * Tests for ProtectedRoute and AdminProtectedRoute components
  */
 
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderWithRouter } from '@/test/helpers';
 import { ProtectedRoute } from '../ProtectedRoute';
 import { AuthProvider } from '../../context/AuthContext';
-import { Route } from 'react-router';
 
 // Mock components
 function ProtectedPage() {

@@ -1,4 +1,7 @@
-// @ts-nocheck - This test file has outdated mocks and needs refactoring
+ 
+ 
+ 
+// This test file has outdated mocks and needs refactoring
  
  
  
@@ -7,6 +10,11 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { AccessManagement } from '../AccessManagement';
 import * as employeeApi from '../../../services/employeeApi';
 import * as SiteContext from '../../../context/SiteContext';
+import { LanguageProvider } from '../../../context/LanguageContext';
+
+function renderComponent(ui: React.ReactElement) {
+  return render(<LanguageProvider>{ui}</LanguageProvider>);
+}
 
 // Mock the dependencies
 vi.mock('../../../services/employeeApi');
@@ -86,22 +94,22 @@ describe('AccessManagement Component', () => {
 
   describe('Component Rendering', () => {
     it('should render without crashing', () => {
-      render(<AccessManagement />);
-      // The component should render the validation method selector
-      expect(screen.getByText('Validation Method')).toBeInTheDocument();
+      renderComponent(<AccessManagement />);
+      // The component should render the email management section
+      expect(screen.getByText('Authorized Email Addresses')).toBeInTheDocument();
     });
 
-    it('should show validation method selector', () => {
-      render(<AccessManagement />);
-      expect(screen.getByText('Email Address')).toBeInTheDocument();
-      expect(screen.getByText('Employee ID')).toBeInTheDocument();
-      expect(screen.getByText('Serial Card')).toBeInTheDocument();
+    it('should show email management UI for email validation method', () => {
+      renderComponent(<AccessManagement validationMethod="email" />);
+      expect(screen.getByText('Authorized Email Addresses')).toBeInTheDocument();
+      expect(screen.getByText('Add Email')).toBeInTheDocument();
+      expect(screen.getByText('Import CSV')).toBeInTheDocument();
     });
   });
 
   describe('Employee List Loading', () => {
     it('should load employees on mount', async () => {
-      render(<AccessManagement />);
+      renderComponent(<AccessManagement />);
 
       await waitFor(() => {
         expect(employeeApi.getEmployees).toHaveBeenCalledWith('site-001');
@@ -109,7 +117,7 @@ describe('AccessManagement Component', () => {
     });
 
     it('should display loaded employees', async () => {
-      render(<AccessManagement />);
+      renderComponent(<AccessManagement />);
 
       await waitFor(() => {
         expect(screen.getByText('john.doe@company.com')).toBeInTheDocument();
@@ -118,7 +126,7 @@ describe('AccessManagement Component', () => {
     });
 
     it('should show employee count', async () => {
-      render(<AccessManagement />);
+      renderComponent(<AccessManagement />);
 
       await waitFor(() => {
         expect(screen.getByText(/2 employees/)).toBeInTheDocument();
@@ -128,7 +136,7 @@ describe('AccessManagement Component', () => {
     it('should show empty state when no employees', async () => {
       vi.mocked(employeeApi.getEmployees).mockResolvedValue([]);
       
-      render(<AccessManagement />);
+      renderComponent(<AccessManagement />);
 
       await waitFor(() => {
         expect(screen.getByText('No employees found')).toBeInTheDocument();
@@ -138,7 +146,7 @@ describe('AccessManagement Component', () => {
 
   describe('Allowed Domains Management', () => {
     it('should display current allowed domains', async () => {
-      render(<AccessManagement />);
+      renderComponent(<AccessManagement />);
 
       await waitFor(() => {
         const input = screen.getByPlaceholderText(/e.g., company.com/);
@@ -147,7 +155,7 @@ describe('AccessManagement Component', () => {
     });
 
     it('should allow editing allowed domains', async () => {
-      render(<AccessManagement />);
+      renderComponent(<AccessManagement />);
 
       await waitFor(() => {
         const input = screen.getByPlaceholderText(/e.g., company.com/);
@@ -157,7 +165,7 @@ describe('AccessManagement Component', () => {
     });
 
     it('should have save button for allowed domains', () => {
-      render(<AccessManagement />);
+      renderComponent(<AccessManagement />);
       
       const saveButtons = screen.getAllByText('Save');
       expect(saveButtons.length).toBeGreaterThan(0);
@@ -166,12 +174,12 @@ describe('AccessManagement Component', () => {
 
   describe('Search Functionality', () => {
     it('should have search input', () => {
-      render(<AccessManagement />);
+      renderComponent(<AccessManagement />);
       expect(screen.getByPlaceholderText(/Search email addresses/)).toBeInTheDocument();
     });
 
     it('should filter employees by search query', async () => {
-      render(<AccessManagement />);
+      renderComponent(<AccessManagement />);
 
       await waitFor(() => {
         expect(screen.getByText('john.doe@company.com')).toBeInTheDocument();
@@ -187,7 +195,7 @@ describe('AccessManagement Component', () => {
 
   describe('Add Employee Modal', () => {
     it('should open add modal when clicking Add Email button', async () => {
-      render(<AccessManagement />);
+      renderComponent(<AccessManagement />);
 
       await waitFor(() => {
         const addButton = screen.getByRole('button', { name: /Add Email/i });
@@ -200,7 +208,7 @@ describe('AccessManagement Component', () => {
     });
 
     it('should have form fields in add modal', async () => {
-      render(<AccessManagement />);
+      renderComponent(<AccessManagement />);
 
       const addButton = screen.getByRole('button', { name: /Add Email/i });
       fireEvent.click(addButton);
@@ -215,39 +223,35 @@ describe('AccessManagement Component', () => {
 
   describe('Action Buttons', () => {
     it('should have Import CSV button', () => {
-      render(<AccessManagement />);
+      renderComponent(<AccessManagement />);
       expect(screen.getByText('Import CSV')).toBeInTheDocument();
     });
 
     it('should have Download Template button', () => {
-      render(<AccessManagement />);
+      renderComponent(<AccessManagement />);
       expect(screen.getByText('Download Template')).toBeInTheDocument();
     });
 
-    it('should have Configure SFTP button', () => {
-      render(<AccessManagement />);
-      expect(screen.getByText('Configure SFTP')).toBeInTheDocument();
+    it('should have Add Email button', () => {
+      renderComponent(<AccessManagement />);
+      expect(screen.getByText('Add Email')).toBeInTheDocument();
     });
   });
 
-  describe('Validation Method Selection', () => {
-    it('should highlight selected validation method', () => {
-      render(<AccessManagement />);
+  describe('Validation Method Prop', () => {
+    it('should render email management when validation method is email', () => {
+      renderComponent(<AccessManagement validationMethod="email" />);
       
-      // Email should be selected by default
-      const emailButton = screen.getByText('Email Address').closest('button');
-      expect(emailButton).toHaveClass('border-[#D91C81]');
+      expect(screen.getByText('Authorized Email Addresses')).toBeInTheDocument();
     });
 
-    it('should change validation method on click', async () => {
-      render(<AccessManagement />);
-      
-      const employeeIdButton = screen.getByText('Employee ID').closest('button');
-      fireEvent.click(employeeIdButton);
+    it('should accept different validation methods via props', () => {
+      const { rerender } = renderComponent(<AccessManagement validationMethod="email" />);
+      expect(screen.getByText('Authorized Email Addresses')).toBeInTheDocument();
 
-      await waitFor(() => {
-        expect(employeeIdButton).toHaveClass('border-[#D91C81]');
-      });
+      rerender(<LanguageProvider><AccessManagement validationMethod="employeeId" /></LanguageProvider>);
+      // Component should re-render with different validation method
+      expect(screen.queryByText('Authorized Email Addresses')).not.toBeInTheDocument();
     });
   });
 
@@ -255,11 +259,11 @@ describe('AccessManagement Component', () => {
     it('should handle API errors gracefully', async () => {
       vi.mocked(employeeApi.getEmployees).mockRejectedValue(new Error('API Error'));
       
-      render(<AccessManagement />);
+      renderComponent(<AccessManagement />);
 
       await waitFor(() => {
         // Component should still render even with API error
-        expect(screen.getByText('Validation Method')).toBeInTheDocument();
+        expect(screen.getByText('Authorized Email Addresses')).toBeInTheDocument();
       });
     });
   });
@@ -278,7 +282,7 @@ describe('AccessManagement Component', () => {
         deleteClient: vi.fn(),
       });
 
-      render(<AccessManagement />);
+      renderComponent(<AccessManagement />);
       expect(screen.getByText('Please select a site to manage access')).toBeInTheDocument();
     });
   });
@@ -327,7 +331,7 @@ describe('AccessManagement - Employee Operations', () => {
       });
       vi.mocked(employeeApi.createEmployee).mockImplementation(mockCreate);
 
-      render(<AccessManagement />);
+      renderComponent(<AccessManagement />);
 
       // This test verifies the API contract
       expect(mockCreate).not.toHaveBeenCalled();
@@ -344,7 +348,7 @@ describe('AccessManagement - Employee Operations', () => {
       });
       vi.mocked(employeeApi.updateEmployee).mockImplementation(mockUpdate);
 
-      render(<AccessManagement />);
+      renderComponent(<AccessManagement />);
 
       // This test verifies the API contract
       expect(mockUpdate).not.toHaveBeenCalled();
@@ -356,7 +360,7 @@ describe('AccessManagement - Employee Operations', () => {
       const mockDelete = vi.fn().mockResolvedValue(undefined);
       vi.mocked(employeeApi.deleteEmployee).mockImplementation(mockDelete);
 
-      render(<AccessManagement />);
+      renderComponent(<AccessManagement />);
 
       // This test verifies the API contract
       expect(mockDelete).not.toHaveBeenCalled();

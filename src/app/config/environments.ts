@@ -1,7 +1,7 @@
 // Runtime environment configuration for the frontend
 // This allows admins to switch between different backend environments
 
-import { projectId, publicAnonKey } from '../../../utils/supabase/info';
+import { publicAnonKey } from '../../../utils/supabase/info';
 
 export type EnvironmentType = 'development' | 'test' | 'uat' | 'production';
 

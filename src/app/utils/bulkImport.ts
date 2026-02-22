@@ -122,7 +122,7 @@ export async function parseExcelFile(file: File): Promise<any[]> {
         }
         
         // Convert worksheet to JSON
-        const jsonData: any[] = [];
+        const jsonData: Record<string, unknown>[] = [];
         const headers: string[] = [];
         
         // Get headers from first row
@@ -135,7 +135,7 @@ export async function parseExcelFile(file: File): Promise<any[]> {
         worksheet.eachRow((row: any, rowNumber: any) => {
           if (rowNumber === 1) return; // Skip header row
           
-          const rowData: any = {};
+          const rowData: Record<string, unknown> = {};
           row.eachCell((cell: any, colNumber: any) => {
             const header = headers[colNumber - 1];
             if (header) {
@@ -170,8 +170,8 @@ export async function parseExcelFile(file: File): Promise<any[]> {
         }
         
         // Normalize headers
-        const normalizedData = sanitizedData.map((row: any) => {
-          const normalizedRow: any = {};
+        const normalizedData = sanitizedData.map((row: Record<string, unknown>) => {
+          const normalizedRow: Record<string, unknown> = {};
           Object.keys(row).forEach(key => {
             const normalizedKey = key.trim().toLowerCase().replace(/\s+/g, '_');
             normalizedRow[normalizedKey] = row[key];

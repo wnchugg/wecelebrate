@@ -4,7 +4,7 @@
  */
 
 import { apiClient } from '../lib/apiClient';
-import type { Gift, Event, Order, Employee, Site, Client } from '../types';
+import type { Gift, Event, Order, Employee, Site, Client, User } from '../types';
 
 /**
  * Extended API client with convenience methods
@@ -56,7 +56,7 @@ export const apiClientExtended = {
     search?: string;
     limit?: number;
   }): Promise<Gift[]> {
-    const params: any = { page: 1, limit: options?.limit || 1000 };
+    const params: Record<string, unknown> = { page: 1, limit: options?.limit || 1000 };
     
     // Note: The actual filtering would need to be implemented in the backend
     // For now, we'll fetch all and filter client-side
@@ -111,7 +111,7 @@ export const apiClientExtended = {
     endDate?: string;
     limit?: number;
   }): Promise<Order[]> {
-    const params: any = { page: 1, limit: options?.limit || 1000 };
+    const params: Record<string, unknown> = { page: 1, limit: options?.limit || 1000 };
     
     const response = await apiClient.orders.list(params);
     let orders = response.data;
@@ -174,7 +174,7 @@ export const apiClientExtended = {
    * Get current user
    * Note: This would need to be implemented in the backend
    */
-  async getCurrentUser(): Promise<any> {
+  async getCurrentUser(): Promise<User | null> {
     // Placeholder - would need to implement user profile API
     console.warn('getCurrentUser API not implemented yet');
     return null;

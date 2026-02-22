@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AlertTriangle, RefreshCcw } from 'lucide-react';
 import { Button } from './ui/button';
-import { useAdmin } from '../context/AdminContext';
 import { useNavigate } from 'react-router';
 import { clearAccessToken } from '../lib/apiClient';
 import { logger } from '../utils/logger';
@@ -27,7 +26,7 @@ export function TokenErrorHandler() {
       // Show error banner after 2 consecutive 401 errors
       if (errorCount >= 1) {
         logger.log('[TokenErrorHandler] Navigating to login page');
-        navigate('/admin/login');
+        void navigate('/admin/login');
       }
     };
 
@@ -41,7 +40,7 @@ export function TokenErrorHandler() {
   const handleClearTokens = () => {
     logger.log('[TokenErrorHandler] Clearing tokens and redirecting to login');
     clearAccessToken();
-    navigate('/admin/login', { replace: true });
+    void navigate('/admin/login', { replace: true });
   };
 
   if (errorCount < 1) return null;

@@ -16,7 +16,7 @@ export function SystemStatus() {
 
   const checkSystemStatus = async () => {
     setLoading(true);
-    const checks: any = {
+    const checks: Record<string, unknown> = {
       timestamp: new Date().toISOString(),
       environment: {
         current: localStorage.getItem('jala_environment') || 'production',
@@ -100,7 +100,7 @@ export function SystemStatus() {
               <h1 className="text-3xl font-bold text-gray-900 mb-2">JALA 2 System Status</h1>
               <p className="text-gray-600">Diagnostic & Quick Actions</p>
             </div>
-            <Button onClick={checkSystemStatus} variant="outline">
+            <Button onClick={() => void checkSystemStatus()} variant="outline">
               <RefreshCw className="w-4 h-4 mr-2" />
               Refresh
             </Button>
@@ -235,7 +235,7 @@ export function SystemStatus() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {!status.backend.hasData && (
               <Button
-                onClick={() => navigate('/initial-seed')}
+                onClick={() => void navigate('/initial-seed')}
                 className="w-full bg-gradient-to-r from-[#D91C81] to-[#B01669] hover:from-[#B01669] hover:to-[#8B1254] text-white justify-start h-auto py-4"
               >
                 <div className="text-left">
@@ -249,7 +249,7 @@ export function SystemStatus() {
             )}
             
             <Button
-              onClick={() => navigate('/admin/login')}
+              onClick={() => void navigate('/admin/login')}
               variant="outline"
               className="w-full justify-start h-auto py-4"
             >
@@ -263,7 +263,7 @@ export function SystemStatus() {
             </Button>
             
             <Button
-              onClick={() => navigate('/admin/data-diagnostic')}
+              onClick={() => void navigate('/admin/data-diagnostic')}
               variant="outline"
               className="w-full justify-start h-auto py-4"
             >
@@ -277,7 +277,7 @@ export function SystemStatus() {
             </Button>
             
             <Button
-              onClick={() => navigate('/validation-test')}
+              onClick={() => void navigate('/validation-test')}
               variant="outline"
               className="w-full justify-start h-auto py-4"
             >
@@ -291,7 +291,7 @@ export function SystemStatus() {
             </Button>
             
             <Button
-              onClick={() => navigate('/performance-test')}
+              onClick={() => void navigate('/performance-test')}
               variant="outline"
               className="w-full justify-start h-auto py-4"
             >
@@ -305,7 +305,7 @@ export function SystemStatus() {
             </Button>
             
             <Button
-              onClick={() => navigate('/')}
+              onClick={() => void navigate('/')}
               variant="outline"
               className="w-full justify-start h-auto py-4"
             >

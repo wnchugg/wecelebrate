@@ -1,6 +1,6 @@
  
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { GiftSelectionConfiguration } from '../GiftSelectionConfiguration';
 import * as SiteContext from '../../../context/SiteContext';
 import { BrowserRouter } from 'react-router';
@@ -86,6 +86,10 @@ describe('GiftSelectionConfiguration Component', () => {
       updateBrand: vi.fn(),
       deleteBrand: vi.fn(),
       getSitesByBrand: vi.fn(),
+          saveSiteDraft: vi.fn(),
+          publishSite: vi.fn(),
+          discardSiteDraft: vi.fn(),
+          getSiteLive: vi.fn(),
     });
   });
 

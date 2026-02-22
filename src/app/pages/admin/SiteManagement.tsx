@@ -1,7 +1,6 @@
 import { CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router';
-import { toast } from 'sonner';
 import {
   Plus,
   Edit,
@@ -17,8 +16,7 @@ import {
   Building2,
   ImageIcon,
   Upload,
-  X,
-  ChevronDown
+  X
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -26,7 +24,6 @@ import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
 import { Switch } from '../../components/ui/switch';
 import { getPublicSiteUrl } from '../../utils/url';
-import { DeployedDomainBanner } from '../../components/admin/DeployedDomainBanner';
 import {
   Dialog,
   DialogContent,
@@ -35,9 +32,9 @@ import {
   DialogTitle,
 } from '../../components/ui/dialog';
 import { useSite } from '../../context/SiteContext';
-import { apiRequest, getAccessToken } from '../../utils/api';
+import { apiRequest } from '../../utils/api';
 import { showErrorToast, showSuccessToast } from '../../utils/errorHandling';
-import { uploadLogo, isBase64DataUrl, isSupabaseStorageUrl } from '../../utils/storage';
+import { uploadLogo } from '../../utils/storage';
 import { logger } from '../../utils/logger';
 
 interface Client {
@@ -129,7 +126,7 @@ export function SiteManagement() {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
   useEffect(() => {
-    loadData();
+    void loadData();
   }, []);
 
   const loadData = async () => {
@@ -192,7 +189,7 @@ export function SiteManagement() {
       }
       
       showSuccessToast(message);
-      loadData();
+      void loadData();
     } catch (error: unknown) {
       showErrorToast('Failed to update site status', error instanceof Error ? error.message : 'Unknown error');
     }
@@ -212,7 +209,7 @@ export function SiteManagement() {
         body: JSON.stringify(newSite)
       });
       showSuccessToast('Site duplicated successfully');
-      loadData();
+      void loadData();
     } catch (error: unknown) {
       showErrorToast('Failed to duplicate site', error instanceof Error ? error.message : 'Unknown error');
     }
@@ -227,7 +224,7 @@ export function SiteManagement() {
     try {
       await apiRequest(`/v2/sites/${siteId}`, { method: 'DELETE' });
       showSuccessToast(`"${siteName}" deleted successfully`);
-      loadData();
+      void loadData();
     } catch (error: unknown) {
       showErrorToast('Failed to delete site', error instanceof Error ? error.message : 'Unknown error');
     } finally {
@@ -252,7 +249,7 @@ export function SiteManagement() {
       }
       setShowSiteModal(false);
       setEditingSite(null);
-      loadData();
+      void loadData();
     } catch (error: unknown) {
       showErrorToast(
         editingSite ? 'Failed to update site' : 'Failed to create site',
@@ -465,7 +462,7 @@ export function SiteManagement() {
                             onClick={() => {
                               // Set current site in context and navigate to configuration
                               setCurrentSite(site as any);
-                              navigate('/admin/site-configuration');
+                              void navigate('/admin/site-configuration');
                             }}
                             title="Configure Site"
                           >
@@ -543,7 +540,7 @@ export function SiteManagement() {
                                   <button
                                     onClick={() => {
                                       setOpenDropdownId(null);
-                                      handleDelete(site.id, site.name);
+                                      void handleDelete(site.id, site.name);
                                     }}
                                     className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
                                     disabled={deletingSiteId === site.id}
@@ -575,7 +572,7 @@ export function SiteManagement() {
         }}
         site={editingSite}
         clients={clients}
-        onSave={handleSaveSite}
+        onSave={() => void handleSaveSite()}
       />
     </div>
   );
@@ -839,7 +836,7 @@ function SiteModal({ open, onClose, site, clients, onSave }: SiteModalProps) {
           })}
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={() => void handleSubmit()} className="space-y-6">
           {/* Step 1: Basic Information */}
           {currentStep === 1 && (
             <div className="space-y-4">
@@ -959,7 +956,7 @@ function SiteModal({ open, onClose, site, clients, onSave }: SiteModalProps) {
                         type="file"
                         className="hidden"
                         accept="image/*"
-                        onChange={handleLogoUpload}
+                        onChange={() => void handleLogoUpload()}
                         disabled={uploadingLogo}
                       />
                     </label>

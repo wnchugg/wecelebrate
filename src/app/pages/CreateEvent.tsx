@@ -59,7 +59,7 @@ export function CreateEvent() {
     // In a real app, this would send data to the server
     toast.success("Event created successfully!");
     setTimeout(() => {
-      navigate("/dashboard");
+      void navigate("/dashboard");
     }, 1000);
   };
 
@@ -232,7 +232,7 @@ export function CreateEvent() {
               type="button"
               variant="outline"
               className="flex-1"
-              onClick={() => navigate(-1)}
+              onClick={() => void navigate(-1)}
             >
               Cancel
             </Button>

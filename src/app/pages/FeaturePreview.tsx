@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Gift, Award, Shield, Package, Heart, Send, MessageCircle, Users, Calendar, ArrowRight, Play, ArrowLeft, Sparkles, Share2, CheckCircle, CreditCard, Truck, Home } from 'lucide-react';
+import { Gift, Award, Shield, Package, MessageCircle, ArrowRight, Sparkles, CheckCircle, CreditCard, Truck, Home } from 'lucide-react';
 import { Link } from 'react-router';
 
 type PreviewMode = 'complete-flow' | 'landing-skip' | 'welcome' | 'celebration';

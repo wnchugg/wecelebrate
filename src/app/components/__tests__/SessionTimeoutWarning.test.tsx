@@ -17,7 +17,6 @@ import userEvent from '@testing-library/user-event';
 import { renderWithRouter } from '@/test/helpers';
 import { SessionTimeoutWarning } from '../SessionTimeoutWarning';
 import { sessionManager, extendSessionActivity } from '../../utils/sessionManager';
-import { useNavigate } from 'react-router';
 
 // Mock session manager with factory function
 vi.mock('../../utils/sessionManager', () => ({

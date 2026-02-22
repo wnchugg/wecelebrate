@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Save, Eye, Plus, Trash2, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 import { useSite } from '../../context/SiteContext';
-import { HeaderFooterConfig, NavigationItem, FooterColumn, SocialLink, SocialPlatform } from '../../types/siteCustomization';
+import { HeaderFooterConfig, NavigationItem, FooterColumn } from '../../types/siteCustomization';
 import { toast } from 'sonner';
 
 const defaultConfig: HeaderFooterConfig = {
@@ -824,7 +824,7 @@ export function HeaderFooterConfiguration() {
               Reset to Default
             </button>
             <button
-              onClick={handleSave}
+              onClick={() => void handleSave()}
               disabled={isSaving}
               className="flex items-center gap-2 px-6 py-2 bg-[#D91C81] text-white rounded-md hover:bg-[#B71569] transition-colors disabled:opacity-50"
             >

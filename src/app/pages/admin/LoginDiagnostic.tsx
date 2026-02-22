@@ -64,7 +64,7 @@ export function LoginDiagnostic() {
           </p>
 
           <button
-            onClick={runDiagnostic}
+            onClick={() => void runDiagnostic()}
             disabled={isLoading}
             className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50"
           >

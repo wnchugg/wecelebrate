@@ -4,7 +4,7 @@ import { mockEvents } from "../data/mockData";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
-import { Search, Filter, Calendar, MapPin, X } from "lucide-react";
+import { Search, Filter, X } from "lucide-react";
 import {
   Select,
   SelectContent,

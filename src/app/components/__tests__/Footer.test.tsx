@@ -11,9 +11,15 @@
  */
 
 import { screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { renderWithRouter } from '@/test/helpers';
 import { Footer } from '../Footer';
+
+vi.mock('../../hooks/useSiteContent', () => ({
+  useSiteContent: () => ({
+    getTranslatedContent: vi.fn((_key: string, fallback?: string) => fallback || ''),
+  }),
+}));
 
 const renderFooter = () => {
   return renderWithRouter(

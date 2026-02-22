@@ -14,7 +14,6 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithRouter } from '@/test/helpers';
 import { Label } from '../label';
-import { Checkbox } from '../checkbox';
 
 describe('Label Component', () => {
   describe('Rendering', () => {

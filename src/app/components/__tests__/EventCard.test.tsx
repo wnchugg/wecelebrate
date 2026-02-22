@@ -13,7 +13,6 @@
 
 import { screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { renderWithRouter } from '@/test/helpers';
 // import { EventCard } from '../EventCard'; // Component not fully implemented
 import type { Event } from '../../data/mockData';
 

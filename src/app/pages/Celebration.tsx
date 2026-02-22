@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { Sparkles, Gift, Heart, Star, Calendar, MapPin, Users, ArrowRight, Award, Loader2, Filter, MessageCircle, Send } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Card } from '../components/ui/card';
+import { Heart, Calendar, ArrowRight, Award, Loader2, Filter, MessageCircle, Send } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';
+import { useDateFormat } from '../hooks/useDateFormat';
 
 // Role color mapping
 const roleColors = {
@@ -54,6 +53,7 @@ export function Celebration() {
   const [loading, setLoading] = useState<boolean>(true);
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { formatDate } = useDateFormat();
 
   useEffect(() => {
     const fetchMilestones = async () => {
@@ -66,7 +66,7 @@ export function Celebration() {
         const data: Milestone[] = await response.json();
         setMilestones(data);
       } catch (error) {
-        toast.error('Failed to load milestones');
+        toast.error(t('notification.error.failedToLoadMilestones'));
       } finally {
         setLoading(false);
       }
@@ -97,7 +97,7 @@ export function Celebration() {
         <div className="max-w-6xl mx-auto">
           {/* Back Button */}
           <button
-            onClick={() => navigate('/')}
+            onClick={() => void navigate('/')}
             className="flex items-center gap-2 text-white/90 hover:text-white mb-6 transition-colors"
           >
             <ArrowRight className="w-5 h-5" />
@@ -265,11 +265,7 @@ export function Celebration() {
                             </span>
                           </div>
                           <p className="text-sm text-gray-500">
-                            {new Date(msg.createdAt).toLocaleDateString('en-US', {
-                              month: 'long',
-                              day: 'numeric',
-                              year: 'numeric',
-                            })}
+                            {formatDate(msg.createdAt)}
                           </p>
                         </div>
                       </div>

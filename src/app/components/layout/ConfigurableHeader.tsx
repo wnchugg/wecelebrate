@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
-import { ChevronRight, Menu, X, Search, User, LogOut, Settings } from 'lucide-react';
-import { useState, useEffect, useMemo } from 'react';
+import { ChevronRight, Menu, X, Search, User, LogOut } from 'lucide-react';
+import { useState, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useSite } from '../../context/SiteContext';
 import { LanguageSelector } from '../LanguageSelector';
@@ -117,7 +117,7 @@ export function ConfigurableHeader({ config, siteName, clientName }: Configurabl
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/gift-selection?search=${encodeURIComponent(searchQuery)}`);
+      void navigate(`/gift-selection?search=${encodeURIComponent(searchQuery)}`);
       setSearchQuery('');
       setSearchOpen(false);
     }
@@ -125,7 +125,7 @@ export function ConfigurableHeader({ config, siteName, clientName }: Configurabl
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    void navigate('/');
   };
 
   return (

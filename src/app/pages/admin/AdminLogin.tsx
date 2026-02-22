@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router';
 import { useAdmin } from '../../context/AdminContext';
-import { Shield, Lock, Mail, AlertCircle, Eye, EyeOff, User, Loader2 } from 'lucide-react';
-import Logo from '../../../imports/Logo';
+import { Shield, Lock, Mail, Eye, EyeOff, User, Loader2 } from 'lucide-react';
 import { EnvironmentBadge } from '../../components/EnvironmentBadge';
 import { BackendConnectionStatus } from '../../components/BackendConnectionStatus';
 import { 
@@ -10,13 +9,11 @@ import {
   sanitizeString, 
   checkRateLimit,
   clearRateLimit,
-  logSecurityEvent,
-  secureDebounce 
+  logSecurityEvent 
 } from '../../utils/frontendSecurity';
 import { showErrorToast, showSuccessToast } from '../../utils/errorHandling';
 import { Alert } from '../../components/Alert';
 import { logger } from '../../utils/logger';
-import { projectId, publicAnonKey } from '../../../../utils/supabase/info';
 import { parseError } from '../../utils/apiErrors';
 
 /**
@@ -52,7 +49,7 @@ export default function AdminLogin(): JSX.Element {
   useEffect(() => {
     if (isAdminAuthenticated && !isCheckingAuth) {
       logger.info('[AdminLogin] User already authenticated, redirecting to dashboard');
-      navigate('/admin/dashboard');
+      void navigate('/admin/dashboard');
     }
   }, [isAdminAuthenticated, isCheckingAuth, navigate]);
 
@@ -209,7 +206,7 @@ export default function AdminLogin(): JSX.Element {
         )}
 
         {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={(e) => void handleSubmit(e)} noValidate className="space-y-6">
           {/* Identifier Field (Email or Username) */}
           <div>
             <label htmlFor="identifier" className="block text-sm font-medium text-gray-700 mb-2">

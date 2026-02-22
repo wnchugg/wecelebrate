@@ -8,15 +8,14 @@ import {
   TrendingUp, 
   Clock 
 } from 'lucide-react';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
-import type { TooltipProps } from 'recharts';
-import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { apiRequest } from '../../utils/api';
 import { showErrorToast, showSuccessToast } from '../../utils/errorHandling';
 import { logger } from '../../utils/logger';
 import { useNavigate } from 'react-router';
+import { useDateFormat } from '../../hooks/useDateFormat';
 
 interface Celebration {
   id: string;
@@ -66,6 +65,7 @@ const CHART_COLORS = {
 
 export function CelebrationAnalytics() {
   const navigate = useNavigate();
+  const { formatDate } = useDateFormat();
   const [celebrations, setCelebrations] = useState<Celebration[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -74,7 +74,7 @@ export function CelebrationAnalytics() {
   const [dateRange, setDateRange] = useState<'30' | '90' | '180' | '365' | 'all'>('90');
 
   useEffect(() => {
-    loadData();
+    void loadData();
   }, []);
 
   const loadData = async () => {
@@ -159,7 +159,8 @@ export function CelebrationAnalytics() {
     const monthly: Record<string, number> = {};
     
     filteredCelebrations.forEach(c => {
-      const month = new Date(c.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+      const date = new Date(c.date);
+      const month = formatDate(date, { year: 'numeric', month: 'short' });
       monthly[month] = (monthly[month] || 0) + 1;
     });
 
@@ -167,13 +168,14 @@ export function CelebrationAnalytics() {
       .map(([month, count]) => ({ month, celebrations: count }))
       .sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime())
       .slice(-12);
-  }, [filteredCelebrations]);
+  }, [filteredCelebrations, formatDate]);
 
   const celebrationsByMonth = useMemo(() => {
     const months: Record<string, number> = {};
     
     celebrations.forEach(c => {
-      const month = new Date(c.date).toLocaleDateString('en-US', { month: 'long' });
+      const date = new Date(c.date);
+      const month = formatDate(date, { month: 'long' });
       months[month] = (months[month] || 0) + 1;
     });
 
@@ -184,7 +186,7 @@ export function CelebrationAnalytics() {
       month: month.substring(0, 3),
       count: months[month] || 0
     }));
-  }, [celebrations]);
+  }, [celebrations, formatDate]);
 
   const yearlyMilestones = useMemo(() => {
     const milestones: Record<string, number> = {};
@@ -259,7 +261,7 @@ export function CelebrationAnalytics() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/admin/reports')}
+            onClick={() => void navigate('/admin/reports')}
             className="gap-2"
           >
             <ArrowLeft className="w-4 h-4" />

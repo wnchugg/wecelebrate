@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   fetchCatalogs,
   fetchCatalogById,
@@ -8,7 +8,6 @@ import {
   fetchSiteCatalogConfig,
   createOrUpdateSiteCatalogConfig,
 } from '../catalogApi';
-import { mockCatalogs, mockSiteConfigs } from '../../test/mockData/catalogData';
 
 describe('Catalog API Service', () => {
   describe('fetchCatalogs', () => {

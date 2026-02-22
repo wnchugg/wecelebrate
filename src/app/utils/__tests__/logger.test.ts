@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { logger, setLogLevel, LogLevel } from '../logger';
+import { logger, setLogLevel } from '../logger';
 
 describe('Logger Utils', () => {
   let consoleLogSpy: any;

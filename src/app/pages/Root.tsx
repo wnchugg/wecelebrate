@@ -1,4 +1,4 @@
-import { Outlet, useNavigate, useLocation } from 'react-router';
+import { Outlet, useLocation } from 'react-router';
 import { useLanguage } from '../context/LanguageContext';
 import { useEffect, ReactNode, Suspense } from 'react';
 import { PublicSiteProvider, usePublicSite } from '../context/PublicSiteContext';

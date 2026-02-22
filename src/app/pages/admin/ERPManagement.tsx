@@ -11,7 +11,6 @@ import {
   XCircle,
   AlertCircle,
   Clock,
-  ExternalLink,
   ChevronDown,
   ChevronRight,
   Activity,
@@ -24,6 +23,8 @@ import { authApi } from '../../utils/api';
 import { showSuccessToast, showErrorToast } from '../../utils/errorHandling';
 import { FieldMapper } from '../../components/admin/FieldMapper';
 import { ScheduleManager } from '../../components/admin/ScheduleManager';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
+import { Button } from '../../components/ui/button';
 
 interface ERPConnection {
   id: string;
@@ -379,7 +380,7 @@ export function ERPManagement() {
                   {/* Actions */}
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => handleTestConnection(connection)}
+                      onClick={() => void handleTestConnection(connection)}
                       disabled={testingConnection === connection.id}
                       className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
                       title="Test Connection"
@@ -401,14 +402,14 @@ export function ERPManagement() {
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleDeleteConnection(connection.id)}
+                      onClick={() => void handleDeleteConnection(connection.id)}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="Delete Connection"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => toggleExpand(connection.id)}
+                      onClick={() => void toggleExpand(connection.id)}
                       className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                       title="Toggle Details"
                     >
@@ -458,7 +459,7 @@ export function ERPManagement() {
                       </h4>
                       <div className="flex items-center gap-3 flex-wrap">
                         <button
-                          onClick={() => handleSyncProducts(connection.id)}
+                          onClick={() => void handleSyncProducts(connection.id)}
                           disabled={syncingConnection === connection.id}
                           className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
                         >
@@ -470,7 +471,7 @@ export function ERPManagement() {
                           Sync Products
                         </button>
                         <button
-                          onClick={() => handleSyncInventory(connection.id)}
+                          onClick={() => void handleSyncInventory(connection.id)}
                           disabled={syncingConnection === connection.id}
                           className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
                         >
@@ -794,15 +795,15 @@ function ERPConnectionModal({ connection, onClose, onSave }: ERPConnectionModalP
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">
+    <Dialog open={true} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader>
+          <DialogTitle>
             {connection ? 'Edit ERP Connection' : 'Add ERP Connection'}
-          </h2>
-        </div>
+          </DialogTitle>
+        </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={() => void handleSubmit()} className="flex-1 overflow-y-auto space-y-6">
           {/* Basic Info */}
           <div className="space-y-4">
             <div>
@@ -986,33 +987,32 @@ function ERPConnectionModal({ connection, onClose, onSave }: ERPConnectionModalP
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
-            <button
+          <DialogFooter>
+            <Button
               type="button"
+              variant="outline"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={saving}
-              className="flex items-center gap-2 px-4 py-2 bg-[#D91C81] text-white rounded-lg hover:bg-[#B91670] transition-colors disabled:opacity-50"
+              className="bg-[#D91C81] hover:bg-[#B91670] text-white"
             >
               {saving ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
                   Saving...
                 </>
               ) : (
                 <>Save Connection</>
               )}
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

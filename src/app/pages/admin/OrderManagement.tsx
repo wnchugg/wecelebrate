@@ -1,9 +1,8 @@
-import { ChevronRight, ChevronDown } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import {
   Package,
   Search,
-  Filter,
   Download,
   Eye,
   Truck,
@@ -12,14 +11,8 @@ import {
   Clock,
   MapPin,
   User,
-  Mail,
-  Phone,
   Calendar,
-  Edit,
-  Trash2,
-  AlertCircle,
-  RefreshCw,
-  Plus
+  RefreshCw
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
@@ -27,7 +20,6 @@ import { Card, CardContent } from '../../components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '../../components/ui/dialog';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { Textarea } from '../../components/ui/textarea';
 import { apiRequest } from '../../utils/api';
 import { showErrorToast, showSuccessToast } from '../../utils/errorHandling';
 
@@ -291,7 +283,7 @@ export function OrderManagement() {
           <Button
             variant="outline"
             size="sm"
-            onClick={loadOrders}
+            onClick={() => void loadOrders()}
             className="gap-2"
           >
             <RefreshCw className="w-4 h-4" />
@@ -419,7 +411,7 @@ export function OrderManagement() {
               <Button
                 size="sm"
                 variant="secondary"
-                onClick={() => handleBulkStatusUpdate('processing')}
+                onClick={() => void handleBulkStatusUpdate('processing')}
                 className="bg-white/20 hover:bg-white/30 text-white border-0"
               >
                 Mark Processing
@@ -427,7 +419,7 @@ export function OrderManagement() {
               <Button
                 size="sm"
                 variant="secondary"
-                onClick={() => handleBulkStatusUpdate('shipped')}
+                onClick={() => void handleBulkStatusUpdate('shipped')}
                 className="bg-white/20 hover:bg-white/30 text-white border-0"
               >
                 Mark Shipped
@@ -435,7 +427,7 @@ export function OrderManagement() {
               <Button
                 size="sm"
                 variant="secondary"
-                onClick={() => handleBulkStatusUpdate('delivered')}
+                onClick={() => void handleBulkStatusUpdate('delivered')}
                 className="bg-white/20 hover:bg-white/30 text-white border-0"
               >
                 Mark Delivered

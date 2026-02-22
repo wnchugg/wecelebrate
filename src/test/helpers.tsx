@@ -7,6 +7,7 @@ import { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { vi } from 'vitest';
+import { LanguageProvider } from '../app/context/LanguageContext';
 
 // ==================== Type-Safe Mock Builders ====================
 
@@ -183,9 +184,11 @@ export function renderWithRouter(
 
   function Wrapper({ children }: { children: React.ReactNode }) {
     return (
-      <MemoryRouter initialEntries={[initialRoute]} {...routerProps}>
-        {children}
-      </MemoryRouter>
+      <LanguageProvider>
+        <MemoryRouter initialEntries={[initialRoute]} {...routerProps}>
+          {children}
+        </MemoryRouter>
+      </LanguageProvider>
     );
   }
 

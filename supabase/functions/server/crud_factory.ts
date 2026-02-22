@@ -499,8 +499,8 @@ export function createCrudRoutes<T = any, R = T>(
       // Transform
       const resourceData = transform ? transform(body) : body;
 
-      // Generate ID
-      const resourceId = generateId();
+      // Generate ID - use provided ID if available, otherwise generate new one
+      const resourceId = (resourceData as any).id || generateId();
 
       // Add metadata
       const resourceWithMeta = {

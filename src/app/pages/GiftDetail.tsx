@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams, Link } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useLanguage } from '../context/LanguageContext';
 import { useOrder } from '../context/OrderContext';
 import { Gift } from '../context/GiftContext';
-import { ArrowLeft, ShoppingCart, Package, Loader2, Check, Minus, Plus, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Check, Minus, Plus, ArrowRight } from 'lucide-react';
 import { ConfigurableHeader } from '../components/layout/ConfigurableHeader';
 import { getCurrentEnvironment, buildApiUrl } from '../config/deploymentEnvironments';
 import { toast } from 'sonner';
@@ -33,7 +33,7 @@ export function GiftDetail() {
   useEffect(() => {
     const loadGift = async () => {
       if (!giftId) {
-        navigate('../gift-selection');
+        void navigate('../gift-selection');
         return;
       }
       
@@ -46,7 +46,7 @@ export function GiftDetail() {
         
         if (!sessionToken) {
           toast.error('Session expired. Please log in again.');
-          navigate('../access');
+          void navigate('../access');
           return;
         }
         
@@ -85,7 +85,7 @@ export function GiftDetail() {
       }
     };
     
-    loadGift();
+    void loadGift();
   }, [giftId, navigate]);
 
   useEffect(() => {
@@ -112,7 +112,7 @@ export function GiftDetail() {
     selectGift(gift);
     setQuantity(localQuantity);
     // Use relative navigation to stay within site context
-    navigate('../shipping-information');
+    void navigate('../shipping-information');
   };
 
   const isCurrentlySelected = selectedGift?.id === giftId;
@@ -149,7 +149,7 @@ export function GiftDetail() {
         <div className="max-w-6xl mx-auto">
           {/* Back Button */}
           <button
-            onClick={() => navigate('../gift-selection')}
+            onClick={() => void navigate('../gift-selection')}
             className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors mb-6"
             aria-label={t('common.back')}
           >

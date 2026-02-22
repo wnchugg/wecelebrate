@@ -39,7 +39,7 @@
 
 .ProseMirror ul,
 .ProseMirror ol {
-  padding-left: 1.5rem;
+  padding-inline-start: 1.5rem;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
@@ -82,9 +82,9 @@
 }
 
 .ProseMirror blockquote {
-  border-left: 4px solid #D91C81;
-  padding-left: 1rem;
-  margin-left: 0;
+  border-inline-start: 4px solid #D91C81;
+  padding-inline-start: 1rem;
+  margin-inline-start: 0;
   font-style: italic;
   color: #6b7280;
 }
@@ -136,11 +136,11 @@
 }
 
 .ProseMirror p[style*="text-align: right"] {
-  text-align: right;
+  text-align: end;
 }
 
 .ProseMirror p[style*="text-align: left"] {
-  text-align: left;
+  text-align: start;
 }
 
 /* Image styles */
@@ -179,7 +179,7 @@
 
 .ProseMirror table th {
   font-weight: 700;
-  text-align: left;
+  text-align: start;
   background-color: #f9fafb;
   color: #1B2A5E;
 }

@@ -2,7 +2,6 @@ import { createContext, useContext, useState, useEffect, useCallback, ReactNode,
 import { logSecurityEvent, startSessionTimer, clearSessionTimer } from '../utils/security';
 import { authApi, setAccessToken, getAccessToken } from '../utils/api';
 import { clearAccessToken } from '../lib/apiClient';
-import { logSecurityEvent as logFrontendSecurityEvent } from '../utils/frontendSecurity';
 import { preloadAdminRoutes } from '../utils/routePreloader';
 import { isPublicRoute } from '../utils/routeUtils';
 import { logger } from '../utils/logger';

@@ -42,6 +42,26 @@ export interface SiteSettings {
   requireShippingAddress?: boolean;
 }
 
+// Currency code type for internationalization
+export type CurrencyCode = 'USD' | 'EUR' | 'GBP' | 'JPY' | 'CNY' | 'INR' | 'CAD' | 'AUD' | 'MXN' | 'BRL';
+
+// Internationalization configuration
+export interface I18nConfig {
+  // Currency settings
+  currency: CurrencyCode;
+  currencyDisplay: 'symbol' | 'code' | 'name';
+  decimalPlaces: number;
+  
+  // Date and time settings
+  timezone: string; // IANA timezone identifier (e.g., 'America/New_York', 'Europe/London', 'Asia/Tokyo')
+  dateFormat: 'MDY' | 'DMY' | 'YMD';
+  timeFormat: '12h' | '24h';
+  
+  // Name formatting settings
+  nameOrder: 'western' | 'eastern';
+  nameFormat: 'formal' | 'casual';
+}
+
 export interface SiteConfig {
   id: string;
   name: string;
@@ -56,6 +76,7 @@ export interface SiteConfig {
     customCss?: string;
   };
   settings: SiteSettings;
+  i18n?: I18nConfig; // Optional internationalization configuration
   siteUrl?: string;
   createdAt: string;
   updatedAt: string;
@@ -141,7 +162,7 @@ export function detectSiteId(): string | null {
   }
   
   // Strategy 3: Path-based (e.g., /site/client1)
-  const pathMatch = window.location.pathname.match(/^\/site\/([^\/]+)/);
+  const pathMatch = window.location.pathname.match(/^\/site\/([^/]+)/);
   if (pathMatch) {
     return pathMatch[1];
   }

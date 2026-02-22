@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Catalog API
  * Test implementation using mock data
@@ -6,7 +5,7 @@
  */
 
 import type { Catalog, SiteCatalogConfig } from '../types/catalog';
-import { mockCatalogs, mockSiteConfigs, filterCatalogs as filterMockCatalogs, getCatalogById as getMockCatalogById, getSiteConfigBySiteId } from '../test/mockData/catalogData';
+import { mockCatalogs, filterCatalogs as filterMockCatalogs, getCatalogById as getMockCatalogById, getSiteConfigBySiteId } from '../test/mockData/catalogData';
 
 export const catalogApi = {
   async getCatalogs(): Promise<{ catalogs: Catalog[] }> {

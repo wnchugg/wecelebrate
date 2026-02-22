@@ -9,6 +9,7 @@ export interface PublicSiteContextType {
   error: string | null;
   refreshSite: () => Promise<void>;
   setSiteById: (siteId: string) => Promise<void>;
+  setSiteBySlug: (slug: string) => Promise<void>;
   availableSites: PublicSite[];
 }
 
@@ -266,8 +267,113 @@ export function PublicSiteProvider({ children }: { children: ReactNode }) {
     }
   }, [applyBranding, loadGiftsForSite]); // useCallback dependencies for setSiteById
 
+  const setSiteBySlug = useCallback(async (slug: string) => {
+    setIsLoading(true);
+    setError(null);
+    
+    console.warn('[PublicSiteContext] setSiteBySlug called with:', slug);
+    
+    try {
+      const response = await publicSiteApi.getSiteBySlug(slug);
+      
+      console.warn('[PublicSiteContext] Full API response:', JSON.stringify(response, null, 2));
+      console.warn('[PublicSiteContext] response.site:', response.site);
+      console.warn('[PublicSiteContext] response.site.settings:', response.site?.settings);
+      
+      const selectedSite = response?.site;
+      
+      if (!selectedSite) {
+        console.error('[PublicSiteContext] Site is null/undefined in API response');
+        console.error('[PublicSiteContext] Full response object:', response);
+        setError(`Site with slug "${slug}" not found in current environment`);
+        setIsLoading(false);
+        return;
+      }
+      
+      console.warn('[PublicSiteContext] Site data received:', {
+        id: selectedSite.id,
+        name: selectedSite.name,
+        slug: selectedSite.slug,
+        validationMethod: selectedSite.settings?.validationMethod,
+        skipLandingPage: selectedSite.settings?.skipLandingPage,
+        hasBranding: !!selectedSite.branding,
+        primaryColor: selectedSite.branding?.primaryColor
+      });
+      
+      setSite(selectedSite);
+      
+      // Save to session storage
+      sessionStorage.setItem('selected_site_id', selectedSite.id);
+      sessionStorage.setItem('selected_site_data', JSON.stringify(selectedSite));
+      
+      // Apply branding to the document
+      applyBranding(selectedSite.branding);
+      
+      // Load gifts for this site
+      await loadGiftsForSite(selectedSite.id);
+      
+      console.warn('[PublicSiteContext] Site loaded successfully:', selectedSite.name);
+    } catch (err) {
+      console.error('[PublicSiteContext] Error loading site by slug:', err);
+      console.error('[PublicSiteContext] Error details:', {
+        message: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : undefined,
+        slug
+      });
+      
+      // Check if this is a "Site not found" error (404)
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      const isSiteNotFound = errorMessage.includes('Site not found') || errorMessage.includes('404');
+      
+      // Check if this is a fetch failure (backend not deployed)
+      const isFetchError = err instanceof TypeError && String(err).includes('fetch');
+      
+      if (isSiteNotFound) {
+        console.error('[PublicSiteContext] Site not found - database may not be initialized');
+        setError('Site not found. Please check the URL and try again.');
+      } else if (isFetchError) {
+        console.error('[PublicSiteContext] Backend fetch failed - backend may not be deployed');
+        setError('Backend server not available. Please check deployment.');
+      } else if (import.meta.env.DEV) {
+        console.warn('[PublicSiteContext] Using fallback site configuration');
+      }
+      
+      // Create a default fallback site
+      const fallbackSite: PublicSite = {
+        id: 'fallback',
+        name: 'JALA Gifting',
+        clientId: 'default',
+        domain: window.location.hostname,
+        status: 'active',
+        branding: {
+          primaryColor: '#D91C81',
+          secondaryColor: '#1B2A5E',
+          accentColor: '#00B4CC',
+        },
+        settings: {
+          validationMethod: 'email',
+          allowMultipleSelections: false,
+          requireShipping: true,
+          supportEmail: 'support@jala.com',
+          languages: ['en'],
+          defaultLanguage: 'en',
+        },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      
+      setSite(fallbackSite);
+      applyBranding(fallbackSite.branding);
+      
+      // Clear error since we have a fallback site
+      setError(null);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [applyBranding, loadGiftsForSite]); // useCallback dependencies for setSiteBySlug
+
   useEffect(() => {
-    loadSite();
+    void loadSite();
   }, []);
 
   const refreshSite = async () => {
@@ -275,7 +381,7 @@ export function PublicSiteProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <PublicSiteContext.Provider value={{ site, currentSite: site, gifts, isLoading, error, refreshSite, setSiteById, availableSites }}>
+    <PublicSiteContext.Provider value={{ site, currentSite: site, gifts, isLoading, error, refreshSite, setSiteById, setSiteBySlug, availableSites }}>
       {children}
     </PublicSiteContext.Provider>
   );

@@ -43,6 +43,9 @@ export interface Client {
   client_erp_system?: string;
   client_sso?: string;
   client_hris_system?: string;
+  default_brand_id?: string;
+  branding_overrides?: Record<string, any>;
+  header_footer_config?: Record<string, any>;
   created_at: string;
   updated_at: string;
 }
@@ -86,6 +89,12 @@ export interface Site {
   font_family?: string;
   custom_css?: string;
   settings?: Record<string, any>;
+  brand_id?: string;
+  branding_overrides?: Record<string, any>;
+  available_languages?: string[];  // Languages enabled for this site (default: ['en'])
+  translations?: Record<string, any>;  // JSONB column storing all translations
+  draft_available_languages?: string[];  // Draft languages (before publish)
+  draft_settings?: Record<string, any>;  // Draft settings (before publish)
   created_at: string;
   updated_at: string;
   created_by?: string;
@@ -104,6 +113,10 @@ export interface CreateSiteInput {
   font_family?: string;
   custom_css?: string;
   settings?: Record<string, any>;
+  available_languages?: string[];  // Languages enabled for this site (default: ['en'])
+  translations?: Record<string, any>;  // JSONB column storing all translations
+  draft_available_languages?: string[];  // Draft languages (before publish)
+  draft_settings?: Record<string, any>;  // Draft settings (before publish)
   created_by?: string;
 }
 
@@ -119,6 +132,10 @@ export interface UpdateSiteInput {
   font_family?: string;
   custom_css?: string;
   settings?: Record<string, any>;
+  available_languages?: string[];  // Languages enabled for this site (default: ['en'])
+  translations?: Record<string, any>;  // JSONB column storing all translations
+  draft_available_languages?: string[];  // Draft languages (before publish)
+  draft_settings?: Record<string, any>;  // Draft settings (before publish)
   updated_by?: string;
 }
 
@@ -310,6 +327,60 @@ export interface EmployeeFilters {
   site_id?: string;
   status?: 'active' | 'inactive' | 'terminated';
   department?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}
+
+// ==================== Site Users (Advanced Auth) ====================
+
+export interface SiteUser {
+  id: string;
+  site_id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  employee_id?: string;
+  password_hash?: string;
+  force_password_reset: boolean;
+  last_login?: string;
+  role: 'admin' | 'manager' | 'employee' | 'viewer';
+  status: 'active' | 'inactive' | 'suspended' | 'pending';
+  metadata?: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateSiteUserInput {
+  site_id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  employee_id?: string;
+  password_hash?: string;
+  force_password_reset?: boolean;
+  role?: 'admin' | 'manager' | 'employee' | 'viewer';
+  status?: 'active' | 'inactive' | 'suspended' | 'pending';
+  metadata?: Record<string, any>;
+}
+
+export interface UpdateSiteUserInput {
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  employee_id?: string;
+  password_hash?: string;
+  force_password_reset?: boolean;
+  last_login?: string;
+  role?: 'admin' | 'manager' | 'employee' | 'viewer';
+  status?: 'active' | 'inactive' | 'suspended' | 'pending';
+  metadata?: Record<string, any>;
+}
+
+export interface SiteUserFilters {
+  site_id?: string;
+  status?: 'active' | 'inactive' | 'suspended' | 'pending';
+  role?: 'admin' | 'manager' | 'employee' | 'viewer';
   search?: string;
   limit?: number;
   offset?: number;

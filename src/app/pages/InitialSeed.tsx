@@ -442,7 +442,7 @@ export function InitialSeed() {
                   />
                 </div>
                 <Button
-                  onClick={handleLogin}
+                  onClick={() => void handleLogin()}
                   disabled={loading || !email || !password}
                   className="w-full bg-gradient-to-r from-[#D91C81] to-[#B01669] hover:from-[#B01669] hover:to-[#8B1254] text-white py-6 text-lg"
                 >
@@ -505,7 +505,7 @@ export function InitialSeed() {
           {/* Action Button */}
           {!result && !needsAuth && (
             <Button
-              onClick={seedDatabase}
+              onClick={() => void seedDatabase()}
               disabled={loading}
               className="w-full bg-gradient-to-r from-[#D91C81] to-[#B01669] hover:from-[#B01669] hover:to-[#8B1254] text-white py-6 text-lg"
             >
@@ -551,7 +551,7 @@ export function InitialSeed() {
 
               <div className="flex gap-3">
                 <Button
-                  onClick={() => navigate('/admin/login')}
+                  onClick={() => void navigate('/admin/login')}
                   className="flex-1 bg-gradient-to-r from-[#D91C81] to-[#B01669] hover:from-[#B01669] hover:to-[#8B1254] text-white"
                 >
                   {authToken ? 'Go to Admin Dashboard' : 'Go to Admin Login'}
@@ -665,7 +665,7 @@ export function InitialSeed() {
           {/* Action Button */}
           {!demoResult && (
             <Button
-              onClick={seedDemoSites}
+              onClick={() => void seedDemoSites()}
               disabled={demoLoading}
               className="w-full bg-gradient-to-r from-[#00B4CC] to-[#1B2A5E] hover:from-[#008FA6] hover:to-[#0F1A3D] text-white py-6 text-lg"
             >
@@ -702,7 +702,7 @@ export function InitialSeed() {
 
               <div className="flex gap-3">
                 <Button
-                  onClick={() => navigate('/stakeholder-review')}
+                  onClick={() => void navigate('/stakeholder-review')}
                   className="flex-1 bg-gradient-to-r from-[#00B4CC] to-[#1B2A5E] hover:from-[#008FA6] hover:to-[#0F1A3D] text-white"
                 >
                   View Stakeholder Review
@@ -786,7 +786,7 @@ export function InitialSeed() {
           {/* Action Button */}
           {!productResult && (
             <Button
-              onClick={reseedProducts}
+              onClick={() => void reseedProducts()}
               disabled={productLoading}
               className="w-full bg-gradient-to-r from-[#10B981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white py-6 text-lg"
             >
@@ -823,7 +823,7 @@ export function InitialSeed() {
 
               <div className="flex gap-3">
                 <Button
-                  onClick={() => navigate('/admin/gift-management')}
+                  onClick={() => void navigate('/admin/gift-management')}
                   className="flex-1 bg-gradient-to-r from-[#10B981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white"
                 >
                   View Gift Catalog
@@ -908,7 +908,7 @@ export function InitialSeed() {
           {!migrateResult && (
             <div className="space-y-3">
               <Button
-                onClick={migrateDatabase}
+                onClick={() => void migrateDatabase()}
                 disabled={migrateLoading}
                 className="w-full bg-gradient-to-r from-[#D91C81] to-[#B01669] hover:from-[#B01669] hover:to-[#8B1254] text-white py-6 text-lg"
               >
@@ -926,7 +926,7 @@ export function InitialSeed() {
               </Button>
               
               <button
-                onClick={handleDebugToken}
+                onClick={() => void handleDebugToken()}
                 className="w-full px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 🔍 Debug Token (Check if logged in)
@@ -961,7 +961,7 @@ export function InitialSeed() {
 
               <div className="flex gap-3">
                 <Button
-                  onClick={() => navigate('/admin/sites')}
+                  onClick={() => void navigate('/admin/sites')}
                   className="flex-1 bg-gradient-to-r from-[#D91C81] to-[#B01669] hover:from-[#B01669] hover:to-[#8B1254] text-white"
                 >
                   View Sites in Admin
@@ -1010,7 +1010,7 @@ export function InitialSeed() {
           <p className="text-sm text-gray-500">
             Need help? Check the{' '}
             <button
-              onClick={() => navigate('/admin/data-diagnostic')}
+              onClick={() => void navigate('/admin/data-diagnostic')}
               className="text-[#D91C81] hover:underline font-semibold"
             >
               Data Diagnostic Tool

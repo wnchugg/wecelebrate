@@ -6,7 +6,7 @@
  * Logger mocks now auto-loaded - no manual setup needed!
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   validateEmail,
   validatePassword,

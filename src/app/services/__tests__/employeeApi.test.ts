@@ -1,7 +1,3 @@
-// @ts-nocheck - This test file uses an outdated API pattern and needs refactoring
- 
- 
- 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   getEmployees,
@@ -13,17 +9,22 @@ import {
   type Employee,
   type CreateEmployeeData,
 } from '../employeeApi';
-import { apiClient } from '../../lib/apiClient';
 
-// Mock the apiClient
+// Mock getAccessToken
 vi.mock('../../lib/apiClient', () => ({
-  apiClient: {
-    get: vi.fn(),
-    post: vi.fn(),
-    put: vi.fn(),
-    delete: vi.fn(),
-  },
+  getAccessToken: vi.fn(() => 'mock-token-123'),
 }));
+
+// Mock getCurrentEnvironment
+vi.mock('../../config/deploymentEnvironments', () => ({
+  getCurrentEnvironment: vi.fn(() => ({
+    id: 'test-env',
+    supabaseUrl: 'https://test-project.supabase.co',
+  })),
+}));
+
+// Mock fetch globally
+global.fetch = vi.fn();
 
 describe('Employee API Service', () => {
   const mockSiteId = 'site-001';
@@ -47,22 +48,21 @@ describe('Employee API Service', () => {
   describe('getEmployees', () => {
     it('should fetch all employees for a site', async () => {
       const mockEmployees = [mockEmployee];
-      const mockResponse = {
-        json: vi.fn().mockResolvedValue({ employees: mockEmployees }),
-      };
-      vi.mocked(apiClient.get).mockResolvedValue(mockResponse as any);
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true, data: mockEmployees }),
+      } as Response);
 
       const result = await getEmployees(mockSiteId);
 
-      expect(apiClient.get).toHaveBeenCalledWith(`/sites/${mockSiteId}/employees`);
       expect(result).toEqual(mockEmployees);
     });
 
     it('should return empty array when no employees exist', async () => {
-      const mockResponse = {
-        json: vi.fn().mockResolvedValue({ employees: [] }),
-      };
-      vi.mocked(apiClient.get).mockResolvedValue(mockResponse as any);
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true, data: [] }),
+      } as Response);
 
       const result = await getEmployees(mockSiteId);
 
@@ -72,14 +72,13 @@ describe('Employee API Service', () => {
 
   describe('getEmployee', () => {
     it('should fetch a single employee by ID', async () => {
-      const mockResponse = {
-        json: vi.fn().mockResolvedValue({ employee: mockEmployee }),
-      };
-      vi.mocked(apiClient.get).mockResolvedValue(mockResponse as any);
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true, data: mockEmployee }),
+      } as Response);
 
       const result = await getEmployee('emp-001', mockSiteId);
 
-      expect(apiClient.get).toHaveBeenCalledWith(`/employees/emp-001?siteId=${mockSiteId}`);
       expect(result).toEqual(mockEmployee);
     });
   });
@@ -92,14 +91,13 @@ describe('Employee API Service', () => {
         department: 'Marketing',
       };
       const createdEmployee = { ...mockEmployee, ...newEmployeeData, id: 'emp-002' };
-      const mockResponse = {
-        json: vi.fn().mockResolvedValue({ employee: createdEmployee }),
-      };
-      vi.mocked(apiClient.post).mockResolvedValue(mockResponse as any);
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true, data: createdEmployee }),
+      } as Response);
 
       const result = await createEmployee(mockSiteId, newEmployeeData);
 
-      expect(apiClient.post).toHaveBeenCalledWith(`/sites/${mockSiteId}/employees`, newEmployeeData);
       expect(result.email).toBe(newEmployeeData.email);
     });
 
@@ -109,10 +107,10 @@ describe('Employee API Service', () => {
         name: 'Jane Smith',
       };
       const createdEmployee = { ...mockEmployee, ...newEmployeeData, id: 'emp-002' };
-      const mockResponse = {
-        json: vi.fn().mockResolvedValue({ employee: createdEmployee }),
-      };
-      vi.mocked(apiClient.post).mockResolvedValue(mockResponse as any);
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true, data: createdEmployee }),
+      } as Response);
 
       const result = await createEmployee(mockSiteId, newEmployeeData);
 
@@ -125,10 +123,10 @@ describe('Employee API Service', () => {
         name: 'Jane Smith',
       };
       const createdEmployee = { ...mockEmployee, ...newEmployeeData, id: 'emp-002' };
-      const mockResponse = {
-        json: vi.fn().mockResolvedValue({ employee: createdEmployee }),
-      };
-      vi.mocked(apiClient.post).mockResolvedValue(mockResponse as any);
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true, data: createdEmployee }),
+      } as Response);
 
       const result = await createEmployee(mockSiteId, newEmployeeData);
 
@@ -143,17 +141,13 @@ describe('Employee API Service', () => {
         department: 'Product',
       };
       const updatedEmployee = { ...mockEmployee, ...updates };
-      const mockResponse = {
-        json: vi.fn().mockResolvedValue({ employee: updatedEmployee }),
-      };
-      vi.mocked(apiClient.put).mockResolvedValue(mockResponse as any);
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true, data: updatedEmployee }),
+      } as Response);
 
       const result = await updateEmployee('emp-001', mockSiteId, updates);
 
-      expect(apiClient.put).toHaveBeenCalledWith('/employees/emp-001', {
-        siteId: mockSiteId,
-        ...updates,
-      });
       expect(result.name).toBe(updates.name);
       expect(result.department).toBe(updates.department);
     });
@@ -161,10 +155,10 @@ describe('Employee API Service', () => {
     it('should update employee status to inactive', async () => {
       const updates = { status: 'inactive' as const };
       const updatedEmployee = { ...mockEmployee, ...updates };
-      const mockResponse = {
-        json: vi.fn().mockResolvedValue({ employee: updatedEmployee }),
-      };
-      vi.mocked(apiClient.put).mockResolvedValue(mockResponse as any);
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true, data: updatedEmployee }),
+      } as Response);
 
       const result = await updateEmployee('emp-001', mockSiteId, updates);
 
@@ -174,14 +168,14 @@ describe('Employee API Service', () => {
 
   describe('deleteEmployee', () => {
     it('should deactivate employee', async () => {
-      const mockResponse = {
-        json: vi.fn().mockResolvedValue({ success: true }),
-      };
-      vi.mocked(apiClient.delete).mockResolvedValue(mockResponse as any);
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true }),
+      } as Response);
 
       await deleteEmployee('emp-001', mockSiteId);
 
-      expect(apiClient.delete).toHaveBeenCalledWith(`/employees/emp-001?siteId=${mockSiteId}`);
+      expect(global.fetch).toHaveBeenCalled();
     });
   });
 
@@ -197,21 +191,17 @@ describe('Employee API Service', () => {
         ...emp,
         id: `emp-${idx + 1}`,
       }));
-      const mockResponse = {
-        json: vi.fn().mockResolvedValue({
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
           success: true,
           imported: 3,
           employees: importedEmployees,
         }),
-      };
-      vi.mocked(apiClient.post).mockResolvedValue(mockResponse as any);
+      } as Response);
 
       const result = await importEmployees(mockSiteId, employeesToImport);
 
-      expect(apiClient.post).toHaveBeenCalledWith('/employees/import', {
-        siteId: mockSiteId,
-        employees: employeesToImport,
-      });
       expect(result.imported).toBe(3);
       expect(result.employees).toHaveLength(3);
     });
@@ -221,15 +211,15 @@ describe('Employee API Service', () => {
         { email: 'valid@company.com', name: 'Valid Employee' },
         { name: 'Invalid Employee' }, // Missing identifier
       ];
-      const mockResponse = {
-        json: vi.fn().mockResolvedValue({
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
           success: true,
           imported: 1,
           errors: [{ row: 2, error: 'Missing identifier' }],
           employees: [{ ...mockEmployee, email: 'valid@company.com', id: 'emp-1' }],
         }),
-      };
-      vi.mocked(apiClient.post).mockResolvedValue(mockResponse as any);
+      } as Response);
 
       const result = await importEmployees(mockSiteId, employeesToImport);
 

@@ -8,9 +8,7 @@ import {
   Users, 
   Badge 
 } from 'lucide-react';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import type { TooltipProps } from 'recharts';
-import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { apiRequest } from '../../utils/api';
@@ -81,7 +79,7 @@ export function ClientPerformanceAnalytics() {
   const [selectedClient, setSelectedClient] = useState<string | null>(null);
 
   useEffect(() => {
-    loadData();
+    void loadData();
   }, []);
 
   const loadData = async () => {
@@ -243,7 +241,7 @@ export function ClientPerformanceAnalytics() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/admin/reports')}
+            onClick={() => void navigate('/admin/reports')}
             className="gap-2"
           >
             <ArrowLeft className="w-4 h-4" />

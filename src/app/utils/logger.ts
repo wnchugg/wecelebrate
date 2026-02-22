@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Production-Safe Logger Utility
  * 
@@ -65,7 +66,7 @@ export const logger = {
   /**
    * Log general information (development only)
    */
-  log: (...args: any[]) => {
+  log: (...args: unknown[]) => {
     if (isDevelopment && shouldLog('DEBUG')) {
       console.log(getTimestamp(), ...args);
     }
@@ -74,7 +75,7 @@ export const logger = {
   /**
    * Log warnings (development only)
    */
-  warn: (...args: any[]) => {
+  warn: (...args: unknown[]) => {
     if (isDevelopment && shouldLog('WARN')) {
       console.warn(getTimestamp('WARN'), ...args);
     }
@@ -83,7 +84,7 @@ export const logger = {
   /**
    * Log informational messages (development only)
    */
-  info: (...args: any[]) => {
+  info: (...args: unknown[]) => {
     if (isDevelopment && shouldLog('INFO')) {
       console.info(getTimestamp('INFO'), ...args);
     }
@@ -92,7 +93,7 @@ export const logger = {
   /**
    * Log debug information (development only)
    */
-  debug: (...args: any[]) => {
+  debug: (...args: unknown[]) => {
     if (isDevelopment && shouldLog('DEBUG')) {
       console.log(getTimestamp('DEBUG'), ...args);
     }
@@ -102,7 +103,7 @@ export const logger = {
    * Log errors (ALWAYS logged - development + production)
    * Errors should always be visible for debugging production issues
    */
-  error: (...args: any[]) => {
+  error: (...args: unknown[]) => {
     if (shouldLog('ERROR')) {
       console.error(getTimestamp('ERROR'), ...args);
     }
@@ -119,18 +120,18 @@ export const logger = {
    * log.info('User logged in'); // [AdminContext] User logged in
    */
   namespace: (namespace: string) => ({
-    log: (...args: any[]) => logger.log(`[${namespace}]`, ...args),
-    warn: (...args: any[]) => logger.warn(`[${namespace}]`, ...args),
-    info: (...args: any[]) => logger.info(`[${namespace}]`, ...args),
-    debug: (...args: any[]) => logger.debug(`[${namespace}]`, ...args),
-    error: (...args: any[]) => logger.error(`[${namespace}]`, ...args),
+    log: (...args: unknown[]) => logger.log(`[${namespace}]`, ...args),
+    warn: (...args: unknown[]) => logger.warn(`[${namespace}]`, ...args),
+    info: (...args: unknown[]) => logger.info(`[${namespace}]`, ...args),
+    debug: (...args: unknown[]) => logger.debug(`[${namespace}]`, ...args),
+    error: (...args: unknown[]) => logger.error(`[${namespace}]`, ...args),
   }),
 
   /**
    * Log a table (development only)
    * Useful for displaying structured data
    */
-  table: (data: any) => {
+  table: (data: unknown) => {
     if (isDevelopment) {
       console.warn(data);
     }
@@ -237,5 +238,5 @@ export default logger;
 // Make logger globally available as a fallback for edge cases
 // This prevents "logger is not defined" errors during module loading
 if (typeof window !== 'undefined') {
-  (window as any).__logger = logger;
+  (window as Record<string, unknown>).__logger = logger;
 }

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Users, 
   Shield, 
   Plus, 
   Edit2, 
@@ -167,7 +166,7 @@ export function RoleManagement() {
 
       const method = selectedRole ? 'PUT' : 'POST';
 
-      const body: any = {
+      const body: Record<string, unknown> = {
         name: formData.name,
         description: formData.description,
         type: formData.type,
@@ -486,7 +485,7 @@ export function RoleManagement() {
                             <Edit2 className="w-4 h-4 text-gray-600" />
                           </button>
                           <button 
-                            onClick={() => handleDeleteRole(role)}
+                            onClick={() => void handleDeleteRole(role)}
                             disabled={isSaving}
                             className="p-2 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Delete Role"
@@ -690,7 +689,7 @@ export function RoleManagement() {
                 Cancel
               </button>
               <button
-                onClick={handleSaveRole}
+                onClick={() => void handleSaveRole()}
                 disabled={isSaving}
                 className="px-4 py-2 bg-[#D91C81] text-white rounded-lg font-semibold hover:bg-[#B71569] transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
               >

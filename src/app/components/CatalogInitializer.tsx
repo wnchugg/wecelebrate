@@ -25,7 +25,7 @@ export function CatalogInitializer(): null {
       }
     };
 
-    initialize();
+    void initialize();
   }, []);
 
   // This component doesn't render anything visible

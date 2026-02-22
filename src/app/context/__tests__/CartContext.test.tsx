@@ -4,8 +4,8 @@
  * Target: 20 tests
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { CartProvider, useCart } from '../CartContext';
 import { mockProduct, createMock } from '@/test/helpers';

@@ -131,7 +131,7 @@ export function PrivacySettings() {
         <div className="grid sm:grid-cols-2 gap-4">
           {/* Export Data */}
           <button
-            onClick={handleExportData}
+            onClick={() => void handleExportData()}
             className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl hover:border-[#D91C81] hover:bg-pink-50 transition-all text-left focus:outline-none focus:ring-2 focus:ring-[#D91C81] focus:ring-offset-2"
           >
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -189,7 +189,7 @@ export function PrivacySettings() {
             </p>
             <div className="flex gap-3">
               <button
-                onClick={handleDeleteData}
+                onClick={() => void handleDeleteData()}
                 className="flex-1 bg-red-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
               >
                 Yes, Delete Everything

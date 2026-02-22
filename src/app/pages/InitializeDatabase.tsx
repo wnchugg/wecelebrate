@@ -97,13 +97,13 @@ export function InitializeDatabase() {
                   
                   <div className="mt-4 flex gap-3">
                     <button
-                      onClick={() => navigate('/admin')}
+                      onClick={() => void navigate('/admin')}
                       className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors"
                     >
                       Go to Admin Login
                     </button>
                     <button
-                      onClick={() => navigate('/')}
+                      onClick={() => void navigate('/')}
                       className="flex-1 bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-700 transition-colors"
                     >
                       Go to Homepage
@@ -126,13 +126,13 @@ export function InitializeDatabase() {
                   </p>
                   <div className="flex gap-3">
                     <button
-                      onClick={() => navigate('/admin')}
+                      onClick={() => void navigate('/admin')}
                       className="flex-1 bg-amber-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-amber-700 transition-colors"
                     >
                       Go to Admin Login
                     </button>
                     <button
-                      onClick={() => navigate('/')}
+                      onClick={() => void navigate('/')}
                       className="flex-1 bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-700 transition-colors"
                     >
                       Go to Homepage
@@ -173,7 +173,7 @@ export function InitializeDatabase() {
               </div>
 
               <button
-                onClick={handleInitialSeed}
+                onClick={() => void handleInitialSeed()}
                 disabled={isSeeding}
                 className="w-full bg-gradient-to-r from-[#D91C81] to-[#B71569] text-white px-6 py-4 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
@@ -192,7 +192,7 @@ export function InitializeDatabase() {
 
               <div className="text-center">
                 <button
-                  onClick={() => navigate('/')}
+                  onClick={() => void navigate('/')}
                   className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
                 >
                   ← Back to Homepage

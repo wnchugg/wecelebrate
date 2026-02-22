@@ -207,7 +207,7 @@ export function SiteMappingRules({ client, sites, onRulesUpdated }: SiteMappingR
             </div>
             <div className="flex gap-2">
               <Button
-                onClick={handleApplyRules}
+                onClick={() => void handleApplyRules()}
                 disabled={isApplying || rules.length === 0}
                 variant="outline"
                 size="sm"
@@ -324,7 +324,7 @@ export function SiteMappingRules({ client, sites, onRulesUpdated }: SiteMappingR
 
                       <div className="flex gap-2 ml-4">
                         <Button
-                          onClick={() => handleToggleRule(rule)}
+                          onClick={() => void handleToggleRule(rule)}
                           variant="outline"
                           size="sm"
                         >
@@ -472,7 +472,7 @@ export function SiteMappingRules({ client, sites, onRulesUpdated }: SiteMappingR
               Cancel
             </Button>
             <Button
-              onClick={handleSaveRule}
+              onClick={() => void handleSaveRule()}
               className="bg-[#D91C81] hover:bg-[#B01669] text-white"
             >
               <Save className="w-4 h-4 mr-2" />

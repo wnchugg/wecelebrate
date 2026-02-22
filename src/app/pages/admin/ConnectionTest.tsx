@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Shield, Server, Database, CheckCircle, XCircle, AlertTriangle, RefreshCw } from 'lucide-react';
 import { getCurrentEnvironment, getAvailableEnvironments } from '../../config/deploymentEnvironments';
 import { projectId, publicAnonKey } from '../../../../utils/supabase/info';
@@ -11,7 +11,7 @@ export function ConnectionTest() {
 
   const runDiagnostics = async () => {
     setIsLoading(true);
-    const results: any = {
+    const results: Record<string, unknown> = {
       timestamp: new Date().toISOString(),
       figmaMakeConfig: {
         projectId,
@@ -98,7 +98,7 @@ export function ConnectionTest() {
 
         <div className="mb-6">
           <button
-            onClick={runDiagnostics}
+            onClick={() => void runDiagnostics()}
             disabled={isLoading}
             className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:bg-gray-300"
           >

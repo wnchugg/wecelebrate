@@ -9,7 +9,7 @@
  * - deploymentEnvironments.ts: Runtime deployment targets (which Supabase project to use)
  */
 
-import { projectId, publicAnonKey } from '../../../utils/supabase/info';
+import { publicAnonKey } from '../../../utils/supabase/info';
 
 export type EnvironmentType = 'development' | 'test' | 'uat' | 'production';
 
@@ -40,7 +40,7 @@ const DEV_PROJECT_ID = 'wjfcqqrlhwdvvjmefxky';
 let DEV_ANON_KEY = publicAnonKey;
 try {
   DEV_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || publicAnonKey;
-} catch (e) {
+} catch {
   // import.meta.env not available, use publicAnonKey
 }
 
@@ -48,7 +48,7 @@ const PROD_PROJECT_ID = 'lmffeqwhrnbsbhdztwyv';
 let PROD_ANON_KEY = publicAnonKey;
 try {
   PROD_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY_PROD || publicAnonKey;
-} catch (e) {
+} catch {
   // import.meta.env not available, use publicAnonKey
 }
 

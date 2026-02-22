@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router';
 import { Mail, CreditCard, Link as LinkIcon, CheckCircle, AlertCircle, IdCard } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Label } from '../components/ui/label';
 import { useAuth } from '../context/AuthContext';
 import { usePublicSite } from '../context/PublicSiteContext';
-import { toast } from 'sonner';
 import { logger } from '../utils/logger';
 import { sanitizeInput, checkRateLimit, logSecurityEvent, validateEmailFormat } from '../utils/security';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';
@@ -45,10 +40,10 @@ export function AccessValidation() {
   // IMPORTANT: This must be before any early returns to follow Rules of Hooks
   useEffect(() => {
     if (currentSite && validationMethod === 'magic_link') {
-      navigate('/access/magic-link-request');
+      void navigate('/access/magic-link-request');
     }
     if (currentSite && (validationMethod as string) === 'sso') {
-      navigate('/access/sso');
+      void navigate('/access/sso');
     }
   }, [navigate, validationMethod, currentSite]);
 
@@ -186,7 +181,7 @@ export function AccessValidation() {
         
         // Navigate to welcome page if enabled, otherwise go directly to gift selection
         // Use ../ to go up one level from /access to the site root
-        navigate(enableWelcomePage === false ? '../gift-selection' : '../welcome');
+        void navigate(enableWelcomePage === false ? '../gift-selection' : '../welcome');
       } else {
         // Validation failed
         setError(data.error || t('validation.error.invalid'));
@@ -218,7 +213,7 @@ export function AccessValidation() {
           placeholder: t('validation.email.placeholder'),
           type: 'email' as const,
           label: t('validation.email.label'),
-          hint: currentSite?.settings?.allowedDomains && currentSite.settings.allowedDomains.length > 0
+          hint: currentSite?.settings?.allowedDomains && currentSite?.settings?.allowedDomains.length > 0
             ? `Please use an email from: ${currentSite.settings.allowedDomains.join(', ')}`
             : t('validation.email.hint'),
         };
@@ -274,7 +269,7 @@ export function AccessValidation() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={() => void handleSubmit()} className="space-y-6">
             <div>
               <label htmlFor="credential" className="block text-sm font-semibold text-gray-700 mb-2">
                 {config.label}

@@ -357,6 +357,7 @@ beforeAll(() => {
       
       constructor(url: string, base?: string) {
         // Simple URL parsing
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         const parser = new (require('url').URL)(url, base);
         this.href = parser.href;
         this.origin = parser.origin;

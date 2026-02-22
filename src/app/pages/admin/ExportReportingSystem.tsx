@@ -3,9 +3,7 @@ import {
   FileText,
   Download,
   Calendar,
-  Send,
   Clock,
-  CheckCircle,
   FileSpreadsheet,
   FileImage,
   Mail,
@@ -22,9 +20,7 @@ import {
   Package,
   Gift,
   Award,
-  DollarSign,
-  Activity,
-  AlertCircle
+  Activity
 } from 'lucide-react';
 
 interface ReportTemplate {

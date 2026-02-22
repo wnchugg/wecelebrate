@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { Button } from '../../components/ui/button';
 import { ArrowLeft, Home, ArrowRight, Globe, Building2 } from 'lucide-react';
 import Logo from '../../../imports/Logo';
 

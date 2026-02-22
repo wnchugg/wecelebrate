@@ -6,18 +6,12 @@ import { Label } from '../ui/label';
 import { Switch } from '../ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Alert, AlertDescription } from '../ui/alert';
-import { Badge } from '../ui/badge';
 import { 
   Server, 
   Key, 
   Folder, 
-  User, 
-  Lock, 
   CheckCircle, 
   XCircle,
-  AlertTriangle,
-  RefreshCw,
-  FileText,
   Eye,
   EyeOff,
   Clock,
@@ -386,7 +380,7 @@ export function SftpConfigModal({ open, onClose, config, onSave }: SftpConfigMod
           {formData.enabled && (
             <div>
               <Button
-                onClick={handleTestConnection}
+                onClick={() => void handleTestConnection()}
                 disabled={testing || !formData.host || !formData.username}
                 variant="outline"
                 className="w-full"

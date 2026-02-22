@@ -17,6 +17,9 @@ import {
   Calendar, 
   MapPin 
 } from 'lucide-react';
+import { CurrencyDisplay } from '../components/CurrencyDisplay';
+import { useDateFormat } from '../hooks/useDateFormat';
+import { translateWithParams } from '../utils/translationHelpers';
 
 interface Order {
   id: string;
@@ -52,6 +55,7 @@ export function OrderTracking() {
   const { orderId, siteId } = useParams();
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { formatDate, formatShortDate, formatTime } = useDateFormat();
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,7 +63,7 @@ export function OrderTracking() {
   useEffect(() => {
     const loadOrder = async () => {
       if (!orderId) {
-        navigate('../gift-selection');
+        void navigate('../gift-selection');
         return;
       }
       
@@ -71,8 +75,8 @@ export function OrderTracking() {
         const sessionToken = sessionStorage.getItem('employee_session');
         
         if (!sessionToken) {
-          toast.error('Session expired. Please log in again.');
-          navigate('../access');
+          toast.error(t('notification.error.sessionExpired'));
+          void navigate('../access');
           return;
         }
         
@@ -98,13 +102,13 @@ export function OrderTracking() {
       } catch (error: any) {
         logger.error('Failed to load order:', error);
         setError(error.message || 'Failed to load order details');
-        toast.error(error.message || 'Failed to load order');
+        toast.error(error.message || t('notification.error.failedToLoadOrder'));
       } finally {
         setIsLoading(false);
       }
     };
     
-    loadOrder();
+    void loadOrder();
   }, [orderId, navigate]);
 
   // Calculate estimated delivery date (7 business days from order date)
@@ -112,11 +116,7 @@ export function OrderTracking() {
     const orderDate = new Date(createdAt);
     const deliveryDate = new Date(orderDate);
     deliveryDate.setDate(deliveryDate.getDate() + 7);
-    return deliveryDate.toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-    });
+    return formatDate(deliveryDate);
   };
 
   // Define order status timeline
@@ -181,7 +181,7 @@ export function OrderTracking() {
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <p className="text-red-500 text-lg font-bold mb-4">{error || 'Order not found'}</p>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => void navigate('/')}
             className="text-[#D91C81] hover:text-[#B71569] font-medium"
           >
             Return Home
@@ -202,7 +202,7 @@ export function OrderTracking() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => navigate('/')}
+                onClick={() => void navigate('/')}
                 className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
                 aria-label="Back"
               >
@@ -229,7 +229,7 @@ export function OrderTracking() {
               Order Number: <span className="font-mono font-bold text-[#D91C81]">{order.orderNumber}</span>
             </p>
             <p className="text-sm text-gray-500">
-              Placed on {new Date(order.createdAt).toLocaleDateString('en-US', {
+              Placed on {formatDate(order.createdAt, {
                 month: 'long',
                 day: 'numeric',
                 year: 'numeric',
@@ -292,12 +292,7 @@ export function OrderTracking() {
                             {status.date && status.completed && (
                               <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
                                 <Clock className="w-3 h-3" />
-                                {new Date(status.date).toLocaleDateString('en-US', {
-                                  month: 'short',
-                                  day: 'numeric',
-                                  hour: 'numeric',
-                                  minute: '2-digit'
-                                })}
+                                {formatShortDate(status.date)} {formatTime(status.date)}
                               </p>
                             )}
                           </div>
@@ -312,8 +307,7 @@ export function OrderTracking() {
                         {/* Tracking Number */}
                         {status.key === 'shipped' && order.trackingNumber && status.completed && (
                           <div className="mt-3 bg-blue-50 border border-blue-200 rounded-lg p-3">
-                            <p className="text-sm text-blue-900 font-medium mb-1">Tracking Number</p>
-                            <p className="font-mono text-blue-700 font-semibold">{order.trackingNumber}</p>
+                            <p className="text-sm text-blue-900 font-medium mb-1">{translateWithParams(t, 'shipping.trackingNumber', { number: order.trackingNumber })}</p>
                             <button className="text-xs text-blue-600 hover:text-blue-800 font-medium mt-2 underline">
                               Track with carrier
                             </button>
@@ -333,8 +327,7 @@ export function OrderTracking() {
                   <div className="flex items-center gap-3">
                     <Calendar className="w-6 h-6 text-[#00B4CC]" />
                     <div>
-                      <p className="text-sm text-gray-600">Estimated Delivery</p>
-                      <p className="font-bold text-gray-900">{estimatedDelivery}</p>
+                      <p className="font-bold text-gray-900">{translateWithParams(t, 'shipping.estimatedDelivery', { date: estimatedDelivery })}</p>
                     </div>
                   </div>
                   {order.status === 'shipped' && (
@@ -355,7 +348,7 @@ export function OrderTracking() {
                     <div>
                       <p className="font-semibold text-green-900">Delivered Successfully!</p>
                       <p className="text-sm text-green-700">
-                        {new Date(order.deliveredAt).toLocaleDateString('en-US', {
+                        {formatDate(order.deliveredAt, {
                           month: 'long',
                           day: 'numeric',
                           year: 'numeric',
@@ -393,7 +386,7 @@ export function OrderTracking() {
                     <span className="font-medium">Quantity:</span> {order.quantity}
                   </p>
                   <p className="text-sm text-gray-700">
-                    <span className="font-medium">Value:</span> ${order.totalValue.toFixed(2)}
+                    <span className="font-medium">Value:</span> <CurrencyDisplay amount={order.totalValue} />
                   </p>
                 </div>
               </div>

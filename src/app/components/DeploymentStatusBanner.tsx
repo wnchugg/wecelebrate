@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { AlertCircle, RefreshCw, X } from 'lucide-react';
 import { logger } from '../utils/logger';
 

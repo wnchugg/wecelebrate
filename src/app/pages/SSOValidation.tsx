@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router';
-import { Shield, ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
+import { Shield, ArrowLeft, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { LanguageSelector } from '../components/LanguageSelector';
@@ -80,7 +80,7 @@ export function SSOValidation() {
         });
         
         authenticate(data.employee?.email || '');
-        navigate('/gift-selection');
+        void navigate('/gift-selection');
       } else {
         setError(data.error || 'Authentication failed. Please try again.');
         logSecurityEvent({
@@ -243,7 +243,7 @@ export function SSOValidation() {
             {/* SSO Button */}
             <div className="space-y-6">
               <button
-                onClick={handleSSOLogin}
+                onClick={() => void handleSSOLogin()}
                 disabled={isInitiating || isSiteLoading}
                 className="w-full bg-white border-2 border-gray-300 hover:border-gray-400 text-gray-800 py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all disabled:bg-gray-100 disabled:cursor-not-allowed flex items-center justify-center gap-3 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-offset-2 min-h-[44px]"
               >

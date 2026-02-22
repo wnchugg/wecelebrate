@@ -66,12 +66,20 @@ interface GeoapifyFeature {
   };
 }
 
-// Unified suggestion format
+// Unified suggestion format — includes full address when available (avoids separate details call)
 interface UnifiedSuggestion {
   placeId: string;
   description: string;
   mainText: string;
   secondaryText: string;
+  address?: {
+    line1: string;
+    line2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
 }
 
 // ===== Configuration =====
@@ -253,11 +261,30 @@ async function searchAddressesGeoapify(
       const mainText = props.address_line1 || props.formatted?.split(',')[0] || '';
       const secondaryText = props.formatted?.split(',').slice(1).join(',').trim() || '';
 
+      // Build line1 from housenumber + street, falling back to address_line1
+      let line1 = '';
+      if (props.housenumber && props.street) {
+        line1 = `${props.housenumber} ${props.street}`;
+      } else if (props.street) {
+        line1 = props.street;
+      } else if (props.address_line1) {
+        line1 = props.address_line1;
+      }
+
       return {
         placeId: props.place_id || `geoapify-${index}`,
         description: props.formatted || '',
         mainText,
         secondaryText,
+        // Embed full address so the frontend never needs a separate details call
+        address: {
+          line1,
+          line2: props.address_line2 || undefined,
+          city: props.city || '',
+          state: props.state || '',
+          postalCode: props.postcode || '',
+          country: props.country_code?.toUpperCase() || props.country || '',
+        },
       };
     });
   } catch (error) {
@@ -432,12 +459,13 @@ export function setupAddressAutocompleteRoutes(app: Hono) {
       // Search for addresses
       const suggestions = await searchAddresses(query, country);
 
-      // Format response — use UnifiedSuggestion field names (already normalised)
+      // Format response — include full address data when available (avoids N+1 details calls)
       const formattedSuggestions = suggestions.map(s => ({
         placeId: s.placeId,
         description: s.description,
         mainText: s.mainText,
         secondaryText: s.secondaryText,
+        address: s.address ?? null,
       }));
 
       return c.json({

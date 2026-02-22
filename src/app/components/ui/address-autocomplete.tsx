@@ -293,54 +293,20 @@ async function fetchAddressSuggestions(
       return [];
     }
 
-    // Fetch details for each suggestion to get structured address data
-    const detailedSuggestions = await Promise.all(
-      data.suggestions.map(async (item: any) => {
-        try {
-          const detailsResponse = await fetch(
-            `${apiUrl}/api/address-autocomplete/details/${item.placeId}`,
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                'X-Environment-ID': env.id,
-                'Authorization': `Bearer ${env.supabaseAnonKey}`,
-              },
-              signal: AbortSignal.timeout(3000),
-            }
-          );
+    // Map suggestions directly — the backend now embeds address data in the search response
+    // so we never need a separate details API call.
+    const suggestions: AddressSuggestion[] = data.suggestions.map((item: any) => ({
+      id: item.placeId,
+      description: item.description,
+      line1: item.address?.line1 || item.mainText || '',
+      line2: item.address?.line2 || undefined,
+      city: item.address?.city || '',
+      state: item.address?.state || '',
+      postalCode: item.address?.postalCode || '',
+      country: item.address?.country || country || '',
+    }));
 
-          if (detailsResponse.ok) {
-            const details = await detailsResponse.json();
-            return {
-              id: item.placeId,
-              description: item.description,
-              line1: details.address.line1 || '',
-              line2: details.address.line2 || undefined,
-              city: details.address.city || '',
-              state: details.address.state || '',
-              postalCode: details.address.postalCode || '',
-              country: details.address.country || '',
-            };
-          }
-        } catch (err) {
-          console.warn('Failed to fetch details for place:', item.placeId);
-        }
-
-        // Fallback to basic suggestion data
-        return {
-          id: item.placeId,
-          description: item.description,
-          line1: item.mainText || '',
-          line2: undefined,
-          city: '',
-          state: '',
-          postalCode: '',
-          country: country || '',
-        };
-      })
-    );
-
-    return detailedSuggestions;
+    return suggestions;
   } catch (error) {
     // Handle different error types
     if (error instanceof Error) {

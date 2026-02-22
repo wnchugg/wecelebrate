@@ -231,7 +231,6 @@ async function searchAddressesGeoapify(
     const params = new URLSearchParams({
       text: query,
       apiKey: GEOAPIFY_API_KEY!,
-      type: 'amenity,street,postcode',
       format: 'json',
       limit: '5',
     });
@@ -433,12 +432,12 @@ export function setupAddressAutocompleteRoutes(app: Hono) {
       // Search for addresses
       const suggestions = await searchAddresses(query, country);
 
-      // Format response
+      // Format response — use UnifiedSuggestion field names (already normalised)
       const formattedSuggestions = suggestions.map(s => ({
-        placeId: s.place_id,
+        placeId: s.placeId,
         description: s.description,
-        mainText: s.structured_formatting.main_text,
-        secondaryText: s.structured_formatting.secondary_text,
+        mainText: s.mainText,
+        secondaryText: s.secondaryText,
       }));
 
       return c.json({

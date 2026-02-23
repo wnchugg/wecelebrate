@@ -122,7 +122,7 @@ export function BrandingConfiguration() {
 
         {/* Apply To Selector */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Apply Branding To:</label>
+          <p className="block text-sm font-medium text-gray-700 mb-2">Apply Branding To:</p>
           <div className="flex gap-4">
             <button
               onClick={() => setApplyTo('site')}
@@ -185,8 +185,9 @@ export function BrandingConfiguration() {
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Primary Logo</h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Logo URL</label>
+                    <label htmlFor="branding-primary-logo-url" className="block text-sm font-medium text-gray-700 mb-2">Logo URL</label>
                     <input
+                      id="branding-primary-logo-url"
                       type="text"
                       value={branding.logos.primary.url}
                       onChange={(e) =>
@@ -203,8 +204,9 @@ export function BrandingConfiguration() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Alt Text</label>
+                    <label htmlFor="branding-primary-logo-alt" className="block text-sm font-medium text-gray-700 mb-2">Alt Text</label>
                     <input
+                      id="branding-primary-logo-alt"
                       type="text"
                       value={branding.logos.primary.alt}
                       onChange={(e) =>
@@ -236,8 +238,9 @@ export function BrandingConfiguration() {
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Secondary Logo (Optional)</h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Logo URL</label>
+                    <label htmlFor="branding-secondary-logo-url" className="block text-sm font-medium text-gray-700 mb-2">Logo URL</label>
                     <input
+                      id="branding-secondary-logo-url"
                       type="text"
                       value={branding.logos.secondary?.url || ''}
                       onChange={(e) =>
@@ -270,8 +273,9 @@ export function BrandingConfiguration() {
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Favicon (Optional)</h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Favicon URL</label>
+                    <label htmlFor="branding-favicon-url" className="block text-sm font-medium text-gray-700 mb-2">Favicon URL</label>
                     <input
+                      id="branding-favicon-url"
                       type="text"
                       value={branding.logos.favicon?.url || ''}
                       onChange={(e) =>
@@ -316,7 +320,7 @@ export function BrandingConfiguration() {
                   ))}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Add Image URL</label>
+                  <p className="block text-sm font-medium text-gray-700 mb-2">Add Image URL</p>
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -366,7 +370,7 @@ export function BrandingConfiguration() {
                   ))}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Add Image URL</label>
+                  <p className="block text-sm font-medium text-gray-700 mb-2">Add Image URL</p>
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -530,8 +534,9 @@ export function BrandingConfiguration() {
           {activeTab === 'typography' && (
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Heading Font</label>
+                <label htmlFor="branding-heading-font" className="block text-sm font-medium text-gray-700 mb-2">Heading Font</label>
                 <input
+                  id="branding-heading-font"
                   type="text"
                   value={branding.typography.headingFont}
                   onChange={(e) =>
@@ -546,8 +551,9 @@ export function BrandingConfiguration() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Body Font</label>
+                <label htmlFor="branding-body-font" className="block text-sm font-medium text-gray-700 mb-2">Body Font</label>
                 <input
+                  id="branding-body-font"
                   type="text"
                   value={branding.typography.bodyFont}
                   onChange={(e) =>
@@ -562,8 +568,9 @@ export function BrandingConfiguration() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Base Font Size (px)</label>
+                <label htmlFor="branding-font-size-base" className="block text-sm font-medium text-gray-700 mb-2">Base Font Size (px)</label>
                 <input
+                  id="branding-font-size-base"
                   type="number"
                   value={branding.typography.fontSizeBase}
                   onChange={(e) =>

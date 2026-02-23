@@ -790,10 +790,11 @@ export function AdminUserManagement() {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="user-mgmt-username" className="block text-sm font-medium text-gray-700 mb-2">
                       Username *
                     </label>
                     <input
+                      id="user-mgmt-username"
                       type="text"
                       value={formData.username}
                       onChange={(e) => setFormData({ ...formData, username: e.target.value })}
@@ -805,10 +806,11 @@ export function AdminUserManagement() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="user-mgmt-email" className="block text-sm font-medium text-gray-700 mb-2">
                       Email Address *
                     </label>
                     <input
+                      id="user-mgmt-email"
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -823,10 +825,11 @@ export function AdminUserManagement() {
                 {!selectedUser && (
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="user-mgmt-password" className="block text-sm font-medium text-gray-700 mb-2">
                         Password *
                       </label>
                       <input
+                        id="user-mgmt-password"
                         type="password"
                         value={formData.password}
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -838,10 +841,11 @@ export function AdminUserManagement() {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="user-mgmt-confirm-password" className="block text-sm font-medium text-gray-700 mb-2">
                         Confirm Password *
                       </label>
                       <input
+                        id="user-mgmt-confirm-password"
                         type="password"
                         value={formData.confirmPassword}
                         onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
@@ -860,10 +864,11 @@ export function AdminUserManagement() {
                 <h3 className="font-semibold text-gray-900">Role & Permissions</h3>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="user-mgmt-role" className="block text-sm font-medium text-gray-700 mb-2">
                     Admin Role *
                   </label>
                   <select
+                    id="user-mgmt-role"
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value as AdminRole })}
                     disabled={isSaving}
@@ -899,14 +904,15 @@ export function AdminUserManagement() {
                 <h3 className="font-semibold text-gray-900">Client Access</h3>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="user-mgmt-client-access" className="block text-sm font-medium text-gray-700 mb-2">
                     Client Access Level *
                   </label>
                   <select
+                    id="user-mgmt-client-access"
                     value={formData.clientAccess === 'all' ? 'all' : 'specific'}
-                    onChange={(e) => setFormData({ 
-                      ...formData, 
-                      clientAccess: e.target.value === 'all' ? 'all' : [] 
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      clientAccess: e.target.value === 'all' ? 'all' : []
                     })}
                     disabled={isSaving}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:opacity-50 disabled:cursor-not-allowed"
@@ -928,14 +934,15 @@ export function AdminUserManagement() {
                 <h3 className="font-semibold text-gray-900">Site Access</h3>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="user-mgmt-site-access" className="block text-sm font-medium text-gray-700 mb-2">
                     Site Access Level *
                   </label>
                   <select
+                    id="user-mgmt-site-access"
                     value={formData.siteAccess === 'all' ? 'all' : 'specific'}
-                    onChange={(e) => setFormData({ 
-                      ...formData, 
-                      siteAccess: e.target.value === 'all' ? 'all' : [] 
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      siteAccess: e.target.value === 'all' ? 'all' : []
                     })}
                     disabled={isSaving}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none disabled:opacity-50 disabled:cursor-not-allowed"
@@ -957,10 +964,11 @@ export function AdminUserManagement() {
                 <h3 className="font-semibold text-gray-900">Account Status</h3>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="user-mgmt-status" className="block text-sm font-medium text-gray-700 mb-2">
                     Status *
                   </label>
                   <select
+                    id="user-mgmt-status"
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value as 'active' | 'inactive' })}
                     disabled={isSaving}
@@ -1073,10 +1081,11 @@ export function AdminUserManagement() {
               </p>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="user-mgmt-new-password" className="block text-sm font-medium text-gray-700 mb-2">
                   New Password *
                 </label>
                 <input
+                  id="user-mgmt-new-password"
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
@@ -1087,10 +1096,11 @@ export function AdminUserManagement() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="user-mgmt-confirm-new-password" className="block text-sm font-medium text-gray-700 mb-2">
                   Confirm New Password *
                 </label>
                 <input
+                  id="user-mgmt-confirm-new-password"
                   type="password"
                   value={confirmNewPassword}
                   onChange={(e) => setConfirmNewPassword(e.target.value)}

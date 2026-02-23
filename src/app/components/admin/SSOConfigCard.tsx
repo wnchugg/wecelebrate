@@ -128,10 +128,11 @@ export function SSOConfigCard(props: SSOConfigCardProps) {
         {/* Unconfigured State - Show only provider selection */}
         {uiState === 'unconfigured' && (
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="sso-provider-unconfigured" className="block text-sm font-semibold text-gray-700 mb-2">
               SSO Provider *
             </label>
             <select
+              id="sso-provider-unconfigured"
               value={ssoProvider}
               onChange={(e) => handleProviderChange(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -183,12 +184,13 @@ export function SSOConfigCard(props: SSOConfigCardProps) {
 
             {/* Provider Selection */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                SSO Provider *
-              </label>
               {uiState === 'edit' ? (
                 <>
+                  <label htmlFor="sso-provider-display" className="block text-sm font-semibold text-gray-700 mb-2">
+                    SSO Provider *
+                  </label>
                   <Input
+                    id="sso-provider-display"
                     value={getProviderDisplayName(ssoProvider)}
                     readOnly
                     className="bg-gray-50"
@@ -199,7 +201,11 @@ export function SSOConfigCard(props: SSOConfigCardProps) {
                 </>
               ) : (
                 <>
+                  <label htmlFor="sso-provider-select" className="block text-sm font-semibold text-gray-700 mb-2">
+                    SSO Provider *
+                  </label>
                   <select
+                    id="sso-provider-select"
                     value={ssoProvider}
                     onChange={(e) => handleProviderChange(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -268,10 +274,11 @@ export function SSOConfigCard(props: SSOConfigCardProps) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="sso-attr-email" className="block text-sm font-semibold text-gray-700 mb-2">
                       Email Attribute
                     </label>
                     <Input
+                      id="sso-attr-email"
                       type="text"
                       defaultValue="email"
                       placeholder="email"
@@ -281,10 +288,11 @@ export function SSOConfigCard(props: SSOConfigCardProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="sso-attr-first-name" className="block text-sm font-semibold text-gray-700 mb-2">
                       First Name Attribute
                     </label>
                     <Input
+                      id="sso-attr-first-name"
                       type="text"
                       defaultValue="firstName"
                       placeholder="firstName"
@@ -294,10 +302,11 @@ export function SSOConfigCard(props: SSOConfigCardProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="sso-attr-last-name" className="block text-sm font-semibold text-gray-700 mb-2">
                       Last Name Attribute
                     </label>
                     <Input
+                      id="sso-attr-last-name"
                       type="text"
                       defaultValue="lastName"
                       placeholder="lastName"
@@ -307,10 +316,11 @@ export function SSOConfigCard(props: SSOConfigCardProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="sso-attr-employee-id" className="block text-sm font-semibold text-gray-700 mb-2">
                       Employee ID Attribute
                     </label>
                     <Input
+                      id="sso-attr-employee-id"
                       type="text"
                       defaultValue="employeeId"
                       placeholder="employeeId"
@@ -331,7 +341,8 @@ export function SSOConfigCard(props: SSOConfigCardProps) {
                     <p className="text-sm text-gray-600">Automatically create accounts for new users</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
-                    <input 
+                    <span className="sr-only">Auto-Provision Users</span>
+                    <input
                       type="checkbox"
                       checked={ssoAutoProvision}
                       onChange={(e) => {
@@ -351,7 +362,8 @@ export function SSOConfigCard(props: SSOConfigCardProps) {
                     <p className="text-sm text-gray-600">Enforce MFA at the provider level</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
-                    <input 
+                    <span className="sr-only">Require Multi-Factor Authentication</span>
+                    <input
                       type="checkbox"
                       onChange={() => setHasChanges(true)}
                       disabled={configMode === 'live'}
@@ -362,10 +374,11 @@ export function SSOConfigCard(props: SSOConfigCardProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="sso-session-timeout" className="block text-sm font-semibold text-gray-700 mb-2">
                     Session Timeout (minutes)
                   </label>
                   <Input
+                    id="sso-session-timeout"
                     type="number"
                     defaultValue="60"
                     min="5"
@@ -399,7 +412,8 @@ export function SSOConfigCard(props: SSOConfigCardProps) {
                     </p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
-                    <input 
+                    <span className="sr-only">Allow Site Manager Bypass</span>
+                    <input
                       type="checkbox"
                       checked={allowAdminBypass}
                       onChange={(e) => {
@@ -416,11 +430,12 @@ export function SSOConfigCard(props: SSOConfigCardProps) {
                 {allowAdminBypass && (
                   <div className="space-y-4 pl-4 border-l-2 border-amber-200">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label htmlFor="sso-bypass-url" className="block text-sm font-semibold text-gray-700 mb-2">
                         Bypass Login URL
                       </label>
                       <div className="flex gap-2">
-                        <Input 
+                        <Input
+                          id="sso-bypass-url"
                           value={`${getPublicSiteUrlBySlug(siteUrl)}/admin-login`}
                           readOnly
                           className="bg-gray-50 font-mono text-sm"
@@ -447,7 +462,8 @@ export function SSOConfigCard(props: SSOConfigCardProps) {
                         <p className="text-sm text-gray-600">Additional security for admin access</p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
-                        <input 
+                        <span className="sr-only">Require 2FA for Bypass</span>
+                        <input
                           type="checkbox"
                           checked={bypassRequires2FA}
                           onChange={(e) => {
@@ -462,10 +478,11 @@ export function SSOConfigCard(props: SSOConfigCardProps) {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label htmlFor="sso-allowed-ips" className="block text-sm font-semibold text-gray-700 mb-2">
                         Allowed IP Addresses (Optional)
                       </label>
-                      <textarea 
+                      <textarea
+                        id="sso-allowed-ips"
                         rows={4}
                         placeholder="192.168.1.1&#10;10.0.0.1&#10;Leave empty to allow all IPs"
                         value={bypassAllowedIPs}

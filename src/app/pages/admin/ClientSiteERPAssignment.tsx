@@ -207,10 +207,11 @@ export function ClientSiteERPAssignment() {
 
           {/* Client Selector */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="erp-assign-select-client" className="block text-sm font-medium text-gray-700 mb-2">
               Select Client *
             </label>
             <select
+              id="erp-assign-select-client"
               value={selectedClient}
               onChange={(e) => setSelectedClient(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D91C81] focus:border-transparent"
@@ -228,10 +229,11 @@ export function ClientSiteERPAssignment() {
             <div className="space-y-6">
               {/* ERP Connection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="erp-assign-client-erp-connection" className="block text-sm font-medium text-gray-700 mb-2">
                   ERP Connection *
                 </label>
                 <select
+                  id="erp-assign-client-erp-connection"
                   value={clientAssignment.erpConnectionId || ''}
                   onChange={(e) => setClientAssignment({
                     ...clientAssignment,
@@ -250,10 +252,11 @@ export function ClientSiteERPAssignment() {
 
               {/* Catalog */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="erp-assign-client-catalog" className="block text-sm font-medium text-gray-700 mb-2">
                   Default Catalog (Optional)
                 </label>
                 <select
+                  id="erp-assign-client-catalog"
                   value={clientAssignment.catalogId || ''}
                   onChange={(e) => setClientAssignment({
                     ...clientAssignment,
@@ -272,9 +275,9 @@ export function ClientSiteERPAssignment() {
 
               {/* Sync Settings */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <p className="block text-sm font-medium text-gray-700 mb-3">
                   Data Sync Settings
-                </label>
+                </p>
                 <div className="space-y-2">
                   {[
                     { key: 'syncOrders', label: 'Sync Orders' },
@@ -345,10 +348,11 @@ export function ClientSiteERPAssignment() {
 
           {/* Site Selector */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="erp-assign-select-site" className="block text-sm font-medium text-gray-700 mb-2">
               Select Site *
             </label>
             <select
+              id="erp-assign-select-site"
               value={selectedSite}
               onChange={(e) => setSelectedSite(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D91C81] focus:border-transparent"
@@ -367,6 +371,7 @@ export function ClientSiteERPAssignment() {
               {/* Override Toggle */}
               <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <label className="flex items-start gap-3 cursor-pointer">
+                  <span className="sr-only">Override Client Settings</span>
                   <input
                     type="checkbox"
                     checked={siteAssignment.overridesClient || false}
@@ -389,10 +394,11 @@ export function ClientSiteERPAssignment() {
                 <>
                   {/* ERP Connection */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="erp-assign-site-erp-connection" className="block text-sm font-medium text-gray-700 mb-2">
                       ERP Connection *
                     </label>
                     <select
+                      id="erp-assign-site-erp-connection"
                       value={siteAssignment.erpConnectionId || ''}
                       onChange={(e) => setSiteAssignment({
                         ...siteAssignment,
@@ -411,10 +417,11 @@ export function ClientSiteERPAssignment() {
 
                   {/* Catalog */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="erp-assign-site-catalog" className="block text-sm font-medium text-gray-700 mb-2">
                       Site Catalog (Optional)
                     </label>
                     <select
+                      id="erp-assign-site-catalog"
                       value={siteAssignment.catalogId || ''}
                       onChange={(e) => setSiteAssignment({
                         ...siteAssignment,
@@ -433,9 +440,9 @@ export function ClientSiteERPAssignment() {
 
                   {/* Sync Settings */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                    <p className="block text-sm font-medium text-gray-700 mb-3">
                       Data Sync Settings
-                    </label>
+                    </p>
                     <div className="space-y-2">
                       {[
                         { key: 'syncOrders', label: 'Sync Orders' },

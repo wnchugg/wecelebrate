@@ -113,10 +113,11 @@ export function BootstrapAdmin() {
 
         <form onSubmit={() => void handleSubmit()} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="bootstrap-email" className="block text-sm font-medium text-gray-700 mb-2">
               Email Address
             </label>
             <input
+              id="bootstrap-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -128,10 +129,11 @@ export function BootstrapAdmin() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="bootstrap-username" className="block text-sm font-medium text-gray-700 mb-2">
               Username
             </label>
             <input
+              id="bootstrap-username"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -143,10 +145,11 @@ export function BootstrapAdmin() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="bootstrap-password" className="block text-sm font-medium text-gray-700 mb-2">
               Password
             </label>
             <input
+              id="bootstrap-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -162,10 +165,11 @@ export function BootstrapAdmin() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="bootstrap-confirm-password" className="block text-sm font-medium text-gray-700 mb-2">
               Confirm Password
             </label>
             <input
+              id="bootstrap-confirm-password"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}

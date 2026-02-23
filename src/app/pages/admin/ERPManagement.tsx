@@ -807,10 +807,11 @@ function ERPConnectionModal({ connection, onClose, onSave }: ERPConnectionModalP
           {/* Basic Info */}
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="erp-mgmt-connection-name" className="block text-sm font-medium text-gray-700 mb-2">
                 Connection Name *
               </label>
               <input
+                id="erp-mgmt-connection-name"
                 type="text"
                 value={formData.name}
                 onChange={e => setFormData({ ...formData, name: e.target.value })}
@@ -821,10 +822,11 @@ function ERPConnectionModal({ connection, onClose, onSave }: ERPConnectionModalP
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="erp-mgmt-erp-type" className="block text-sm font-medium text-gray-700 mb-2">
                 ERP Type *
               </label>
               <select
+                id="erp-mgmt-erp-type"
                 value={formData.type}
                 onChange={e => setFormData({ ...formData, type: e.target.value as any })}
                 required
@@ -839,10 +841,11 @@ function ERPConnectionModal({ connection, onClose, onSave }: ERPConnectionModalP
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="erp-mgmt-status" className="block text-sm font-medium text-gray-700 mb-2">
                 Status *
               </label>
               <select
+                id="erp-mgmt-status"
                 value={formData.status}
                 onChange={e => setFormData({ ...formData, status: e.target.value as any })}
                 required
@@ -860,10 +863,11 @@ function ERPConnectionModal({ connection, onClose, onSave }: ERPConnectionModalP
             <h3 className="text-sm font-semibold text-gray-900">API Configuration</h3>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="erp-mgmt-api-url" className="block text-sm font-medium text-gray-700 mb-2">
                 API URL *
               </label>
               <input
+                id="erp-mgmt-api-url"
                 type="url"
                 value={formData.apiUrl}
                 onChange={e => setFormData({ ...formData, apiUrl: e.target.value })}
@@ -874,10 +878,11 @@ function ERPConnectionModal({ connection, onClose, onSave }: ERPConnectionModalP
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="erp-mgmt-auth-type" className="block text-sm font-medium text-gray-700 mb-2">
                 Authentication Type *
               </label>
               <select
+                id="erp-mgmt-auth-type"
                 value={formData.authType}
                 onChange={e => setFormData({ ...formData, authType: e.target.value as any })}
                 required
@@ -893,10 +898,11 @@ function ERPConnectionModal({ connection, onClose, onSave }: ERPConnectionModalP
 
             {(formData.authType === 'api_key' || formData.authType === 'bearer') && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="erp-mgmt-api-key" className="block text-sm font-medium text-gray-700 mb-2">
                   API Key / Token *
                 </label>
                 <input
+                  id="erp-mgmt-api-key"
                   type="password"
                   value={formData.apiKey}
                   onChange={e => setFormData({ ...formData, apiKey: e.target.value })}
@@ -910,10 +916,11 @@ function ERPConnectionModal({ connection, onClose, onSave }: ERPConnectionModalP
             {formData.authType === 'basic' && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="erp-mgmt-username" className="block text-sm font-medium text-gray-700 mb-2">
                     Username *
                   </label>
                   <input
+                    id="erp-mgmt-username"
                     type="text"
                     value={formData.username}
                     onChange={e => setFormData({ ...formData, username: e.target.value })}
@@ -922,10 +929,11 @@ function ERPConnectionModal({ connection, onClose, onSave }: ERPConnectionModalP
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="erp-mgmt-basic-password" className="block text-sm font-medium text-gray-700 mb-2">
                     Password *
                   </label>
                   <input
+                    id="erp-mgmt-basic-password"
                     type="password"
                     value={formData.apiKey}
                     onChange={e => setFormData({ ...formData, apiKey: e.target.value })}
@@ -974,10 +982,11 @@ function ERPConnectionModal({ connection, onClose, onSave }: ERPConnectionModalP
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="erp-mgmt-sync-interval" className="block text-sm font-medium text-gray-700 mb-2">
                 Sync Interval (minutes)
               </label>
               <input
+                id="erp-mgmt-sync-interval"
                 type="number"
                 value={formData.syncInterval}
                 onChange={e => setFormData({ ...formData, syncInterval: parseInt(e.target.value) })}

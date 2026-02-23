@@ -53,12 +53,13 @@ export function OAuthFields({
         </svg>
         OAuth 2.0 / OpenID Connect Settings
       </h4>
-      
+
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label htmlFor="oauth-client-id" className="block text-sm font-semibold text-gray-700 mb-2">
           Client ID *
         </label>
         <Input
+          id="oauth-client-id"
           type="text"
           value={ssoClientId}
           onChange={(e) => {
@@ -74,10 +75,11 @@ export function OAuthFields({
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label htmlFor="oauth-client-secret" className="block text-sm font-semibold text-gray-700 mb-2">
           Client Secret *
         </label>
         <Input
+          id="oauth-client-secret"
           type="password"
           value={ssoClientSecret}
           onChange={(e) => {
@@ -96,10 +98,11 @@ export function OAuthFields({
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label htmlFor="oauth-auth-url" className="block text-sm font-semibold text-gray-700 mb-2">
           Authorization URL *
         </label>
         <Input
+          id="oauth-auth-url"
           type="url"
           value={ssoAuthUrl}
           onChange={(e) => {
@@ -115,10 +118,11 @@ export function OAuthFields({
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label htmlFor="oauth-token-url" className="block text-sm font-semibold text-gray-700 mb-2">
           Token URL *
         </label>
         <Input
+          id="oauth-token-url"
           type="url"
           value={ssoTokenUrl}
           onChange={(e) => {
@@ -134,10 +138,11 @@ export function OAuthFields({
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label htmlFor="oauth-user-info-url" className="block text-sm font-semibold text-gray-700 mb-2">
           User Info URL
         </label>
         <Input
+          id="oauth-user-info-url"
           type="url"
           value={ssoUserInfoUrl}
           onChange={(e) => {
@@ -150,10 +155,11 @@ export function OAuthFields({
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label htmlFor="oauth-scope" className="block text-sm font-semibold text-gray-700 mb-2">
           Scope
         </label>
         <Input
+          id="oauth-scope"
           type="text"
           value={ssoScope}
           onChange={(e) => {
@@ -169,11 +175,12 @@ export function OAuthFields({
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label htmlFor="oauth-redirect-uri" className="block text-sm font-semibold text-gray-700 mb-2">
           Redirect URI (Callback URL) *
         </label>
         <div className="flex gap-2">
           <Input
+            id="oauth-redirect-uri"
             type="url"
             value={ssoRedirectUri}
             readOnly

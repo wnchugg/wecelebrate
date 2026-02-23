@@ -276,10 +276,11 @@ export function CreateSiteModal({ isOpen, onClose, onSuccess, clients }: CreateS
               )}
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="site-name" className="block text-sm font-semibold text-gray-700 mb-2">
                   Site Name *
                 </label>
                 <input
+                  id="site-name"
                   type="text"
                   required
                   value={formData.name}
@@ -290,10 +291,11 @@ export function CreateSiteModal({ isOpen, onClose, onSuccess, clients }: CreateS
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="site-client" className="block text-sm font-semibold text-gray-700 mb-2">
                   Client Name *
                 </label>
                 <select
+                  id="site-client"
                   value={formData.clientId}
                   onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -306,12 +308,13 @@ export function CreateSiteModal({ isOpen, onClose, onSuccess, clients }: CreateS
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="site-domain" className="block text-sm font-semibold text-gray-700 mb-2">
                   Domain *
                 </label>
                 <div className="flex items-center gap-2">
                   <LinkIcon className="w-5 h-5 text-gray-400" />
                   <input
+                    id="site-domain"
                     type="text"
                     required
                     value={formData.domain}
@@ -339,17 +342,19 @@ export function CreateSiteModal({ isOpen, onClose, onSuccess, clients }: CreateS
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="site-primary-color-text" className="block text-sm font-semibold text-gray-700 mb-2">
                     Primary Color
                   </label>
                   <div className="flex gap-2">
                     <input
                       type="color"
+                      aria-label="Primary color picker"
                       value={formData.branding.primaryColor}
                       onChange={(e) => setFormData({ ...formData, branding: { ...formData.branding, primaryColor: e.target.value } })}
                       className="w-12 h-10 border border-gray-300 rounded-lg cursor-pointer"
                     />
                     <input
+                      id="site-primary-color-text"
                       type="text"
                       value={formData.branding.primaryColor}
                       onChange={(e) => setFormData({ ...formData, branding: { ...formData.branding, primaryColor: e.target.value } })}
@@ -359,17 +364,19 @@ export function CreateSiteModal({ isOpen, onClose, onSuccess, clients }: CreateS
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="site-secondary-color-text" className="block text-sm font-semibold text-gray-700 mb-2">
                     Secondary Color
                   </label>
                   <div className="flex gap-2">
                     <input
                       type="color"
+                      aria-label="Secondary color picker"
                       value={formData.branding.secondaryColor}
                       onChange={(e) => setFormData({ ...formData, branding: { ...formData.branding, secondaryColor: e.target.value } })}
                       className="w-12 h-10 border border-gray-300 rounded-lg cursor-pointer"
                     />
                     <input
+                      id="site-secondary-color-text"
                       type="text"
                       value={formData.branding.secondaryColor}
                       onChange={(e) => setFormData({ ...formData, branding: { ...formData.branding, secondaryColor: e.target.value } })}
@@ -379,17 +386,19 @@ export function CreateSiteModal({ isOpen, onClose, onSuccess, clients }: CreateS
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="site-accent-color-text" className="block text-sm font-semibold text-gray-700 mb-2">
                     Accent Color
                   </label>
                   <div className="flex gap-2">
                     <input
                       type="color"
+                      aria-label="Accent color picker"
                       value={formData.branding.accentColor}
                       onChange={(e) => setFormData({ ...formData, branding: { ...formData.branding, accentColor: e.target.value } })}
                       className="w-12 h-10 border border-gray-300 rounded-lg cursor-pointer"
                     />
                     <input
+                      id="site-accent-color-text"
                       type="text"
                       value={formData.branding.accentColor}
                       onChange={(e) => setFormData({ ...formData, branding: { ...formData.branding, accentColor: e.target.value } })}
@@ -424,10 +433,11 @@ export function CreateSiteModal({ isOpen, onClose, onSuccess, clients }: CreateS
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="site-validation-method" className="block text-sm font-semibold text-gray-700 mb-2">
                   Validation Method
                 </label>
                 <select
+                  id="site-validation-method"
                   value={formData.validationMethod}
                   onChange={(e) => setFormData({ ...formData, validationMethod: e.target.value as 'email' | 'employee_id' | 'serial_card' | 'magic_link' })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -440,10 +450,11 @@ export function CreateSiteModal({ isOpen, onClose, onSuccess, clients }: CreateS
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="site-shipping-mode" className="block text-sm font-semibold text-gray-700 mb-2">
                   Shipping Mode
                 </label>
                 <select
+                  id="site-shipping-mode"
                   value={formData.shippingMode}
                   onChange={(e) => setFormData({ ...formData, shippingMode: e.target.value as 'individual' | 'bulk' | 'store_pickup' })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"

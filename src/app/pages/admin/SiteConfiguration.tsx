@@ -2224,10 +2224,11 @@ export function SiteConfiguration() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="site-name" className="block text-sm font-semibold text-gray-700 mb-2">
                     Site Name
                   </label>
                   <Input
+                    id="site-name"
                     type="text"
                     value={siteName}
                     onChange={(e) => {
@@ -2240,7 +2241,7 @@ export function SiteConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="site-url-slug" className="block text-sm font-semibold text-gray-700 mb-2">
                     Site URL Slug
                   </label>
                   <div className="space-y-2">
@@ -2249,6 +2250,7 @@ export function SiteConfiguration() {
                         {getEnvironmentBaseUrl()}/site/
                       </span>
                       <Input
+                        id="site-url-slug"
                         type="text"
                         value={siteUrl}
                         onChange={(e) => {
@@ -2271,10 +2273,11 @@ export function SiteConfiguration() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="site-dropdown-name" className="block text-sm font-semibold text-gray-700 mb-2">
                     Dropdown Display Name <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
+                    id="site-dropdown-name"
                     value={siteDropDownName}
                     onChange={(e) => {
                       setSiteDropDownName(e.target.value);
@@ -2288,10 +2291,11 @@ export function SiteConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="site-custom-domain-url" className="block text-sm font-semibold text-gray-700 mb-2">
                     Custom Domain URL <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
+                    id="site-custom-domain-url"
                     value={siteCustomDomainUrl}
                     onChange={(e) => {
                       setSiteCustomDomainUrl(e.target.value);
@@ -2304,10 +2308,11 @@ export function SiteConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="site-account-manager" className="block text-sm font-semibold text-gray-700 mb-2">
                     Account Manager <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
+                    id="site-account-manager"
                     value={siteAccountManager}
                     onChange={(e) => {
                       setSiteAccountManager(e.target.value);
@@ -2320,10 +2325,11 @@ export function SiteConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="site-account-manager-email" className="block text-sm font-semibold text-gray-700 mb-2">
                     Account Manager Email <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
+                    id="site-account-manager-email"
                     type="email"
                     value={siteAccountManagerEmail}
                     onChange={(e) => {
@@ -2362,10 +2368,11 @@ export function SiteConfiguration() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="availability-start-date" className="block text-sm font-semibold text-gray-700 mb-2">
                     Start Date
                   </label>
                   <Input
+                    id="availability-start-date"
                     type="datetime-local"
                     value={availabilityStartDate}
                     onChange={(e) => {
@@ -2380,10 +2387,11 @@ export function SiteConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="availability-end-date" className="block text-sm font-semibold text-gray-700 mb-2">
                     End Date
                   </label>
                   <Input
+                    id="availability-end-date"
                     type="datetime-local"
                     value={availabilityEndDate}
                     onChange={(e) => {
@@ -2399,10 +2407,11 @@ export function SiteConfiguration() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="expired-period-message" className="block text-sm font-semibold text-gray-700 mb-2">
                   Expired Period Message
                 </label>
                 <textarea
+                  id="expired-period-message"
                   rows={4}
                   value={expiredMessage}
                   onChange={(e) => {
@@ -2456,10 +2465,11 @@ export function SiteConfiguration() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="site-code" className="block text-sm font-semibold text-gray-700 mb-2">
                     Site Code <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
+                    id="site-code"
                     value={siteCode}
                     onChange={(e) => {
                       setSiteCode(e.target.value);
@@ -2472,10 +2482,11 @@ export function SiteConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="site-erp-system" className="block text-sm font-semibold text-gray-700 mb-2">
                     ERP System
                   </label>
                   <select
+                    id="site-erp-system"
                     value={siteErpIntegration}
                     onChange={(e) => {
                       setSiteErpIntegration(e.target.value);
@@ -2497,10 +2508,11 @@ export function SiteConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="site-erp-instance" className="block text-sm font-semibold text-gray-700 mb-2">
                     ERP Instance
                   </label>
                   <Input
+                    id="site-erp-instance"
                     value={siteErpInstance}
                     onChange={(e) => {
                       setSiteErpInstance(e.target.value);
@@ -2513,10 +2525,11 @@ export function SiteConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="site-ship-from-country" className="block text-sm font-semibold text-gray-700 mb-2">
                     Ship From Country *
                   </label>
                   <Input
+                    id="site-ship-from-country"
                     value={siteShipFromCountry}
                     onChange={(e) => {
                       setSiteShipFromCountry(e.target.value.toUpperCase());
@@ -2530,10 +2543,11 @@ export function SiteConfiguration() {
                 </div>
 
                 <div className="col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="site-hris-system" className="block text-sm font-semibold text-gray-700 mb-2">
                     HRIS System <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
+                    id="site-hris-system"
                     value={siteHrisSystem}
                     onChange={(e) => {
                       setSiteHrisSystem(e.target.value);
@@ -2568,7 +2582,8 @@ export function SiteConfiguration() {
                     <p className="text-sm text-gray-600">Show celebration feature</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
-                    <input 
+                    <span className="sr-only">Enable Celebrations</span>
+                    <input
                       type="checkbox"
                       checked={siteCelebrationsEnabled}
                       onChange={(e) => {
@@ -2588,7 +2603,8 @@ export function SiteConfiguration() {
                     <p className="text-sm text-gray-600">Extend timeout to 4 hours</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
-                    <input 
+                    <span className="sr-only">4-Hour Session Timeout</span>
+                    <input
                       type="checkbox"
                       checked={allowSessionTimeoutExtend}
                       onChange={(e) => {
@@ -2608,7 +2624,8 @@ export function SiteConfiguration() {
                     <p className="text-sm text-gray-600">Track employee interactions</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
-                    <input 
+                    <span className="sr-only">Employee Activity Logging</span>
+                    <input
                       type="checkbox"
                       checked={enableEmployeeLogReport}
                       onChange={(e) => {
@@ -2642,10 +2659,11 @@ export function SiteConfiguration() {
                 <h3 className="text-sm font-semibold text-gray-700 mb-4">Default Settings</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="default-language" className="block text-sm font-semibold text-gray-700 mb-2">
                       Default Language
                     </label>
                     <select
+                      id="default-language"
                       value={defaultLanguage}
                       onChange={(e) => {
                         setDefaultLanguage(e.target.value);
@@ -2678,10 +2696,11 @@ export function SiteConfiguration() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="default-currency" className="block text-sm font-semibold text-gray-700 mb-2">
                       Default Currency
                     </label>
                     <select
+                      id="default-currency"
                       value={defaultCurrency}
                       onChange={(e) => {
                         setDefaultCurrency(e.target.value);
@@ -2698,10 +2717,11 @@ export function SiteConfiguration() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="default-country" className="block text-sm font-semibold text-gray-700 mb-2">
                       Default Country
                     </label>
                     <select
+                      id="default-country"
                       value={defaultCountry}
                       onChange={(e) => {
                         setDefaultCountry(e.target.value);
@@ -2841,10 +2861,11 @@ export function SiteConfiguration() {
               <div className="border-t border-gray-200 pt-6">
                 <h3 className="text-sm font-semibold text-gray-700 mb-4">Regional Restrictions</h3>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="allowed-countries" className="block text-sm font-semibold text-gray-700 mb-2">
                     Allowed Countries <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
+                    id="allowed-countries"
                     value={allowedCountries.join(', ')}
                     onChange={(e) => {
                       const countries = e.target.value.split(',').map(c => c.trim()).filter(c => c);
@@ -2876,10 +2897,11 @@ export function SiteConfiguration() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="regional-office-name" className="block text-sm font-semibold text-gray-700 mb-2">
                     Regional Office Name <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
+                    id="regional-office-name"
                     value={regionalOfficeName}
                     onChange={(e) => {
                       setRegionalOfficeName(e.target.value);
@@ -2892,10 +2914,11 @@ export function SiteConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="regional-contact-name" className="block text-sm font-semibold text-gray-700 mb-2">
                     Contact Name <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
+                    id="regional-contact-name"
                     value={regionalContactName}
                     onChange={(e) => {
                       setRegionalContactName(e.target.value);
@@ -2907,10 +2930,11 @@ export function SiteConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="regional-contact-email" className="block text-sm font-semibold text-gray-700 mb-2">
                     Contact Email <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
+                    id="regional-contact-email"
                     type="email"
                     value={regionalContactEmail}
                     onChange={(e) => {
@@ -2923,10 +2947,11 @@ export function SiteConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="regional-contact-phone" className="block text-sm font-semibold text-gray-700 mb-2">
                     Contact Phone <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
+                    id="regional-contact-phone"
                     type="tel"
                     value={regionalContactPhone}
                     onChange={(e) => {
@@ -2943,10 +2968,11 @@ export function SiteConfiguration() {
                 <p className="text-sm font-semibold text-gray-700 mb-4">Regional Address</p>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="regional-address-line-1" className="block text-sm font-semibold text-gray-700 mb-2">
                       Address Line 1 <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                     </label>
                     <Input
+                      id="regional-address-line-1"
                       value={regionalAddressLine1}
                       onChange={(e) => {
                         setRegionalAddressLine1(e.target.value);
@@ -2958,10 +2984,11 @@ export function SiteConfiguration() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="regional-address-line-2" className="block text-sm font-semibold text-gray-700 mb-2">
                       Address Line 2 <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                     </label>
                     <Input
+                      id="regional-address-line-2"
                       value={regionalAddressLine2}
                       onChange={(e) => {
                         setRegionalAddressLine2(e.target.value);
@@ -2973,10 +3000,11 @@ export function SiteConfiguration() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="regional-address-line-3" className="block text-sm font-semibold text-gray-700 mb-2">
                       Address Line 3 <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                     </label>
                     <Input
+                      id="regional-address-line-3"
                       value={regionalAddressLine3}
                       onChange={(e) => {
                         setRegionalAddressLine3(e.target.value);
@@ -2989,10 +3017,11 @@ export function SiteConfiguration() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label htmlFor="regional-city" className="block text-sm font-semibold text-gray-700 mb-2">
                         City <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                       </label>
                       <Input
+                        id="regional-city"
                         value={regionalCity}
                         onChange={(e) => {
                           setRegionalCity(e.target.value);
@@ -3004,10 +3033,11 @@ export function SiteConfiguration() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label htmlFor="regional-country-state" className="block text-sm font-semibold text-gray-700 mb-2">
                         Country/State <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                       </label>
                       <Input
+                        id="regional-country-state"
                         value={regionalCountryState}
                         onChange={(e) => {
                           setRegionalCountryState(e.target.value);
@@ -3020,10 +3050,11 @@ export function SiteConfiguration() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="regional-tax-id" className="block text-sm font-semibold text-gray-700 mb-2">
                       Tax ID / VAT Number <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                     </label>
                     <Input
+                      id="regional-tax-id"
                       value={regionalTaxId}
                       onChange={(e) => {
                         setRegionalTaxId(e.target.value);
@@ -3071,7 +3102,8 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Display header navigation on all pages</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Show Header</span>
+                  <input
                     type="checkbox"
                     checked={showHeader}
                     onChange={(e) => {
@@ -3086,10 +3118,11 @@ export function SiteConfiguration() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="header-layout" className="block text-sm font-semibold text-gray-700 mb-2">
                   Header Layout
                 </label>
                 <select
+                  id="header-layout"
                   value={headerLayout}
                   onChange={(e) => {
                     setHeaderLayout(e.target.value as any);
@@ -3113,7 +3146,8 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Show language switcher in header</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Language Selector</span>
+                  <input
                     type="checkbox"
                     checked={showLanguageSelector}
                     onChange={(e) => {
@@ -3128,10 +3162,11 @@ export function SiteConfiguration() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="company-name" className="block text-sm font-semibold text-gray-700 mb-2">
                   Company Name
                 </label>
                 <Input
+                  id="company-name"
                   type="text"
                   value={companyName}
                   onChange={(e) => {
@@ -3227,7 +3262,8 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Display footer on all pages</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Show Footer</span>
+                  <input
                     type="checkbox"
                     checked={showFooter}
                     onChange={(e) => {
@@ -3242,10 +3278,11 @@ export function SiteConfiguration() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="footer-text" className="block text-sm font-semibold text-gray-700 mb-2">
                   Footer Text
                 </label>
                 <Input
+                  id="footer-text"
                   type="text"
                   value={footerText}
                   onChange={(e) => {
@@ -3377,7 +3414,7 @@ export function SiteConfiguration() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="primary-color-text" className="block text-sm font-semibold text-gray-700 mb-2">
                     Primary Color
                   </label>
                   <div className="flex gap-2">
@@ -3392,6 +3429,7 @@ export function SiteConfiguration() {
                       className="w-12 h-10 border border-gray-300 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                     <Input
+                      id="primary-color-text"
                       type="text"
                       value={primaryColor}
                       onChange={(e) => {
@@ -3409,7 +3447,7 @@ export function SiteConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="secondary-color-text" className="block text-sm font-semibold text-gray-700 mb-2">
                     Secondary Color
                   </label>
                   <div className="flex gap-2">
@@ -3424,6 +3462,7 @@ export function SiteConfiguration() {
                       className="w-12 h-10 border border-gray-300 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                     <Input
+                      id="secondary-color-text"
                       type="text"
                       value={secondaryColor}
                       onChange={(e) => {
@@ -3441,7 +3480,7 @@ export function SiteConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="tertiary-color-text" className="block text-sm font-semibold text-gray-700 mb-2">
                     Tertiary Color
                   </label>
                   <div className="flex gap-2">
@@ -3456,6 +3495,7 @@ export function SiteConfiguration() {
                       className="w-12 h-10 border border-gray-300 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                     <Input
+                      id="tertiary-color-text"
                       type="text"
                       value={tertiaryColor}
                       onChange={(e) => {
@@ -3514,10 +3554,11 @@ export function SiteConfiguration() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="primary-logo-upload" className="block text-sm font-semibold text-gray-700 mb-2">
                   Primary Logo
                 </label>
                 <input
+                  id="primary-logo-upload"
                   type="file"
                   accept="image/*"
                   disabled={false}
@@ -3529,10 +3570,11 @@ export function SiteConfiguration() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="favicon-upload" className="block text-sm font-semibold text-gray-700 mb-2">
                   Favicon
                 </label>
                 <input
+                  id="favicon-upload"
                   type="file"
                   accept="image/x-icon,image/png"
                   disabled={false}
@@ -3616,8 +3658,9 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Let users select multiple quantities of gifts</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
+                  <span className="sr-only">Allow Quantity Selection</span>
+                  <input
+                    type="checkbox"
                     checked={allowQuantitySelection}
                     onChange={(e) => {
                       setAllowQuantitySelection(e.target.checked);
@@ -3636,7 +3679,8 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Display pricing information to users</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Show Gift Prices</span>
+                  <input
                     type="checkbox"
                     checked={showPricing}
                     onChange={(e) => {
@@ -3651,9 +3695,9 @@ export function SiteConfiguration() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <p className="block text-sm font-semibold text-gray-700 mb-2">
                   Gifts Per User
-                </label>
+                </p>
                 <div className="flex items-center gap-3">
                   {/* Minus Button */}
                   <button
@@ -3741,10 +3785,11 @@ export function SiteConfiguration() {
               </Alert>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="default-gift" className="block text-sm font-semibold text-gray-700 mb-2">
                   Default Gift
                 </label>
                 <select
+                  id="default-gift"
                   value={defaultGiftId || ''}
                   onChange={(e) => {
                     setDefaultGiftId(e.target.value || null);
@@ -3767,10 +3812,11 @@ export function SiteConfiguration() {
 
               {defaultGiftId && (
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="default-gift-days-after-close" className="block text-sm font-semibold text-gray-700 mb-2">
                     Days After Site Closes
                   </label>
                   <Input
+                    id="default-gift-days-after-close"
                     type="number"
                     min="0"
                     max="365"
@@ -3839,7 +3885,8 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Allow users to search for gifts by name or description</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Enable Search</span>
+                  <input
                     type="checkbox"
                     checked={enableSearch}
                     onChange={(e) => {
@@ -3859,7 +3906,8 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Show category and price range filters</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Enable Filters</span>
+                  <input
                     type="checkbox"
                     checked={enableFilters}
                     onChange={(e) => {
@@ -3886,10 +3934,11 @@ export function SiteConfiguration() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="grid-columns" className="block text-sm font-semibold text-gray-700 mb-2">
                   Grid Columns
                 </label>
                 <select
+                  id="grid-columns"
                   value={gridColumns}
                   onChange={(e) => {
                     setGridColumns(parseInt(e.target.value));
@@ -3914,7 +3963,8 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Display description text on gift cards</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Show Gift Descriptions</span>
+                  <input
                     type="checkbox"
                     checked={showDescription}
                     onChange={(e) => {
@@ -3953,7 +4003,8 @@ export function SiteConfiguration() {
                       </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input 
+                      <span className="sr-only">{option} sort option</span>
+                      <input
                         type="checkbox"
                         checked={sortOptions.includes(option)}
                         onChange={(e) => {
@@ -4055,7 +4106,8 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Show landing page before authentication</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Enable Landing Page</span>
+                  <input
                     type="checkbox"
                     checked={enableLandingPage}
                     onChange={(e) => {
@@ -4143,7 +4195,8 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Show welcome page after authentication</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Enable Welcome Page</span>
+                  <input
                     type="checkbox"
                     checked={enableWelcomePage}
                     onChange={(e) => {
@@ -4202,10 +4255,11 @@ export function SiteConfiguration() {
                     
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        <label htmlFor="welcome-page-image-url" className="block text-sm font-semibold text-gray-700 mb-2">
                           Image URL <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                         </label>
                         <Input
+                          id="welcome-page-image-url"
                           value={welcomePageImageUrl}
                           onChange={(e) => {
                             setWelcomePageImageUrl(e.target.value);
@@ -4218,10 +4272,11 @@ export function SiteConfiguration() {
 
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          <label htmlFor="welcome-page-author-name" className="block text-sm font-semibold text-gray-700 mb-2">
                             Author Name <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                           </label>
                           <Input
+                            id="welcome-page-author-name"
                             value={welcomePageAuthorName}
                             onChange={(e) => {
                               setWelcomePageAuthorName(e.target.value);
@@ -4233,10 +4288,11 @@ export function SiteConfiguration() {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          <label htmlFor="welcome-page-author-title" className="block text-sm font-semibold text-gray-700 mb-2">
                             Author Title <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                           </label>
                           <Input
+                            id="welcome-page-author-title"
                             value={welcomePageAuthorTitle}
                             onChange={(e) => {
                               setWelcomePageAuthorTitle(e.target.value);
@@ -4471,10 +4527,11 @@ export function SiteConfiguration() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="site-config-validation-method" className="block text-sm font-semibold text-gray-700 mb-2">
                       Validation Method
                     </label>
                     <select
+                      id="site-config-validation-method"
                       value={validationMethod}
                       onChange={(e) => {
                         setValidationMethod(e.target.value as any);
@@ -4642,7 +4699,8 @@ export function SiteConfiguration() {
                   </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Skip Review Page</span>
+                  <input
                     type="checkbox"
                     checked={skipReviewPage}
                     onChange={(e) => {
@@ -4650,7 +4708,7 @@ export function SiteConfiguration() {
                       setHasChanges(true);
                     }}
                     disabled={false}
-                    className="sr-only peer" 
+                    className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
                 </label>
@@ -4681,12 +4739,13 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Display product images in the review summary</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Show Gift Images</span>
+                  <input
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
                     disabled={false}
-                    className="sr-only peer" 
+                    className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
                 </label>
@@ -4698,12 +4757,13 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Display pricing information in the review</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Show Gift Prices</span>
+                  <input
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
                     disabled={false}
-                    className="sr-only peer" 
+                    className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
                 </label>
@@ -4715,22 +4775,24 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Let users edit their selections from the review page</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Allow Editing</span>
+                  <input
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
                     disabled={false}
-                    className="sr-only peer" 
+                    className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
                 </label>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="site-config-review-page-title" className="block text-sm font-semibold text-gray-700 mb-2">
                   Review Page Title
                 </label>
                 <Input
+                  id="site-config-review-page-title"
                   type="text"
                   defaultValue="Review Your Order"
                   placeholder="Review Your Order"
@@ -4743,10 +4805,11 @@ export function SiteConfiguration() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="site-config-review-page-description" className="block text-sm font-semibold text-gray-700 mb-2">
                   Review Page Description
                 </label>
                 <textarea
+                  id="site-config-review-page-description"
                   rows={3}
                   defaultValue="Please review your selections before submitting your order."
                   placeholder="Please review your selections before submitting your order."
@@ -4760,10 +4823,11 @@ export function SiteConfiguration() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="site-config-submit-button-text" className="block text-sm font-semibold text-gray-700 mb-2">
                   Submit Button Text
                 </label>
                 <Input
+                  id="site-config-submit-button-text"
                   type="text"
                   defaultValue="Submit Order"
                   placeholder="Submit Order"
@@ -4863,22 +4927,24 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Users must agree to terms before submitting</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Require Terms Acceptance</span>
+                  <input
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
                     disabled={false}
-                    className="sr-only peer" 
+                    className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
                 </label>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="site-config-terms-text" className="block text-sm font-semibold text-gray-700 mb-2">
                   Terms & Conditions Text
                 </label>
                 <textarea
+                  id="site-config-terms-text"
                   rows={6}
                   defaultValue="By submitting this order, you agree to our terms and conditions."
                   placeholder="Enter your terms and conditions..."
@@ -4892,10 +4958,11 @@ export function SiteConfiguration() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="site-config-terms-url" className="block text-sm font-semibold text-gray-700 mb-2">
                   Terms & Conditions URL (Optional)
                 </label>
                 <Input
+                  id="site-config-terms-url"
                   type="url"
                   placeholder="https://example.com/terms"
                   onChange={() => setHasChanges(true)}
@@ -4933,10 +5000,11 @@ export function SiteConfiguration() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="site-config-confirmation-title" className="block text-sm font-semibold text-gray-700 mb-2">
                   Confirmation Title
                 </label>
                 <Input
+                  id="site-config-confirmation-title"
                   type="text"
                   defaultValue="Order Confirmed!"
                   placeholder="Order Confirmed!"
@@ -4949,10 +5017,11 @@ export function SiteConfiguration() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="site-config-confirmation-message" className="block text-sm font-semibold text-gray-700 mb-2">
                   Confirmation Message
                 </label>
                 <textarea
+                  id="site-config-confirmation-message"
                   rows={4}
                   defaultValue="Thank you for your order! We've received your selection and will process it shortly. You'll receive a confirmation email with tracking information once your order ships."
                   placeholder="Enter confirmation message..."
@@ -4971,12 +5040,13 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Display the order confirmation number</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Show Order Number</span>
+                  <input
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
                     disabled={false}
-                    className="sr-only peer" 
+                    className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
                 </label>
@@ -4988,12 +5058,13 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Display a summary of selected items</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Show Order Summary</span>
+                  <input
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
                     disabled={false}
-                    className="sr-only peer" 
+                    className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
                 </label>
@@ -5005,22 +5076,24 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Display estimated delivery timeframe</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Show Estimated Delivery</span>
+                  <input
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
                     disabled={false}
-                    className="sr-only peer" 
+                    className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
                 </label>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="site-config-estimated-delivery-text" className="block text-sm font-semibold text-gray-700 mb-2">
                   Estimated Delivery Text
                 </label>
                 <Input
+                  id="site-config-estimated-delivery-text"
                   type="text"
                   defaultValue="Your order will arrive within 5-7 business days"
                   placeholder="Your order will arrive within 5-7 business days"
@@ -5049,22 +5122,24 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Automatically email order confirmation to users</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Send Confirmation Email</span>
+                  <input
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
                     disabled={false}
-                    className="sr-only peer" 
+                    className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
                 </label>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="site-config-email-subject" className="block text-sm font-semibold text-gray-700 mb-2">
                   Email Subject Line
                 </label>
                 <Input
+                  id="site-config-email-subject"
                   type="text"
                   defaultValue="Your Order Confirmation"
                   placeholder="Your Order Confirmation"
@@ -5077,10 +5152,11 @@ export function SiteConfiguration() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="site-config-reply-to-email" className="block text-sm font-semibold text-gray-700 mb-2">
                   Reply-To Email Address
                 </label>
                 <Input
+                  id="site-config-reply-to-email"
                   type="email"
                   placeholder="support@example.com"
                   onChange={() => setHasChanges(true)}
@@ -5179,12 +5255,13 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Allow users to track their order status</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Show Track Order Button</span>
+                  <input
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
                     disabled={false}
-                    className="sr-only peer" 
+                    className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
                 </label>
@@ -5196,22 +5273,24 @@ export function SiteConfiguration() {
                   <p className="text-sm text-gray-600">Let users print their order confirmation</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Show Print Receipt Button</span>
+                  <input
                     type="checkbox"
                     defaultChecked
                     onChange={() => setHasChanges(true)}
                     disabled={false}
-                    className="sr-only peer" 
+                    className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D91C81] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
                 </label>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="site-config-custom-btn-text" className="block text-sm font-semibold text-gray-700 mb-2">
                   Custom Action Button Text (Optional)
                 </label>
                 <Input
+                  id="site-config-custom-btn-text"
                   type="text"
                   placeholder="e.g., Return to Dashboard"
                   onChange={() => setHasChanges(true)}
@@ -5223,10 +5302,11 @@ export function SiteConfiguration() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="site-config-custom-btn-url" className="block text-sm font-semibold text-gray-700 mb-2">
                   Custom Action Button URL (Optional)
                 </label>
                 <Input
+                  id="site-config-custom-btn-url"
                   type="url"
                   placeholder="https://example.com/dashboard"
                   onChange={() => setHasChanges(true)}

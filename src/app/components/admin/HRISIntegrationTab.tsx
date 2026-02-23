@@ -843,9 +843,10 @@ export function HRISIntegrationTab({ client, sites, onSyncComplete }: HRISIntegr
 
               {/* Scope Selection */}
               <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                <Label className="mb-3 block">Connection Scope</Label>
+                <p className="mb-3 block text-sm font-medium leading-none">Connection Scope</p>
                 <div className="space-y-3">
                   <label className="flex items-start gap-3 cursor-pointer">
+                    <span className="sr-only">Client Level (All Sites)</span>
                     <input
                       type="radio"
                       name="scope"
@@ -865,6 +866,7 @@ export function HRISIntegrationTab({ client, sites, onSyncComplete }: HRISIntegr
                   </label>
                   
                   <label className="flex items-start gap-3 cursor-pointer">
+                    <span className="sr-only">Specific Sites</span>
                     <input
                       type="radio"
                       name="scope"
@@ -1071,37 +1073,41 @@ export function HRISIntegrationTab({ client, sites, onSyncComplete }: HRISIntegr
                 </div>
 
                 <div className="space-y-3 mt-4">
-                  <label className="flex items-center gap-2 cursor-pointer">
+                  <div className="flex items-center gap-2 cursor-pointer">
                     <Switch
+                      aria-label="Auto-import employees"
                       checked={formData.autoImport}
                       onCheckedChange={(checked) => setFormData({ ...formData, autoImport: checked })}
                     />
                     <span className="text-sm text-gray-700">Auto-import employees</span>
-                  </label>
-                  
-                  <label className="flex items-center gap-2 cursor-pointer">
+                  </div>
+
+                  <div className="flex items-center gap-2 cursor-pointer">
                     <Switch
+                      aria-label="Update existing employees"
                       checked={formData.updateExisting}
                       onCheckedChange={(checked) => setFormData({ ...formData, updateExisting: checked })}
                     />
                     <span className="text-sm text-gray-700">Update existing employees</span>
-                  </label>
-                  
-                  <label className="flex items-center gap-2 cursor-pointer">
+                  </div>
+
+                  <div className="flex items-center gap-2 cursor-pointer">
                     <Switch
+                      aria-label="Deactivate employees not found in HRIS"
                       checked={formData.deactivateMissing}
                       onCheckedChange={(checked) => setFormData({ ...formData, deactivateMissing: checked })}
                     />
                     <span className="text-sm text-gray-700">Deactivate employees not found in HRIS</span>
-                  </label>
-                  
-                  <label className="flex items-center gap-2 cursor-pointer">
+                  </div>
+
+                  <div className="flex items-center gap-2 cursor-pointer">
                     <Switch
+                      aria-label="Send notification after sync"
                       checked={formData.notifyOnSync}
                       onCheckedChange={(checked) => setFormData({ ...formData, notifyOnSync: checked })}
                     />
                     <span className="text-sm text-gray-700">Send notification after sync</span>
-                  </label>
+                  </div>
                 </div>
               </div>
             </div>

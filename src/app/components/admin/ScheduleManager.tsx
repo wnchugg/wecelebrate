@@ -451,10 +451,11 @@ function ScheduleFormModal({
         <form onSubmit={() => void handleSubmit()} className="p-6 space-y-6">
           {/* Basic Info */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="sched-name" className="block text-sm font-medium text-gray-700 mb-2">
               Schedule Name *
             </label>
             <input
+              id="sched-name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -465,10 +466,11 @@ function ScheduleFormModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="sched-sync-type" className="block text-sm font-medium text-gray-700 mb-2">
               Sync Type *
             </label>
             <select
+              id="sched-sync-type"
               value={syncType}
               onChange={(e) => setSyncType(e.target.value as 'products' | 'inventory' | 'both')}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D91C81] focus:border-transparent"
@@ -481,9 +483,9 @@ function ScheduleFormModal({
 
           {/* Schedule Type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <p className="block text-sm font-medium text-gray-700 mb-2">
               Schedule Type *
-            </label>
+            </p>
             <div className="flex gap-4">
               <label className="flex items-center">
                 <input
@@ -518,10 +520,11 @@ function ScheduleFormModal({
             />
           ) : (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="sched-interval-minutes" className="block text-sm font-medium text-gray-700 mb-2">
                 Interval (minutes) *
               </label>
               <input
+                id="sched-interval-minutes"
                 type="number"
                 value={intervalMinutes}
                 onChange={(e) => setIntervalMinutes(e.target.value)}
@@ -542,6 +545,7 @@ function ScheduleFormModal({
               <div className="text-sm text-gray-600">Schedule will run automatically when enabled</div>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
+              <span className="sr-only">Enable Schedule</span>
               <input
                 type="checkbox"
                 checked={enabled}
@@ -569,10 +573,11 @@ function ScheduleFormModal({
 
             {notifyOnFailure && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="sched-email-recipients" className="block text-sm font-medium text-gray-700 mb-2">
                   Email Recipients (comma-separated)
                 </label>
                 <input
+                  id="sched-email-recipients"
                   type="text"
                   value={emailRecipients}
                   onChange={(e) => setEmailRecipients(e.target.value)}

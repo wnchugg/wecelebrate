@@ -468,6 +468,7 @@ export function SiteGiftConfiguration() {
               <label className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-all ${
                 config.assignmentStrategy === 'all' ? 'border-[#D91C81] bg-pink-50' : 'border-gray-200'
               }`}>
+                <span className="sr-only">All Products</span>
                 <input
                   type="radio"
                   name="strategy"
@@ -487,6 +488,7 @@ export function SiteGiftConfiguration() {
               <label className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-all ${
                 config.assignmentStrategy === 'price_levels' ? 'border-[#D91C81] bg-pink-50' : 'border-gray-200'
               }`}>
+                <span className="sr-only">Price Levels</span>
                 <input
                   type="radio"
                   name="strategy"
@@ -506,6 +508,7 @@ export function SiteGiftConfiguration() {
               <label className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-all ${
                 config.assignmentStrategy === 'exclusions' ? 'border-[#D91C81] bg-pink-50' : 'border-gray-200'
               }`}>
+                <span className="sr-only">Exclusions</span>
                 <input
                   type="radio"
                   name="strategy"
@@ -525,6 +528,7 @@ export function SiteGiftConfiguration() {
               <label className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-all ${
                 config.assignmentStrategy === 'explicit' ? 'border-[#D91C81] bg-pink-50' : 'border-gray-200'
               }`}>
+                <span className="sr-only">Explicit Selection</span>
                 <input
                   type="radio"
                   name="strategy"
@@ -604,10 +608,11 @@ export function SiteGiftConfiguration() {
                     {isEditing ? (
                       <div className="space-y-3">
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-1">
+                          <label htmlFor="sgc-level-name" className="block text-sm font-semibold text-gray-700 mb-1">
                             Level Name
                           </label>
                           <Input
+                            id="sgc-level-name"
                             type="text"
                             value={levelForm.name}
                             onChange={(e) => setLevelForm({ ...levelForm, name: e.target.value })}
@@ -616,10 +621,11 @@ export function SiteGiftConfiguration() {
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                            <label htmlFor="sgc-level-min-price" className="block text-sm font-semibold text-gray-700 mb-1">
                               Min Price ({currencySymbol})
                             </label>
                             <Input
+                              id="sgc-level-min-price"
                               type="number"
                               value={levelForm.minPrice}
                               onChange={(e) => setLevelForm({ ...levelForm, minPrice: parseFloat(e.target.value) })}
@@ -628,10 +634,11 @@ export function SiteGiftConfiguration() {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                            <label htmlFor="sgc-level-max-price" className="block text-sm font-semibold text-gray-700 mb-1">
                               Max Price ({currencySymbol})
                             </label>
                             <Input
+                              id="sgc-level-max-price"
                               type="number"
                               value={levelForm.maxPrice}
                               onChange={(e) => setLevelForm({ ...levelForm, maxPrice: parseFloat(e.target.value) })}
@@ -713,9 +720,9 @@ export function SiteGiftConfiguration() {
             <CardContent className="space-y-6">
               {/* Excluded Categories */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                <p className="block text-sm font-semibold text-gray-700 mb-3">
                   Excluded Categories
-                </label>
+                </p>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {GIFT_CATEGORIES.map((category) => (
                     <label key={category} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-all">
@@ -740,10 +747,11 @@ export function SiteGiftConfiguration() {
 
               {/* Excluded SKUs */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                <label htmlFor="sgc-excluded-skus" className="block text-sm font-semibold text-gray-700 mb-3">
                   Excluded SKUs
                 </label>
                 <select
+                  id="sgc-excluded-skus"
                   multiple
                   className="w-full h-48 px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
                   value={config.excludedSkus || []}

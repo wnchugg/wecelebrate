@@ -181,6 +181,7 @@ export function CronBuilder({ value, onChange, timezone = 'UTC', onTimezoneChang
                   : 'border-gray-200 hover:border-gray-300 bg-white'
               }`}
             >
+              <span className="sr-only">{preset.label}</span>
               <input
                 type="radio"
                 name="preset"
@@ -207,11 +208,12 @@ export function CronBuilder({ value, onChange, timezone = 'UTC', onTimezoneChang
           <div className="grid grid-cols-5 gap-4">
             {/* Minute */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="cron-minute" className="block text-sm font-medium text-gray-700 mb-2">
                 Minute
                 <span className="block text-xs text-gray-500 font-normal mt-1">0-59</span>
               </label>
               <input
+                id="cron-minute"
                 type="text"
                 value={minute}
                 onChange={(e) => setMinute(e.target.value)}
@@ -222,11 +224,12 @@ export function CronBuilder({ value, onChange, timezone = 'UTC', onTimezoneChang
 
             {/* Hour */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="cron-hour" className="block text-sm font-medium text-gray-700 mb-2">
                 Hour
                 <span className="block text-xs text-gray-500 font-normal mt-1">0-23</span>
               </label>
               <input
+                id="cron-hour"
                 type="text"
                 value={hour}
                 onChange={(e) => setHour(e.target.value)}
@@ -237,11 +240,12 @@ export function CronBuilder({ value, onChange, timezone = 'UTC', onTimezoneChang
 
             {/* Day */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="cron-day" className="block text-sm font-medium text-gray-700 mb-2">
                 Day
                 <span className="block text-xs text-gray-500 font-normal mt-1">1-31</span>
               </label>
               <input
+                id="cron-day"
                 type="text"
                 value={day}
                 onChange={(e) => setDay(e.target.value)}
@@ -252,11 +256,12 @@ export function CronBuilder({ value, onChange, timezone = 'UTC', onTimezoneChang
 
             {/* Month */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="cron-month" className="block text-sm font-medium text-gray-700 mb-2">
                 Month
                 <span className="block text-xs text-gray-500 font-normal mt-1">1-12</span>
               </label>
               <input
+                id="cron-month"
                 type="text"
                 value={month}
                 onChange={(e) => setMonth(e.target.value)}
@@ -267,11 +272,12 @@ export function CronBuilder({ value, onChange, timezone = 'UTC', onTimezoneChang
 
             {/* Day of Week */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="cron-dow" className="block text-sm font-medium text-gray-700 mb-2">
                 Day of Week
                 <span className="block text-xs text-gray-500 font-normal mt-1">0-6</span>
               </label>
               <input
+                id="cron-dow"
                 type="text"
                 value={dayOfWeek}
                 onChange={(e) => setDayOfWeek(e.target.value)}
@@ -302,10 +308,11 @@ export function CronBuilder({ value, onChange, timezone = 'UTC', onTimezoneChang
       {/* Timezone Selection */}
       {onTimezoneChange && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="cron-timezone" className="block text-sm font-medium text-gray-700 mb-2">
             Timezone
           </label>
           <select
+            id="cron-timezone"
             value={timezone}
             onChange={(e) => onTimezoneChange(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D91C81] focus:border-transparent"

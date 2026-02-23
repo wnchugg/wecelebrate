@@ -549,10 +549,11 @@ export function AccessGroupManagement() {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="agm-group-name" className="block text-sm font-medium text-gray-700 mb-2">
                       Group Name *
                     </label>
                     <input
+                      id="agm-group-name"
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -564,10 +565,11 @@ export function AccessGroupManagement() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="agm-group-type" className="block text-sm font-medium text-gray-700 mb-2">
                       Type *
                     </label>
                     <select
+                      id="agm-group-type"
                       value={formData.type}
                       onChange={(e) => setFormData({ ...formData, type: e.target.value as 'predefined' | 'custom' })}
                       disabled={isSaving || (selectedGroup?.type === 'predefined')}
@@ -580,10 +582,11 @@ export function AccessGroupManagement() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="agm-description" className="block text-sm font-medium text-gray-700 mb-2">
                     Description
                   </label>
                   <textarea
+                    id="agm-description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Describe what this access group can see..."
@@ -595,10 +598,11 @@ export function AccessGroupManagement() {
 
                 {formData.type === 'custom' && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="agm-client-id" className="block text-sm font-medium text-gray-700 mb-2">
                       Client ID * (for custom groups)
                     </label>
                     <input
+                      id="agm-client-id"
                       type="text"
                       value={formData.clientId}
                       onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}

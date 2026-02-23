@@ -184,6 +184,7 @@ export function EmailNotificationConfiguration() {
                           {/* Actions */}
                           <div className="flex items-center gap-2">
                             <label className="relative inline-flex items-center cursor-pointer">
+                              <span className="sr-only">Enable {template.name}</span>
                               <input
                                 type="checkbox"
                                 checked={template.enabled}
@@ -399,8 +400,9 @@ export function EmailNotificationConfiguration() {
                     </h3>
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Subject Line</label>
+                        <label htmlFor="enc-subject-line" className="block text-sm font-medium text-gray-700 mb-2">Subject Line</label>
                         <input
+                          id="enc-subject-line"
                           type="text"
                           value={editingTemplate.subject}
                           onChange={(e) => setEditingTemplate({ ...editingTemplate, subject: e.target.value })}
@@ -408,8 +410,9 @@ export function EmailNotificationConfiguration() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">HTML Content</label>
+                        <label htmlFor="enc-html-content" className="block text-sm font-medium text-gray-700 mb-2">HTML Content</label>
                         <textarea
+                          id="enc-html-content"
                           value={editingTemplate.htmlContent}
                           onChange={(e) => setEditingTemplate({ ...editingTemplate, htmlContent: e.target.value })}
                           rows={10}
@@ -417,8 +420,9 @@ export function EmailNotificationConfiguration() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Plain Text Content</label>
+                        <label htmlFor="enc-text-content" className="block text-sm font-medium text-gray-700 mb-2">Plain Text Content</label>
                         <textarea
+                          id="enc-text-content"
                           value={editingTemplate.textContent}
                           onChange={(e) => setEditingTemplate({ ...editingTemplate, textContent: e.target.value })}
                           rows={5}
@@ -438,8 +442,9 @@ export function EmailNotificationConfiguration() {
                     </h3>
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Push Title</label>
+                        <label htmlFor="enc-push-title" className="block text-sm font-medium text-gray-700 mb-2">Push Title</label>
                         <input
+                          id="enc-push-title"
                           type="text"
                           value={editingTemplate.pushTitle || ''}
                           onChange={(e) => setEditingTemplate({ ...editingTemplate, pushTitle: e.target.value })}
@@ -447,8 +452,9 @@ export function EmailNotificationConfiguration() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Push Body</label>
+                        <label htmlFor="enc-push-body" className="block text-sm font-medium text-gray-700 mb-2">Push Body</label>
                         <textarea
+                          id="enc-push-body"
                           value={editingTemplate.pushBody || ''}
                           onChange={(e) => setEditingTemplate({ ...editingTemplate, pushBody: e.target.value })}
                           rows={3}
@@ -467,8 +473,9 @@ export function EmailNotificationConfiguration() {
                       SMS Settings
                     </h3>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">SMS Content (160 chars recommended)</label>
+                      <label htmlFor="enc-sms-content" className="block text-sm font-medium text-gray-700 mb-2">SMS Content (160 chars recommended)</label>
                       <textarea
+                        id="enc-sms-content"
                         value={editingTemplate.smsContent || ''}
                         onChange={(e) => setEditingTemplate({ ...editingTemplate, smsContent: e.target.value })}
                         rows={3}

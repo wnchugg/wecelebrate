@@ -453,10 +453,11 @@ export function EmailAutomationTriggers({ siteId, templates }: EmailAutomationTr
             <div className="px-6 py-4 space-y-4">
               {/* Rule Name */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="auto-rule-name" className="block text-sm font-semibold text-gray-700 mb-2">
                   Rule Name *
                 </label>
                 <input
+                  id="auto-rule-name"
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -467,10 +468,11 @@ export function EmailAutomationTriggers({ siteId, templates }: EmailAutomationTr
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="auto-rule-description" className="block text-sm font-semibold text-gray-700 mb-2">
                   Description
                 </label>
                 <textarea
+                  id="auto-rule-description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={2}
@@ -481,10 +483,11 @@ export function EmailAutomationTriggers({ siteId, templates }: EmailAutomationTr
 
               {/* Trigger Event */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="auto-rule-trigger" className="block text-sm font-semibold text-gray-700 mb-2">
                   Trigger Event *
                 </label>
                 <select
+                  id="auto-rule-trigger"
                   value={formData.trigger}
                   onChange={(e) => setFormData({ ...formData, trigger: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D91C81] focus:border-transparent"
@@ -500,10 +503,11 @@ export function EmailAutomationTriggers({ siteId, templates }: EmailAutomationTr
 
               {/* Email Template */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="auto-rule-template" className="block text-sm font-semibold text-gray-700 mb-2">
                   Email Template *
                 </label>
                 <select
+                  id="auto-rule-template"
                   value={formData.templateId}
                   onChange={(e) => setFormData({ ...formData, templateId: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D91C81] focus:border-transparent"
@@ -520,10 +524,11 @@ export function EmailAutomationTriggers({ siteId, templates }: EmailAutomationTr
               {/* Conditional Fields */}
               {formData.trigger === 'selection_expiring' && (
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="auto-rule-days-expiry" className="block text-sm font-semibold text-gray-700 mb-2">
                     Days Before Expiry
                   </label>
                   <input
+                    id="auto-rule-days-expiry"
                     type="number"
                     min="1"
                     value={formData.daysBeforeExpiry}
@@ -537,10 +542,11 @@ export function EmailAutomationTriggers({ siteId, templates }: EmailAutomationTr
 
               {formData.trigger === 'anniversary_approaching' && (
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="auto-rule-days-anniversary" className="block text-sm font-semibold text-gray-700 mb-2">
                     Days Before Anniversary
                   </label>
                   <input
+                    id="auto-rule-days-anniversary"
                     type="number"
                     min="1"
                     value={formData.daysBeforeAnniversary}

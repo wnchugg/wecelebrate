@@ -109,8 +109,9 @@ export function GiftSelectionConfiguration() {
           <div className="space-y-6">
             {/* Layout Style */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Layout Style</label>
+              <label htmlFor="gift-config-layout-style" className="block text-sm font-medium text-gray-700 mb-2">Layout Style</label>
               <select
+                id="gift-config-layout-style"
                 value={config.layout.style}
                 onChange={(e) =>
                   setConfig(prev => ({
@@ -153,8 +154,9 @@ export function GiftSelectionConfiguration() {
 
             {/* Items Per Page */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Items Per Page</label>
+              <label htmlFor="gift-config-items-per-page" className="block text-sm font-medium text-gray-700 mb-2">Items Per Page</label>
               <input
+                id="gift-config-items-per-page"
                 type="number"
                 value={config.layout.itemsPerPage}
                 onChange={(e) =>
@@ -172,7 +174,7 @@ export function GiftSelectionConfiguration() {
 
             {/* Pagination */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">Pagination Options</label>
+              <p className="block text-sm font-medium text-gray-700 mb-3">Pagination Options</p>
               <div className="space-y-2">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
@@ -234,7 +236,7 @@ export function GiftSelectionConfiguration() {
           <div className="space-y-6">
             {/* Enable Search */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">Search Functionality</label>
+              <p className="block text-sm font-medium text-gray-700 mb-3">Search Functionality</p>
               <div className="space-y-2">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
@@ -272,8 +274,9 @@ export function GiftSelectionConfiguration() {
             {config.search.enabled && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Placeholder Text</label>
+                  <label htmlFor="gift-config-search-placeholder" className="block text-sm font-medium text-gray-700 mb-2">Placeholder Text</label>
                   <input
+                    id="gift-config-search-placeholder"
                     type="text"
                     value={config.search.placeholder}
                     onChange={(e) =>
@@ -287,8 +290,9 @@ export function GiftSelectionConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Position</label>
+                  <label htmlFor="gift-config-search-position" className="block text-sm font-medium text-gray-700 mb-2">Position</label>
                   <select
+                    id="gift-config-search-position"
                     value={config.search.position}
                     onChange={(e) =>
                       setConfig(prev => ({
@@ -304,7 +308,7 @@ export function GiftSelectionConfiguration() {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Search Button</label>
+                  <p className="block text-sm font-medium text-gray-700 mb-3">Search Button</p>
                   <div className="space-y-2">
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input
@@ -340,7 +344,7 @@ export function GiftSelectionConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Search Type</label>
+                  <p className="block text-sm font-medium text-gray-700 mb-3">Search Type</p>
                   <div className="space-y-2">
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input
@@ -389,7 +393,7 @@ export function GiftSelectionConfiguration() {
           <div className="space-y-6">
             {/* Enable Filters */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">Filter Functionality</label>
+              <p className="block text-sm font-medium text-gray-700 mb-3">Filter Functionality</p>
               <div className="space-y-2">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
@@ -427,8 +431,9 @@ export function GiftSelectionConfiguration() {
             {config.filters.enabled && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Position</label>
+                  <label htmlFor="gift-config-filters-position" className="block text-sm font-medium text-gray-700 mb-2">Position</label>
                   <select
+                    id="gift-config-filters-position"
                     value={config.filters.position}
                     onChange={(e) =>
                       setConfig(prev => ({
@@ -445,7 +450,7 @@ export function GiftSelectionConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Filter Behavior</label>
+                  <p className="block text-sm font-medium text-gray-700 mb-3">Filter Behavior</p>
                   <div className="space-y-2">
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input
@@ -484,7 +489,7 @@ export function GiftSelectionConfiguration() {
                   <h3 className="text-lg font-medium text-gray-900 mb-4">Category Filter</h3>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Category Filter Status</label>
+                      <p className="block text-sm font-medium text-gray-700 mb-3">Category Filter Status</p>
                       <div className="space-y-2">
                         <label className="flex items-center gap-3 cursor-pointer">
                           <input
@@ -526,8 +531,9 @@ export function GiftSelectionConfiguration() {
                     </div>
                     {config.filters.categories.enabled && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Label</label>
+                        <label htmlFor="gift-config-category-filter-label" className="block text-sm font-medium text-gray-700 mb-2">Label</label>
                         <input
+                          id="gift-config-category-filter-label"
                           type="text"
                           value={config.filters.categories.label}
                           onChange={(e) =>
@@ -550,7 +556,7 @@ export function GiftSelectionConfiguration() {
                   <h3 className="text-lg font-medium text-gray-900 mb-4">Price Range Filter</h3>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Price Range Filter Status</label>
+                      <p className="block text-sm font-medium text-gray-700 mb-3">Price Range Filter Status</p>
                       <div className="space-y-2">
                         <label className="flex items-center gap-3 cursor-pointer">
                           <input
@@ -592,8 +598,9 @@ export function GiftSelectionConfiguration() {
                     </div>
                     {config.filters.priceRange.enabled && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Label</label>
+                        <label htmlFor="gift-config-price-range-filter-label" className="block text-sm font-medium text-gray-700 mb-2">Label</label>
                         <input
+                          id="gift-config-price-range-filter-label"
                           type="text"
                           value={config.filters.priceRange.label}
                           onChange={(e) =>
@@ -626,7 +633,7 @@ export function GiftSelectionConfiguration() {
           <div className="space-y-6">
             {/* Enable Sorting */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">Sorting Functionality</label>
+              <p className="block text-sm font-medium text-gray-700 mb-3">Sorting Functionality</p>
               <div className="space-y-2">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
@@ -664,8 +671,9 @@ export function GiftSelectionConfiguration() {
             {config.sorting.enabled && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Position</label>
+                  <label htmlFor="gift-config-sorting-position" className="block text-sm font-medium text-gray-700 mb-2">Position</label>
                   <select
+                    id="gift-config-sorting-position"
                     value={config.sorting.position}
                     onChange={(e) =>
                       setConfig(prev => ({
@@ -681,8 +689,9 @@ export function GiftSelectionConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Default Sort</label>
+                  <label htmlFor="gift-config-default-sort" className="block text-sm font-medium text-gray-700 mb-2">Default Sort</label>
                   <select
+                    id="gift-config-default-sort"
                     value={config.sorting.default}
                     onChange={(e) =>
                       setConfig(prev => ({
@@ -710,7 +719,7 @@ export function GiftSelectionConfiguration() {
 
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">Show Prices</label>
+              <p className="block text-sm font-medium text-gray-700 mb-3">Show Prices</p>
               <div className="space-y-2">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
@@ -746,7 +755,7 @@ export function GiftSelectionConfiguration() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">Show Inventory Status</label>
+              <p className="block text-sm font-medium text-gray-700 mb-3">Show Inventory Status</p>
               <div className="space-y-2">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
@@ -782,7 +791,7 @@ export function GiftSelectionConfiguration() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">Show Ratings</label>
+              <p className="block text-sm font-medium text-gray-700 mb-3">Show Ratings</p>
               <div className="space-y-2">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
@@ -818,7 +827,7 @@ export function GiftSelectionConfiguration() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">Show Quick View</label>
+              <p className="block text-sm font-medium text-gray-700 mb-3">Show Quick View</p>
               <div className="space-y-2">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
@@ -854,8 +863,9 @@ export function GiftSelectionConfiguration() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Image Aspect Ratio</label>
+              <label htmlFor="gift-config-image-aspect-ratio" className="block text-sm font-medium text-gray-700 mb-2">Image Aspect Ratio</label>
               <select
+                id="gift-config-image-aspect-ratio"
                 value={config.display.imageAspectRatio}
                 onChange={(e) =>
                   setConfig(prev => ({
@@ -872,8 +882,9 @@ export function GiftSelectionConfiguration() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Hover Effect</label>
+              <label htmlFor="gift-config-hover-effect" className="block text-sm font-medium text-gray-700 mb-2">Hover Effect</label>
               <select
+                id="gift-config-hover-effect"
                 value={config.display.hoverEffect}
                 onChange={(e) =>
                   setConfig(prev => ({
@@ -897,8 +908,9 @@ export function GiftSelectionConfiguration() {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">No Results Message</label>
+              <label htmlFor="gift-config-no-results-message" className="block text-sm font-medium text-gray-700 mb-2">No Results Message</label>
               <input
+                id="gift-config-no-results-message"
                 type="text"
                 value={config.messages.noResults}
                 onChange={(e) =>
@@ -912,8 +924,9 @@ export function GiftSelectionConfiguration() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Loading Message</label>
+              <label htmlFor="gift-config-loading-message" className="block text-sm font-medium text-gray-700 mb-2">Loading Message</label>
               <input
+                id="gift-config-loading-message"
                 type="text"
                 value={config.messages.loading}
                 onChange={(e) =>
@@ -927,8 +940,9 @@ export function GiftSelectionConfiguration() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Error Message</label>
+              <label htmlFor="gift-config-error-message" className="block text-sm font-medium text-gray-700 mb-2">Error Message</label>
               <input
+                id="gift-config-error-message"
                 type="text"
                 value={config.messages.error}
                 onChange={(e) =>

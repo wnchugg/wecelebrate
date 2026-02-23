@@ -224,7 +224,7 @@ export function HeaderFooterConfiguration() {
 
         {/* Apply To Selector */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Apply Configuration To:</label>
+          <p className="block text-sm font-medium text-gray-700 mb-2">Apply Configuration To:</p>
           <div className="flex gap-4">
             <button
               onClick={() => setApplyTo('site')}
@@ -294,8 +294,9 @@ export function HeaderFooterConfiguration() {
 
               {/* Layout */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Layout</label>
+                <label htmlFor="header-footer-header-layout" className="block text-sm font-medium text-gray-700 mb-2">Layout</label>
                 <select
+                  id="header-footer-header-layout"
                   value={config.header.layout}
                   onChange={(e) =>
                     setConfig(prev => ({
@@ -316,8 +317,9 @@ export function HeaderFooterConfiguration() {
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Logo</h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Logo URL</label>
+                    <label htmlFor="header-footer-header-logo-url" className="block text-sm font-medium text-gray-700 mb-2">Logo URL</label>
                     <input
+                      id="header-footer-header-logo-url"
                       type="text"
                       value={config.header.logo.url}
                       onChange={(e) =>
@@ -335,8 +337,9 @@ export function HeaderFooterConfiguration() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Alt Text</label>
+                      <label htmlFor="header-footer-header-logo-alt" className="block text-sm font-medium text-gray-700 mb-2">Alt Text</label>
                       <input
+                        id="header-footer-header-logo-alt"
                         type="text"
                         value={config.header.logo.alt}
                         onChange={(e) =>
@@ -352,8 +355,9 @@ export function HeaderFooterConfiguration() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Height (px)</label>
+                      <label htmlFor="hfc-header-logo-height" className="block text-sm font-medium text-gray-700 mb-2">Height (px)</label>
                       <input
+                        id="hfc-header-logo-height"
                         type="number"
                         value={config.header.logo.height}
                         onChange={(e) =>
@@ -465,8 +469,9 @@ export function HeaderFooterConfiguration() {
                 {config.header.progressBar.enabled && (
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Style</label>
+                      <label htmlFor="hfc-progress-bar-style" className="block text-sm font-medium text-gray-700 mb-2">Style</label>
                       <select
+                        id="hfc-progress-bar-style"
                         value={config.header.progressBar.style}
                         onChange={(e) =>
                           setConfig(prev => ({
@@ -622,8 +627,9 @@ export function HeaderFooterConfiguration() {
 
               {/* Layout */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Layout</label>
+                <label htmlFor="hfc-footer-layout" className="block text-sm font-medium text-gray-700 mb-2">Layout</label>
                 <select
+                  id="hfc-footer-layout"
                   value={config.footer.layout}
                   onChange={(e) =>
                     setConfig(prev => ({
@@ -642,8 +648,9 @@ export function HeaderFooterConfiguration() {
               {/* Colors */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Background Color</label>
+                  <label htmlFor="hfc-footer-bg-color" className="block text-sm font-medium text-gray-700 mb-2">Background Color</label>
                   <input
+                    id="hfc-footer-bg-color"
                     type="color"
                     value={config.footer.backgroundColor}
                     onChange={(e) =>
@@ -656,8 +663,9 @@ export function HeaderFooterConfiguration() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Text Color</label>
+                  <label htmlFor="hfc-footer-text-color" className="block text-sm font-medium text-gray-700 mb-2">Text Color</label>
                   <input
+                    id="hfc-footer-text-color"
                     type="color"
                     value={config.footer.textColor}
                     onChange={(e) =>

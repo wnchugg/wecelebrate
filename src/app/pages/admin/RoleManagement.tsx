@@ -548,10 +548,11 @@ export function RoleManagement() {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="role-name" className="block text-sm font-medium text-gray-700 mb-2">
                       Role Name *
                     </label>
                     <input
+                      id="role-name"
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -563,10 +564,11 @@ export function RoleManagement() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="role-type" className="block text-sm font-medium text-gray-700 mb-2">
                       Type *
                     </label>
                     <select
+                      id="role-type"
                       value={formData.type}
                       onChange={(e) => setFormData({ ...formData, type: e.target.value as 'predefined' | 'custom' })}
                       disabled={isSaving || (selectedRole?.type === 'predefined')}
@@ -579,10 +581,11 @@ export function RoleManagement() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="role-description" className="block text-sm font-medium text-gray-700 mb-2">
                     Description
                   </label>
                   <textarea
+                    id="role-description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Describe what this role represents..."
@@ -594,10 +597,11 @@ export function RoleManagement() {
 
                 {formData.type === 'custom' && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="role-client-id" className="block text-sm font-medium text-gray-700 mb-2">
                       Client ID * (for custom roles)
                     </label>
                     <input
+                      id="role-client-id"
                       type="text"
                       value={formData.clientId}
                       onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}

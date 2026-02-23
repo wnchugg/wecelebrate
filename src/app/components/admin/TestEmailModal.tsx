@@ -122,11 +122,12 @@ export function TestEmailModal({ template, onClose }: TestEmailModalProps) {
         <div className="p-6 space-y-6">
           {/* Test Email Input */}
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <label htmlFor="test-email-address" className="block text-sm font-semibold text-gray-900 mb-2">
               Send Test Email To
             </label>
             <div className="flex gap-3">
               <input
+                id="test-email-address"
                 type="email"
                 value={testEmail}
                 onChange={(e) => setTestEmail(e.target.value)}
@@ -194,11 +195,12 @@ export function TestEmailModal({ template, onClose }: TestEmailModalProps) {
                   const Icon = VARIABLE_ICONS[varName] || User;
                   return (
                     <div key={varName} className="space-y-1">
-                      <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <label htmlFor={`test-var-${varName}`} className="block text-sm font-medium text-gray-700 flex items-center gap-2">
                         <Icon className="w-4 h-4 text-gray-500" />
                         {varName}
                       </label>
                       <input
+                        id={`test-var-${varName}`}
                         type="text"
                         value={customVariables[varName] || ''}
                         onChange={(e) =>
@@ -223,7 +225,7 @@ export function TestEmailModal({ template, onClose }: TestEmailModalProps) {
 
             {/* Subject Line */}
             <div className="mb-4">
-              <label className="block text-xs font-medium text-gray-600 mb-1">Subject Line</label>
+              <p className="block text-xs font-medium text-gray-600 mb-1">Subject Line</p>
               <div
                 className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm text-gray-900"
                 dangerouslySetInnerHTML={{ __html: previewContent(template.subject) }}
@@ -233,7 +235,7 @@ export function TestEmailModal({ template, onClose }: TestEmailModalProps) {
             {/* HTML Preview */}
             {template.emailEnabled && (
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Email Body</label>
+                <p className="block text-xs font-medium text-gray-600 mb-1">Email Body</p>
                 <div className="bg-white border-2 border-gray-200 rounded-lg p-6 max-h-96 overflow-auto">
                   <div
                     className="prose prose-sm max-w-none"

@@ -68,10 +68,11 @@ export function EditUserModal({ open, user, onClose, onSave }: EditUserModalProp
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="edit-user-first-name" className="block text-sm font-medium text-gray-700 mb-1">
                 First Name <span className="text-red-500">*</span>
               </label>
               <input
+                id="edit-user-first-name"
                 type="text"
                 value={formData.firstName}
                 onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
@@ -81,10 +82,11 @@ export function EditUserModal({ open, user, onClose, onSave }: EditUserModalProp
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="edit-user-last-name" className="block text-sm font-medium text-gray-700 mb-1">
                 Last Name <span className="text-red-500">*</span>
               </label>
               <input
+                id="edit-user-last-name"
                 type="text"
                 value={formData.lastName}
                 onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
@@ -95,10 +97,11 @@ export function EditUserModal({ open, user, onClose, onSave }: EditUserModalProp
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="edit-user-email" className="block text-sm font-medium text-gray-700 mb-1">
               Email Address <span className="text-red-500">*</span>
             </label>
             <input
+              id="edit-user-email"
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -108,10 +111,11 @@ export function EditUserModal({ open, user, onClose, onSave }: EditUserModalProp
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="edit-user-employee-id" className="block text-sm font-medium text-gray-700 mb-1">
               Employee ID
             </label>
             <input
+              id="edit-user-employee-id"
               type="text"
               value={formData.employeeId}
               onChange={(e) => setFormData({ ...formData, employeeId: e.target.value })}
@@ -121,10 +125,11 @@ export function EditUserModal({ open, user, onClose, onSave }: EditUserModalProp
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="edit-user-role" className="block text-sm font-medium text-gray-700 mb-1">
               Role <span className="text-red-500">*</span>
             </label>
             <select
+              id="edit-user-role"
               value={formData.role}
               onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -140,10 +145,11 @@ export function EditUserModal({ open, user, onClose, onSave }: EditUserModalProp
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="edit-user-status" className="block text-sm font-medium text-gray-700 mb-1">
               Status <span className="text-red-500">*</span>
             </label>
             <select
+              id="edit-user-status"
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value as UserStatus })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"

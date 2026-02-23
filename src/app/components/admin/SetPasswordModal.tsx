@@ -76,11 +76,12 @@ export function SetPasswordModal({ open, user, onClose, onSetPassword }: SetPass
         {/* Form */}
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="set-password-input" className="block text-sm font-medium text-gray-700 mb-1">
               Temporary Password <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
+                id="set-password-input"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

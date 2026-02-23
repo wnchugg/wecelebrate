@@ -615,9 +615,9 @@ export function Reports() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
+              <p className="text-sm font-medium text-gray-700 mb-2 block">
                 Reporting Level
-              </label>
+              </p>
               <Select value={reportScope} onValueChange={(value: 'site' | 'client') => setReportScope(value)}>
                 <SelectTrigger className="w-full">
                   <SelectValue />
@@ -641,9 +641,9 @@ export function Reports() {
 
             {reportScope === 'client' ? (
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                <p className="text-sm font-medium text-gray-700 mb-2 block">
                   Select Client
-                </label>
+                </p>
                 <Select value={selectedClientId} onValueChange={setSelectedClientId}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Choose a client..." />
@@ -664,9 +664,9 @@ export function Reports() {
               </div>
             ) : (
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                <p className="text-sm font-medium text-gray-700 mb-2 block">
                   Select Site
-                </label>
+                </p>
                 <Select value={selectedSiteId} onValueChange={setSelectedSiteId}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Choose a site..." />

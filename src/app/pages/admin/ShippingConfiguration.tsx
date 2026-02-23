@@ -106,6 +106,7 @@ const DraggableField = ({ field, index, moveField, onEdit, onDelete, onToggle, g
 
       <div className="flex items-center gap-2">
         <label className="relative inline-flex items-center cursor-pointer">
+          <span className="sr-only">Enable field</span>
           <input
             type="checkbox"
             checked={field.enabled}
@@ -627,8 +628,9 @@ export function ShippingConfiguration() {
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-xs font-medium text-gray-700 mb-1">Label</label>
+                          <label htmlFor="employee-mode-label" className="block text-xs font-medium text-gray-700 mb-1">Label</label>
                           <input
+                            id="employee-mode-label"
                             type="text"
                             value={config.shippingModes.employee.label || ''}
                             onChange={(e) =>
@@ -644,8 +646,9 @@ export function ShippingConfiguration() {
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
+                          <label htmlFor="employee-mode-description" className="block text-xs font-medium text-gray-700 mb-1">Description</label>
                           <input
+                            id="employee-mode-description"
                             type="text"
                             value={config.shippingModes.employee.description || ''}
                             onChange={(e) =>
@@ -672,8 +675,9 @@ export function ShippingConfiguration() {
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-xs font-medium text-gray-700 mb-1">Label</label>
+                          <label htmlFor="company-mode-label" className="block text-xs font-medium text-gray-700 mb-1">Label</label>
                           <input
+                            id="company-mode-label"
                             type="text"
                             value={config.shippingModes.company.label || ''}
                             onChange={(e) =>
@@ -689,8 +693,9 @@ export function ShippingConfiguration() {
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
+                          <label htmlFor="company-mode-description" className="block text-xs font-medium text-gray-700 mb-1">Description</label>
                           <input
+                            id="company-mode-description"
                             type="text"
                             value={config.shippingModes.company.description || ''}
                             onChange={(e) =>
@@ -717,8 +722,9 @@ export function ShippingConfiguration() {
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-xs font-medium text-gray-700 mb-1">Label</label>
+                          <label htmlFor="store-mode-label" className="block text-xs font-medium text-gray-700 mb-1">Label</label>
                           <input
+                            id="store-mode-label"
                             type="text"
                             value={config.shippingModes.store.label || ''}
                             onChange={(e) =>
@@ -734,8 +740,9 @@ export function ShippingConfiguration() {
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
+                          <label htmlFor="store-mode-description" className="block text-xs font-medium text-gray-700 mb-1">Description</label>
                           <input
+                            id="store-mode-description"
                             type="text"
                             value={config.shippingModes.store.description || ''}
                             onChange={(e) =>
@@ -788,8 +795,9 @@ export function ShippingConfiguration() {
                   {config.addressValidation?.enabled && (
                     <div className="pl-6 space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Validation Service</label>
+                        <label htmlFor="validation-service" className="block text-sm font-medium text-gray-700 mb-2">Validation Service</label>
                         <select
+                          id="validation-service"
                           value={config.addressValidation?.service || 'none'}
                           onChange={(e) =>
                             updateConfig(currentSite.id, {
@@ -857,6 +865,7 @@ export function ShippingConfiguration() {
                       {/* Address Autocomplete Toggle */}
                       <div className="pt-4 border-t border-gray-200">
                         <label className="flex items-start gap-3 text-sm text-gray-700">
+                          <span className="sr-only">Enable Address Autocomplete</span>
                           <input
                             type="checkbox"
                             checked={config.addressValidation?.enableAutocomplete !== false} // Default to true
@@ -908,6 +917,7 @@ export function ShippingConfiguration() {
             </div>
             <div className="flex items-center gap-4">
               <label className="relative inline-flex items-center cursor-pointer" onClick={(e) => e.stopPropagation()}>
+                <span className="sr-only">Enable employee address shipping</span>
                 <input
                   type="checkbox"
                   checked={config.shippingModes.employee.enabled}
@@ -966,6 +976,7 @@ export function ShippingConfiguration() {
                               Required
                             </label>
                             <label className="relative inline-flex items-center cursor-pointer">
+                              <span className="sr-only">Enable field</span>
                               <input
                                 type="checkbox"
                                 checked={field.enabled}
@@ -1043,6 +1054,7 @@ export function ShippingConfiguration() {
             </div>
             <div className="flex items-center gap-4">
               <label className="relative inline-flex items-center cursor-pointer" onClick={(e) => e.stopPropagation()}>
+                <span className="sr-only">Enable company address shipping</span>
                 <input
                   type="checkbox"
                   checked={config.shippingModes.company.enabled}
@@ -1070,8 +1082,9 @@ export function ShippingConfiguration() {
                 <h3 className="text-sm font-semibold text-gray-700 mb-4">Company Address</h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+                    <label htmlFor="company-addr-name" className="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
                     <input
+                      id="company-addr-name"
                       type="text"
                       value={companyAddress.companyName}
                       onChange={(e) => setCompanyAddress({ ...companyAddress, companyName: e.target.value })}
@@ -1082,8 +1095,9 @@ export function ShippingConfiguration() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Contact Person</label>
+                      <label htmlFor="company-contact-person" className="block text-sm font-medium text-gray-700 mb-2">Contact Person</label>
                       <input
+                        id="company-contact-person"
                         type="text"
                         value={companyAddress.contactPerson}
                         onChange={(e) => setCompanyAddress({ ...companyAddress, contactPerson: e.target.value })}
@@ -1092,8 +1106,9 @@ export function ShippingConfiguration() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
+                      <label htmlFor="company-contact-email" className="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
                       <input
+                        id="company-contact-email"
                         type="email"
                         value={companyAddress.contactEmail}
                         onChange={(e) => setCompanyAddress({ ...companyAddress, contactEmail: e.target.value })}
@@ -1104,7 +1119,7 @@ export function ShippingConfiguration() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Company Address</label>
+                    <p className="block text-sm font-medium text-gray-700 mb-2">Company Address</p>
                     <AddressInput
                       value={companyAddressData}
                       onChange={setCompanyAddressData}
@@ -1113,7 +1128,7 @@ export function ShippingConfiguration() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                    <p className="block text-sm font-medium text-gray-700 mb-2">Phone Number</p>
                     <PhoneInput
                       value={companyAddress.phoneNumber}
                       onChange={(value) => setCompanyAddress({ ...companyAddress, phoneNumber: value })}
@@ -1123,8 +1138,9 @@ export function ShippingConfiguration() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Delivery Instructions (Optional)</label>
+                    <label htmlFor="company-delivery-instructions" className="block text-sm font-medium text-gray-700 mb-2">Delivery Instructions (Optional)</label>
                     <textarea
+                      id="company-delivery-instructions"
                       value={companyAddress.deliveryInstructions}
                       onChange={(e) => setCompanyAddress({ ...companyAddress, deliveryInstructions: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -1164,6 +1180,7 @@ export function ShippingConfiguration() {
             </div>
             <div className="flex items-center gap-4">
               <label className="relative inline-flex items-center cursor-pointer" onClick={(e) => e.stopPropagation()}>
+                <span className="sr-only">Enable store pickup shipping</span>
                 <input
                   type="checkbox"
                   checked={config.shippingModes.store.enabled}
@@ -1350,6 +1367,7 @@ export function ShippingConfiguration() {
 
                                 <div className="flex items-center gap-2">
                                   <label className="relative inline-flex items-center cursor-pointer">
+                                    <span className="sr-only">Enable store location</span>
                                     <input
                                       type="checkbox"
                                       checked={store.enabled}
@@ -1410,8 +1428,9 @@ export function ShippingConfiguration() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Field Name (Key)</label>
+                    <label htmlFor="new-field-name" className="block text-sm font-medium text-gray-700 mb-2">Field Name (Key)</label>
                     <input
+                      id="new-field-name"
                       type="text"
                       value={newField.fieldName}
                       onChange={(e) => setNewField({ ...newField, fieldName: e.target.value })}
@@ -1420,8 +1439,9 @@ export function ShippingConfiguration() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Field Label</label>
+                    <label htmlFor="new-field-label" className="block text-sm font-medium text-gray-700 mb-2">Field Label</label>
                     <input
+                      id="new-field-label"
                       type="text"
                       value={newField.fieldLabel}
                       onChange={(e) => setNewField({ ...newField, fieldLabel: e.target.value })}
@@ -1433,8 +1453,9 @@ export function ShippingConfiguration() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Field Type</label>
+                    <label htmlFor="new-field-type" className="block text-sm font-medium text-gray-700 mb-2">Field Type</label>
                     <select
+                      id="new-field-type"
                       value={newField.fieldType}
                       onChange={(e) => setNewField({ ...newField, fieldType: e.target.value as CustomFieldType })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -1445,8 +1466,9 @@ export function ShippingConfiguration() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    <label htmlFor="new-field-category" className="block text-sm font-medium text-gray-700 mb-2">Category</label>
                     <select
+                      id="new-field-category"
                       value={newField.category}
                       onChange={(e) => setNewField({ ...newField, category: e.target.value as 'invoicing' | 'distribution' | 'preferences' | 'other' })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -1459,8 +1481,9 @@ export function ShippingConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Placeholder</label>
+                  <label htmlFor="new-field-placeholder" className="block text-sm font-medium text-gray-700 mb-2">Placeholder</label>
                   <input
+                    id="new-field-placeholder"
                     type="text"
                     value={newField.placeholder || ''}
                     onChange={(e) => setNewField({ ...newField, placeholder: e.target.value })}
@@ -1470,8 +1493,9 @@ export function ShippingConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Help Text</label>
+                  <label htmlFor="new-field-helptext" className="block text-sm font-medium text-gray-700 mb-2">Help Text</label>
                   <input
+                    id="new-field-helptext"
                     type="text"
                     value={newField.helpText || ''}
                     onChange={(e) => setNewField({ ...newField, helpText: e.target.value })}
@@ -1482,8 +1506,9 @@ export function ShippingConfiguration() {
 
                 {newField.fieldType === 'select' && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Options (comma-separated)</label>
+                    <label htmlFor="new-field-options" className="block text-sm font-medium text-gray-700 mb-2">Options (comma-separated)</label>
                     <input
+                      id="new-field-options"
                       type="text"
                       value={newField.options?.join(', ') || ''}
                       onChange={(e) => setNewField({ ...newField, options: e.target.value.split(',').map(s => s.trim()) })}
@@ -1553,8 +1578,9 @@ export function ShippingConfiguration() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Field Name (Key)</label>
+                    <label htmlFor="edit-field-name" className="block text-sm font-medium text-gray-700 mb-2">Field Name (Key)</label>
                     <input
+                      id="edit-field-name"
                       type="text"
                       value={editingField.fieldName}
                       onChange={(e) => setEditingField({ ...editingField, fieldName: e.target.value })}
@@ -1562,8 +1588,9 @@ export function ShippingConfiguration() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Field Label</label>
+                    <label htmlFor="edit-field-label" className="block text-sm font-medium text-gray-700 mb-2">Field Label</label>
                     <input
+                      id="edit-field-label"
                       type="text"
                       value={editingField.fieldLabel}
                       onChange={(e) => setEditingField({ ...editingField, fieldLabel: e.target.value })}
@@ -1574,8 +1601,9 @@ export function ShippingConfiguration() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Field Type</label>
+                    <label htmlFor="edit-field-type" className="block text-sm font-medium text-gray-700 mb-2">Field Type</label>
                     <select
+                      id="edit-field-type"
                       value={editingField.fieldType}
                       onChange={(e) => setEditingField({ ...editingField, fieldType: e.target.value as CustomFieldType })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -1586,8 +1614,9 @@ export function ShippingConfiguration() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    <label htmlFor="edit-field-category" className="block text-sm font-medium text-gray-700 mb-2">Category</label>
                     <select
+                      id="edit-field-category"
                       value={editingField.category}
                       onChange={(e) => setEditingField({ ...editingField, category: e.target.value as 'invoicing' | 'distribution' | 'preferences' | 'other' })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -1600,8 +1629,9 @@ export function ShippingConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Placeholder</label>
+                  <label htmlFor="edit-field-placeholder" className="block text-sm font-medium text-gray-700 mb-2">Placeholder</label>
                   <input
+                    id="edit-field-placeholder"
                     type="text"
                     value={editingField.placeholder || ''}
                     onChange={(e) => setEditingField({ ...editingField, placeholder: e.target.value })}
@@ -1610,8 +1640,9 @@ export function ShippingConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Help Text</label>
+                  <label htmlFor="edit-field-helptext" className="block text-sm font-medium text-gray-700 mb-2">Help Text</label>
                   <input
+                    id="edit-field-helptext"
                     type="text"
                     value={editingField.helpText || ''}
                     onChange={(e) => setEditingField({ ...editingField, helpText: e.target.value })}
@@ -1621,8 +1652,9 @@ export function ShippingConfiguration() {
 
                 {editingField.fieldType === 'select' && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Options (comma-separated)</label>
+                    <label htmlFor="edit-field-options" className="block text-sm font-medium text-gray-700 mb-2">Options (comma-separated)</label>
                     <input
+                      id="edit-field-options"
                       type="text"
                       value={editingField.options?.join(', ') || ''}
                       onChange={(e) => setEditingField({ ...editingField, options: e.target.value.split(',').map(s => s.trim()) })}
@@ -1680,8 +1712,9 @@ export function ShippingConfiguration() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Store Name *</label>
+                    <label htmlFor="new-store-name" className="block text-sm font-medium text-gray-700 mb-2">Store Name *</label>
                     <input
+                      id="new-store-name"
                       type="text"
                       value={newStore.storeName}
                       onChange={(e) => setNewStore({ ...newStore, storeName: e.target.value })}
@@ -1690,8 +1723,9 @@ export function ShippingConfiguration() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Store Code</label>
+                    <label htmlFor="new-store-code" className="block text-sm font-medium text-gray-700 mb-2">Store Code</label>
                     <input
+                      id="new-store-code"
                       type="text"
                       value={newStore.storeCode}
                       onChange={(e) => setNewStore({ ...newStore, storeCode: e.target.value })}
@@ -1702,7 +1736,7 @@ export function ShippingConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Store Address</label>
+                  <p className="block text-sm font-medium text-gray-700 mb-2">Store Address</p>
                   <AddressInput
                     value={newStoreAddress}
                     onChange={setNewStoreAddress}
@@ -1712,7 +1746,7 @@ export function ShippingConfiguration() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                    <p className="block text-sm font-medium text-gray-700 mb-2">Phone Number</p>
                     <PhoneInput
                       value={newStore.phoneNumber}
                       onChange={(value) => setNewStore({ ...newStore, phoneNumber: value })}
@@ -1721,8 +1755,9 @@ export function ShippingConfiguration() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <label htmlFor="new-store-email" className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                     <input
+                      id="new-store-email"
                       type="email"
                       value={newStore.email}
                       onChange={(e) => setNewStore({ ...newStore, email: e.target.value })}
@@ -1733,8 +1768,9 @@ export function ShippingConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Store Hours</label>
+                  <label htmlFor="new-store-hours" className="block text-sm font-medium text-gray-700 mb-2">Store Hours</label>
                   <input
+                    id="new-store-hours"
                     type="text"
                     value={newStore.storeHours}
                     onChange={(e) => setNewStore({ ...newStore, storeHours: e.target.value })}
@@ -1744,8 +1780,9 @@ export function ShippingConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Special Instructions</label>
+                  <label htmlFor="new-store-instructions" className="block text-sm font-medium text-gray-700 mb-2">Special Instructions</label>
                   <textarea
+                    id="new-store-instructions"
                     value={newStore.specialInstructions}
                     onChange={(e) => setNewStore({ ...newStore, specialInstructions: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -1812,8 +1849,9 @@ export function ShippingConfiguration() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Store Name *</label>
+                    <label htmlFor="edit-store-name" className="block text-sm font-medium text-gray-700 mb-2">Store Name *</label>
                     <input
+                      id="edit-store-name"
                       type="text"
                       value={editingStore.storeName}
                       onChange={(e) => setEditingStore({ ...editingStore, storeName: e.target.value })}
@@ -1821,8 +1859,9 @@ export function ShippingConfiguration() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Store Code</label>
+                    <label htmlFor="edit-store-code" className="block text-sm font-medium text-gray-700 mb-2">Store Code</label>
                     <input
+                      id="edit-store-code"
                       type="text"
                       value={editingStore.storeCode}
                       onChange={(e) => setEditingStore({ ...editingStore, storeCode: e.target.value })}
@@ -1832,7 +1871,7 @@ export function ShippingConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Store Address</label>
+                  <p className="block text-sm font-medium text-gray-700 mb-2">Store Address</p>
                   <AddressInput
                     value={editingStoreAddress}
                     onChange={setEditingStoreAddress}
@@ -1842,7 +1881,7 @@ export function ShippingConfiguration() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                    <p className="block text-sm font-medium text-gray-700 mb-2">Phone Number</p>
                     <PhoneInput
                       value={editingStore.phoneNumber}
                       onChange={(value) => setEditingStore({ ...editingStore, phoneNumber: value })}
@@ -1851,8 +1890,9 @@ export function ShippingConfiguration() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <label htmlFor="edit-store-email" className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                     <input
+                      id="edit-store-email"
                       type="email"
                       value={editingStore.email}
                       onChange={(e) => setEditingStore({ ...editingStore, email: e.target.value })}
@@ -1862,8 +1902,9 @@ export function ShippingConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Store Hours</label>
+                  <label htmlFor="edit-store-hours" className="block text-sm font-medium text-gray-700 mb-2">Store Hours</label>
                   <input
+                    id="edit-store-hours"
                     type="text"
                     value={editingStore.storeHours}
                     onChange={(e) => setEditingStore({ ...editingStore, storeHours: e.target.value })}
@@ -1872,8 +1913,9 @@ export function ShippingConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Special Instructions</label>
+                  <label htmlFor="edit-store-instructions" className="block text-sm font-medium text-gray-700 mb-2">Special Instructions</label>
                   <textarea
+                    id="edit-store-instructions"
                     value={editingStore.specialInstructions}
                     onChange={(e) => setEditingStore({ ...editingStore, specialInstructions: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -1919,8 +1961,9 @@ export function ShippingConfiguration() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Field Name (Key)</label>
+                    <label htmlFor="new-store-field-name" className="block text-sm font-medium text-gray-700 mb-2">Field Name (Key)</label>
                     <input
+                      id="new-store-field-name"
                       type="text"
                       value={newStoreField.fieldName}
                       onChange={(e) => setNewStoreField({ ...newStoreField, fieldName: e.target.value })}
@@ -1929,8 +1972,9 @@ export function ShippingConfiguration() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Field Label</label>
+                    <label htmlFor="new-store-field-label" className="block text-sm font-medium text-gray-700 mb-2">Field Label</label>
                     <input
+                      id="new-store-field-label"
                       type="text"
                       value={newStoreField.fieldLabel}
                       onChange={(e) => setNewStoreField({ ...newStoreField, fieldLabel: e.target.value })}
@@ -1942,8 +1986,9 @@ export function ShippingConfiguration() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Field Type</label>
+                    <label htmlFor="new-store-field-type" className="block text-sm font-medium text-gray-700 mb-2">Field Type</label>
                     <select
+                      id="new-store-field-type"
                       value={newStoreField.fieldType}
                       onChange={(e) => setNewStoreField({ ...newStoreField, fieldType: e.target.value as CustomFieldType })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -1954,8 +1999,9 @@ export function ShippingConfiguration() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    <label htmlFor="new-store-field-category" className="block text-sm font-medium text-gray-700 mb-2">Category</label>
                     <select
+                      id="new-store-field-category"
                       value={newStoreField.category}
                       onChange={(e) => setNewStoreField({ ...newStoreField, category: e.target.value as 'invoicing' | 'distribution' | 'preferences' | 'other' })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -1968,8 +2014,9 @@ export function ShippingConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Placeholder</label>
+                  <label htmlFor="new-store-field-placeholder" className="block text-sm font-medium text-gray-700 mb-2">Placeholder</label>
                   <input
+                    id="new-store-field-placeholder"
                     type="text"
                     value={newStoreField.placeholder || ''}
                     onChange={(e) => setNewStoreField({ ...newStoreField, placeholder: e.target.value })}
@@ -1979,8 +2026,9 @@ export function ShippingConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Help Text</label>
+                  <label htmlFor="new-store-field-helptext" className="block text-sm font-medium text-gray-700 mb-2">Help Text</label>
                   <input
+                    id="new-store-field-helptext"
                     type="text"
                     value={newStoreField.helpText || ''}
                     onChange={(e) => setNewStoreField({ ...newStoreField, helpText: e.target.value })}
@@ -1991,8 +2039,9 @@ export function ShippingConfiguration() {
 
                 {newStoreField.fieldType === 'select' && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Options (comma-separated)</label>
+                    <label htmlFor="new-store-field-options" className="block text-sm font-medium text-gray-700 mb-2">Options (comma-separated)</label>
                     <input
+                      id="new-store-field-options"
                       type="text"
                       value={newStoreField.options?.join(', ') || ''}
                       onChange={(e) => setNewStoreField({ ...newStoreField, options: e.target.value.split(',').map(s => s.trim()) })}
@@ -2079,8 +2128,9 @@ export function ShippingConfiguration() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Field Name (Key)</label>
+                    <label htmlFor="ship-config-edit-field-name" className="block text-sm font-medium text-gray-700 mb-2">Field Name (Key)</label>
                     <input
+                      id="ship-config-edit-field-name"
                       type="text"
                       value={editingStoreField.fieldName}
                       onChange={(e) => setEditingStoreField({ ...editingStoreField, fieldName: e.target.value })}
@@ -2088,8 +2138,9 @@ export function ShippingConfiguration() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Field Label</label>
+                    <label htmlFor="ship-config-edit-field-label" className="block text-sm font-medium text-gray-700 mb-2">Field Label</label>
                     <input
+                      id="ship-config-edit-field-label"
                       type="text"
                       value={editingStoreField.fieldLabel}
                       onChange={(e) => setEditingStoreField({ ...editingStoreField, fieldLabel: e.target.value })}
@@ -2100,8 +2151,9 @@ export function ShippingConfiguration() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Field Type</label>
+                    <label htmlFor="ship-config-edit-field-type" className="block text-sm font-medium text-gray-700 mb-2">Field Type</label>
                     <select
+                      id="ship-config-edit-field-type"
                       value={editingStoreField.fieldType}
                       onChange={(e) => setEditingStoreField({ ...editingStoreField, fieldType: e.target.value as CustomFieldType })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -2112,8 +2164,9 @@ export function ShippingConfiguration() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    <label htmlFor="ship-config-edit-category" className="block text-sm font-medium text-gray-700 mb-2">Category</label>
                     <select
+                      id="ship-config-edit-category"
                       value={editingStoreField.category}
                       onChange={(e) => setEditingStoreField({ ...editingStoreField, category: e.target.value as 'invoicing' | 'distribution' | 'preferences' | 'other' })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -2126,8 +2179,9 @@ export function ShippingConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Placeholder</label>
+                  <label htmlFor="ship-config-edit-placeholder" className="block text-sm font-medium text-gray-700 mb-2">Placeholder</label>
                   <input
+                    id="ship-config-edit-placeholder"
                     type="text"
                     value={editingStoreField.placeholder || ''}
                     onChange={(e) => setEditingStoreField({ ...editingStoreField, placeholder: e.target.value })}
@@ -2136,8 +2190,9 @@ export function ShippingConfiguration() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Help Text</label>
+                  <label htmlFor="ship-config-edit-help-text" className="block text-sm font-medium text-gray-700 mb-2">Help Text</label>
                   <input
+                    id="ship-config-edit-help-text"
                     type="text"
                     value={editingStoreField.helpText || ''}
                     onChange={(e) => setEditingStoreField({ ...editingStoreField, helpText: e.target.value })}
@@ -2147,8 +2202,9 @@ export function ShippingConfiguration() {
 
                 {editingStoreField.fieldType === 'select' && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Options (comma-separated)</label>
+                    <label htmlFor="ship-config-edit-options" className="block text-sm font-medium text-gray-700 mb-2">Options (comma-separated)</label>
                     <input
+                      id="ship-config-edit-options"
                       type="text"
                       value={editingStoreField.options?.join(', ') || ''}
                       onChange={(e) => setEditingStoreField({ ...editingStoreField, options: e.target.value.split(',').map(s => s.trim()) })}

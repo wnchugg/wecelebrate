@@ -43,10 +43,11 @@ export function SAMLFields({
       </h4>
 
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label htmlFor="saml-idp-entry-point" className="block text-sm font-semibold text-gray-700 mb-2">
           IdP Entry Point (SSO URL) *
         </label>
         <Input
+          id="saml-idp-entry-point"
           type="url"
           value={ssoIdpEntryPoint}
           onChange={(e) => {
@@ -62,10 +63,11 @@ export function SAMLFields({
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label htmlFor="saml-entity-id" className="block text-sm font-semibold text-gray-700 mb-2">
           Issuer / Entity ID *
         </label>
         <Input
+          id="saml-entity-id"
           type="text"
           value={ssoEntityId}
           onChange={(e) => {
@@ -81,10 +83,11 @@ export function SAMLFields({
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label htmlFor="saml-certificate" className="block text-sm font-semibold text-gray-700 mb-2">
           X.509 Certificate *
         </label>
         <textarea
+          id="saml-certificate"
           rows={4}
           value={ssoCertificate}
           onChange={(e) => {
@@ -104,11 +107,12 @@ export function SAMLFields({
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label htmlFor="saml-acs-url" className="block text-sm font-semibold text-gray-700 mb-2">
           Assertion Consumer Service URL *
         </label>
         <div className="flex gap-2">
           <Input
+            id="saml-acs-url"
             type="url"
             value={ssoAcsUrl}
             readOnly

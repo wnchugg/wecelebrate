@@ -142,11 +142,12 @@ export function DeployedDomainBanner() {
           {isEditing ? (
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-amber-900 mb-1">
+                <label htmlFor="deployed-domain-url" className="block text-xs font-medium text-amber-900 mb-1">
                   Deployed Site URL
                 </label>
                 <div className="flex gap-2">
                   <Input
+                    id="deployed-domain-url"
                     type="text"
                     value={domain}
                     onChange={(e) => setDomain(e.target.value)}

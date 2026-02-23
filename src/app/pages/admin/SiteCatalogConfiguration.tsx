@@ -269,10 +269,11 @@ export default function SiteCatalogConfiguration() {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="scc-select-catalog" className="block text-sm font-medium text-gray-700 mb-2">
                 Select Catalog <span className="text-red-500">*</span>
               </label>
               <select
+                id="scc-select-catalog"
                 value={selectedCatalogId}
                 onChange={(e) => setSelectedCatalogId(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D91C81] focus:border-transparent"
@@ -325,9 +326,10 @@ export default function SiteCatalogConfiguration() {
             <div className="space-y-6">
               {/* Categories */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Excluded Categories</label>
+                <label htmlFor="scc-new-category" className="block text-sm font-medium text-gray-700 mb-2">Excluded Categories</label>
                 <div className="flex gap-2 mb-2">
                   <input
+                    id="scc-new-category"
                     type="text"
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
@@ -367,9 +369,10 @@ export default function SiteCatalogConfiguration() {
 
               {/* SKUs */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Excluded SKUs</label>
+                <label htmlFor="scc-new-sku" className="block text-sm font-medium text-gray-700 mb-2">Excluded SKUs</label>
                 <div className="flex gap-2 mb-2">
                   <input
+                    id="scc-new-sku"
                     type="text"
                     value={newSku}
                     onChange={(e) => setNewSku(e.target.value)}
@@ -409,9 +412,10 @@ export default function SiteCatalogConfiguration() {
 
               {/* Tags */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Excluded Tags</label>
+                <label htmlFor="scc-new-tag" className="block text-sm font-medium text-gray-700 mb-2">Excluded Tags</label>
                 <div className="flex gap-2 mb-2">
                   <input
+                    id="scc-new-tag"
                     type="text"
                     value={newTag}
                     onChange={(e) => setNewTag(e.target.value)}
@@ -452,9 +456,10 @@ export default function SiteCatalogConfiguration() {
 
               {/* Brands */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Excluded Brands</label>
+                <label htmlFor="scc-new-brand" className="block text-sm font-medium text-gray-700 mb-2">Excluded Brands</label>
                 <div className="flex gap-2 mb-2">
                   <input
+                    id="scc-new-brand"
                     type="text"
                     value={newBrand}
                     onChange={(e) => setNewBrand(e.target.value)}
@@ -519,10 +524,11 @@ export default function SiteCatalogConfiguration() {
 
               {allowPriceOverride && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="scc-price-adjustment" className="block text-sm font-medium text-gray-700 mb-2">
                     Global Price Adjustment (%)
                   </label>
                   <input
+                    id="scc-price-adjustment"
                     type="number"
                     value={priceAdjustment}
                     onChange={(e) => setPriceAdjustment(Number(e.target.value))}
@@ -593,10 +599,11 @@ export default function SiteCatalogConfiguration() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="scc-min-inventory" className="block text-sm font-medium text-gray-700 mb-2">
                   Minimum Inventory Threshold
                 </label>
                 <input
+                  id="scc-min-inventory"
                   type="number"
                   value={minimumInventory}
                   onChange={(e) => setMinimumInventory(Number(e.target.value))}
@@ -611,10 +618,11 @@ export default function SiteCatalogConfiguration() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="scc-min-price" className="block text-sm font-medium text-gray-700 mb-2">
                     Minimum Price ($)
                   </label>
                   <input
+                    id="scc-min-price"
                     type="number"
                     value={minimumPrice}
                     onChange={(e) => setMinimumPrice(Number(e.target.value))}
@@ -625,10 +633,11 @@ export default function SiteCatalogConfiguration() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="scc-max-price" className="block text-sm font-medium text-gray-700 mb-2">
                     Maximum Price ($)
                   </label>
                   <input
+                    id="scc-max-price"
                     type="number"
                     value={maximumPrice}
                     onChange={(e) => setMaximumPrice(Number(e.target.value))}

@@ -97,6 +97,7 @@ export function MultiLanguageSelector({
                   <div className="flex items-center gap-3 flex-1">
                     {/* Checkbox */}
                     <label className="flex items-center cursor-pointer">
+                      <span className="sr-only">{language.name}</span>
                       <input
                         type="checkbox"
                         checked={isSelected}

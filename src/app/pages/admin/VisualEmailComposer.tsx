@@ -190,10 +190,11 @@ export function VisualEmailComposer({
           {/* Template Info */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="vec-template-name" className="block text-sm font-medium text-gray-700 mb-2">
                 Template Name
               </label>
               <input
+                id="vec-template-name"
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
@@ -202,8 +203,9 @@ export function VisualEmailComposer({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+              <label htmlFor="vec-category" className="block text-sm font-medium text-gray-700 mb-2">Category</label>
               <select
+                id="vec-category"
                 value={formData.category}
                 onChange={(e) =>
                   setFormData((prev) => ({
@@ -222,10 +224,11 @@ export function VisualEmailComposer({
 
           {/* Subject Line */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="vec-email-subject" className="block text-sm font-medium text-gray-700 mb-2">
               Email Subject
             </label>
             <input
+              id="vec-email-subject"
               type="text"
               value={formData.defaultSubject}
               onChange={(e) =>
@@ -307,10 +310,11 @@ export function VisualEmailComposer({
                   />
                 ) : (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="vec-html-content" className="block text-sm font-medium text-gray-700 mb-2">
                       HTML Content
                     </label>
                     <textarea
+                      id="vec-html-content"
                       value={formData.defaultHtmlContent}
                       onChange={(e) => handleHtmlChange(e.target.value)}
                       className="w-full h-[400px] px-4 py-3 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none font-mono text-sm"
@@ -343,11 +347,12 @@ export function VisualEmailComposer({
 
           {/* Text Content (Auto-generated) */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="vec-plain-text" className="block text-sm font-medium text-gray-700 mb-2">
               Plain Text Version
               <span className="text-xs text-gray-500 ml-2">(auto-generated from HTML)</span>
             </label>
             <textarea
+              id="vec-plain-text"
               value={formData.defaultTextContent}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, defaultTextContent: e.target.value }))

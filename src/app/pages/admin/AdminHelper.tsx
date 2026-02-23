@@ -276,10 +276,11 @@ export function AdminHelper() {
 
           <form onSubmit={() => void handleDiagnostic()} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="helper-diagnostic-identifier" className="block text-sm font-medium text-gray-700 mb-2">
                 Diagnostic Identifier
               </label>
               <input
+                id="helper-diagnostic-identifier"
                 type="text"
                 value={diagnosticIdentifier}
                 onChange={(e) => setDiagnosticIdentifier(e.target.value)}
@@ -326,12 +327,13 @@ export function AdminHelper() {
 
             <form onSubmit={() => void handleLogin()} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="helper-login-email" className="block text-sm font-medium text-gray-700 mb-2">
                   Email Address
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
+                    id="helper-login-email"
                     type="email"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
@@ -343,12 +345,13 @@ export function AdminHelper() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="helper-login-password" className="block text-sm font-medium text-gray-700 mb-2">
                   Password
                 </label>
                 <div className="relative">
                   <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
+                    id="helper-login-password"
                     type="password"
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
@@ -383,10 +386,11 @@ export function AdminHelper() {
 
             <form onSubmit={() => void handleSignup()} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="helper-signup-name" className="block text-sm font-medium text-gray-700 mb-2">
                   Full Name
                 </label>
                 <input
+                  id="helper-signup-name"
                   type="text"
                   value={signupName}
                   onChange={(e) => setSignupName(e.target.value)}
@@ -397,12 +401,13 @@ export function AdminHelper() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="helper-signup-email" className="block text-sm font-medium text-gray-700 mb-2">
                   Email Address
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
+                    id="helper-signup-email"
                     type="email"
                     value={signupEmail}
                     onChange={(e) => setSignupEmail(e.target.value)}
@@ -414,12 +419,13 @@ export function AdminHelper() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="helper-signup-password" className="block text-sm font-medium text-gray-700 mb-2">
                   Password
                 </label>
                 <div className="relative">
                   <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
+                    id="helper-signup-password"
                     type="password"
                     value={signupPassword}
                     onChange={(e) => setSignupPassword(e.target.value)}
@@ -432,12 +438,13 @@ export function AdminHelper() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="helper-signup-confirm-password" className="block text-sm font-medium text-gray-700 mb-2">
                   Confirm Password
                 </label>
                 <div className="relative">
                   <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
+                    id="helper-signup-confirm-password"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}

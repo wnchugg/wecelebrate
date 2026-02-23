@@ -194,10 +194,11 @@ export default function CatalogEdit() {
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="catalog-name" className="block text-sm font-medium text-gray-700 mb-2">
                 Catalog Name <span className="text-red-500">*</span>
               </label>
               <input
+                id="catalog-name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -208,10 +209,11 @@ export default function CatalogEdit() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="catalog-description" className="block text-sm font-medium text-gray-700 mb-2">
                 Description
               </label>
               <textarea
+                id="catalog-description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D91C81] focus:border-transparent"
@@ -222,9 +224,9 @@ export default function CatalogEdit() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <p className="block text-sm font-medium text-gray-700 mb-2">
                   Catalog Type <span className="text-red-500">*</span>
-                </label>
+                </p>
                 <div className="grid grid-cols-2 gap-2">
                   {(['erp', 'vendor', 'manual', 'dropship'] as CatalogType[]).map((catalogType) => {
                     const Icon = getCatalogTypeIcon(catalogType);
@@ -248,10 +250,11 @@ export default function CatalogEdit() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="catalog-status" className="block text-sm font-medium text-gray-700 mb-2">
                   Status
                 </label>
                 <select
+                  id="catalog-status"
                   value={status}
                   onChange={(e) => setStatus(e.target.value as 'active' | 'inactive')}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D91C81] focus:border-transparent"
@@ -270,10 +273,11 @@ export default function CatalogEdit() {
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="catalog-source-type" className="block text-sm font-medium text-gray-700 mb-2">
                 Source Type <span className="text-red-500">*</span>
               </label>
               <select
+                id="catalog-source-type"
                 value={sourceType}
                 onChange={(e) => setSourceType(e.target.value as SourceType)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D91C81] focus:border-transparent"
@@ -286,10 +290,11 @@ export default function CatalogEdit() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="catalog-source-system" className="block text-sm font-medium text-gray-700 mb-2">
                   Source System <span className="text-red-500">*</span>
                 </label>
                 <input
+                  id="catalog-source-system"
                   type="text"
                   value={sourceSystem}
                   onChange={(e) => setSourceSystem(e.target.value)}
@@ -300,10 +305,11 @@ export default function CatalogEdit() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="catalog-source-id" className="block text-sm font-medium text-gray-700 mb-2">
                   Source ID <span className="text-red-500">*</span>
                 </label>
                 <input
+                  id="catalog-source-id"
                   type="text"
                   value={sourceId}
                   onChange={(e) => setSourceId(e.target.value)}
@@ -315,10 +321,11 @@ export default function CatalogEdit() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="catalog-source-version" className="block text-sm font-medium text-gray-700 mb-2">
                 Source Version
               </label>
               <input
+                id="catalog-source-version"
                 type="text"
                 value={sourceVersion}
                 onChange={(e) => setSourceVersion(e.target.value)}
@@ -336,10 +343,11 @@ export default function CatalogEdit() {
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="catalog-default-currency" className="block text-sm font-medium text-gray-700 mb-2">
                   Default Currency <span className="text-red-500">*</span>
                 </label>
                 <select
+                  id="catalog-default-currency"
                   value={defaultCurrency}
                   onChange={(e) => setDefaultCurrency(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D91C81] focus:border-transparent"
@@ -353,10 +361,11 @@ export default function CatalogEdit() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="catalog-price-markup" className="block text-sm font-medium text-gray-700 mb-2">
                   Price Markup (%)
                 </label>
                 <input
+                  id="catalog-price-markup"
                   type="number"
                   value={priceMarkup}
                   onChange={(e) => setPriceMarkup(parseFloat(e.target.value) || 0)}
@@ -371,6 +380,7 @@ export default function CatalogEdit() {
             {/* Auto Sync */}
             <div className="border border-gray-200 rounded-lg p-4">
               <label className="flex items-center gap-3 cursor-pointer">
+                <span className="sr-only">Enable Auto Sync</span>
                 <input
                   type="checkbox"
                   checked={autoSync}
@@ -385,10 +395,11 @@ export default function CatalogEdit() {
               
               {autoSync && (
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="catalog-sync-frequency" className="block text-sm font-medium text-gray-700 mb-2">
                     Sync Frequency
                   </label>
                   <select
+                    id="catalog-sync-frequency"
                     value={syncFrequency}
                     onChange={(e) => setSyncFrequency(e.target.value as SyncFrequency)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D91C81] focus:border-transparent"
@@ -405,6 +416,7 @@ export default function CatalogEdit() {
             {/* Other Settings */}
             <div className="space-y-3">
               <label className="flex items-center gap-3 cursor-pointer">
+                <span className="sr-only">Allow Site Overrides</span>
                 <input
                   type="checkbox"
                   checked={allowSiteOverrides}
@@ -418,6 +430,7 @@ export default function CatalogEdit() {
               </label>
 
               <label className="flex items-center gap-3 cursor-pointer">
+                <span className="sr-only">Track Inventory</span>
                 <input
                   type="checkbox"
                   checked={trackInventory}
@@ -431,6 +444,7 @@ export default function CatalogEdit() {
               </label>
 
               <label className="flex items-center gap-3 cursor-pointer">
+                <span className="sr-only">Require Approval for Sync Changes</span>
                 <input
                   type="checkbox"
                   checked={requireApproval}
@@ -444,6 +458,7 @@ export default function CatalogEdit() {
               </label>
 
               <label className="flex items-center gap-3 cursor-pointer">
+                <span className="sr-only">Notify on Sync</span>
                 <input
                   type="checkbox"
                   checked={notifyOnSync}
@@ -457,6 +472,7 @@ export default function CatalogEdit() {
               </label>
 
               <label className="flex items-center gap-3 cursor-pointer">
+                <span className="sr-only">Notify on Error</span>
                 <input
                   type="checkbox"
                   checked={notifyOnError}

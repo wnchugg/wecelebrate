@@ -448,10 +448,11 @@ function WebhookForm({ webhook, siteId, onSave, onCancel, newWebhook, setNewWebh
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="wm-webhook-name" className="block text-sm font-medium text-gray-700 mb-2">
               Webhook Name
             </label>
             <input
+              id="wm-webhook-name"
               type="text"
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
@@ -461,10 +462,11 @@ function WebhookForm({ webhook, siteId, onSave, onCancel, newWebhook, setNewWebh
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="wm-webhook-url" className="block text-sm font-medium text-gray-700 mb-2">
               Webhook URL
             </label>
             <input
+              id="wm-webhook-url"
               type="url"
               value={formData.url}
               onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
@@ -475,10 +477,11 @@ function WebhookForm({ webhook, siteId, onSave, onCancel, newWebhook, setNewWebh
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="wm-secret-key" className="block text-sm font-medium text-gray-700 mb-2">
               Secret Key
             </label>
             <input
+              id="wm-secret-key"
               type="text"
               value={formData.secret}
               onChange={(e) => setFormData(prev => ({ ...prev, secret: e.target.value }))}
@@ -491,9 +494,9 @@ function WebhookForm({ webhook, siteId, onSave, onCancel, newWebhook, setNewWebh
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <p className="block text-sm font-medium text-gray-700 mb-3">
               Events to Subscribe
-            </label>
+            </p>
             <div className="space-y-2">
               {eventOptions.map((event) => (
                 <label key={event} className="flex items-center gap-2 cursor-pointer">

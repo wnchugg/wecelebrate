@@ -139,9 +139,9 @@ export function SitePreview({ site, onClose }: SitePreviewProps) {
             <CardContent>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                  <p className="text-sm font-medium text-gray-700 mb-2 block">
                     Primary Color
-                  </label>
+                  </p>
                   <div className="flex items-center gap-3">
                     <div
                       className="w-16 h-16 rounded-lg border-2 border-gray-300 shadow-sm"
@@ -153,9 +153,9 @@ export function SitePreview({ site, onClose }: SitePreviewProps) {
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                  <p className="text-sm font-medium text-gray-700 mb-2 block">
                     Secondary Color
-                  </label>
+                  </p>
                   <div className="flex items-center gap-3">
                     <div
                       className="w-16 h-16 rounded-lg border-2 border-gray-300 shadow-sm"
@@ -168,9 +168,9 @@ export function SitePreview({ site, onClose }: SitePreviewProps) {
                 </div>
                 {site.branding.tertiaryColor && (
                   <div>
-                    <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    <p className="text-sm font-medium text-gray-700 mb-2 block">
                       Tertiary Color
-                    </label>
+                    </p>
                     <div className="flex items-center gap-3">
                       <div
                         className="w-16 h-16 rounded-lg border-2 border-gray-300 shadow-sm"
@@ -219,25 +219,25 @@ export function SitePreview({ site, onClose }: SitePreviewProps) {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Validation Method</label>
+                  <p className="text-sm font-medium text-gray-700">Validation Method</p>
                   <Badge variant="outline" className="mt-1">
                     {site.settings.validationMethod}
                   </Badge>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Shipping Mode</label>
+                  <p className="text-sm font-medium text-gray-700">Shipping Mode</p>
                   <Badge variant="outline" className="mt-1">
                     {site.settings.shippingMode}
                   </Badge>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Default Language</label>
+                  <p className="text-sm font-medium text-gray-700">Default Language</p>
                   <Badge variant="outline" className="mt-1">
                     {site.settings.defaultLanguage.toUpperCase()}
                   </Badge>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Gifts Per User</label>
+                  <p className="text-sm font-medium text-gray-700">Gifts Per User</p>
                   <Badge variant="outline" className="mt-1">
                     {site.settings.giftsPerUser}
                   </Badge>
@@ -246,19 +246,19 @@ export function SitePreview({ site, onClose }: SitePreviewProps) {
 
               <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700">Show Pricing</label>
+                  <p className="text-sm font-medium text-gray-700">Show Pricing</p>
                   <Badge variant={site.settings.showPricing ? 'default' : 'secondary'}>
                     {site.settings.showPricing ? 'Yes' : 'No'}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700">Quantity Selection</label>
+                  <p className="text-sm font-medium text-gray-700">Quantity Selection</p>
                   <Badge variant={site.settings.allowQuantitySelection ? 'default' : 'secondary'}>
                     {site.settings.allowQuantitySelection ? 'Enabled' : 'Disabled'}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700">Language Selector</label>
+                  <p className="text-sm font-medium text-gray-700">Language Selector</p>
                   <Badge variant={site.settings.enableLanguageSelector ? 'default' : 'secondary'}>
                     {site.settings.enableLanguageSelector ? 'Enabled' : 'Disabled'}
                   </Badge>
@@ -267,9 +267,9 @@ export function SitePreview({ site, onClose }: SitePreviewProps) {
 
               {site.settings.defaultCurrency && (
                 <div className="pt-4 border-t">
-                  <label className="text-sm font-medium text-gray-700 block mb-2">
+                  <p className="text-sm font-medium text-gray-700 block mb-2">
                     International Settings
-                  </label>
+                  </p>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <span className="text-sm text-gray-600">Default Currency: </span>

@@ -431,11 +431,12 @@ export function AccessManagement({
 
           {/* Domain Filter */}
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="access-allowed-domains" className="block text-sm font-semibold text-gray-700 mb-2">
               Allowed Domains (optional)
             </label>
             <div className="flex gap-2">
               <input
+                id="access-allowed-domains"
                 type="text"
                 placeholder="e.g., company.com, business.org"
                 value={allowedDomains}
@@ -709,10 +710,11 @@ export function AccessManagement({
 
               {validationMethod === 'employeeId' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="access-employee-id" className="block text-sm font-medium text-gray-700 mb-1">
                     Employee ID <span className="text-red-500">*</span>
                   </label>
                   <input
+                    id="access-employee-id"
                     type="text"
                     value={formData.employeeId}
                     onChange={(e) => setFormData({ ...formData, employeeId: e.target.value })}
@@ -724,10 +726,11 @@ export function AccessManagement({
 
               {validationMethod === 'serialCard' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="access-serial-card" className="block text-sm font-medium text-gray-700 mb-1">
                     Serial Card <span className="text-red-500">*</span>
                   </label>
                   <input
+                    id="access-serial-card"
                     type="text"
                     value={formData.serialCard}
                     onChange={(e) => setFormData({ ...formData, serialCard: e.target.value })}
@@ -738,10 +741,11 @@ export function AccessManagement({
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="access-full-name" className="block text-sm font-medium text-gray-700 mb-1">
                   Full Name
                 </label>
                 <input
+                  id="access-full-name"
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -751,10 +755,11 @@ export function AccessManagement({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="access-department" className="block text-sm font-medium text-gray-700 mb-1">
                   Department
                 </label>
                 <input
+                  id="access-department"
                   type="text"
                   value={formData.department}
                   onChange={(e) => setFormData({ ...formData, department: e.target.value })}

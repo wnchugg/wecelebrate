@@ -581,10 +581,11 @@ export function ClientConfiguration({
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-client-name" className="block text-sm font-semibold text-gray-700 mb-2">
                     Client Name *
                   </label>
                   <Input
+                    id="client-config-client-name"
                     value={clientName}
                     onChange={(e) => {
                       setClientName(e.target.value);
@@ -595,10 +596,11 @@ export function ClientConfiguration({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-url-slug" className="block text-sm font-semibold text-gray-700 mb-2">
                     URL Slug <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
+                    id="client-config-url-slug"
                     value={clientCode}
                     onChange={(e) => {
                       setClientCode(e.target.value);
@@ -612,10 +614,11 @@ export function ClientConfiguration({
                 </div>
 
                 <div className="col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-description" className="block text-sm font-semibold text-gray-700 mb-2">
                     Description <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <textarea
+                    id="client-config-description"
                     value={description}
                     onChange={(e) => {
                       setDescription(e.target.value);
@@ -628,10 +631,11 @@ export function ClientConfiguration({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-client-region" className="block text-sm font-semibold text-gray-700 mb-2">
                     Client Region
                   </label>
                   <select
+                    id="client-config-client-region"
                     value={clientRegion}
                     onChange={(e) => {
                       setClientRegion(e.target.value);
@@ -650,10 +654,11 @@ export function ClientConfiguration({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-source-code" className="block text-sm font-semibold text-gray-700 mb-2">
                     Source Code <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
+                    id="client-config-source-code"
                     value={clientSourceCode}
                     onChange={(e) => {
                       setClientSourceCode(e.target.value);
@@ -665,10 +670,11 @@ export function ClientConfiguration({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-tax-id" className="block text-sm font-semibold text-gray-700 mb-2">
                     Tax ID <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
+                    id="client-config-tax-id"
                     value={clientTaxId}
                     onChange={(e) => {
                       setClientTaxId(e.target.value);
@@ -694,10 +700,11 @@ export function ClientConfiguration({
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-contact-name" className="block text-sm font-semibold text-gray-700 mb-2">
                     Contact Name
                   </label>
                   <Input
+                    id="client-config-contact-name"
                     value={clientContactName}
                     onChange={(e) => {
                       setClientContactName(e.target.value);
@@ -708,10 +715,11 @@ export function ClientConfiguration({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-contact-email" className="block text-sm font-semibold text-gray-700 mb-2">
                     Contact Email
                   </label>
                   <Input
+                    id="client-config-contact-email"
                     type="email"
                     value={contactEmail}
                     onChange={(e) => {
@@ -723,10 +731,11 @@ export function ClientConfiguration({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-contact-phone" className="block text-sm font-semibold text-gray-700 mb-2">
                     Contact Phone
                   </label>
                   <PhoneInput
+                    id="client-config-contact-phone"
                     value={clientContactPhone}
                     onChange={(value) => {
                       setClientContactPhone(value);
@@ -752,10 +761,11 @@ export function ClientConfiguration({
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-status" className="block text-sm font-semibold text-gray-700 mb-2">
                     Status
                   </label>
                   <select
+                    id="client-config-status"
                     value={status}
                     onChange={(e) => {
                       setStatus(e.target.value as 'active' | 'inactive');
@@ -885,10 +895,11 @@ export function ClientConfiguration({
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-account-manager-name" className="block text-sm font-semibold text-gray-700 mb-2">
                     Account Manager Name
                   </label>
                   <Input
+                    id="client-config-account-manager-name"
                     value={clientAccountManager}
                     onChange={(e) => {
                       setClientAccountManager(e.target.value);
@@ -899,10 +910,11 @@ export function ClientConfiguration({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-account-manager-email" className="block text-sm font-semibold text-gray-700 mb-2">
                     Account Manager Email
                   </label>
                   <Input
+                    id="client-config-account-manager-email"
                     type="email"
                     value={clientAccountManagerEmail}
                     onChange={(e) => {
@@ -927,10 +939,11 @@ export function ClientConfiguration({
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-impl-manager-name" className="block text-sm font-semibold text-gray-700 mb-2">
                     Implementation Manager Name
                   </label>
                   <Input
+                    id="client-config-impl-manager-name"
                     value={clientImplementationManager}
                     onChange={(e) => {
                       setClientImplementationManager(e.target.value);
@@ -941,10 +954,11 @@ export function ClientConfiguration({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-impl-manager-email" className="block text-sm font-semibold text-gray-700 mb-2">
                     Implementation Manager Email
                   </label>
                   <Input
+                    id="client-config-impl-manager-email"
                     type="email"
                     value={clientImplementationManagerEmail}
                     onChange={(e) => {
@@ -969,10 +983,11 @@ export function ClientConfiguration({
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-tech-owner-name" className="block text-sm font-semibold text-gray-700 mb-2">
                     Technology Owner Name
                   </label>
                   <Input
+                    id="client-config-tech-owner-name"
                     value={technologyOwner}
                     onChange={(e) => {
                       setTechnologyOwner(e.target.value);
@@ -983,10 +998,11 @@ export function ClientConfiguration({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-tech-owner-email" className="block text-sm font-semibold text-gray-700 mb-2">
                     Technology Owner Email
                   </label>
                   <Input
+                    id="client-config-tech-owner-email"
                     type="email"
                     value={technologyOwnerEmail}
                     onChange={(e) => {
@@ -1051,10 +1067,11 @@ export function ClientConfiguration({
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="client-config-client-url" className="block text-sm font-semibold text-gray-700 mb-2">
                   Client URL <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                 </label>
                 <Input
+                  id="client-config-client-url"
                   value={clientUrl}
                   onChange={(e) => {
                     setClientUrl(e.target.value);
@@ -1066,10 +1083,11 @@ export function ClientConfiguration({
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="client-config-custom-domain-url" className="block text-sm font-semibold text-gray-700 mb-2">
                   Custom Domain URL <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                 </label>
                 <Input
+                  id="client-config-custom-domain-url"
                   value={clientCustomUrl}
                   onChange={(e) => {
                     setClientCustomUrl(e.target.value);
@@ -1092,10 +1110,11 @@ export function ClientConfiguration({
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="client-config-auth-method" className="block text-sm font-semibold text-gray-700 mb-2">
                   Authentication Method
                 </label>
                 <select
+                  id="client-config-auth-method"
                   value={clientAuthenticationMethod}
                   onChange={(e) => {
                     setClientAuthenticationMethod(e.target.value);
@@ -1119,7 +1138,8 @@ export function ClientConfiguration({
                   <p className="text-sm text-gray-600">Extend user session timeout to 4 hours</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">4-Hour Session Timeout</span>
+                  <input
                     type="checkbox"
                     checked={clientAllowSessionTimeoutExtend}
                     onChange={(e) => {
@@ -1149,7 +1169,8 @@ export function ClientConfiguration({
                   <p className="text-sm text-gray-600">Client has imported employee information</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
+                  <span className="sr-only">Has Employee Data</span>
+                  <input
                     type="checkbox"
                     checked={clientHasEmployeeData}
                     onChange={(e) => {
@@ -1216,10 +1237,11 @@ export function ClientConfiguration({
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-invoice-type" className="block text-sm font-semibold text-gray-700 mb-2">
                     Invoice Type
                   </label>
                   <select
+                    id="client-config-invoice-type"
                     value={clientInvoiceType}
                     onChange={(e) => {
                       setClientInvoiceType(e.target.value);
@@ -1241,10 +1263,11 @@ export function ClientConfiguration({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-invoice-template-type" className="block text-sm font-semibold text-gray-700 mb-2">
                     Invoice Template Type
                   </label>
                   <select
+                    id="client-config-invoice-template-type"
                     value={clientInvoiceTemplateType}
                     onChange={(e) => {
                       setClientInvoiceTemplateType(e.target.value);
@@ -1274,10 +1297,11 @@ export function ClientConfiguration({
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-po-type" className="block text-sm font-semibold text-gray-700 mb-2">
                     PO Type <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
+                    id="client-config-po-type"
                     value={clientPoType}
                     onChange={(e) => {
                       setClientPoType(e.target.value);
@@ -1288,10 +1312,11 @@ export function ClientConfiguration({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="client-config-po-number" className="block text-sm font-semibold text-gray-700 mb-2">
                     PO Number <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                   </label>
                   <Input
+                    id="client-config-po-number"
                     value={clientPoNumber}
                     onChange={(e) => {
                       setClientPoNumber(e.target.value);
@@ -1355,10 +1380,11 @@ export function ClientConfiguration({
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="client-config-erp-system" className="block text-sm font-semibold text-gray-700 mb-2">
                   ERP System
                 </label>
                 <select
+                  id="client-config-erp-system"
                   value={clientErpSystem}
                   onChange={(e) => {
                     setClientErpSystem(e.target.value);
@@ -1390,10 +1416,11 @@ export function ClientConfiguration({
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="client-config-sso-provider" className="block text-sm font-semibold text-gray-700 mb-2">
                   SSO Provider <span className="text-gray-400 font-normal ml-1">(Optional)</span>
                 </label>
                 <Input
+                  id="client-config-sso-provider"
                   value={clientSso}
                   onChange={(e) => {
                     setClientSso(e.target.value);

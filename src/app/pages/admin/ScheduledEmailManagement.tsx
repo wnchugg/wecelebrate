@@ -303,8 +303,9 @@ export function ScheduledEmailManagement() {
         {/* Actions Bar */}
         <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <label className="text-sm font-medium text-gray-700">Filter:</label>
+            <label htmlFor="sem-filter-status" className="text-sm font-medium text-gray-700">Filter:</label>
             <select
+              id="sem-filter-status"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -478,10 +479,11 @@ function ScheduleEmailForm({ siteId, onSave, onCancel }: ScheduleEmailFormProps)
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="sem-trigger-type" className="block text-sm font-medium text-gray-700 mb-2">
               Trigger Type
             </label>
             <select
+              id="sem-trigger-type"
               value={formData.trigger}
               onChange={(e) => setFormData(prev => ({ ...prev, trigger: e.target.value, variables: {} }))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
@@ -495,10 +497,11 @@ function ScheduleEmailForm({ siteId, onSave, onCancel }: ScheduleEmailFormProps)
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="sem-recipient-email" className="block text-sm font-medium text-gray-700 mb-2">
               Recipient Email
             </label>
             <input
+              id="sem-recipient-email"
               type="email"
               value={formData.recipientEmail}
               onChange={(e) => setFormData(prev => ({ ...prev, recipientEmail: e.target.value }))}
@@ -508,10 +511,11 @@ function ScheduleEmailForm({ siteId, onSave, onCancel }: ScheduleEmailFormProps)
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="sem-scheduled-for" className="block text-sm font-medium text-gray-700 mb-2">
               Scheduled Date & Time
             </label>
             <input
+              id="sem-scheduled-for"
               type="datetime-local"
               value={formData.scheduledFor}
               onChange={(e) => setFormData(prev => ({ ...prev, scheduledFor: e.target.value }))}
@@ -521,9 +525,9 @@ function ScheduleEmailForm({ siteId, onSave, onCancel }: ScheduleEmailFormProps)
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <p className="block text-sm font-medium text-gray-700 mb-3">
               Template Variables
-            </label>
+            </p>
             <div className="space-y-3">
               {selectedTrigger?.vars.map(varName => (
                 <div key={varName}>

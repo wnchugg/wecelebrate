@@ -252,10 +252,11 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="erp-connection-name" className="block text-sm font-medium text-gray-700 mb-2">
                   Connection Name *
                 </label>
                 <input
+                  id="erp-connection-name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -265,10 +266,11 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="erp-provider" className="block text-sm font-medium text-gray-700 mb-2">
                   ERP Provider *
                 </label>
                 <select
+                  id="erp-provider"
                   value={provider}
                   onChange={(e) => setProvider(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D91C81] focus:border-transparent"
@@ -355,10 +357,11 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="erp-api-url" className="block text-sm font-medium text-gray-700 mb-2">
                     API URL *
                   </label>
                   <input
+                    id="erp-api-url"
                     type="url"
                     value={apiUrl}
                     onChange={(e) => setApiUrl(e.target.value)}
@@ -369,11 +372,12 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="erp-api-key" className="block text-sm font-medium text-gray-700 mb-2">
                       API Key
                     </label>
                     <div className="relative">
                       <input
+                        id="erp-api-key"
                         type={showPassword ? 'text' : 'password'}
                         value={apiKey}
                         onChange={(e) => setApiKey(e.target.value)}
@@ -391,10 +395,11 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="erp-api-secret" className="block text-sm font-medium text-gray-700 mb-2">
                       API Secret
                     </label>
                     <input
+                      id="erp-api-secret"
                       type={showPassword ? 'text' : 'password'}
                       value={apiSecret}
                       onChange={(e) => setApiSecret(e.target.value)}
@@ -405,10 +410,11 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="erp-oauth-token" className="block text-sm font-medium text-gray-700 mb-2">
                     OAuth Token (Optional)
                   </label>
                   <input
+                    id="erp-oauth-token"
                     type={showPassword ? 'text' : 'password'}
                     value={oauthToken}
                     onChange={(e) => setOauthToken(e.target.value)}
@@ -430,10 +436,11 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="erp-doi-endpoint" className="block text-sm font-medium text-gray-700 mb-2">
                     DOI Endpoint *
                   </label>
                   <input
+                    id="erp-doi-endpoint"
                     type="url"
                     value={doiEndpoint}
                     onChange={(e) => setDoiEndpoint(e.target.value)}
@@ -444,10 +451,11 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="erp-doi-username" className="block text-sm font-medium text-gray-700 mb-2">
                       Username *
                     </label>
                     <input
+                      id="erp-doi-username"
                       type="text"
                       value={doiUsername}
                       onChange={(e) => setDoiUsername(e.target.value)}
@@ -457,11 +465,12 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="erp-doi-password" className="block text-sm font-medium text-gray-700 mb-2">
                       Password *
                     </label>
                     <div className="relative">
                       <input
+                        id="erp-doi-password"
                         type={showPassword ? 'text' : 'password'}
                         value={doiPassword}
                         onChange={(e) => setDoiPassword(e.target.value)}
@@ -493,10 +502,11 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="erp-sftp-host" className="block text-sm font-medium text-gray-700 mb-2">
                       SFTP Host *
                     </label>
                     <input
+                      id="erp-sftp-host"
                       type="text"
                       value={sftpHost}
                       onChange={(e) => setSftpHost(e.target.value)}
@@ -506,10 +516,11 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="erp-sftp-port" className="block text-sm font-medium text-gray-700 mb-2">
                       Port *
                     </label>
                     <input
+                      id="erp-sftp-port"
                       type="number"
                       value={sftpPort}
                       onChange={(e) => setSftpPort(parseInt(e.target.value))}
@@ -521,10 +532,11 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="erp-sftp-username" className="block text-sm font-medium text-gray-700 mb-2">
                       Username *
                     </label>
                     <input
+                      id="erp-sftp-username"
                       type="text"
                       value={sftpUsername}
                       onChange={(e) => setSftpUsername(e.target.value)}
@@ -534,11 +546,12 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="erp-sftp-password" className="block text-sm font-medium text-gray-700 mb-2">
                       Password *
                     </label>
                     <div className="relative">
                       <input
+                        id="erp-sftp-password"
                         type={showPassword ? 'text' : 'password'}
                         value={sftpPassword}
                         onChange={(e) => setSftpPassword(e.target.value)}
@@ -557,10 +570,11 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="erp-sftp-path" className="block text-sm font-medium text-gray-700 mb-2">
                     Remote Path
                   </label>
                   <input
+                    id="erp-sftp-path"
                     type="text"
                     value={sftpPath}
                     onChange={(e) => setSftpPath(e.target.value)}
@@ -589,6 +603,7 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
+                  <span className="sr-only">{dataType.label}</span>
                   <input
                     type="checkbox"
                     checked={enabledDataTypes.includes(dataType.value)}
@@ -613,10 +628,11 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="erp-timeout" className="block text-sm font-medium text-gray-700 mb-2">
                   Timeout (ms)
                 </label>
                 <input
+                  id="erp-timeout"
                   type="number"
                   value={timeout}
                   onChange={(e) => setTimeout(parseInt(e.target.value))}
@@ -625,10 +641,11 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="erp-retry-attempts" className="block text-sm font-medium text-gray-700 mb-2">
                   Retry Attempts
                 </label>
                 <input
+                  id="erp-retry-attempts"
                   type="number"
                   value={retryAttempts}
                   onChange={(e) => setRetryAttempts(parseInt(e.target.value))}
@@ -637,10 +654,11 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="erp-batch-size" className="block text-sm font-medium text-gray-700 mb-2">
                   Batch Size
                 </label>
                 <input
+                  id="erp-batch-size"
                   type="number"
                   value={batchSize}
                   onChange={(e) => setBatchSize(parseInt(e.target.value))}
@@ -650,10 +668,11 @@ export function ERPConnectionForm({ connection, onClose, onSave }: ERPConnection
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="erp-sync-schedule" className="block text-sm font-medium text-gray-700 mb-2">
                 Sync Schedule (Cron Expression)
               </label>
               <input
+                id="erp-sync-schedule"
                 type="text"
                 value={syncSchedule}
                 onChange={(e) => setSyncSchedule(e.target.value)}

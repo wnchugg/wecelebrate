@@ -179,7 +179,7 @@ As a token of our appreciation for your continued service, we invite you to sele
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#D91C81] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading...</p>
+          <p className="text-gray-600 font-medium">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -191,7 +191,7 @@ As a token of our appreciation for your continued service, we invite you to sele
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#D91C81] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Redirecting...</p>
+          <p className="text-gray-600 font-medium">{t('common.redirecting')}</p>
         </div>
       </div>
     );
@@ -311,14 +311,14 @@ As a token of our appreciation for your continued service, we invite you to sele
       {celebrationEnabled && celebrationMessages.length > 0 && (
         <div className="max-w-6xl mx-auto px-4 py-16">
           <div className="text-center mb-12">
-            <h2 
+            <h2
               className="text-3xl md:text-4xl font-bold mb-4"
               style={{ color: primaryColor }}
             >
-              Messages from Your Team
+              {t('welcome.celebrationTitle')}
             </h2>
-            <p className="text-gray-600 text-lg">
-              Your colleagues have shared their congratulations and appreciation
+            <p className="text-gray-600 text-lg" aria-live="polite">
+              {t('welcome.celebrationSubtitle')}
             </p>
           </div>
 
@@ -360,7 +360,7 @@ As a token of our appreciation for your continued service, we invite you to sele
                         {msg.senderName}
                       </p>
                       <p className="text-gray-600 text-xs capitalize">
-                        {msg.senderRole === 'leadership' ? 'Leadership Team' : msg.senderRole}
+                        {msg.senderRole === 'leadership' ? t('welcome.leadershipTeam') : msg.senderRole}
                       </p>
                     </div>
                   </div>
@@ -377,7 +377,7 @@ As a token of our appreciation for your continued service, we invite you to sele
               style={{ color: primaryColor }}
             >
               <MessageCircle className="w-5 h-5" />
-              View all messages & add yours
+              {t('welcome.viewAllMessages')}
               <ArrowRight className="w-5 h-5" />
             </button>
           </div>
@@ -393,8 +393,8 @@ As a token of our appreciation for your continued service, we invite you to sele
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="text-white">
-            <p className="font-semibold text-lg">Ready to choose your gift?</p>
-            <p className="text-white/80 text-sm">Let's get started with your selection</p>
+            <p className="font-semibold text-lg">{t('welcome.readyToChoose')}</p>
+            <p className="text-white/80 text-sm">{t('welcome.letsGetStarted')}</p>
           </div>
           <button
             onClick={handleContinue}

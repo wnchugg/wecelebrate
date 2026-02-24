@@ -146,7 +146,19 @@ export const translations = {
     'gifts.curatedSelection': 'Choose one gift from our curated selection. Each gift has been carefully selected to show our appreciation.',
     'gifts.giftsAvailable': 'gift available',
     'gifts.giftsAvailablePlural': 'gifts available',
-    
+    'gifts.sortAZ': 'Sort: A-Z',
+    'gifts.sortValueLow': 'Sort: Value Low-High',
+    'gifts.sortValueHigh': 'Sort: Value High-Low',
+    'gifts.clearFilters': 'Clear Filters',
+    'gifts.noGiftsFound': 'No Gifts Found',
+    'gifts.clearAllFilters': 'Clear All Filters',
+    'gifts.noImageAvailable': 'No Image Available',
+    'gifts.inStock': 'In Stock',
+    'gifts.searchLabel': 'Search gifts',
+    'gifts.filterByCategory': 'Filter by category',
+    'gifts.sortBy': 'Sort gifts by',
+    'gifts.showingCount': 'Showing {shown} of {total} gifts',
+
     // Gift Details
     'giftDetail.description': 'Description',
     'giftDetail.features': 'Features',
@@ -167,7 +179,9 @@ export const translations = {
     'giftDetail.reviewNotice': 'You\'ll be able to review your selection before confirming',
     'giftDetail.giftInfoTitle': 'Gift Information',
     'giftDetail.giftInfoDesc': 'This gift will be carefully packaged and shipped according to your delivery preferences. You\'ll receive tracking information once your order is processed.',
-    
+    'giftDetail.notFound': 'Gift not found',
+    'giftDetail.failedToLoad': 'Failed to load gift details',
+
     // Shipping Information
     'shipping.title': 'Shipping Information',
     'shipping.subtitle': 'Where should we send your gift?',
@@ -196,7 +210,8 @@ export const translations = {
     'shipping.continueToReview': 'Continue to Review',
     'shipping.enterFullName': 'Enter your full name',
     'shipping.enterStreet': 'Street address',
-    
+    'shipping.streetRequired': 'Please enter your street address',
+
     // Review Order
     'review.title': 'Review Your Order',
     'review.subtitle': 'Please confirm your selection and shipping details',
@@ -224,7 +239,13 @@ export const translations = {
     'welcome.defaultTitle': 'Congratulations on Your Anniversary!',
     'welcome.defaultMessage': 'Your dedication and commitment over the years have been invaluable to our team. Today, we celebrate your contributions and the positive impact you\'ve made on our organization.\\n\\nAs a token of our appreciation for your continued service, we invite you to select a special gift. Thank you for being such an important part of our success.',
     'welcome.defaultCta': 'Choose Your Gift',
-    
+    'welcome.celebrationTitle': 'Messages from Your Team',
+    'welcome.celebrationSubtitle': 'Your colleagues have shared their congratulations and appreciation',
+    'welcome.leadershipTeam': 'Leadership Team',
+    'welcome.viewAllMessages': 'View all messages & add yours',
+    'welcome.readyToChoose': 'Ready to choose your gift?',
+    'welcome.letsGetStarted': "Let's get started with your selection",
+
     // Confirmation
     'confirmation.title': 'Order Confirmed!',
     'confirmation.subtitle': 'Thank you for your selection',
@@ -248,7 +269,12 @@ export const translations = {
     'confirmation.returnHome': 'Return to Home',
     'confirmation.needHelp': 'Need help with your order?',
     'confirmation.contactSupportWithOrder': 'Contact support with your order number:',
-    
+    'confirmation.loading': 'Loading order details...',
+    'confirmation.orderNotFound': 'Order not found',
+    'confirmation.returnToGiftSelection': 'Return to Gift Selection',
+    'confirmation.trackOrder': 'Track This Order',
+    'confirmation.viewAllOrders': 'View All Orders',
+
     // Errors
     'error.general': 'An error occurred. Please try again.',
     'error.network': 'Network error. Please check your connection.',
@@ -256,7 +282,10 @@ export const translations = {
     'error.unauthorized': 'Access denied',
     'error.validation': 'Please check your input and try again.',
     'error.sessionExpired': 'Your session has expired. Please sign in again.',
-    
+    // Address Autocomplete
+    'address.unableToFetch': 'Unable to fetch address suggestions',
+    'address.suggestionsListbox': 'Address suggestions',
+
     // Status Messages
     'status.loading': 'Loading...',
     'status.saving': 'Saving...',

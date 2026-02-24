@@ -68,7 +68,7 @@ export function Confirmation() {
         const sessionToken = sessionStorage.getItem('employee_session');
         
         if (!sessionToken) {
-          toast.error('Session expired. Please log in again.');
+          toast.error(t('notification.error.sessionExpired'));
           void navigate('../access');
           return;
         }
@@ -88,7 +88,7 @@ export function Confirmation() {
         const data = await response.json();
         
         if (!response.ok) {
-          throw new Error(data.error || 'Failed to load order');
+          throw new Error(data.error || t('notification.error.failedToLoadOrder'));
         }
         
         setOrder(data.order);
@@ -97,8 +97,8 @@ export function Confirmation() {
         clearOrder();
       } catch (error: unknown) {
         logger.error('Failed to load order:', error);
-        setError(error instanceof Error ? error.message : 'Failed to load order details');
-        toast.error(error instanceof Error ? error.message : 'Failed to load order');
+        setError(error instanceof Error ? error.message : t('notification.error.failedToLoadOrder'));
+        toast.error(error instanceof Error ? error.message : t('notification.error.failedToLoadOrder'));
       } finally {
         setIsLoading(false);
       }
@@ -118,9 +118,9 @@ export function Confirmation() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
+        <div className="text-center" aria-live="polite" aria-busy="true">
           <Loader2 className="w-12 h-12 text-[#D91C81] animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading order details...</p>
+          <p className="text-gray-600">{t('confirmation.loading')}</p>
         </div>
       </div>
     );
@@ -130,12 +130,12 @@ export function Confirmation() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <p className="text-red-500 text-lg font-bold mb-4">{error || 'Order not found'}</p>
+          <p className="text-red-500 text-lg font-bold mb-4" role="alert">{error || t('confirmation.orderNotFound')}</p>
           <button
             onClick={() => void navigate('../gift-selection')}
             className="text-[#D91C81] hover:text-[#B71569] font-medium"
           >
-            Return to Gift Selection
+            {t('confirmation.returnToGiftSelection')}
           </button>
         </div>
       </div>
@@ -230,13 +230,13 @@ export function Confirmation() {
               className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#00B4CC] to-[#00E5A0] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
             >
               <Package className="w-5 h-5" />
-              Track This Order
+              {t('confirmation.trackOrder')}
             </Link>
             <Link
               to="/my-orders"
               className="flex items-center justify-center gap-2 bg-white text-gray-700 px-6 py-3 rounded-lg font-semibold border-2 border-gray-200 hover:border-gray-300 transition-all"
             >
-              View All Orders
+              {t('confirmation.viewAllOrders')}
             </Link>
             <Link
               to="/"
@@ -244,7 +244,7 @@ export function Confirmation() {
               className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#D91C81] to-[#B71569] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
             >
               <Home className="w-5 h-5" />
-              Return Home
+              {t('confirmation.returnHome')}
             </Link>
           </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useId } from 'react';
 import { MapPin, Loader2 } from 'lucide-react';
 import { Input } from './input';
 import { cn } from './utils';
@@ -33,6 +33,7 @@ interface AddressAutocompleteProps {
   disabled?: boolean;
   minQueryLength?: number;
   debounceMs?: number;
+  id?: string;
 }
 
 export function AddressAutocomplete({
@@ -45,6 +46,7 @@ export function AddressAutocomplete({
   disabled = false,
   minQueryLength = 3,
   debounceMs = 300,
+  id,
 }: AddressAutocompleteProps) {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
@@ -56,6 +58,9 @@ export function AddressAutocomplete({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const autoId = useId();
+  const inputId = id ?? `address-input-${autoId}`;
+  const listboxId = `address-suggestions-${autoId}`;
 
   // Handle search with debouncing
   const handleSearch = useCallback(
@@ -186,7 +191,14 @@ export function AddressAutocomplete({
         <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
         <Input
           ref={inputRef}
+          id={inputId}
           type="text"
+          role="combobox"
+          aria-expanded={isOpen}
+          aria-autocomplete="list"
+          aria-haspopup="listbox"
+          aria-controls={isOpen ? listboxId : undefined}
+          aria-activedescendant={selectedIndex >= 0 && isOpen ? `${listboxId}-option-${selectedIndex}` : undefined}
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -208,7 +220,7 @@ export function AddressAutocomplete({
       </div>
 
       {error && (
-        <p className="text-xs text-red-500 mt-1">{error}</p>
+        <p className="text-xs text-red-500 mt-1" role="alert">{error}</p>
       )}
 
       {isOpen && suggestions.length > 0 && (
@@ -216,10 +228,13 @@ export function AddressAutocomplete({
           ref={dropdownRef}
           className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto"
         >
-          <ul className="py-1">
+          <ul id={listboxId} role="listbox" aria-label="Address suggestions" className="py-1">
             {suggestions.map((suggestion, index) => (
               <li
                 key={suggestion.id}
+                id={`${listboxId}-option-${index}`}
+                role="option"
+                aria-selected={selectedIndex === index}
                 onClick={() => handleSelect(suggestion)}
                 className={cn(
                   'px-4 py-2 cursor-pointer hover:bg-gray-100 transition-colors',

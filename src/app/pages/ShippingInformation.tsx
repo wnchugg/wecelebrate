@@ -58,7 +58,7 @@ export function ShippingInformation() {
 
     // Validate street address when not using company shipping
     if (companyConfig.shippingMethod !== 'company' && !formData.street.trim()) {
-      toast.error('Please enter your street address');
+      toast.error(t('shipping.streetRequired'));
       return;
     }
 
@@ -220,10 +220,11 @@ export function ShippingInformation() {
                 </div>
               
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="shipping-address-line1" className="block text-sm font-semibold text-gray-700 mb-2">
                     {t('shipping.address')} *
                   </label>
                   <AddressAutocomplete
+                    id="shipping-address-line1"
                     onSelect={handleAddressSelect}
                     onChange={(value) => setFormData(prev => ({ ...prev, street: value }))}
                     country={formData.country}

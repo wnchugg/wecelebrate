@@ -45,7 +45,7 @@ export function GiftDetail() {
         const sessionToken = sessionStorage.getItem('employee_session');
         
         if (!sessionToken) {
-          toast.error('Session expired. Please log in again.');
+          toast.error(t('notification.error.sessionExpired'));
           void navigate('../access');
           return;
         }
@@ -69,16 +69,16 @@ export function GiftDetail() {
         }
         
         if (!data.gift) {
-          setError('Gift not found');
-          toast.error('Gift not found');
+          setError(t('giftDetail.notFound'));
+          toast.error(t('giftDetail.notFound'));
           setTimeout(() => navigate('../gift-selection'), 2000);
         } else {
           setGift(data.gift);
         }
       } catch (error: unknown) {
         logger.error('Failed to load gift:', error);
-        setError(error instanceof Error ? error.message : 'Failed to load gift details');
-        toast.error(error instanceof Error ? error.message : 'Failed to load gift');
+        setError(error instanceof Error ? error.message : t('giftDetail.failedToLoad'));
+        toast.error(error instanceof Error ? error.message : t('giftDetail.failedToLoad'));
         setTimeout(() => navigate('../gift-selection'), 2000);
       } finally {
         setIsLoading(false);
@@ -131,7 +131,7 @@ export function GiftDetail() {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
+        <div className="text-center" role="alert">
           <p className="text-red-500 text-lg font-bold mb-4">{error}</p>
           <p className="text-gray-600">{t('common.redirecting')}</p>
         </div>

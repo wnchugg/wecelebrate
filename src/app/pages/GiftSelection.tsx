@@ -9,6 +9,7 @@ import { usePublicSite } from '../context/PublicSiteContext';
 import { useSite } from '../context/SiteContext';
 import { defaultGiftSelectionConfig } from '../types/siteCustomization';
 import { mergeGiftSelectionConfig } from '../utils/configMerge';
+import { translateWithParams } from '../utils/translationHelpers';
 
 interface Gift {
   id: string;
@@ -229,6 +230,7 @@ export function GiftSelection() {
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#D91C81] focus:ring-4 focus:ring-pink-100 transition-all outline-none"
                       placeholder={config.search.placeholder}
+                      aria-label={t('gifts.searchLabel')}
                     />
                   </div>
                 )}
@@ -240,10 +242,11 @@ export function GiftSelection() {
                       value={selectedCategory}
                       onChange={(e) => setSelectedCategory(e.target.value)}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#D91C81] focus:ring-4 focus:ring-pink-100 transition-all outline-none appearance-none bg-white"
+                      aria-label={t('gifts.filterByCategory')}
                     >
                       {categories.map(category => (
                         <option key={category} value={category}>
-                          {category === 'all' ? 'All Categories' : category}
+                          {category === 'all' ? t('gifts.filter.all') : category}
                         </option>
                       ))}
                     </select>
@@ -257,10 +260,11 @@ export function GiftSelection() {
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as 'name' | 'value-asc' | 'value-desc')}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#D91C81] focus:ring-4 focus:ring-pink-100 transition-all outline-none appearance-none bg-white"
+                      aria-label={t('gifts.sortBy')}
                     >
-                      <option value="name">Sort: A-Z</option>
-                      <option value="value-asc">Sort: Value Low-High</option>
-                      <option value="value-desc">Sort: Value High-Low</option>
+                      <option value="name">{t('gifts.sortAZ')}</option>
+                      <option value="value-asc">{t('gifts.sortValueLow')}</option>
+                      <option value="value-desc">{t('gifts.sortValueHigh')}</option>
                     </select>
                   </div>
                 )}
@@ -268,9 +272,8 @@ export function GiftSelection() {
 
               {/* Active Filters & Results Count */}
               <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
-                <p className="text-sm text-gray-600">
-                  Showing <span className="font-semibold text-gray-900">{filteredGifts.length}</span> of{' '}
-                  <span className="font-semibold text-gray-900">{gifts.length}</span> gifts
+                <p role="status" aria-live="polite" className="text-sm text-gray-600">
+                  {translateWithParams(t, 'gifts.showingCount', { shown: filteredGifts.length, total: gifts.length })}
                 </p>
                 {(searchQuery || selectedCategory !== 'all' || sortBy !== 'name') && (
                   <button
@@ -278,7 +281,7 @@ export function GiftSelection() {
                     className="flex items-center gap-2 text-[#D91C81] hover:text-[#B71569] font-medium text-sm transition-colors"
                   >
                     <X className="w-4 h-4" />
-                    Clear Filters
+                    {t('gifts.clearFilters')}
                   </button>
                 )}
               </div>
@@ -289,7 +292,7 @@ export function GiftSelection() {
           {filteredGifts.length === 0 && !isLoading && (
             <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
               <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">No Gifts Found</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('gifts.noGiftsFound')}</h2>
               <p className="text-gray-600 mb-6">
                 {error || config.messages.noResults}
               </p>
@@ -298,7 +301,7 @@ export function GiftSelection() {
                   onClick={clearFilters}
                   className="inline-flex items-center gap-2 bg-gradient-to-r from-[#D91C81] to-[#B71569] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
                 >
-                  Clear All Filters
+                  {t('gifts.clearAllFilters')}
                 </button>
               )}
             </div>
@@ -362,7 +365,7 @@ export function GiftSelection() {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                            <span className="text-gray-400 text-sm">No Image Available</span>
+                            <span className="text-gray-400 text-sm">{t('gifts.noImageAvailable')}</span>
                           </div>
                         )}
                         {/* Category Badge */}
@@ -390,13 +393,13 @@ export function GiftSelection() {
                           <span className={`text-sm font-semibold ${
                             isHovered ? 'text-[#D91C81]' : 'text-gray-700'
                           } transition-colors`}>
-                            View Details →
+                            {t('gifts.viewDetails')} →
                           </span>
                           {config.display.showInventory && (
                             gift.available ? (
-                              <span className="text-xs text-green-600 font-medium">In Stock</span>
+                              <span className="text-xs text-green-600 font-medium">{t('gifts.inStock')}</span>
                             ) : (
-                              <span className="text-xs text-red-600 font-medium">Out of Stock</span>
+                              <span className="text-xs text-red-600 font-medium">{t('gifts.outOfStock')}</span>
                             )
                           )}
                         </div>

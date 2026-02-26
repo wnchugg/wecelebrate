@@ -23,6 +23,7 @@ vi.mock('../../context/LanguageContext', () => ({
 
 describe('useSiteContent Property-Based Tests', () => {
   beforeEach(() => {
+    vi.resetModules();
     vi.clearAllMocks();
     // Suppress console warnings in tests
     vi.spyOn(console, 'warn').mockImplementation(() => {});

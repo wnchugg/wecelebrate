@@ -85,7 +85,7 @@ describe('TranslatableInput Component', () => {
     it('should show default language value in input', () => {
       renderWithRouter(<TranslatableInput {...defaultProps} />);
       
-      const input = screen.getByRole('textbox');
+      const input = screen.getByRole('textbox') as HTMLInputElement;
       expect(input.value).toBe('Hello');
     });
   });
@@ -174,7 +174,7 @@ describe('TranslatableInput Component', () => {
       const user = userEvent.setup();
       renderWithRouter(<TranslatableInput {...defaultProps} />);
       
-      const input = screen.getByRole('textbox');
+      const input = screen.getByRole('textbox') as HTMLInputElement;
       expect(input.value).toBe('Hello');
       
       const tabs = screen.getAllByRole('button');
@@ -194,7 +194,7 @@ describe('TranslatableInput Component', () => {
       
       await user.click(frenchTab);
       
-      const input = screen.getByRole('textbox');
+      const input = screen.getByRole('textbox') as HTMLInputElement;
       expect(input.value).toBe('');
     });
   });

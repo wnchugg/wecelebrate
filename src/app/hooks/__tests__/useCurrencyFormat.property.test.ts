@@ -18,6 +18,7 @@ vi.mock('../../components/CurrencyDisplay', () => ({
 
 describe('useCurrencyFormat Property-Based Tests', () => {
   beforeEach(() => {
+    vi.resetModules();
     vi.clearAllMocks();
   });
 

@@ -17,6 +17,7 @@ vi.mock('../../context/LanguageContext', () => ({
 
 describe('useDateFormat Hook', () => {
   beforeEach(() => {
+    vi.resetModules();
     vi.clearAllMocks();
   });
 

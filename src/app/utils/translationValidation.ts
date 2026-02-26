@@ -93,16 +93,25 @@ export function canPublishTranslations(
 
   // Check each required field for default language translation
   for (const field of requiredFields) {
-    // Access the field directly (flat key structure)
-    const fieldTranslations = translations[field];
+    // Handle dot-notation paths (e.g., 'welcomePage.title')
+    const parts = field.split('.');
+    let current: any = translations;
+    
+    // Navigate through nested structure
+    for (const part of parts) {
+      if (!current || typeof current !== 'object') {
+        current = undefined;
+        break;
+      }
+      current = current[part];
+    }
 
     // Check if we have a translation object with the default language
-    if (!fieldTranslations || typeof fieldTranslations !== 'object') {
+    if (!current || typeof current !== 'object') {
       missingDefaultTranslations.push(field);
       continue;
     }
 
-    const current = fieldTranslations as Record<string, unknown>;
     const translation = current[defaultLanguage];
     
     if (!translation || typeof translation !== 'string' || translation.trim().length === 0) {

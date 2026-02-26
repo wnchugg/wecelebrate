@@ -18,6 +18,7 @@ vi.mock('../../context/LanguageContext', () => ({
 
 describe('useDateFormat Property-Based Tests', () => {
   beforeEach(() => {
+    vi.resetModules();
     vi.clearAllMocks();
   });
 

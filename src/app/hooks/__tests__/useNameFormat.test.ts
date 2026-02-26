@@ -16,6 +16,7 @@ vi.mock('../../context/LanguageContext', () => ({
 
 describe('useNameFormat - Unit Tests', () => {
   beforeEach(() => {
+    vi.resetModules();
     vi.clearAllMocks();
   });
 

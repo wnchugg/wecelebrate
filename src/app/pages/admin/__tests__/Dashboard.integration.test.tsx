@@ -5,7 +5,7 @@
  * Tests the full integration: Component → Service → Backend API
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router';
@@ -40,9 +40,6 @@ import { useSite } from '../../../context/SiteContext';
 const mockUseSite = vi.mocked(useSite);
 const mockFetch = vi.fn();
 
-// Replace global fetch
-global.fetch = mockFetch;
-
 describe('Dashboard Integration Tests', () => {
   const mockSite = {
     id: 'site-1',
@@ -76,8 +73,15 @@ describe('Dashboard Integration Tests', () => {
     updatedAt: '2024-01-01T00:00:00.000Z'
   };
 
+  beforeAll(() => {
+    // Set up global fetch mock for this test suite
+    global.fetch = mockFetch;
+  });
+
   beforeEach(() => {
-    vi.clearAllMocks();
+    // Clear mock call history but preserve implementations
+    mockFetch.mockClear();
+    
     mockUseSite.mockReturnValue({
       currentSite: mockSite as any,
       sites: [mockSite] as any[],
@@ -92,7 +96,7 @@ describe('Dashboard Integration Tests', () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    mockFetch.mockClear();
   });
 
   const renderDashboard = () => {

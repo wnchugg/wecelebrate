@@ -425,8 +425,8 @@ describe('ClientConfiguration Component', () => {
       await userEvent.click(appTab);
 
       await waitFor(() => {
-        expect(screen.getByText(/4-Hour Session Timeout/i)).toBeInTheDocument();
-        expect(screen.getByText(/Has Employee Data/i)).toBeInTheDocument();
+        expect(screen.getAllByText(/4-Hour Session Timeout/i).length).toBeGreaterThan(0);
+        expect(screen.getAllByText(/Has Employee Data/i).length).toBeGreaterThan(0);
       });
     });
   });

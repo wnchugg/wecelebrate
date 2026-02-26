@@ -60,11 +60,11 @@ describe('MultiLanguageSelector Component', () => {
         <MultiLanguageSelector {...defaultProps} />
       );
 
-      // Check for a few language names
-      expect(screen.getByText('English (US)')).toBeInTheDocument();
-      expect(screen.getByText('Español')).toBeInTheDocument();
-      expect(screen.getByText('Français')).toBeInTheDocument();
-      expect(screen.getByText('Deutsch')).toBeInTheDocument();
+      // Check for a few language names (using getAllByText since they appear in both sr-only and visible text)
+      expect(screen.getAllByText('English (US)').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Español').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Français').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Deutsch').length).toBeGreaterThan(0);
     });
 
     it('should show default language badge', () => {
@@ -196,7 +196,8 @@ describe('MultiLanguageSelector Component', () => {
       );
 
       // Check that English (default) doesn't have a "Set as default" button
-      const englishRow = screen.getByText('English (US)').closest('.flex.items-center.justify-between');
+      const englishElements = screen.getAllByText('English (US)');
+      const englishRow = englishElements[0].closest('.flex.items-center.justify-between');
       expect(englishRow?.textContent).not.toContain('Set as default');
     });
 
@@ -259,8 +260,8 @@ describe('MultiLanguageSelector Component', () => {
       await user.type(searchInput, 'Español');
 
       // Should show Spanish but not French
-      expect(screen.queryByText('Español')).toBeInTheDocument();
-      expect(screen.queryByText('Français')).not.toBeInTheDocument();
+      expect(screen.queryAllByText('Español').length).toBeGreaterThan(0);
+      expect(screen.queryAllByText('Français').length).toBe(0);
     });
 
     it('should filter languages by code', async () => {
@@ -274,7 +275,7 @@ describe('MultiLanguageSelector Component', () => {
       await user.type(searchInput, 'es');
 
       // Should show Spanish languages
-      expect(screen.queryByText('Español')).toBeInTheDocument();
+      expect(screen.queryAllByText('Español').length).toBeGreaterThan(0);
     });
 
     it('should show "no results" message when no languages match', async () => {
@@ -300,7 +301,7 @@ describe('MultiLanguageSelector Component', () => {
       const searchInput = screen.getByPlaceholderText('Search languages...');
       await user.type(searchInput, 'français');
 
-      expect(screen.queryByText('Français')).toBeInTheDocument();
+      expect(screen.queryAllByText('Français').length).toBeGreaterThan(0);
     });
 
     it('should clear filter when search is cleared', async () => {
@@ -314,10 +315,10 @@ describe('MultiLanguageSelector Component', () => {
       
       // Type and then clear
       await user.type(searchInput, 'Spanish');
-      expect(screen.queryByText('Français')).not.toBeInTheDocument();
+      expect(screen.queryAllByText('Français').length).toBe(0);
       
       await user.clear(searchInput);
-      expect(screen.queryByText('Français')).toBeInTheDocument();
+      expect(screen.queryAllByText('Français').length).toBeGreaterThan(0);
     });
   });
 

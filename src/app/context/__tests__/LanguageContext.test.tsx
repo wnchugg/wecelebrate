@@ -4,15 +4,18 @@
  * Target: 10 tests
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+// Mock translations - must be before imports for proper hoisting
+import { vi } from 'vitest';
+
+vi.mock('../../i18n/translations', () => ({
+  t: (key: string, lang: string) => `${key}_${lang}`,
+  TranslationKey: {} as any,
+}));
+
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { ReactNode } from 'react';
 import { LanguageProvider, useLanguage, languages } from '../LanguageContext';
-
-// Mock translations
-vi.mock('../../i18n/translations', () => ({
-  t: vi.fn((key: string, lang: string) => `${key}_${lang}`),
-}));
 
 describe('LanguageContext', () => {
   beforeEach(() => {
@@ -260,8 +263,9 @@ describe('LanguageContext', () => {
         result.current.setLanguage('es');
       });
       
-      const translation = result.current.t('welcome' as any);
-      expect(translation).toBe('welcome_es');
+      // Test with mocked translation (returns key_lang format)
+      const translation = result.current.t('common.welcome' as any);
+      expect(translation).toBe('common.welcome_es'); // Mocked format
     });
 
     it('should use current language code in translation', () => {
@@ -271,8 +275,9 @@ describe('LanguageContext', () => {
         result.current.setLanguage('fr');
       });
       
-      const translation = result.current.t('hello' as any);
-      expect(translation).toContain('_fr');
+      // Test with mocked translation (returns key_lang format)
+      const translation = result.current.t('common.welcome' as any);
+      expect(translation).toBe('common.welcome_fr'); // Mocked format
     });
   });
 });

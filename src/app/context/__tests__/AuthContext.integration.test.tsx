@@ -4,25 +4,29 @@
  * Tests for AuthContext integration with authentication flows
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { vi } from 'vitest';
+
+// Use vi.hoisted to create mock functions that can be referenced in vi.mock
+const { mockLogSecurityEvent, mockStartSessionTimer, mockClearSessionTimer, mockResetSessionTimer } = vi.hoisted(() => ({
+  mockLogSecurityEvent: vi.fn(),
+  mockStartSessionTimer: vi.fn(),
+  mockClearSessionTimer: vi.fn(),
+  mockResetSessionTimer: vi.fn(),
+}));
+
+vi.mock('../../utils/security', () => ({
+  logSecurityEvent: mockLogSecurityEvent,
+  startSessionTimer: mockStartSessionTimer,
+  clearSessionTimer: mockClearSessionTimer,
+  resetSessionTimer: mockResetSessionTimer,
+}));
+
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AuthProvider, useAuth } from '../../context/AuthContext';
 import { BrowserRouter } from 'react-router';
 import { ReactNode } from 'react';
-
-// Mock security utilities
-vi.mock('../../utils/security', () => ({
-  logSecurityEvent: vi.fn(),
-  startSessionTimer: vi.fn(),
-  clearSessionTimer: vi.fn(),
-  resetSessionTimer: vi.fn(),
-}));
-
-const mockLogSecurityEvent = vi.mocked(await import('../../utils/security')).logSecurityEvent;
-const mockStartSessionTimer = vi.mocked(await import('../../utils/security')).startSessionTimer;
-const mockClearSessionTimer = vi.mocked(await import('../../utils/security')).clearSessionTimer;
-const mockResetSessionTimer = vi.mocked(await import('../../utils/security')).resetSessionTimer;
 
 // Test component that uses AuthContext
 function TestAuthComponent() {
@@ -64,7 +68,11 @@ function TestWrapper({ children }: { children: ReactNode }) {
 
 describe('Auth Context Integration Suite', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    mockLogSecurityEvent.mockClear();
+    mockStartSessionTimer.mockClear();
+    mockClearSessionTimer.mockClear();
+    mockResetSessionTimer.mockClear();
+    vi.resetModules(); // Reset module cache
   });
 
   afterEach(() => {
@@ -72,6 +80,14 @@ describe('Auth Context Integration Suite', () => {
   });
 
   describe('Context Provider', () => {
+    it('should verify mocks are set up correctly', () => {
+      // Verify mocks are mock functions
+      expect(vi.isMockFunction(mockLogSecurityEvent)).toBe(true);
+      expect(vi.isMockFunction(mockStartSessionTimer)).toBe(true);
+      expect(vi.isMockFunction(mockClearSessionTimer)).toBe(true);
+      expect(vi.isMockFunction(mockResetSessionTimer)).toBe(true);
+    });
+
     it('should provide auth context to children', () => {
       render(
         <TestWrapper>

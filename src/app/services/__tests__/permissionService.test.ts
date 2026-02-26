@@ -50,8 +50,8 @@ describe('permissionService', () => {
       const result = await hasPermission('proxy_login');
 
       expect(result).toBe(true);
-      expect(supabase.rpc).toHaveBeenCalledWith('user_has_permission', {
-        p_user_id: 'user-1',
+      expect(supabase.rpc).toHaveBeenCalledWith('admin_user_has_permission', {
+        p_admin_user_id: 'user-1',
         p_permission: 'proxy_login',
       });
     });
@@ -110,8 +110,8 @@ describe('permissionService', () => {
       const result = await userHasPermission('user-2', 'user_management');
 
       expect(result).toBe(true);
-      expect(supabase.rpc).toHaveBeenCalledWith('user_has_permission', {
-        p_user_id: 'user-2',
+      expect(supabase.rpc).toHaveBeenCalledWith('admin_user_has_permission', {
+        p_admin_user_id: 'user-2',
         p_permission: 'user_management',
       });
     });
@@ -132,8 +132,8 @@ describe('permissionService', () => {
       const result = await grantPermission('user-1', 'proxy_login');
 
       expect(result.success).toBe(true);
-      expect(supabase.rpc).toHaveBeenCalledWith('grant_permission', {
-        p_user_id: 'user-1',
+      expect(supabase.rpc).toHaveBeenCalledWith('grant_admin_permission', {
+        p_admin_user_id: 'user-1',
         p_permission: 'proxy_login',
         p_granted_by: 'admin-1',
         p_expires_at: null,
@@ -155,8 +155,8 @@ describe('permissionService', () => {
       const result = await grantPermission('user-1', 'proxy_login', expiresAt);
 
       expect(result.success).toBe(true);
-      expect(supabase.rpc).toHaveBeenCalledWith('grant_permission', {
-        p_user_id: 'user-1',
+      expect(supabase.rpc).toHaveBeenCalledWith('grant_admin_permission', {
+        p_admin_user_id: 'user-1',
         p_permission: 'proxy_login',
         p_granted_by: 'admin-1',
         p_expires_at: expiresAt,
@@ -191,8 +191,8 @@ describe('permissionService', () => {
       const result = await revokePermission('user-1', 'proxy_login');
 
       expect(result.success).toBe(true);
-      expect(supabase.rpc).toHaveBeenCalledWith('revoke_permission', {
-        p_user_id: 'user-1',
+      expect(supabase.rpc).toHaveBeenCalledWith('revoke_admin_permission', {
+        p_admin_user_id: 'user-1',
         p_permission: 'proxy_login',
       });
     });

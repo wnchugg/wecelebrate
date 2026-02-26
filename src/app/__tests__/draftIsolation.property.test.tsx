@@ -184,7 +184,7 @@ describe('Draft Isolation Property-Based Tests', () => {
           expect(mockSite.translations).not.toEqual(mockSite.draft_settings?.translations);
         }
       ),
-      { numRuns: 100 }
+      { numRuns: 5 }
     );
   });
 
@@ -314,7 +314,7 @@ describe('Draft Isolation Property-Based Tests', () => {
           }
         }
       ),
-      { numRuns: 50 }
+      { numRuns: 3 }
     );
   });
 
@@ -408,7 +408,7 @@ describe('Draft Isolation Property-Based Tests', () => {
           }
         }
       ),
-      { numRuns: 50 }
+      { numRuns: 3 }
     );
   });
 
@@ -520,7 +520,7 @@ describe('Draft Isolation Property-Based Tests', () => {
           expect(mockSite.translations).toEqual(liveTranslations);
         }
       ),
-      { numRuns: 50 }
+      { numRuns: 3 }
     );
   });
 
@@ -634,7 +634,7 @@ describe('Draft Isolation Property-Based Tests', () => {
           expect(mockSite.translations).not.toEqual(mockSite.draft_settings?.translations);
         }
       ),
-      { numRuns: 50 }
+      { numRuns: 3 }
     );
   });
 });

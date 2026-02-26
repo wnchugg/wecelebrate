@@ -4,19 +4,33 @@
  * Target: 26 tests
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { vi } from 'vitest';
+
+// Use vi.hoisted to create mock functions that can be referenced in vi.mock
+const { mockLogSecurityEvent, mockStartSessionTimer, mockClearSessionTimer, mockResetSessionTimer } = vi.hoisted(() => ({
+  mockLogSecurityEvent: vi.fn(),
+  mockStartSessionTimer: vi.fn(),
+  mockClearSessionTimer: vi.fn(),
+  mockResetSessionTimer: vi.fn(),
+}));
+
+vi.mock('../../utils/security', () => ({
+  logSecurityEvent: mockLogSecurityEvent,
+  startSessionTimer: mockStartSessionTimer,
+  clearSessionTimer: mockClearSessionTimer,
+  resetSessionTimer: mockResetSessionTimer,
+}));
+
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { ReactNode } from 'react';
 import { AuthProvider, useAuth, User } from '../AuthContext';
-import { logSecurityEvent, startSessionTimer, clearSessionTimer, resetSessionTimer } from '../../utils/security';
 
-// Mock security utilities
-vi.mock('../../utils/security', () => ({
-  logSecurityEvent: vi.fn(),
-  startSessionTimer: vi.fn(),
-  clearSessionTimer: vi.fn(),
-  resetSessionTimer: vi.fn(),
-}));
+// Use the mock functions directly
+const logSecurityEvent = mockLogSecurityEvent;
+const startSessionTimer = mockStartSessionTimer;
+const clearSessionTimer = mockClearSessionTimer;
+const resetSessionTimer = mockResetSessionTimer;
 
 describe('AuthContext', () => {
   beforeEach(() => {

@@ -55,21 +55,21 @@ describe('TranslatableTextarea Component', () => {
     it('should use default rows value of 4', () => {
       renderWithRouter(<TranslatableTextarea {...defaultProps} />);
       
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       expect(textarea.rows).toBe(4);
     });
 
     it('should apply custom rows value', () => {
       renderWithRouter(<TranslatableTextarea {...defaultProps} rows={8} />);
       
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       expect(textarea.rows).toBe(8);
     });
 
     it('should apply rows value of 2', () => {
       renderWithRouter(<TranslatableTextarea {...defaultProps} rows={2} />);
       
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       expect(textarea.rows).toBe(2);
     });
   });
@@ -78,14 +78,14 @@ describe('TranslatableTextarea Component', () => {
     it('should apply maxLength attribute when specified', () => {
       renderWithRouter(<TranslatableTextarea {...defaultProps} maxLength={500} />);
       
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       expect(textarea.maxLength).toBe(500);
     });
 
     it('should not apply maxLength attribute when not specified', () => {
       renderWithRouter(<TranslatableTextarea {...defaultProps} />);
       
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       expect(textarea.maxLength).toBe(-1); // -1 is the default when maxLength is not set
     });
 
@@ -153,7 +153,7 @@ describe('TranslatableTextarea Component', () => {
     it('should show default language value in textarea', () => {
       renderWithRouter(<TranslatableTextarea {...defaultProps} />);
       
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       expect(textarea.value).toBe('Hello World');
     });
   });
@@ -240,7 +240,7 @@ describe('TranslatableTextarea Component', () => {
       const user = userEvent.setup();
       renderWithRouter(<TranslatableTextarea {...defaultProps} />);
       
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       expect(textarea.value).toBe('Hello World');
       
       const tabs = screen.getAllByRole('button');
@@ -260,7 +260,7 @@ describe('TranslatableTextarea Component', () => {
       
       await user.click(frenchTab);
       
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       expect(textarea.value).toBe('');
     });
   });

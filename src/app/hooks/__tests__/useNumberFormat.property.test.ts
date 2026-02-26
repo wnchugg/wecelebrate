@@ -18,6 +18,7 @@ vi.mock('../../context/LanguageContext', () => ({
 
 describe('useNumberFormat Property-Based Tests', () => {
   beforeEach(() => {
+    vi.resetModules();
     vi.clearAllMocks();
   });
 

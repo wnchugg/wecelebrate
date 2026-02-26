@@ -152,6 +152,7 @@ describe('Language Switching Integration Tests', () => {
     // Clear localStorage before each test
     localStorage.clear();
     currentSiteOverride = mockSite;
+    vi.resetModules();
   });
 
   it('should display content in default language (English) on initial load', () => {
@@ -364,12 +365,19 @@ describe('Language Switching with RTL Layout', () => {
 
   function RTLTestWrapper({ children }: { children: React.ReactNode }) {
     // useSite is mocked to return currentSiteOverride (set in beforeEach)
-    return <LanguageProvider>{children}</LanguageProvider>;
+    return (
+      <LanguageProvider>
+        <SiteProvider>
+          {children}
+        </SiteProvider>
+      </LanguageProvider>
+    );
   }
 
   beforeEach(() => {
     localStorage.clear();
     currentSiteOverride = mockSiteWithRTL;
+    vi.resetModules();
     // Reset global DOM state that LanguageContext modifies via useEffect
     document.documentElement.dir = 'ltr';
     document.documentElement.lang = 'en';
@@ -573,6 +581,7 @@ describe('Language Switching with useSiteContent Hook', () => {
   beforeEach(() => {
     localStorage.clear();
     currentSiteOverride = mockSite;
+    vi.resetModules();
   });
 
   it('should return translated content for current language', () => {

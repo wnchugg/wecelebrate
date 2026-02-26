@@ -124,9 +124,9 @@ describe('Dashboard Component', () => {
   };
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    // Global afterEach clears all mocks, so we must re-setup them here
+    // This runs AFTER the previous test's afterEach
     
-    // Set default mock return value
     mockGetDashboardData.mockResolvedValue(mockDashboardData);
     
     mockUseSite.mockReturnValue({
@@ -143,7 +143,7 @@ describe('Dashboard Component', () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    // No need to clear here - global afterEach does it
   });
 
   const renderDashboard = () => {

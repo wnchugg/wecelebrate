@@ -428,7 +428,7 @@ function checkClientRateLimit(endpoint: string): boolean {
     logSecurityEvent({
       action: 'rate_limit',
       status: 'warning',
-      details: `Client-side rate limit exceeded for endpoint: ${endpoint}`
+      details: { message: `Client-side rate limit exceeded for endpoint: ${endpoint}` }
     });
     return false;
   }
@@ -532,7 +532,7 @@ export async function apiRequest<T>(
       logSecurityEvent({
         action: 'rate_limit',
         status: 'warning',
-        details: `Server rate limit hit for ${endpoint}. Retry after: ${retryAfter}s`
+        details: { message: `Server rate limit hit for ${endpoint}. Retry after: ${retryAfter}s` }
       });
       
       throw new Error(`Rate limited. Try again in ${retryAfter || 60} seconds.`);
@@ -566,7 +566,7 @@ export async function apiRequest<T>(
           logSecurityEvent({
             action: 'auth_failure',
             status: 'failure',
-            details: `Authentication failed for ${endpoint}: ${errorMessage || response.statusText || 'Unknown error'}`
+            details: { message: `Authentication failed for ${endpoint}: ${errorMessage || response.statusText || 'Unknown error'}` }
           });
           
           // Clear invalid token

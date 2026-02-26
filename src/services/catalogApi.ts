@@ -4,7 +4,7 @@
  * NOTE: This is a legacy file - use src/app/services/catalogApi.ts instead
  */
 
-import type { Catalog, SiteCatalogConfig } from '../types/catalog';
+import type { Catalog, SiteCatalogConfig } from '../app/types/catalog';
 import { mockCatalogs, filterCatalogs as filterMockCatalogs, getCatalogById as getMockCatalogById, getSiteConfigBySiteId } from '../test/mockData/catalogData';
 
 export const catalogApi = {

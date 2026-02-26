@@ -289,7 +289,7 @@ export function EmployeeImportModal({ open, onClose, validationType, onImport }:
                 ref={fileInputRef}
                 type="file"
                 accept=".csv,.xlsx,.xls"
-                onChange={() => void handleFileUpload()}
+                onChange={(e) => void handleFileUpload(e)}
                 className="hidden"
                 id="file-upload"
               />

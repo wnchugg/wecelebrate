@@ -52,7 +52,10 @@ describe('Property 5: Semantic Preservation', () => {
       ['auth.role()'],
       ['auth.uid()', 'auth.role()'],
     ),
-  });
+  }).map(warning => ({
+    ...warning,
+    authFunctions: [...warning.authFunctions] as string[]
+  }));
 
   // Generator for policy SQL with auth functions
   const policySQLGenerator = fc.oneof(
@@ -69,7 +72,7 @@ describe('Property 5: Semantic Preservation', () => {
   const rlsOptimizationGenerator = fc.tuple(
     rlsAuthWarningGenerator,
     policySQLGenerator
-  ).map(([warning, originalSQL]) => {
+  ).map(([warning, originalSQL]: [any, any]) => {
     // Generate optimized SQL by wrapping auth functions
     let optimizedSQL = originalSQL;
     
@@ -493,7 +496,10 @@ describe('Property 27: Validation Query Generation', () => {
       ['auth.jwt()'],
       ['auth.role()'],
     ),
-  });
+  }).map(warning => ({
+    ...warning,
+    authFunctions: [...warning.authFunctions] as string[]
+  }));
 
   // Generator for RLS optimizations
   const rlsOptimizationGenerator = fc.tuple(
@@ -503,7 +509,7 @@ describe('Property 27: Validation Query Generation', () => {
       fc.constant('user_id = auth.uid()'),
       fc.constant('auth.uid() = user_id AND status = true'),
     )
-  ).map(([warning, originalSQL]) => {
+  ).map(([warning, originalSQL]: [any, any]) => {
     const optimizedSQL = originalSQL.replace(/(?<!\(SELECT\s+)(auth\.uid\(\))/gi, '(SELECT $1)');
     
     const optimization: RLSOptimization = {
@@ -584,7 +590,7 @@ describe('Property 27: Validation Query Generation', () => {
 
       // Verify queries are generated for all contexts
       expect(queries.length).toBe(defaultContexts.length);
-      queries.forEach(query => {
+      queries.forEach((query: any) => {
         expect(query).toBeDefined();
         expect(typeof query).toBe('string');
         expect(query.length).toBeGreaterThan(0);
@@ -677,7 +683,10 @@ describe('Property 28: Validation Failure Handling', () => {
     schemaName: fc.constant('public'),
     policyName: fc.string({ minLength: 5, maxLength: 20 }),
     authFunctions: fc.constantFrom(['auth.uid()'], ['auth.jwt()']),
-  });
+  }).map(warning => ({
+    ...warning,
+    authFunctions: [...warning.authFunctions] as string[]
+  }));
 
   // Generator for user contexts
   const userContextGenerator = fc.record({

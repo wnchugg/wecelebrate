@@ -457,7 +457,7 @@ export function isSafeContent(content: string): boolean {
  * Sanitize object keys to prevent prototype pollution
  */
 export function sanitizeObject<T extends Record<string, unknown>>(obj: T): T {
-  const sanitized: Record<string, unknown> = {};
+  const sanitized = {} as Record<string, unknown>;
   
   for (const key in obj) {
     // Skip prototype properties
@@ -472,7 +472,7 @@ export function sanitizeObject<T extends Record<string, unknown>>(obj: T): T {
     sanitized[key] = obj[key];
   }
   
-  return sanitized;
+  return sanitized as T;
 }
 
 // ==================== SECURITY MONITORING ====================

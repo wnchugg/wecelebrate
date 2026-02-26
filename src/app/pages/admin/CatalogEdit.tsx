@@ -187,7 +187,7 @@ export default function CatalogEdit() {
       )}
 
       {/* Form */}
-      <form onSubmit={() => void handleSubmit()} className="space-y-6">
+      <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
         {/* Basic Information */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>

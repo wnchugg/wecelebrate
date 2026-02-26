@@ -10,6 +10,11 @@ import { ECard } from '../components/ECard';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';
 import { publicAnonKey } from '../../../utils/supabase/info';
 import { logger } from '../utils/logger';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export function Welcome() {
   const navigate = useNavigate();
@@ -22,6 +27,7 @@ export function Welcome() {
   const [celebrationMessages, setCelebrationMessages] = useState<CelebrationMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [dbCheckComplete, setDbCheckComplete] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState<CelebrationMessage | null>(null);
 
   const welcomeContent = currentSite?.settings.welcomePageContent;
   const celebrationEnabled = currentSite?.settings.celebrationModule?.enabled;
@@ -226,18 +232,16 @@ As a token of our appreciation for your continued service, we invite you to sele
                           alt="Welcome"
                           className="w-full h-full object-cover"
                         />
-                        <button
+                        <Button
+                          size="icon"
+                          variant="ghost"
                           onClick={() => setVideoPlaying(true)}
-                          className="absolute inset-0 flex items-center justify-center group bg-black/20 hover:bg-black/30 transition-colors"
-                          aria-label="Play video"
+                          aria-label="Play welcome video"
+                          className="absolute inset-0 w-20 h-20 rounded-full mx-auto my-auto bg-black/20 hover:bg-black/30"
+                          style={{ backgroundColor: primaryColor }}
                         >
-                          <div 
-                            className="w-20 h-20 rounded-full flex items-center justify-center transition-transform group-hover:scale-110"
-                            style={{ backgroundColor: primaryColor }}
-                          >
-                            <Play className="w-10 h-10 text-white ml-1" fill="white" />
-                          </div>
-                        </button>
+                          <Play className="w-10 h-10 text-white ml-1" fill="white" />
+                        </Button>
                       </div>
                     ) : (
                       <iframe
@@ -280,12 +284,11 @@ As a token of our appreciation for your continued service, we invite you to sele
                 {(welcomeContent?.authorName || welcomeContent?.authorTitle) && (
                   <div className="mt-auto pt-6 border-t border-gray-200">
                     <div className="flex items-center gap-4">
-                      <div 
-                        className="w-14 h-14 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0"
-                        style={{ backgroundColor: primaryColor }}
-                      >
-                        {welcomeContent.authorName?.charAt(0) || 'A'}
-                      </div>
+                      <Avatar className="w-14 h-14">
+                        <AvatarFallback style={{ backgroundColor: primaryColor }} className="text-white text-lg font-bold">
+                          {welcomeContent.authorName?.charAt(0) || 'A'}
+                        </AvatarFallback>
+                      </Avatar>
                       <div>
                         {welcomeContent.authorName && (
                           <p className="font-bold text-gray-900 text-lg">
@@ -323,64 +326,135 @@ As a token of our appreciation for your continued service, we invite you to sele
           </div>
 
           {/* Card Grid - Matching your design with eCards */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {celebrationMessages.map((msg) => (
-              <div
-                key={msg.id}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 overflow-hidden cursor-pointer"
-              >
-                {/* eCard Display */}
-                <div className="p-4">
-                  <ECard
-                    template={msg.eCard}
-                    message={msg.message}
-                    senderName={msg.senderName}
-                    recipientName="You"
-                    size="small"
-                    showMessage={false}
-                  />
-                </div>
-
-                {/* Message Text */}
-                <div className="px-6 pb-4">
-                  <p className="text-gray-700 text-sm leading-relaxed italic mb-4">
-                    "{msg.message}"
-                  </p>
-
-                  {/* Sender Info */}
-                  <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
-                    <div 
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
-                      style={{ backgroundColor: primaryColor }}
-                    >
-                      {msg.senderName.charAt(0)}
+          {loading ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Card key={i}>
+                  <CardHeader className="p-4">
+                    <Skeleton className="h-48 w-full rounded-lg" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-3/4 mb-4" />
+                    <div className="flex items-center gap-3 pt-4 border-t">
+                      <Skeleton className="h-10 w-10 rounded-full" />
+                      <div className="flex-1">
+                        <Skeleton className="h-4 w-24 mb-1" />
+                        <Skeleton className="h-3 w-16" />
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-semibold text-gray-900">
-                        {msg.senderName}
-                      </p>
-                      <p className="text-gray-600 text-xs capitalize">
-                        {msg.senderRole === 'leadership' ? t('welcome.leadershipTeam') : msg.senderRole}
-                      </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              {celebrationMessages.map((msg) => (
+                <Card 
+                  key={msg.id}
+                  className="hover:shadow-xl transition-all transform hover:-translate-y-1 cursor-pointer"
+                  onClick={() => setSelectedMessage(msg)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelectedMessage(msg);
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Message from ${msg.senderName}`}
+                >
+                  {/* eCard Display */}
+                  <CardHeader className="p-4">
+                    <ECard
+                      template={msg.eCard}
+                      message={msg.message}
+                      senderName={msg.senderName}
+                      recipientName="You"
+                      size="small"
+                      showMessage={false}
+                    />
+                  </CardHeader>
+
+                  {/* Message Text */}
+                  <CardContent>
+                    <CardDescription className="italic mb-4">
+                      "{msg.message}"
+                    </CardDescription>
+
+                    {/* Sender Info */}
+                    <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
+                      <Avatar className="w-10 h-10">
+                        <AvatarFallback style={{ backgroundColor: primaryColor }} className="text-white font-bold text-sm">
+                          {msg.senderName.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-semibold text-gray-900">
+                          {msg.senderName}
+                        </p>
+                        <p className="text-gray-600 text-xs capitalize">
+                          {msg.senderRole === 'leadership' ? t('welcome.leadershipTeam') : msg.senderRole}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
 
           {/* View All Messages Link */}
           <div className="text-center">
-            <button
+            <Button
+              variant="ghost"
+              size="lg"
               onClick={() => void navigate('/celebration')}
-              className="inline-flex items-center gap-2 text-lg font-semibold hover:gap-3 transition-all"
+              className="gap-2"
               style={{ color: primaryColor }}
             >
               <MessageCircle className="w-5 h-5" />
               {t('welcome.viewAllMessages')}
               <ArrowRight className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
+
+          {/* Full Message Dialog */}
+          <Dialog open={selectedMessage !== null} onOpenChange={() => setSelectedMessage(null)}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Message from {selectedMessage?.senderName}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                {selectedMessage && (
+                  <>
+                    <ECard
+                      template={selectedMessage.eCard}
+                      message={selectedMessage.message}
+                      senderName={selectedMessage.senderName}
+                      recipientName="You"
+                      size="large"
+                    />
+                    <div className="flex items-center gap-3 pt-4 border-t">
+                      <Avatar className="w-12 h-12">
+                        <AvatarFallback style={{ backgroundColor: primaryColor }} className="text-white font-bold">
+                          {selectedMessage.senderName.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-semibold text-gray-900 text-lg">
+                          {selectedMessage.senderName}
+                        </p>
+                        <p className="text-gray-600 text-sm capitalize">
+                          {selectedMessage.senderRole === 'leadership' ? t('welcome.leadershipTeam') : selectedMessage.senderRole}
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       )}
 
@@ -396,17 +470,18 @@ As a token of our appreciation for your continued service, we invite you to sele
             <p className="font-semibold text-lg">{t('welcome.readyToChoose')}</p>
             <p className="text-white/80 text-sm">{t('welcome.letsGetStarted')}</p>
           </div>
-          <button
+          <Button
+            size="lg"
             onClick={handleContinue}
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-offset-2 group"
+            className="gap-3 px-8 py-4 text-lg font-bold"
             style={{ 
               backgroundColor: primaryColor,
               boxShadow: `0 4px 14px ${primaryColor}40`
             }}
           >
             <span className="text-white">{buttonText}</span>
-            <ArrowRight className="w-5 h-5 text-white transition-transform group-hover:translate-x-1" />
-          </button>
+            <ArrowRight className="w-5 h-5 text-white" />
+          </Button>
         </div>
       </div>
     </div>

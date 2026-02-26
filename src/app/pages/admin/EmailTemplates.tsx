@@ -530,7 +530,7 @@ export function EmailTemplates() {
         <TemplateEditor
           template={editingTemplate}
           onClose={() => setEditingTemplate(null)}
-          onSave={() => void handleSaveTemplate()}
+          onSave={handleSaveTemplate}
         />
       )}
 
@@ -547,7 +547,7 @@ export function EmailTemplates() {
         <TestEmailDialog
           template={testingTemplate}
           onClose={() => setTestingTemplate(null)}
-          onSend={() => void handleTestEmail()}
+          onSend={handleTestEmail}
         />
       )}
     </div>

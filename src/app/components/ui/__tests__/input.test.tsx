@@ -23,7 +23,9 @@ describe('Input Component', () => {
   describe('Rendering', () => {
     it('should render input element', () => {
       renderWithRouter(<Input />);
-      expect(screen.getByRole('textbox')).toBeInTheDocument();
+      const input = screen.getByRole('textbox');
+      expect(input).toBeInTheDocument();
+      expect(input.className).toContain('rounded-md');
     });
 
     it('should render with placeholder', () => {

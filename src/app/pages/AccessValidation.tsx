@@ -1,26 +1,81 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router';
-import { Mail, CreditCard, Link as LinkIcon, CheckCircle, AlertCircle, IdCard } from 'lucide-react';
+import { useNavigate } from 'react-router';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Mail, CreditCard, Link as LinkIcon, CheckCircle, AlertCircle, IdCard, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { usePublicSite } from '../context/PublicSiteContext';
 import { logger } from '../utils/logger';
-import { sanitizeInput, checkRateLimit, logSecurityEvent, validateEmailFormat } from '../utils/security';
+import { sanitizeInput, checkRateLimit, logSecurityEvent } from '../utils/security';
 import { getCurrentEnvironment } from '../config/deploymentEnvironments';
 import { useLanguage } from '../context/LanguageContext';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../components/ui/form';
+import { Input } from '../components/ui/input';
+import { Button } from '../components/ui/button';
+import {
+  emailAccessSchema,
+  employeeIdAccessSchema,
+  serialCardAccessSchema,
+} from '../schemas/access.schema';
 
 export function AccessValidation() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { currentSite } = usePublicSite();
   const { authenticate } = useAuth();
   const { t } = useLanguage();
-  const [input, setInput] = useState('');
   const [error, setError] = useState('');
-  const [isValidating, setIsValidating] = useState(false);
 
   // Wait for site to load before determining validation method
   const validationMethod = currentSite?.settings?.validationMethod || 'email';
   const siteId = currentSite?.id || '';
+
+  // Determine which schema to use based on validation method
+  const getSchema = () => {
+    switch (validationMethod) {
+      case 'email':
+        return emailAccessSchema;
+      case 'employee_id':
+        return employeeIdAccessSchema;
+      case 'serial_card':
+        return serialCardAccessSchema;
+      default:
+        return emailAccessSchema;
+    }
+  };
+
+  // Get field name based on validation method
+  const getFieldName = (): 'email' | 'employeeId' | 'serialCard' => {
+    switch (validationMethod) {
+      case 'email':
+        return 'email';
+      case 'employee_id':
+        return 'employeeId';
+      case 'serial_card':
+        return 'serialCard';
+      default:
+        return 'email';
+    }
+  };
+
+  // Initialize form with appropriate schema
+  const form = useForm({
+    resolver: zodResolver(getSchema() as any),
+    defaultValues: validationMethod === 'email'
+      ? { email: '' }
+      : validationMethod === 'employee_id'
+      ? { employeeId: '' }
+      : { serialCard: '' },
+  });
 
   // Debug logging - ALWAYS log, not just in dev mode
   useEffect(() => {
@@ -47,71 +102,49 @@ export function AccessValidation() {
     }
   }, [navigate, validationMethod, currentSite]);
 
-  // Show loading spinner while site is loading
+  // Show loading skeleton while site is loading
   if (!currentSite) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#00E5A0] via-[#0066CC] via-[#D91C81] to-[#1B2A5E] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white font-medium">Loading site configuration...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show error if site failed to load
-  if (!currentSite) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#00E5A0] via-[#0066CC] via-[#D91C81] to-[#1B2A5E] flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <AlertCircle className="w-8 h-8 text-red-600" />
+      <div className="min-h-screen bg-gradient-to-br from-[#00E5A0] via-[#0066CC] via-[#D91C81] to-[#1B2A5E] flex items-center justify-center px-4 py-12">
+        <div className="max-w-md w-full">
+          <div className="bg-white rounded-3xl p-8 md:p-10" style={{ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.16)' }}>
+            <Skeleton className="w-16 h-16 rounded-2xl mx-auto mb-6" />
+            <Skeleton className="h-8 w-3/4 mx-auto mb-3" />
+            <Skeleton className="h-5 w-2/3 mx-auto mb-8" />
+            <div className="space-y-6">
+              <div>
+                <Skeleton className="h-4 w-24 mb-2" />
+                <Skeleton className="h-12 w-full rounded-xl" />
+                <Skeleton className="h-4 w-full mt-2" />
+              </div>
+              <Skeleton className="h-14 w-full rounded-xl" />
+            </div>
+            <Skeleton className="h-20 w-full rounded-xl mt-6" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Site Not Found</h2>
-          <p className="text-gray-600 mb-6">
-            Unable to load site configuration
-          </p>
-          <Link
-            to="/"
-            className="inline-block px-6 py-3 bg-[#D91C81] text-white rounded-lg font-semibold hover:bg-[#B71569] transition-colors"
-          >
-            Go to Home
-          </Link>
         </div>
       </div>
     );
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = form.handleSubmit(async (data: Record<string, string>) => {
     setError('');
-    setIsValidating(true);
+
+    // Get the input value based on validation method
+    const fieldName = getFieldName();
+    const inputValue = data[fieldName] || '';
 
     // Sanitize input to prevent XSS
-    const sanitizedInput = sanitizeInput(input);
+    const sanitizedInput = sanitizeInput(inputValue);
 
     // Rate limiting check
     const clientId = `validation_${Date.now()}`;
     const rateLimitCheck = checkRateLimit(clientId, 5, 900000);
     if (!rateLimitCheck.allowed) {
       setError(t('validation.error.rateLimit'));
-      setIsValidating(false);
       logSecurityEvent({
         action: 'access_validation_rate_limit',
         status: 'failure',
         details: { method: validationMethod }
-      });
-      return;
-    }
-
-    // Additional email format validation for email method
-    if (validationMethod === 'email' && !validateEmailFormat(sanitizedInput)) {
-      setError(t('validation.error.format'));
-      setIsValidating(false);
-      logSecurityEvent({
-        action: 'access_validation_invalid_format',
-        status: 'failure',
-        details: { method: 'email' }
       });
       return;
     }
@@ -148,14 +181,19 @@ export function AccessValidation() {
       });
 
       logger.log('[AccessValidation] Validation response status:', response.status);
-      const data = await response.json();
-      logger.log('[AccessValidation] Validation response data:', data);
+      const responseData = await response.json() as { 
+        valid?: boolean; 
+        sessionToken?: string; 
+        employee?: { name?: string; email?: string }; 
+        error?: string;
+      };
+      logger.log('[AccessValidation] Validation response data:', responseData);
 
-      if (data.valid && data.sessionToken) {
+      if (responseData.valid && responseData.sessionToken) {
         // Store session token
-        sessionStorage.setItem('employee_session', data.sessionToken);
-        sessionStorage.setItem('employee_name', data.employee?.name || '');
-        sessionStorage.setItem('employee_email', data.employee?.email || '');
+        sessionStorage.setItem('employee_session', responseData.sessionToken);
+        sessionStorage.setItem('employee_name', responseData.employee?.name || '');
+        sessionStorage.setItem('employee_email', responseData.employee?.email || '');
         
         logSecurityEvent({
           action: 'access_validation_success',
@@ -167,8 +205,6 @@ export function AccessValidation() {
         authenticate(sanitizedInput);
         
         // Check if welcome page is enabled
-        // If explicitly set to false, skip welcome page
-        // If not set or set to true, show welcome page
         const enableWelcomePage = currentSite?.settings?.enableWelcomePage;
         
         logger.log('[AccessValidation] Welcome page setting:', {
@@ -180,11 +216,10 @@ export function AccessValidation() {
         });
         
         // Navigate to welcome page if enabled, otherwise go directly to gift selection
-        // Use ../ to go up one level from /access to the site root
         void navigate(enableWelcomePage === false ? '../gift-selection' : '../welcome');
       } else {
         // Validation failed
-        setError(data.error || t('validation.error.invalid'));
+        setError(responseData.error || t('validation.error.invalid'));
         logSecurityEvent({
           action: 'access_validation_failed',
           status: 'failure',
@@ -199,10 +234,8 @@ export function AccessValidation() {
         status: 'failure',
         details: { method: validationMethod, error: error instanceof Error ? error.message : 'Unknown error' }
       });
-    } finally {
-      setIsValidating(false);
     }
-  };
+  });
 
   const getValidationConfig = () => {
     switch (validationMethod) {
@@ -249,6 +282,7 @@ export function AccessValidation() {
 
   const config = getValidationConfig();
   const Icon = config.icon;
+  const fieldName = getFieldName();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#00E5A0] via-[#0066CC] via-[#D91C81] to-[#1B2A5E] flex items-center justify-center px-4 py-12">
@@ -269,53 +303,54 @@ export function AccessValidation() {
           </div>
 
           {/* Form */}
-          <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
-            <div>
-              <label htmlFor="credential" className="block text-sm font-semibold text-gray-700 mb-2">
-                {config.label}
-              </label>
-              <input
-                id="credential"
-                type={config.type}
-                value={input}
-                onChange={(e) => {
-                  setInput(e.target.value);
-                  setError('');
-                }}
-                placeholder={config.placeholder}
-                required
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#D91C81] focus:ring-4 focus:ring-pink-100 transition-all outline-none"
+          <Form {...form}>
+            <form onSubmit={(e) => { e.preventDefault(); void onSubmit(); }} className="space-y-6">
+              <FormField
+                control={form.control as any}
+                name={fieldName}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{config.label}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type={config.type}
+                        placeholder={config.placeholder}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>{config.hint}</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <p className="text-sm text-gray-500 mt-2">{config.hint}</p>
-            </div>
 
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3" role="alert" aria-live="polite">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                <p className="text-sm text-red-800">{error}</p>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isValidating || !input}
-              className="w-full bg-gradient-to-r from-[#D91C81] to-[#B71569] text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus:outline-none focus:ring-4 focus:ring-[#D91C81] focus:ring-offset-2 min-h-[44px]"
-              style={{ boxShadow: '0 4px 12px rgba(217, 28, 129, 0.3)' }}
-              aria-busy={isValidating}
-            >
-              {isValidating ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true" />
-                  <span>{t('validation.verifying')}</span>
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="w-5 h-5" aria-hidden="true" />
-                  {t('validation.verifyAccess')}
-                </>
+              {error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
               )}
-            </button>
-          </form>
+
+              <Button
+                type="submit"
+                disabled={form.formState.isSubmitting}
+                className="w-full bg-gradient-to-r from-[#D91C81] to-[#B71569] hover:shadow-lg min-h-[44px]"
+                size="lg"
+              >
+                {form.formState.isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    {t('validation.verifying')}
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-5 h-5 mr-2" />
+                    {t('validation.verifyAccess')}
+                  </>
+                )}
+              </Button>
+            </form>
+          </Form>
 
           {/* Info Message */}
           {currentSite && (

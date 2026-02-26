@@ -10,7 +10,38 @@ export function SitesDiagnostic() {
 
   const runDiagnostics = async () => {
     setLoading(true);
-    const diagnostics: Record<string, unknown> = {
+    
+    interface ApiCallResult {
+      success: boolean;
+      responseFormat?: unknown;
+      dataLength?: number;
+      hasSuccessFlag?: boolean;
+      hasDataProperty?: boolean;
+      error?: string;
+      status?: number;
+    }
+    
+    interface DirectFetchResult {
+      success: boolean;
+      status?: number;
+      statusText?: string;
+      contentType?: string;
+      rawText?: string;
+      parsedJson?: unknown;
+      error?: string;
+    }
+    
+    const diagnostics: {
+      timestamp: string;
+      environment: unknown;
+      token: unknown;
+      apiCalls: {
+        sites?: ApiCallResult;
+        clients?: ApiCallResult;
+        directFetch?: DirectFetchResult;
+      };
+      errors: Array<{ endpoint: string; error: string }>;
+    } = {
       timestamp: new Date().toISOString(),
       environment: null,
       token: null,
@@ -119,21 +150,21 @@ export function SitesDiagnostic() {
         }
 
         diagnostics.apiCalls.directFetch = {
-          url: directUrl,
+          success: true,
           status: response.status,
           statusText: response.statusText,
-          headers: Object.fromEntries(response.headers.entries()),
-          responseText: responseText.substring(0, 500),
-          parsedResponse: parsedResponse,
-        };
+          rawText: responseText.substring(0, 500),
+          parsedJson: parsedResponse,
+        } as DirectFetchResult;
       } catch (err: any) {
         diagnostics.apiCalls.directFetch = {
+          success: false,
           error: err.message,
-        };
+        } as DirectFetchResult;
       }
 
     } catch (err: any) {
-      diagnostics.errors.push({ general: err.message });
+      diagnostics.errors.push({ endpoint: 'general', error: err.message });
     }
 
     setResults(diagnostics);

@@ -60,13 +60,25 @@ export default function AuthDiagnostic() {
   const testConnection = async () => {
     setTesting(true);
     const env = getCurrentEnvironment();
-    const results: Record<string, unknown> = {
+    
+    interface TestResult {
+      name: string;
+      url: string;
+      status: number;
+      ok?: boolean;
+      data?: unknown;
+      error?: string;
+    }
+    
+    const results: {
+      tests: TestResult[];
+    } = {
       tests: []
     };
 
     // Test 1: Health check with Authorization header
+    const healthUrl = `${env.supabaseUrl}/functions/v1/make-server-6fcaeea3/health`;
     try {
-      const healthUrl = `${env.supabaseUrl}/functions/v1/make-server-6fcaeea3/health`;
       const response = await fetch(healthUrl, {
         headers: {
           'Authorization': `Bearer ${env.supabaseAnonKey}`,
@@ -78,25 +90,22 @@ export default function AuthDiagnostic() {
         name: 'Health Check with Authorization',
         url: healthUrl,
         status: response.status,
-        statusText: response.statusText,
         ok: response.ok,
-        headers: {
-          Authorization: env.supabaseAnonKey.substring(0, 30) + '...',
-        },
-        body: await response.text().catch(() => 'Could not read body'),
-      });
+        data: await response.text().catch(() => 'Could not read body'),
+      } as TestResult);
     } catch (error: any) {
       results.tests.push({
         name: 'Health Check with Authorization',
+        url: healthUrl,
+        status: 0,
         error: error.message,
-        failed: true,
-      });
+      } as TestResult);
     }
 
     // Test 2: Try with publicAnonKey directly
+    const healthUrl2 = `${env.supabaseUrl}/functions/v1/make-server-6fcaeea3/health`;
     try {
-      const healthUrl = `${env.supabaseUrl}/functions/v1/make-server-6fcaeea3/health`;
-      const response = await fetch(healthUrl, {
+      const response = await fetch(healthUrl2, {
         headers: {
           'Authorization': `Bearer ${publicAnonKey}`,
           'Content-Type': 'application/json',
@@ -105,21 +114,18 @@ export default function AuthDiagnostic() {
 
       results.tests.push({
         name: 'Health Check with publicAnonKey from info.tsx',
-        url: healthUrl,
+        url: healthUrl2,
         status: response.status,
-        statusText: response.statusText,
         ok: response.ok,
-        headers: {
-          Authorization: publicAnonKey.substring(0, 30) + '...',
-        },
-        body: await response.text().catch(() => 'Could not read body'),
-      });
+        data: await response.text().catch(() => 'Could not read body'),
+      } as TestResult);
     } catch (error: any) {
       results.tests.push({
         name: 'Health Check with publicAnonKey',
+        url: healthUrl2,
+        status: 0,
         error: error.message,
-        failed: true,
-      });
+      } as TestResult);
     }
 
     setTestResults(results);

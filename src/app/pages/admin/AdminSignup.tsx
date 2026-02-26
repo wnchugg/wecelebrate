@@ -191,7 +191,7 @@ export function AdminSignup() {
 
           {/* Form */}
           <form 
-            onSubmit={() => void handleSubmit()} 
+            onSubmit={(e) => void handleSubmit(e)} 
             className="space-y-5 px-8 py-6"
             name={`admin-signup-${currentEnv.id}`}
           >

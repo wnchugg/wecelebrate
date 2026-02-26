@@ -803,7 +803,7 @@ function ERPConnectionModal({ connection, onClose, onSave }: ERPConnectionModalP
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={() => void handleSubmit()} className="flex-1 overflow-y-auto space-y-6">
+        <form onSubmit={(e) => void handleSubmit(e)} className="flex-1 overflow-y-auto space-y-6">
           {/* Basic Info */}
           <div className="space-y-4">
             <div>

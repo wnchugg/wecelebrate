@@ -206,6 +206,62 @@ export function SiteConfiguration() {
   type TranslationValue = string | boolean | Record<string, string>;
   const [translations, setTranslations] = useState<Record<string, TranslationValue>>(currentSite?.translations || {});
   
+  // Helper to safely access nested translation objects
+  const getTranslationSection = (section: string): Record<string, string> => {
+    const value = translations?.[section];
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      return value as Record<string, string>;
+    }
+    return {};
+  };
+
+  // Helper to safely get nested translation value (e.g., 'header.logoAlt')
+  const getNestedTranslation = (path: string): Record<string, string> => {
+    const pathParts = path.split('.');
+    let current: unknown = translations;
+    
+    for (const part of pathParts) {
+      if (current && typeof current === 'object' && !Array.isArray(current)) {
+        current = (current as Record<string, unknown>)[part];
+      } else {
+        return {};
+      }
+    }
+    
+    if (current && typeof current === 'object' && !Array.isArray(current)) {
+      return current as Record<string, string>;
+    }
+    return {};
+  };
+
+  // Helper to flatten nested translations for validation
+  const flattenTranslationsForValidation = (
+    trans: Record<string, TranslationValue>,
+    prefix = ''
+  ): Record<string, Record<string, string>> => {
+    const result: Record<string, Record<string, string>> = {};
+    
+    for (const [key, value] of Object.entries(trans)) {
+      const fullKey = prefix ? `${prefix}.${key}` : key;
+      
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        // Check if this is a translation object (has language codes) or nested structure
+        const keys = Object.keys(value);
+        const isTranslationObject = keys.length > 0 && keys.every(k => k.length === 2 || k === 'en' || k === 'es' || k === 'fr' || k === 'de' || k === 'it' || k === 'pt' || k === 'nl' || k === 'pl' || k === 'tr' || k === 'ar' || k === 'he' || k === 'ja');
+        
+        if (isTranslationObject) {
+          // This is a translation object with language codes
+          result[fullKey] = value as Record<string, string>;
+        } else {
+          // This is a nested structure, recurse
+          Object.assign(result, flattenTranslationsForValidation(value as Record<string, TranslationValue>, fullKey));
+        }
+      }
+    }
+    
+    return result;
+  };
+  
   const [availabilityStartDate, setAvailabilityStartDate] = useState(currentSite?.settings?.availabilityStartDate || '');
   const [availabilityEndDate, setAvailabilityEndDate] = useState(currentSite?.settings?.availabilityEndDate || '');
   const [expiredMessage, setExpiredMessage] = useState(
@@ -1123,7 +1179,7 @@ export function SiteConfiguration() {
     ];
     
     const translationValidation = validateTranslations(
-      translations,
+      flattenTranslationsForValidation(translations),
       requiredFields,
       draftAvailableLanguages
     );
@@ -1374,7 +1430,7 @@ export function SiteConfiguration() {
     
     // Check for incomplete non-default language translations
     const completionValidation = validateTranslations(
-      translations,
+      flattenTranslationsForValidation(translations),
       requiredFields,
       draftAvailableLanguages
     );
@@ -3188,7 +3244,7 @@ export function SiteConfiguration() {
                 <div className="space-y-4">
                   <TranslatableInput
                     label="Logo Alt Text"
-                    value={translations?.header?.logoAlt || {}}
+                    value={getNestedTranslation('header.logoAlt')}
                     onChange={(language, value) => updateTranslation('header.logoAlt', language, value)}
                     availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                     defaultLanguage={defaultLanguage}
@@ -3198,7 +3254,7 @@ export function SiteConfiguration() {
 
                   <TranslatableInput
                     label="Home Link Text"
-                    value={translations?.header?.homeLink || {}}
+                    value={getNestedTranslation('header.homeLink')}
                     onChange={(language, value) => updateTranslation('header.homeLink', language, value)}
                     availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                     defaultLanguage={defaultLanguage}
@@ -3208,7 +3264,7 @@ export function SiteConfiguration() {
 
                   <TranslatableInput
                     label="Products Link Text"
-                    value={translations?.header?.productsLink || {}}
+                    value={getNestedTranslation('header.productsLink')}
                     onChange={(language, value) => updateTranslation('header.productsLink', language, value)}
                     availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                     defaultLanguage={defaultLanguage}
@@ -3217,7 +3273,7 @@ export function SiteConfiguration() {
 
                   <TranslatableInput
                     label="About Link Text"
-                    value={translations?.header?.aboutLink || {}}
+                    value={getNestedTranslation('header.aboutLink')}
                     onChange={(language, value) => updateTranslation('header.aboutLink', language, value)}
                     availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                     defaultLanguage={defaultLanguage}
@@ -3226,7 +3282,7 @@ export function SiteConfiguration() {
 
                   <TranslatableInput
                     label="Contact Link Text"
-                    value={translations?.header?.contactLink || {}}
+                    value={getNestedTranslation('header.contactLink')}
                     onChange={(language, value) => updateTranslation('header.contactLink', language, value)}
                     availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                     defaultLanguage={defaultLanguage}
@@ -3235,7 +3291,7 @@ export function SiteConfiguration() {
 
                   <TranslatableInput
                     label="CTA Button Text"
-                    value={translations?.header?.ctaButton || {}}
+                    value={getNestedTranslation('header.ctaButton')}
                     onChange={(language, value) => updateTranslation('header.ctaButton', language, value)}
                     availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                     defaultLanguage={defaultLanguage}
@@ -3304,7 +3360,7 @@ export function SiteConfiguration() {
                 <div className="space-y-4">
                   <TranslatableTextarea
                     label="Footer Text"
-                    value={translations?.footer?.text || {}}
+                    value={getNestedTranslation('footer.text')}
                     onChange={(language, value) => updateTranslation('footer.text', language, value)}
                     availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                     defaultLanguage={defaultLanguage}
@@ -3314,7 +3370,7 @@ export function SiteConfiguration() {
 
                   <TranslatableInput
                     label="Privacy Link Text"
-                    value={translations?.footer?.privacyLink || {}}
+                    value={getNestedTranslation('footer.privacyLink')}
                     onChange={(language, value) => updateTranslation('footer.privacyLink', language, value)}
                     availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                     defaultLanguage={defaultLanguage}
@@ -3323,7 +3379,7 @@ export function SiteConfiguration() {
 
                   <TranslatableInput
                     label="Terms Link Text"
-                    value={translations?.footer?.termsLink || {}}
+                    value={getNestedTranslation('footer.termsLink')}
                     onChange={(language, value) => updateTranslation('footer.termsLink', language, value)}
                     availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                     defaultLanguage={defaultLanguage}
@@ -3332,7 +3388,7 @@ export function SiteConfiguration() {
 
                   <TranslatableInput
                     label="Contact Link Text"
-                    value={translations?.footer?.contactLink || {}}
+                    value={getNestedTranslation('footer.contactLink')}
                     onChange={(language, value) => updateTranslation('footer.contactLink', language, value)}
                     availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                     defaultLanguage={defaultLanguage}
@@ -4139,7 +4195,7 @@ export function SiteConfiguration() {
                 <CardContent className="space-y-4">
                   <TranslatableInput
                     label="Hero Title"
-                    value={translations?.landingPage?.heroTitle || {}}
+                    value={getNestedTranslation('landingPage.heroTitle')}
                     onChange={(language, value) => updateTranslation('landingPage.heroTitle', language, value)}
                     availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                     defaultLanguage={defaultLanguage}
@@ -4149,7 +4205,7 @@ export function SiteConfiguration() {
 
                   <TranslatableInput
                     label="Hero Subtitle"
-                    value={translations?.landingPage?.heroSubtitle || {}}
+                    value={getNestedTranslation('landingPage.heroSubtitle')}
                     onChange={(language, value) => updateTranslation('landingPage.heroSubtitle', language, value)}
                     availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                     defaultLanguage={defaultLanguage}
@@ -4158,7 +4214,7 @@ export function SiteConfiguration() {
 
                   <TranslatableInput
                     label="Hero CTA Button"
-                    value={translations?.landingPage?.heroCTA || {}}
+                    value={getNestedTranslation('landingPage.heroCTA')}
                     onChange={(language, value) => updateTranslation('landingPage.heroCTA', language, value)}
                     availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                     defaultLanguage={defaultLanguage}
@@ -4219,7 +4275,7 @@ export function SiteConfiguration() {
                     <div className="space-y-4">
                       <TranslatableInput
                         label="Page Title"
-                        value={translations?.welcomePage?.title || {}}
+                        value={getNestedTranslation('welcomePage.title')}
                         onChange={(language, value) => updateTranslation('welcomePage.title', language, value)}
                         availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                         defaultLanguage={defaultLanguage}
@@ -4229,7 +4285,7 @@ export function SiteConfiguration() {
 
                       <TranslatableTextarea
                         label="Welcome Message"
-                        value={translations?.welcomePage?.message || {}}
+                        value={getNestedTranslation('welcomePage.message')}
                         onChange={(language, value) => updateTranslation('welcomePage.message', language, value)}
                         availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                         defaultLanguage={defaultLanguage}
@@ -4239,7 +4295,7 @@ export function SiteConfiguration() {
 
                       <TranslatableInput
                         label="Button Text"
-                        value={translations?.welcomePage?.buttonText || {}}
+                        value={getNestedTranslation('welcomePage.buttonText')}
                         onChange={(language, value) => updateTranslation('welcomePage.buttonText', language, value)}
                         availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                         defaultLanguage={defaultLanguage}
@@ -4464,7 +4520,7 @@ export function SiteConfiguration() {
             <CardContent className="space-y-4">
               <TranslatableInput
                 label="Page Title"
-                value={translations?.accessPage?.title || {}}
+                value={getNestedTranslation('accessPage.title')}
                 onChange={(language, value) => updateTranslation('accessPage.title', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -4474,7 +4530,7 @@ export function SiteConfiguration() {
 
               <TranslatableTextarea
                 label="Description"
-                value={translations?.accessPage?.description || {}}
+                value={getNestedTranslation('accessPage.description')}
                 onChange={(language, value) => updateTranslation('accessPage.description', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -4484,7 +4540,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Button Text"
-                value={translations?.accessPage?.buttonText || {}}
+                value={getNestedTranslation('accessPage.buttonText')}
                 onChange={(language, value) => updateTranslation('accessPage.buttonText', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -4494,7 +4550,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Error Message"
-                value={translations?.accessPage?.errorMessage || {}}
+                value={getNestedTranslation('accessPage.errorMessage')}
                 onChange={(language, value) => updateTranslation('accessPage.errorMessage', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -4504,7 +4560,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Success Message"
-                value={translations?.accessPage?.successMessage || {}}
+                value={getNestedTranslation('accessPage.successMessage')}
                 onChange={(language, value) => updateTranslation('accessPage.successMessage', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -4855,7 +4911,7 @@ export function SiteConfiguration() {
             <CardContent className="space-y-4">
               <TranslatableInput
                 label="Page Title"
-                value={translations?.reviewOrder?.title || {}}
+                value={getNestedTranslation('reviewOrder.title')}
                 onChange={(language, value) => updateTranslation('reviewOrder.title', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -4865,7 +4921,7 @@ export function SiteConfiguration() {
 
               <TranslatableTextarea
                 label="Instructions"
-                value={translations?.reviewOrder?.instructions || {}}
+                value={getNestedTranslation('reviewOrder.instructions')}
                 onChange={(language, value) => updateTranslation('reviewOrder.instructions', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -4875,7 +4931,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Confirm Button Text"
-                value={translations?.reviewOrder?.confirmButton || {}}
+                value={getNestedTranslation('reviewOrder.confirmButton')}
                 onChange={(language, value) => updateTranslation('reviewOrder.confirmButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -4885,7 +4941,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Edit Button Text"
-                value={translations?.reviewOrder?.editButton || {}}
+                value={getNestedTranslation('reviewOrder.editButton')}
                 onChange={(language, value) => updateTranslation('reviewOrder.editButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -4894,7 +4950,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Shipping Label"
-                value={translations?.reviewOrder?.shippingLabel || {}}
+                value={getNestedTranslation('reviewOrder.shippingLabel')}
                 onChange={(language, value) => updateTranslation('reviewOrder.shippingLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -4903,7 +4959,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Items Label"
-                value={translations?.reviewOrder?.itemsLabel || {}}
+                value={getNestedTranslation('reviewOrder.itemsLabel')}
                 onChange={(language, value) => updateTranslation('reviewOrder.itemsLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5183,7 +5239,7 @@ export function SiteConfiguration() {
             <CardContent className="space-y-4">
               <TranslatableInput
                 label="Page Title"
-                value={translations?.confirmation?.title || {}}
+                value={getNestedTranslation('confirmation.title')}
                 onChange={(language, value) => updateTranslation('confirmation.title', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5193,7 +5249,7 @@ export function SiteConfiguration() {
 
               <TranslatableTextarea
                 label="Confirmation Message"
-                value={translations?.confirmation?.message || {}}
+                value={getNestedTranslation('confirmation.message')}
                 onChange={(language, value) => updateTranslation('confirmation.message', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5203,7 +5259,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Order Number Label"
-                value={translations?.confirmation?.orderNumberLabel || {}}
+                value={getNestedTranslation('confirmation.orderNumberLabel')}
                 onChange={(language, value) => updateTranslation('confirmation.orderNumberLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5212,7 +5268,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Tracking Label"
-                value={translations?.confirmation?.trackingLabel || {}}
+                value={getNestedTranslation('confirmation.trackingLabel')}
                 onChange={(language, value) => updateTranslation('confirmation.trackingLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5221,7 +5277,7 @@ export function SiteConfiguration() {
 
               <TranslatableTextarea
                 label="Next Steps"
-                value={translations?.confirmation?.nextSteps || {}}
+                value={getNestedTranslation('confirmation.nextSteps')}
                 onChange={(language, value) => updateTranslation('confirmation.nextSteps', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5231,7 +5287,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Continue Button Text"
-                value={translations?.confirmation?.continueButton || {}}
+                value={getNestedTranslation('confirmation.continueButton')}
                 onChange={(language, value) => updateTranslation('confirmation.continueButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5334,7 +5390,7 @@ export function SiteConfiguration() {
             <CardContent className="space-y-4">
               <TranslatableInput
                 label="Page Title"
-                value={translations?.catalogPage?.title || {}}
+                value={getNestedTranslation('catalogPage.title')}
                 onChange={(language, value) => updateTranslation('catalogPage.title', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5344,7 +5400,7 @@ export function SiteConfiguration() {
 
               <TranslatableTextarea
                 label="Page Description"
-                value={translations?.catalogPage?.description || {}}
+                value={getNestedTranslation('catalogPage.description')}
                 onChange={(language, value) => updateTranslation('catalogPage.description', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5354,7 +5410,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Empty Catalog Message"
-                value={translations?.catalogPage?.emptyMessage || {}}
+                value={getNestedTranslation('catalogPage.emptyMessage')}
                 onChange={(language, value) => updateTranslation('catalogPage.emptyMessage', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5363,7 +5419,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Filter All Text"
-                value={translations?.catalogPage?.filterAllText || {}}
+                value={getNestedTranslation('catalogPage.filterAllText')}
                 onChange={(language, value) => updateTranslation('catalogPage.filterAllText', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5372,7 +5428,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Search Placeholder"
-                value={translations?.catalogPage?.searchPlaceholder || {}}
+                value={getNestedTranslation('catalogPage.searchPlaceholder')}
                 onChange={(language, value) => updateTranslation('catalogPage.searchPlaceholder', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5393,7 +5449,7 @@ export function SiteConfiguration() {
             <CardContent className="space-y-4">
               <TranslatableInput
                 label="Back Button Text"
-                value={translations?.productDetail?.backButton || {}}
+                value={getNestedTranslation('productDetail.backButton')}
                 onChange={(language, value) => updateTranslation('productDetail.backButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5402,7 +5458,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Add to Cart Button"
-                value={translations?.productDetail?.addToCart || {}}
+                value={getNestedTranslation('productDetail.addToCart')}
                 onChange={(language, value) => updateTranslation('productDetail.addToCart', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5411,7 +5467,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Buy Now Button"
-                value={translations?.productDetail?.buyNow || {}}
+                value={getNestedTranslation('productDetail.buyNow')}
                 onChange={(language, value) => updateTranslation('productDetail.buyNow', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5420,7 +5476,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Out of Stock Message"
-                value={translations?.productDetail?.outOfStock || {}}
+                value={getNestedTranslation('productDetail.outOfStock')}
                 onChange={(language, value) => updateTranslation('productDetail.outOfStock', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5429,7 +5485,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Specifications Label"
-                value={translations?.productDetail?.specifications || {}}
+                value={getNestedTranslation('productDetail.specifications')}
                 onChange={(language, value) => updateTranslation('productDetail.specifications', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5438,7 +5494,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Description Label"
-                value={translations?.productDetail?.description || {}}
+                value={getNestedTranslation('productDetail.description')}
                 onChange={(language, value) => updateTranslation('productDetail.description', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5459,7 +5515,7 @@ export function SiteConfiguration() {
             <CardContent className="space-y-4">
               <TranslatableInput
                 label="Page Title"
-                value={translations?.checkoutPage?.title || {}}
+                value={getNestedTranslation('checkoutPage.title')}
                 onChange={(language, value) => updateTranslation('checkoutPage.title', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5469,7 +5525,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Shipping Section Title"
-                value={translations?.checkoutPage?.shippingTitle || {}}
+                value={getNestedTranslation('checkoutPage.shippingTitle')}
                 onChange={(language, value) => updateTranslation('checkoutPage.shippingTitle', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5478,7 +5534,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Payment Section Title"
-                value={translations?.checkoutPage?.paymentTitle || {}}
+                value={getNestedTranslation('checkoutPage.paymentTitle')}
                 onChange={(language, value) => updateTranslation('checkoutPage.paymentTitle', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5487,7 +5543,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Order Summary Title"
-                value={translations?.checkoutPage?.orderSummary || {}}
+                value={getNestedTranslation('checkoutPage.orderSummary')}
                 onChange={(language, value) => updateTranslation('checkoutPage.orderSummary', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5496,7 +5552,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Place Order Button"
-                value={translations?.checkoutPage?.placeOrderButton || {}}
+                value={getNestedTranslation('checkoutPage.placeOrderButton')}
                 onChange={(language, value) => updateTranslation('checkoutPage.placeOrderButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5505,7 +5561,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Free Shipping Message"
-                value={translations?.checkoutPage?.freeShippingMessage || {}}
+                value={getNestedTranslation('checkoutPage.freeShippingMessage')}
                 onChange={(language, value) => updateTranslation('checkoutPage.freeShippingMessage', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5526,7 +5582,7 @@ export function SiteConfiguration() {
             <CardContent className="space-y-4">
               <TranslatableInput
                 label="Page Title"
-                value={translations?.cartPage?.title || {}}
+                value={getNestedTranslation('cartPage.title')}
                 onChange={(language, value) => updateTranslation('cartPage.title', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5536,7 +5592,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Empty Cart Message"
-                value={translations?.cartPage?.emptyMessage || {}}
+                value={getNestedTranslation('cartPage.emptyMessage')}
                 onChange={(language, value) => updateTranslation('cartPage.emptyMessage', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5545,7 +5601,7 @@ export function SiteConfiguration() {
 
               <TranslatableTextarea
                 label="Empty Cart Description"
-                value={translations?.cartPage?.emptyDescription || {}}
+                value={getNestedTranslation('cartPage.emptyDescription')}
                 onChange={(language, value) => updateTranslation('cartPage.emptyDescription', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5555,7 +5611,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Browse Button"
-                value={translations?.cartPage?.browseButton || {}}
+                value={getNestedTranslation('cartPage.browseButton')}
                 onChange={(language, value) => updateTranslation('cartPage.browseButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5564,7 +5620,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Remove Button"
-                value={translations?.cartPage?.removeButton || {}}
+                value={getNestedTranslation('cartPage.removeButton')}
                 onChange={(language, value) => updateTranslation('cartPage.removeButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5573,7 +5629,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Clear Cart Button"
-                value={translations?.cartPage?.clearCartButton || {}}
+                value={getNestedTranslation('cartPage.clearCartButton')}
                 onChange={(language, value) => updateTranslation('cartPage.clearCartButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5582,7 +5638,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Clear Cart Confirmation"
-                value={translations?.cartPage?.clearCartConfirm || {}}
+                value={getNestedTranslation('cartPage.clearCartConfirm')}
                 onChange={(language, value) => updateTranslation('cartPage.clearCartConfirm', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5591,7 +5647,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Subtotal Label"
-                value={translations?.cartPage?.subtotalLabel || {}}
+                value={getNestedTranslation('cartPage.subtotalLabel')}
                 onChange={(language, value) => updateTranslation('cartPage.subtotalLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5600,7 +5656,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Shipping Label"
-                value={translations?.cartPage?.shippingLabel || {}}
+                value={getNestedTranslation('cartPage.shippingLabel')}
                 onChange={(language, value) => updateTranslation('cartPage.shippingLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5609,7 +5665,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Tax Label"
-                value={translations?.cartPage?.taxLabel || {}}
+                value={getNestedTranslation('cartPage.taxLabel')}
                 onChange={(language, value) => updateTranslation('cartPage.taxLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5618,7 +5674,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Total Label"
-                value={translations?.cartPage?.totalLabel || {}}
+                value={getNestedTranslation('cartPage.totalLabel')}
                 onChange={(language, value) => updateTranslation('cartPage.totalLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5627,7 +5683,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Checkout Button"
-                value={translations?.cartPage?.checkoutButton || {}}
+                value={getNestedTranslation('cartPage.checkoutButton')}
                 onChange={(language, value) => updateTranslation('cartPage.checkoutButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5636,7 +5692,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Continue Shopping Button"
-                value={translations?.cartPage?.continueShoppingButton || {}}
+                value={getNestedTranslation('cartPage.continueShoppingButton')}
                 onChange={(language, value) => updateTranslation('cartPage.continueShoppingButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5645,7 +5701,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Security Notice"
-                value={translations?.cartPage?.securityNotice || {}}
+                value={getNestedTranslation('cartPage.securityNotice')}
                 onChange={(language, value) => updateTranslation('cartPage.securityNotice', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5666,7 +5722,7 @@ export function SiteConfiguration() {
             <CardContent className="space-y-4">
               <TranslatableInput
                 label="Page Title"
-                value={translations?.orderHistory?.title || {}}
+                value={getNestedTranslation('orderHistory.title')}
                 onChange={(language, value) => updateTranslation('orderHistory.title', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5676,7 +5732,7 @@ export function SiteConfiguration() {
 
               <TranslatableTextarea
                 label="Page Description"
-                value={translations?.orderHistory?.description || {}}
+                value={getNestedTranslation('orderHistory.description')}
                 onChange={(language, value) => updateTranslation('orderHistory.description', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5686,7 +5742,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Empty State Title"
-                value={translations?.orderHistory?.emptyTitle || {}}
+                value={getNestedTranslation('orderHistory.emptyTitle')}
                 onChange={(language, value) => updateTranslation('orderHistory.emptyTitle', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5695,7 +5751,7 @@ export function SiteConfiguration() {
 
               <TranslatableTextarea
                 label="Empty State Message"
-                value={translations?.orderHistory?.emptyMessage || {}}
+                value={getNestedTranslation('orderHistory.emptyMessage')}
                 onChange={(language, value) => updateTranslation('orderHistory.emptyMessage', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5705,7 +5761,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Browse Button"
-                value={translations?.orderHistory?.browseButton || {}}
+                value={getNestedTranslation('orderHistory.browseButton')}
                 onChange={(language, value) => updateTranslation('orderHistory.browseButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5714,7 +5770,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="View Details Button"
-                value={translations?.orderHistory?.viewDetailsButton || {}}
+                value={getNestedTranslation('orderHistory.viewDetailsButton')}
                 onChange={(language, value) => updateTranslation('orderHistory.viewDetailsButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5723,7 +5779,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Status: Pending"
-                value={translations?.orderHistory?.statusPending || {}}
+                value={getNestedTranslation('orderHistory.statusPending')}
                 onChange={(language, value) => updateTranslation('orderHistory.statusPending', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5732,7 +5788,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Status: Confirmed"
-                value={translations?.orderHistory?.statusConfirmed || {}}
+                value={getNestedTranslation('orderHistory.statusConfirmed')}
                 onChange={(language, value) => updateTranslation('orderHistory.statusConfirmed', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5741,7 +5797,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Status: Shipped"
-                value={translations?.orderHistory?.statusShipped || {}}
+                value={getNestedTranslation('orderHistory.statusShipped')}
                 onChange={(language, value) => updateTranslation('orderHistory.statusShipped', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5750,7 +5806,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Status: Delivered"
-                value={translations?.orderHistory?.statusDelivered || {}}
+                value={getNestedTranslation('orderHistory.statusDelivered')}
                 onChange={(language, value) => updateTranslation('orderHistory.statusDelivered', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5759,7 +5815,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Status: Cancelled"
-                value={translations?.orderHistory?.statusCancelled || {}}
+                value={getNestedTranslation('orderHistory.statusCancelled')}
                 onChange={(language, value) => updateTranslation('orderHistory.statusCancelled', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5780,7 +5836,7 @@ export function SiteConfiguration() {
             <CardContent className="space-y-4">
               <TranslatableInput
                 label="Page Title"
-                value={translations?.orderTracking?.title || {}}
+                value={getNestedTranslation('orderTracking.title')}
                 onChange={(language, value) => updateTranslation('orderTracking.title', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5790,7 +5846,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Order Number Label"
-                value={translations?.orderTracking?.orderNumberLabel || {}}
+                value={getNestedTranslation('orderTracking.orderNumberLabel')}
                 onChange={(language, value) => updateTranslation('orderTracking.orderNumberLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5799,7 +5855,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Placed On Label"
-                value={translations?.orderTracking?.placedOnLabel || {}}
+                value={getNestedTranslation('orderTracking.placedOnLabel')}
                 onChange={(language, value) => updateTranslation('orderTracking.placedOnLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5808,7 +5864,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Status Label"
-                value={translations?.orderTracking?.statusLabel || {}}
+                value={getNestedTranslation('orderTracking.statusLabel')}
                 onChange={(language, value) => updateTranslation('orderTracking.statusLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5817,7 +5873,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Order Placed Label"
-                value={translations?.orderTracking?.orderPlacedLabel || {}}
+                value={getNestedTranslation('orderTracking.orderPlacedLabel')}
                 onChange={(language, value) => updateTranslation('orderTracking.orderPlacedLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5826,7 +5882,7 @@ export function SiteConfiguration() {
 
               <TranslatableTextarea
                 label="Order Placed Description"
-                value={translations?.orderTracking?.orderPlacedDesc || {}}
+                value={getNestedTranslation('orderTracking.orderPlacedDesc')}
                 onChange={(language, value) => updateTranslation('orderTracking.orderPlacedDesc', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5836,7 +5892,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Order Confirmed Label"
-                value={translations?.orderTracking?.orderConfirmedLabel || {}}
+                value={getNestedTranslation('orderTracking.orderConfirmedLabel')}
                 onChange={(language, value) => updateTranslation('orderTracking.orderConfirmedLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5845,7 +5901,7 @@ export function SiteConfiguration() {
 
               <TranslatableTextarea
                 label="Order Confirmed Description"
-                value={translations?.orderTracking?.orderConfirmedDesc || {}}
+                value={getNestedTranslation('orderTracking.orderConfirmedDesc')}
                 onChange={(language, value) => updateTranslation('orderTracking.orderConfirmedDesc', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5855,7 +5911,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Shipped Label"
-                value={translations?.orderTracking?.shippedLabel || {}}
+                value={getNestedTranslation('orderTracking.shippedLabel')}
                 onChange={(language, value) => updateTranslation('orderTracking.shippedLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5864,7 +5920,7 @@ export function SiteConfiguration() {
 
               <TranslatableTextarea
                 label="Shipped Description"
-                value={translations?.orderTracking?.shippedDesc || {}}
+                value={getNestedTranslation('orderTracking.shippedDesc')}
                 onChange={(language, value) => updateTranslation('orderTracking.shippedDesc', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5874,7 +5930,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Delivered Label"
-                value={translations?.orderTracking?.deliveredLabel || {}}
+                value={getNestedTranslation('orderTracking.deliveredLabel')}
                 onChange={(language, value) => updateTranslation('orderTracking.deliveredLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5883,7 +5939,7 @@ export function SiteConfiguration() {
 
               <TranslatableTextarea
                 label="Delivered Description"
-                value={translations?.orderTracking?.deliveredDesc || {}}
+                value={getNestedTranslation('orderTracking.deliveredDesc')}
                 onChange={(language, value) => updateTranslation('orderTracking.deliveredDesc', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5893,7 +5949,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Tracking Number Label"
-                value={translations?.orderTracking?.trackingNumberLabel || {}}
+                value={getNestedTranslation('orderTracking.trackingNumberLabel')}
                 onChange={(language, value) => updateTranslation('orderTracking.trackingNumberLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5902,7 +5958,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Estimated Delivery Label"
-                value={translations?.orderTracking?.estimatedDeliveryLabel || {}}
+                value={getNestedTranslation('orderTracking.estimatedDeliveryLabel')}
                 onChange={(language, value) => updateTranslation('orderTracking.estimatedDeliveryLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5911,7 +5967,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Gift Details Label"
-                value={translations?.orderTracking?.giftDetailsLabel || {}}
+                value={getNestedTranslation('orderTracking.giftDetailsLabel')}
                 onChange={(language, value) => updateTranslation('orderTracking.giftDetailsLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5920,7 +5976,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Shipping Address Label"
-                value={translations?.orderTracking?.shippingAddressLabel || {}}
+                value={getNestedTranslation('orderTracking.shippingAddressLabel')}
                 onChange={(language, value) => updateTranslation('orderTracking.shippingAddressLabel', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5929,7 +5985,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Return Home Button"
-                value={translations?.orderTracking?.returnHomeButton || {}}
+                value={getNestedTranslation('orderTracking.returnHomeButton')}
                 onChange={(language, value) => updateTranslation('orderTracking.returnHomeButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5938,7 +5994,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Print Button"
-                value={translations?.orderTracking?.printButton || {}}
+                value={getNestedTranslation('orderTracking.printButton')}
                 onChange={(language, value) => updateTranslation('orderTracking.printButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5947,7 +6003,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Support Message"
-                value={translations?.orderTracking?.supportMessage || {}}
+                value={getNestedTranslation('orderTracking.supportMessage')}
                 onChange={(language, value) => updateTranslation('orderTracking.supportMessage', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5968,7 +6024,7 @@ export function SiteConfiguration() {
             <CardContent className="space-y-4">
               <TranslatableInput
                 label="Page Title"
-                value={translations?.notFoundPage?.title || {}}
+                value={getNestedTranslation('notFoundPage.title')}
                 onChange={(language, value) => updateTranslation('notFoundPage.title', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5978,7 +6034,7 @@ export function SiteConfiguration() {
 
               <TranslatableTextarea
                 label="Error Message"
-                value={translations?.notFoundPage?.message || {}}
+                value={getNestedTranslation('notFoundPage.message')}
                 onChange={(language, value) => updateTranslation('notFoundPage.message', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5988,7 +6044,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Home Button"
-                value={translations?.notFoundPage?.homeButton || {}}
+                value={getNestedTranslation('notFoundPage.homeButton')}
                 onChange={(language, value) => updateTranslation('notFoundPage.homeButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -5997,7 +6053,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Admin Login Button"
-                value={translations?.notFoundPage?.adminLoginButton || {}}
+                value={getNestedTranslation('notFoundPage.adminLoginButton')}
                 onChange={(language, value) => updateTranslation('notFoundPage.adminLoginButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -6006,7 +6062,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Client Portal Button"
-                value={translations?.notFoundPage?.clientPortalButton || {}}
+                value={getNestedTranslation('notFoundPage.clientPortalButton')}
                 onChange={(language, value) => updateTranslation('notFoundPage.clientPortalButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -6027,7 +6083,7 @@ export function SiteConfiguration() {
             <CardContent className="space-y-4">
               <TranslatableInput
                 label="Page Title"
-                value={translations?.privacyPolicy?.title || {}}
+                value={getNestedTranslation('privacyPolicy.title')}
                 onChange={(language, value) => updateTranslation('privacyPolicy.title', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -6037,7 +6093,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Last Updated Label"
-                value={translations?.privacyPolicy?.lastUpdated || {}}
+                value={getNestedTranslation('privacyPolicy.lastUpdated')}
                 onChange={(language, value) => updateTranslation('privacyPolicy.lastUpdated', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -6046,7 +6102,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Introduction Section Title"
-                value={translations?.privacyPolicy?.introductionTitle || {}}
+                value={getNestedTranslation('privacyPolicy.introductionTitle')}
                 onChange={(language, value) => updateTranslation('privacyPolicy.introductionTitle', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -6055,7 +6111,7 @@ export function SiteConfiguration() {
 
               <TranslatableTextarea
                 label="Introduction Text"
-                value={translations?.privacyPolicy?.introductionText || {}}
+                value={getNestedTranslation('privacyPolicy.introductionText')}
                 onChange={(language, value) => updateTranslation('privacyPolicy.introductionText', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -6065,7 +6121,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Information Collected Section Title"
-                value={translations?.privacyPolicy?.informationCollectedTitle || {}}
+                value={getNestedTranslation('privacyPolicy.informationCollectedTitle')}
                 onChange={(language, value) => updateTranslation('privacyPolicy.informationCollectedTitle', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -6074,7 +6130,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="How We Use Section Title"
-                value={translations?.privacyPolicy?.howWeUseTitle || {}}
+                value={getNestedTranslation('privacyPolicy.howWeUseTitle')}
                 onChange={(language, value) => updateTranslation('privacyPolicy.howWeUseTitle', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -6083,7 +6139,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Your Rights Section Title"
-                value={translations?.privacyPolicy?.yourRightsTitle || {}}
+                value={getNestedTranslation('privacyPolicy.yourRightsTitle')}
                 onChange={(language, value) => updateTranslation('privacyPolicy.yourRightsTitle', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -6092,7 +6148,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Data Security Section Title"
-                value={translations?.privacyPolicy?.dataSecurityTitle || {}}
+                value={getNestedTranslation('privacyPolicy.dataSecurityTitle')}
                 onChange={(language, value) => updateTranslation('privacyPolicy.dataSecurityTitle', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -6101,7 +6157,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Contact Section Title"
-                value={translations?.privacyPolicy?.contactTitle || {}}
+                value={getNestedTranslation('privacyPolicy.contactTitle')}
                 onChange={(language, value) => updateTranslation('privacyPolicy.contactTitle', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -6110,7 +6166,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Privacy Settings Button"
-                value={translations?.privacyPolicy?.privacySettingsButton || {}}
+                value={getNestedTranslation('privacyPolicy.privacySettingsButton')}
                 onChange={(language, value) => updateTranslation('privacyPolicy.privacySettingsButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -6131,7 +6187,7 @@ export function SiteConfiguration() {
             <CardContent className="space-y-4">
               <TranslatableInput
                 label="Page Title"
-                value={translations?.expiredPage?.title || {}}
+                value={getNestedTranslation('expiredPage.title')}
                 onChange={(language, value) => updateTranslation('expiredPage.title', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -6141,7 +6197,7 @@ export function SiteConfiguration() {
 
               <TranslatableTextarea
                 label="Expiration Message"
-                value={translations?.expiredPage?.message || {}}
+                value={getNestedTranslation('expiredPage.message')}
                 onChange={(language, value) => updateTranslation('expiredPage.message', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -6151,7 +6207,7 @@ export function SiteConfiguration() {
 
               <TranslatableTextarea
                 label="Contact Message"
-                value={translations?.expiredPage?.contactMessage || {}}
+                value={getNestedTranslation('expiredPage.contactMessage')}
                 onChange={(language, value) => updateTranslation('expiredPage.contactMessage', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}
@@ -6161,7 +6217,7 @@ export function SiteConfiguration() {
 
               <TranslatableInput
                 label="Return Home Button"
-                value={translations?.expiredPage?.returnHomeButton || {}}
+                value={getNestedTranslation('expiredPage.returnHomeButton')}
                 onChange={(language, value) => updateTranslation('expiredPage.returnHomeButton', language, value)}
                 availableLanguages={configMode === 'draft' ? draftAvailableLanguages : availableLanguages}
                 defaultLanguage={defaultLanguage}

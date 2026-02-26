@@ -3,13 +3,14 @@ import { useNavigate, useParams } from 'react-router';
 import { useLanguage } from '../context/LanguageContext';
 import { useOrder } from '../context/OrderContext';
 import { Gift } from '../context/GiftContext';
-import { ArrowLeft, Check, Minus, Plus, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Check, Minus, Plus, ArrowRight, AlertCircle } from 'lucide-react';
 import { ConfigurableHeader } from '../components/layout/ConfigurableHeader';
 import { getCurrentEnvironment, buildApiUrl } from '../config/deploymentEnvironments';
 import { toast } from 'sonner';
 import { logger } from '../utils/logger';
 import { usePublicSite } from '../context/PublicSiteContext';
 import { useSite } from '../context/SiteContext';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export function GiftDetail() {
   const { giftId, siteId } = useParams();
@@ -130,10 +131,13 @@ export function GiftDetail() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center" role="alert">
-          <p className="text-red-500 text-lg font-bold mb-4">{error}</p>
-          <p className="text-gray-600">{t('common.redirecting')}</p>
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="max-w-md w-full space-y-4">
+          <Alert variant="destructive">
+            <AlertCircle aria-hidden="true" />
+            <AlertDescription className="text-base font-semibold">{error}</AlertDescription>
+          </Alert>
+          <p className="text-gray-600 text-center">{t('common.redirecting')}</p>
         </div>
       </div>
     );

@@ -8,6 +8,9 @@ import { toast } from 'sonner';
 import { logger } from '../utils/logger';
 import { useDateFormat } from '../hooks/useDateFormat';
 import { translateWithParams } from '../utils/translationHelpers';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface Order {
   id: string;
@@ -131,12 +134,13 @@ export function Confirmation() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <p className="text-red-500 text-lg font-bold mb-4" role="alert">{error || t('confirmation.orderNotFound')}</p>
-          <button
+          <Button
             onClick={() => void navigate('../gift-selection')}
-            className="text-[#D91C81] hover:text-[#B71569] font-medium"
+            variant="ghost"
+            className="text-[#D91C81] hover:text-[#B71569]"
           >
             {t('confirmation.returnToGiftSelection')}
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -172,80 +176,77 @@ export function Confirmation() {
           </div>
 
           {/* Order Details Card */}
-          <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
-            {/* Order Number */}
-            <div className="text-center pb-6 mb-6 border-b border-gray-200">
+          <Card className="mb-6">
+            <CardHeader className="text-center pb-6 border-b">
               <p className="text-sm text-gray-500 mb-1">{t('confirmation.orderNumber')}</p>
-              <p className="text-2xl font-bold text-gray-900">{order.orderNumber}</p>
-            </div>
+              <CardTitle className="text-2xl">{order.orderNumber}</CardTitle>
+            </CardHeader>
 
-            {/* Gift Details */}
-            <div className="mb-6">
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Package className="w-5 h-5 text-blue-600" />
-                {t('confirmation.yourGift')}
-              </h3>
-              <div className="flex gap-4 bg-gray-50 rounded-xl p-4">
-                <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                  <img
-                    src={order.giftImageUrl}
-                    alt={order.giftName}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-900 mb-1">{order.giftName}</p>
-                  <p className="text-sm text-gray-600">{order.giftCategory}</p>
-                  {allowQuantity && (
-                    <p className="text-sm text-gray-700 font-medium mt-2">
-                      {t('confirmation.quantity')} {order.quantity}
-                    </p>
-                  )}
+            <CardContent className="pt-6">
+              {/* Gift Details */}
+              <div className="mb-6">
+                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Package className="w-5 h-5 text-blue-600" />
+                  {t('confirmation.yourGift')}
+                </h3>
+                <div className="flex gap-4 bg-gray-50 rounded-xl p-4">
+                  <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                    <img
+                      src={order.giftImageUrl}
+                      alt={order.giftName}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900 mb-1">{order.giftName}</p>
+                    <Badge variant="secondary">{order.giftCategory}</Badge>
+                    {allowQuantity && (
+                      <p className="text-sm text-gray-700 font-medium mt-2">
+                        {t('confirmation.quantity')} {order.quantity}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Shipping Details */}
-            <div className="mb-6">
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Package className="w-5 h-5 text-blue-600" />
-                {t('confirmation.shippingTo')}
-              </h3>
-              <div className="bg-gray-50 rounded-xl p-4">
-                <p className="font-semibold text-gray-900">{order.shippingAddress.fullName}</p>
-                <p className="text-gray-700 text-sm mt-1">{order.shippingAddress.addressLine1}</p>
-                <p className="text-gray-700 text-sm">
-                  {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.postalCode}
-                </p>
-                <p className="text-gray-700 text-sm">{order.shippingAddress.country}</p>
-                <p className="text-gray-700 text-sm mt-2">{order.shippingAddress.phone}</p>
+              {/* Shipping Details */}
+              <div className="mb-6">
+                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Package className="w-5 h-5 text-blue-600" />
+                  {t('confirmation.shippingTo')}
+                </h3>
+                <div className="bg-gray-50 rounded-xl p-4">
+                  <p className="font-semibold text-gray-900">{order.shippingAddress.fullName}</p>
+                  <p className="text-gray-700 text-sm mt-1">{order.shippingAddress.addressLine1}</p>
+                  <p className="text-gray-700 text-sm">
+                    {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.postalCode}
+                  </p>
+                  <p className="text-gray-700 text-sm">{order.shippingAddress.country}</p>
+                  <p className="text-gray-700 text-sm mt-2">{order.shippingAddress.phone}</p>
+                </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-            <Link
-              to={`/order-tracking/${orderId}`}
-              className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#00B4CC] to-[#00E5A0] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
-            >
-              <Package className="w-5 h-5" />
-              {t('confirmation.trackOrder')}
-            </Link>
-            <Link
-              to="/my-orders"
-              className="flex items-center justify-center gap-2 bg-white text-gray-700 px-6 py-3 rounded-lg font-semibold border-2 border-gray-200 hover:border-gray-300 transition-all"
-            >
-              {t('confirmation.viewAllOrders')}
-            </Link>
-            <Link
-              to="/"
-              onClick={() => clearOrder()}
-              className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#D91C81] to-[#B71569] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
-            >
-              <Home className="w-5 h-5" />
-              {t('confirmation.returnHome')}
-            </Link>
+            <Button asChild className="gap-2 bg-gradient-to-r from-[#00B4CC] to-[#00E5A0]">
+              <Link to={`/order-tracking/${orderId}`}>
+                <Package className="w-5 h-5" />
+                {t('confirmation.trackOrder')}
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="gap-2">
+              <Link to="/my-orders">
+                {t('confirmation.viewAllOrders')}
+              </Link>
+            </Button>
+            <Button asChild className="gap-2 bg-gradient-to-r from-[#D91C81] to-[#B71569]">
+              <Link to="/" onClick={() => clearOrder()}>
+                <Home className="w-5 h-5" />
+                {t('confirmation.returnHome')}
+              </Link>
+            </Button>
           </div>
 
           {/* Support Info */}

@@ -5,6 +5,8 @@ import { usePublicSite } from '../context/PublicSiteContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { CatalogInitializer } from '../components/CatalogInitializer';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function Landing() {
   const { t } = useLanguage();
@@ -26,10 +28,24 @@ export function Landing() {
   // Show loading state while checking site configuration
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#00E5A0] via-[#0066CC] via-[#D91C81] to-[#1B2A5E] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white font-medium">Loading...</p>
+      <div className="min-h-screen bg-gradient-to-br from-[#00E5A0] via-[#0066CC] via-[#D91C81] to-[#1B2A5E]">
+        <div className="px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+          <div className="max-w-7xl mx-auto text-center">
+            <Skeleton className="h-16 w-3/4 mx-auto mb-6 bg-white/20" />
+            <Skeleton className="h-8 w-2/3 mx-auto mb-10 bg-white/20" />
+            <Skeleton className="h-14 w-48 mx-auto mb-20 bg-white/20 rounded-full" />
+            
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
+                  <Skeleton className="w-16 h-16 rounded-full mx-auto mb-4 bg-white/20" />
+                  <Skeleton className="h-6 w-3/4 mx-auto mb-3 bg-white/20" />
+                  <Skeleton className="h-4 w-full mb-2 bg-white/20" />
+                  <Skeleton className="h-4 w-5/6 mx-auto bg-white/20" />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -74,14 +90,15 @@ function DefaultLandingPage() {
             {heroSubtitle}
           </p>
 
-          <Link
-            to="access"
-            className="inline-flex items-center gap-2 sm:gap-3 bg-white text-[#D91C81] px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:bg-white/95 transition-all hover:gap-4 focus:outline-none focus:ring-4 focus:ring-white focus:ring-offset-4 focus:ring-offset-[#D91C81]"
-            style={{ boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)' }}
-          >
-            {heroCTA}
-            <Gift className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
-          </Link>
+          <Button asChild size="lg" className="gap-3 text-lg">
+            <Link
+              to="access"
+              style={{ boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)' }}
+            >
+              {heroCTA}
+              <Gift className="w-6 h-6" aria-hidden="true" />
+            </Link>
+          </Button>
         </div>
 
         {/* Features Grid */}
@@ -156,62 +173,76 @@ function DefaultLandingPage() {
       {/* Floating Buttons - Only in dev mode */}
       {import.meta.env.DEV && (
         <div className="fixed bottom-4 left-4 z-50 flex flex-col gap-2">
-          <Link
-            to="/stakeholder-review"
-            className="flex items-center gap-2 bg-gradient-to-r from-[#D91C81] to-[#1B2A5E] hover:shadow-xl text-white px-4 py-3 rounded-lg shadow-lg transition-all"
-            title="Stakeholder Review - Platform Overview"
-          >
-            <Eye className="w-5 h-5" />
-            <span className="font-semibold text-sm">📊 Stakeholder Review</span>
-          </Link>
-          <Link
-            to="/initial-seed"
-            className="flex items-center gap-2 bg-gradient-to-r from-[#00B4CC] to-[#1B2A5E] hover:shadow-xl text-white px-4 py-3 rounded-lg shadow-lg transition-all"
-            title="Seed Demo Sites - Create Stakeholder Demos"
-          >
-            <Database className="w-5 h-5" />
-            <span className="font-semibold text-sm">🌱 Seed Demo Sites</span>
-          </Link>
-          <Link
-            to="/technical-review"
-            className="flex items-center gap-2 bg-gradient-to-r from-[#1B2A5E] to-[#0F1942] hover:shadow-xl text-white px-4 py-3 rounded-lg shadow-lg transition-all"
-            title="Technical Review - Architecture & Documentation"
-          >
-            <Code className="w-5 h-5" />
-            <span className="font-semibold text-sm">⚙️ Technical Review</span>
-          </Link>
-          <Link
-            to="/feature-preview"
-            className="flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:shadow-xl text-white px-4 py-3 rounded-lg shadow-lg transition-all"
-            title="Preview New Features"
-          >
-            <Award className="w-5 h-5" />
-            <span className="font-semibold text-sm">🎨 Feature Preview</span>
-          </Link>
-          <Link
-            to="/my-orders"
-            className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:shadow-xl text-white px-4 py-3 rounded-lg shadow-lg transition-all"
-            title="View My Orders"
-          >
-            <Package className="w-5 h-5" />
-            <span className="font-semibold text-sm">My Orders</span>
-          </Link>
-          <Link
-            to="/flow-demo"
-            className="flex items-center gap-2 bg-gradient-to-r from-[#00B4CC] to-[#00E5A0] hover:shadow-xl text-white px-4 py-3 rounded-lg shadow-lg transition-all"
-            title="View 6-Step Flow Demo"
-          >
-            <Layers className="w-5 h-5" />
-            <span className="font-semibold text-sm">Flow Demo</span>
-          </Link>
-          <Link
-            to="/language-test"
-            className="flex items-center gap-2 bg-[#D91C81] hover:bg-[#B71569] text-white px-4 py-3 rounded-lg shadow-lg transition-all hover:shadow-xl"
-            title="Test Language Translations"
-          >
-            <TestTube2 className="w-5 h-5" />
-            <span className="font-semibold text-sm">Language Test</span>
-          </Link>
+          <Button asChild variant="default" className="gap-2 bg-gradient-to-r from-[#D91C81] to-[#1B2A5E] hover:shadow-xl">
+            <Link
+              to="/stakeholder-review"
+              title="Stakeholder Review - Platform Overview"
+              aria-label="View stakeholder review and platform overview"
+            >
+              <Eye className="w-5 h-5" />
+              <span className="font-semibold text-sm">📊 Stakeholder Review</span>
+            </Link>
+          </Button>
+          <Button asChild variant="default" className="gap-2 bg-gradient-to-r from-[#00B4CC] to-[#1B2A5E] hover:shadow-xl">
+            <Link
+              to="/initial-seed"
+              title="Seed Demo Sites - Create Stakeholder Demos"
+              aria-label="Seed demo sites and create stakeholder demos"
+            >
+              <Database className="w-5 h-5" />
+              <span className="font-semibold text-sm">🌱 Seed Demo Sites</span>
+            </Link>
+          </Button>
+          <Button asChild variant="default" className="gap-2 bg-gradient-to-r from-[#1B2A5E] to-[#0F1942] hover:shadow-xl">
+            <Link
+              to="/technical-review"
+              title="Technical Review - Architecture & Documentation"
+              aria-label="View technical review, architecture and documentation"
+            >
+              <Code className="w-5 h-5" />
+              <span className="font-semibold text-sm">⚙️ Technical Review</span>
+            </Link>
+          </Button>
+          <Button asChild variant="default" className="gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:shadow-xl">
+            <Link
+              to="/feature-preview"
+              title="Preview New Features"
+              aria-label="Preview new features"
+            >
+              <Award className="w-5 h-5" />
+              <span className="font-semibold text-sm">🎨 Feature Preview</span>
+            </Link>
+          </Button>
+          <Button asChild variant="default" className="gap-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:shadow-xl">
+            <Link
+              to="/my-orders"
+              title="View My Orders"
+              aria-label="View my orders"
+            >
+              <Package className="w-5 h-5" />
+              <span className="font-semibold text-sm">My Orders</span>
+            </Link>
+          </Button>
+          <Button asChild variant="default" className="gap-2 bg-gradient-to-r from-[#00B4CC] to-[#00E5A0] hover:shadow-xl">
+            <Link
+              to="/flow-demo"
+              title="View 6-Step Flow Demo"
+              aria-label="View 6-step flow demo"
+            >
+              <Layers className="w-5 h-5" />
+              <span className="font-semibold text-sm">Flow Demo</span>
+            </Link>
+          </Button>
+          <Button asChild variant="default" className="gap-2 bg-[#D91C81] hover:bg-[#B71569] hover:shadow-xl">
+            <Link
+              to="/language-test"
+              title="Test Language Translations"
+              aria-label="Test language translations"
+            >
+              <TestTube2 className="w-5 h-5" />
+              <span className="font-semibold text-sm">Language Test</span>
+            </Link>
+          </Button>
         </div>
       )}
     </div>

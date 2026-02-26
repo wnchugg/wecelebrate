@@ -8,12 +8,47 @@
 // ===== Re-export API Types =====
 export * from './api.types';
 export * from './emailTemplates';
-export * from './shippingConfig';
 export * from './catalog';  // NEW: Catalog types
 export * from './siteCustomization';  // NEW: Site customization types
-export * from './admin';  // NEW: Admin component types
-export * from './component.types';  // NEW: Component prop types
 export * from './error.types';  // NEW: Error handling types
+
+// Export admin types - explicitly to avoid conflicts
+export type {
+  SftpSchedule,
+  SftpConfigValue,
+  SftpConfig as AdminSftpConfig,
+  StoreLocationValue,
+  AdminStoreLocation,
+  ScheduleExecutionLog,
+  ScheduleExecutionStatus,
+  ScheduleExecutionResult,
+} from './admin';
+
+// Export shipping config types - explicitly to avoid conflicts
+export type {
+  ShippingMode,
+  ShippingPageConfiguration,
+  StoreLocation as ShippingStoreLocation,
+} from './shippingConfig';
+
+// Export component types - explicitly to avoid conflicts
+export type {
+  BaseComponentProps,
+  ErrorBoundaryProps,
+  ModalProps,
+  TooltipProps,
+  BadgeProps,
+  AvatarProps,
+  CardProps,
+  TabsProps,
+  DialogProps,
+  PopoverProps,
+  DropdownMenuProps,
+  SftpConfig as ComponentSftpConfig,
+  StoreLocation as ComponentStoreLocation,
+  SftpConfigModalProps,
+  StoreLocationModalProps,
+} from './component.types';
 
 // Re-export shared types from /src/types
 export type {

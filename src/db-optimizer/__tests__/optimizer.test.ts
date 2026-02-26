@@ -627,8 +627,8 @@ describe('Property 6: Permissive Policy Consolidation Detection', () => {
 
   test.prop([policySetGenerator])(
     'should identify multiple permissive policies with same table/role/action as consolidation candidates',
-    (policies) => {
-      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    (policies): void => {
+      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
       const warnings = consolidator.identifyConsolidationCandidates(policies);
 
       // Group policies manually to verify
@@ -658,8 +658,8 @@ describe('Property 6: Permissive Policy Consolidation Detection', () => {
 
   test.prop([policySetGenerator])(
     'should not identify restrictive policies as consolidation candidates',
-    (policies) => {
-      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    (policies): void => {
+      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
       const warnings = consolidator.identifyConsolidationCandidates(policies);
 
       // All warnings should only reference permissive policies
@@ -677,8 +677,8 @@ describe('Property 6: Permissive Policy Consolidation Detection', () => {
 
   test.prop([policySetGenerator])(
     'should group policies by exact table/role/action match',
-    (policies) => {
-      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    (policies): void => {
+      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
       const warnings = consolidator.identifyConsolidationCandidates(policies);
 
       // Each warning should have policies with matching table/role/action
@@ -700,8 +700,8 @@ describe('Property 6: Permissive Policy Consolidation Detection', () => {
 
   test.prop([policySetGenerator])(
     'should not create warnings for single policies',
-    (policies) => {
-      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    (policies): void => {
+      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
       const warnings = consolidator.identifyConsolidationCandidates(policies);
 
       // Each warning should reference at least 2 policies
@@ -740,7 +740,7 @@ describe('Property 6: Permissive Policy Consolidation Detection', () => {
       },
     ];
 
-    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
     const warnings = consolidator.identifyConsolidationCandidates(policies);
 
     expect(warnings.length).toBe(1);
@@ -770,7 +770,7 @@ describe('Property 6: Permissive Policy Consolidation Detection', () => {
       },
     ];
 
-    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
     const warnings = consolidator.identifyConsolidationCandidates(policies);
 
     expect(warnings.length).toBe(0);
@@ -796,7 +796,7 @@ describe('Property 6: Permissive Policy Consolidation Detection', () => {
       },
     ];
 
-    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
     const warnings = consolidator.identifyConsolidationCandidates(policies);
 
     expect(warnings.length).toBe(0);
@@ -822,7 +822,7 @@ describe('Property 6: Permissive Policy Consolidation Detection', () => {
       },
     ];
 
-    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
     const warnings = consolidator.identifyConsolidationCandidates(policies);
 
     expect(warnings.length).toBe(0);
@@ -876,8 +876,8 @@ describe('Property 7: OR Logic Consolidation', () => {
 
   test.prop([policySetGenerator, warningGenerator])(
     'should combine USING clauses with OR logic',
-    (policies, warning) => {
-      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    (policies, warning): void => {
+      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
       const consolidated = (consolidator as any).mergePolicies(policies, warning);
 
       // Each original USING clause should appear in the consolidated USING
@@ -897,8 +897,8 @@ describe('Property 7: OR Logic Consolidation', () => {
 
   test.prop([policySetGenerator, warningGenerator])(
     'should combine WITH CHECK clauses with OR logic when present',
-    (policies, warning) => {
-      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    (policies, warning): void => {
+      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
       const consolidated = (consolidator as any).mergePolicies(policies, warning);
 
       const withCheckPolicies = policies.filter(p => p.withCheck && p.withCheck.trim() !== '');
@@ -925,8 +925,8 @@ describe('Property 7: OR Logic Consolidation', () => {
 
   test.prop([policySetGenerator, warningGenerator])(
     'should wrap each clause in parentheses',
-    (policies, warning) => {
-      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    (policies, warning): void => {
+      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
       const consolidated = (consolidator as any).mergePolicies(policies, warning);
 
       // Count parentheses in USING clause
@@ -955,8 +955,8 @@ describe('Property 7: OR Logic Consolidation', () => {
 
   test.prop([policySetGenerator, warningGenerator])(
     'should preserve all original policy logic',
-    (policies, warning) => {
-      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    (policies, warning): void => {
+      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
       const consolidated = (consolidator as any).mergePolicies(policies, warning);
 
       // All non-empty USING clauses should be present
@@ -989,7 +989,7 @@ describe('Property 7: OR Logic Consolidation', () => {
       policyNames: ['policy_1', 'policy_2'],
     };
 
-    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
     const consolidated = (consolidator as any).mergePolicies(policies, warning);
 
     expect(consolidated.using).toBe('(user_id = 1) OR (user_id = 2)');
@@ -1009,7 +1009,7 @@ describe('Property 7: OR Logic Consolidation', () => {
       policyNames: ['policy_1', 'policy_2', 'policy_3'],
     };
 
-    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
     const consolidated = (consolidator as any).mergePolicies(policies, warning);
 
     expect(consolidated.using).toBe('(user_id = 1) OR (user_id = 2) OR (user_id = 3)');
@@ -1028,7 +1028,7 @@ describe('Property 7: OR Logic Consolidation', () => {
       policyNames: ['policy_1', 'policy_2'],
     };
 
-    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
     const consolidated = (consolidator as any).mergePolicies(policies, warning);
 
     expect(consolidated.using).toBe('(user_id = 1) OR (user_id = 2)');
@@ -1049,7 +1049,7 @@ describe('Property 7: OR Logic Consolidation', () => {
       policyNames: ['policy_1', 'policy_2', 'policy_3'],
     };
 
-    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
     const consolidated = (consolidator as any).mergePolicies(policies, warning);
 
     expect(consolidated.using).toBe('(user_id = 1) OR (user_id = 2) OR (user_id = 3)');
@@ -1069,7 +1069,7 @@ describe('Property 7: OR Logic Consolidation', () => {
       policyNames: ['policy_1', 'policy_2'],
     };
 
-    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
     const consolidated = (consolidator as any).mergePolicies(policies, warning);
 
     expect(consolidated.using).toBe('(user_id = 1) OR (user_id = 2)');
@@ -1101,7 +1101,7 @@ describe('Property 8: Conflicting Policy Detection', () => {
       { name: 'policy_2', using: 'user_id = 1', withCheck: 'status = false' },
     ];
 
-    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
     const hasConflict = (consolidator as any).hasConflictingClauses(policies);
 
     // Current implementation returns false (allows consolidation)
@@ -1115,7 +1115,7 @@ describe('Property 8: Conflicting Policy Detection', () => {
       { name: 'policy_2', using: 'user_id = 2', withCheck: 'status = true' },
     ];
 
-    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
     const hasConflict = (consolidator as any).hasConflictingClauses(policies);
 
     expect(hasConflict).toBe(false);
@@ -1127,7 +1127,7 @@ describe('Property 8: Conflicting Policy Detection', () => {
       { name: 'policy_2', using: 'user_id = 2' },
     ];
 
-    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
     const hasConflict = (consolidator as any).hasConflictingClauses(policies);
 
     expect(hasConflict).toBe(false);
@@ -1139,7 +1139,7 @@ describe('Property 8: Conflicting Policy Detection', () => {
       { name: 'policy_2', using: 'user_id = 2' },
     ];
 
-    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
     const hasConflict = (consolidator as any).hasConflictingClauses(policies);
 
     expect(hasConflict).toBe(false);
@@ -1168,8 +1168,8 @@ describe('Property 8: Conflicting Policy Detection', () => {
     )
   ])(
     'should not falsely detect conflicts in random policy sets',
-    (policies) => {
-      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    (policies): void => {
+      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
       const hasConflict = (consolidator as any).hasConflictingClauses(policies);
 
       // Current implementation should always return false
@@ -1239,7 +1239,7 @@ describe('Property 8: Conflicting Policy Detection', () => {
             roles: ['authenticated'],
             cmd: 'SELECT',
             qual: 'user_id = 1',
-            with_check: null,
+            with_check: null as any,
           };
         } else if (policyName === 'policy_2') {
           return {
@@ -1300,8 +1300,8 @@ describe('Property 9: Policy Type Separation', () => {
 
   test.prop([mixedPolicySetGenerator])(
     'should never consolidate permissive and restrictive policies together',
-    (policies) => {
-      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    (policies): void => {
+      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
       const warnings = consolidator.identifyConsolidationCandidates(policies);
 
       // Verify that all warnings only reference permissive policies
@@ -1324,8 +1324,8 @@ describe('Property 9: Policy Type Separation', () => {
 
   test.prop([mixedPolicySetGenerator])(
     'should only identify permissive policies as consolidation candidates',
-    (policies) => {
-      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    (policies): void => {
+      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
       const warnings = consolidator.identifyConsolidationCandidates(policies);
 
       // Count permissive policies that could be consolidated
@@ -1351,8 +1351,8 @@ describe('Property 9: Policy Type Separation', () => {
 
   test.prop([mixedPolicySetGenerator])(
     'should create separate consolidation groups for permissive and restrictive policies',
-    (policies) => {
-      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    (policies): void => {
+      const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
       const warnings = consolidator.identifyConsolidationCandidates(policies);
 
       // For each table/role/action combination, verify that permissive and restrictive
@@ -1417,7 +1417,7 @@ describe('Property 9: Policy Type Separation', () => {
       },
     ];
 
-    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
     const warnings = consolidator.identifyConsolidationCandidates(policies);
 
     // Should only create one warning for the two permissive policies
@@ -1446,7 +1446,7 @@ describe('Property 9: Policy Type Separation', () => {
       },
     ];
 
-    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
     const warnings = consolidator.identifyConsolidationCandidates(policies);
 
     // Should not create any warnings for restrictive policies
@@ -1508,19 +1508,19 @@ describe('Property 9: Policy Type Separation', () => {
       },
     ];
 
-    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async () => null });
+    const consolidator = new (PolicyConsolidator as any)({ getPolicyDefinition: async (): Promise<null> => null });
     const warnings = consolidator.identifyConsolidationCandidates(policies);
 
     // Should create two warnings: one for SELECT permissive, one for INSERT permissive
     expect(warnings.length).toBe(2);
 
     // Find SELECT warning
-    const selectWarning = warnings.find(w => w.action === 'SELECT');
+    const selectWarning = warnings.find((w: any) => w.action === 'SELECT');
     expect(selectWarning).toBeDefined();
     expect(selectWarning!.policyNames).toEqual(['perm_select_1', 'perm_select_2']);
 
     // Find INSERT warning
-    const insertWarning = warnings.find(w => w.action === 'INSERT');
+    const insertWarning = warnings.find((w: any) => w.action === 'INSERT');
     expect(insertWarning).toBeDefined();
     expect(insertWarning!.policyNames).toEqual(['perm_insert_1', 'perm_insert_2']);
 
@@ -1537,7 +1537,7 @@ describe('Property 9: Policy Type Separation', () => {
     // consolidation if it detected mixed types (currently returns false as placeholder)
     
     const mockDb = {
-      getPolicyDefinition: async () => null,
+      getPolicyDefinition: async (): Promise<null> => null,
     };
 
     const consolidator = new (PolicyConsolidator as any)(mockDb);

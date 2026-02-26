@@ -422,7 +422,7 @@ export function ScheduledEmailManagement() {
         {showForm && (
           <ScheduleEmailForm
             siteId={currentSite.id}
-            onSave={() => void handleScheduleEmail()}
+            onSave={handleScheduleEmail}
             onCancel={() => setShowForm(false)}
           />
         )}

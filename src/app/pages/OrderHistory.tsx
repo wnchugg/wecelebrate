@@ -8,6 +8,7 @@ import { Package, ArrowLeft, Calendar, Eye, ShoppingBag } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { CurrencyDisplay } from '../components/CurrencyDisplay';
 import { useDateFormat } from '../hooks/useDateFormat';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface OrderSummary {
   id: string;
@@ -79,10 +80,51 @@ export function OrderHistory() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-[#D91C81] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading order history...</p>
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white shadow-sm sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Skeleton className="w-5 h-5" />
+                <Skeleton className="h-8 w-[88px]" />
+              </div>
+              <Skeleton className="h-10 w-32" />
+            </div>
+          </div>
+        </header>
+
+        <div className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-8">
+              <Skeleton className="h-10 w-64 mx-auto mb-2" />
+              <Skeleton className="h-6 w-48 mx-auto" />
+            </div>
+
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-xl shadow-md p-6">
+                  <div className="flex flex-col sm:flex-row gap-6">
+                    <Skeleton className="w-24 h-24 rounded-lg" />
+                    <div className="flex-1 space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-2 flex-1">
+                          <Skeleton className="h-6 w-48" />
+                          <Skeleton className="h-4 w-32" />
+                        </div>
+                        <Skeleton className="h-6 w-20 rounded-full" />
+                      </div>
+                      <div className="flex gap-4">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-4 w-28" />
+                      </div>
+                      <Skeleton className="h-5 w-40" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );

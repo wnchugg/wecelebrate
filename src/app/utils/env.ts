@@ -72,7 +72,7 @@ export function hasEnvVar(key: keyof ImportMetaEnv): boolean {
  */
 export function getAllEnvVars(): Partial<ImportMetaEnv> {
   const env = safeGetEnv();
-  return env ? { ...env } : {};
+  return env && typeof env === 'object' ? { ...env as ImportMetaEnv } : {};
 }
 
 /**

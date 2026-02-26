@@ -831,6 +831,6 @@ describe('Property 1: Parser categorization', () => {
       expect(warning).toHaveProperty('schemaName');
       expect(warning).toHaveProperty('indexName');
     }
-  }, { numRuns: 100 });
+  });
 });
 

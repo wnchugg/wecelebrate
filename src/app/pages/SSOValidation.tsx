@@ -8,6 +8,7 @@ import { logSecurityEvent } from '../utils/security';
 import { getCurrentEnvironment, buildApiUrl } from '../config/deploymentEnvironments';
 import { useSite } from '../context/SiteContext';
 import Logo from '../../imports/Logo';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export function SSOValidation() {
   const navigate = useNavigate();
@@ -261,10 +262,10 @@ export function SSOValidation() {
               </button>
 
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3" role="alert" aria-live="polite">
-                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                  <p className="text-sm text-red-800">{error}</p>
-                </div>
+                <Alert variant="destructive">
+                  <AlertCircle aria-hidden="true" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
               )}
             </div>
 

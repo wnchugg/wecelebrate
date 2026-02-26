@@ -572,7 +572,7 @@ export function SiteManagement() {
         }}
         site={editingSite}
         clients={clients}
-        onSave={() => void handleSaveSite()}
+        onSave={handleSaveSite}
       />
     </div>
   );
@@ -836,7 +836,7 @@ function SiteModal({ open, onClose, site, clients, onSave }: SiteModalProps) {
           })}
         </div>
 
-        <form onSubmit={() => void handleSubmit()} className="space-y-6">
+        <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
           {/* Step 1: Basic Information */}
           {currentStep === 1 && (
             <div className="space-y-4">
@@ -956,7 +956,7 @@ function SiteModal({ open, onClose, site, clients, onSave }: SiteModalProps) {
                         type="file"
                         className="hidden"
                         accept="image/*"
-                        onChange={() => void handleLogoUpload()}
+                        onChange={(e) => void handleLogoUpload(e)}
                         disabled={uploadingLogo}
                       />
                     </label>

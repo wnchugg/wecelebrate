@@ -8,7 +8,7 @@
 export * from './models';
 export * from './parser';
 export * from './analyzer';
-export * from './optimizer';
+export { PolicyConsolidator as OptimizerPolicyConsolidator } from './optimizer';
 export * from './validator';
 export * from './estimator';
 export * from './migration';

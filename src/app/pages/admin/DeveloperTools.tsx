@@ -112,7 +112,24 @@ export function DeveloperTools() {
   // Connection Test Logic
   const runConnectionTest = async () => {
     setIsLoadingConnection(true);
-    const results: Record<string, unknown> = {
+    
+    interface ConnectionTest {
+      name: string;
+      projectId: string;
+      url: string;
+      status: number | string;
+      ok: boolean;
+      data?: unknown;
+      error?: string;
+    }
+    
+    const results: {
+      timestamp: string;
+      figmaMakeConfig: Record<string, unknown>;
+      currentEnvironment: unknown;
+      allEnvironments: unknown;
+      connectionTests: ConnectionTest[];
+    } = {
       timestamp: new Date().toISOString(),
       figmaMakeConfig: {
         projectId,
@@ -199,7 +216,7 @@ export function DeveloperTools() {
         hasToken: !!token,
         token: token ? `${token.substring(0, 20)}...` : 'No token',
       },
-      endpoints: {},
+      endpoints: {} as Record<string, unknown>,
     };
 
     // Test endpoints
@@ -242,14 +259,14 @@ export function DeveloperTools() {
           data = { raw: responseText, parseError };
         }
 
-        diagnosticResults.endpoints[endpoint.name] = {
+        (diagnosticResults.endpoints as Record<string, unknown>)[endpoint.name] = {
           status: response.status,
           ok: response.ok,
           data: data,
           error: parseError,
         };
       } catch (error: any) {
-        diagnosticResults.endpoints[endpoint.name] = {
+        (diagnosticResults.endpoints as Record<string, unknown>)[endpoint.name] = {
           status: 0,
           ok: false,
           data: null,

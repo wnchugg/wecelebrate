@@ -4,7 +4,8 @@
  */
 
 import { apiClient } from '../lib/apiClient';
-import type { Gift, Event, Order, Employee, Site, Client, User } from '../types';
+import type { Gift, Event, Order, Employee, Site, Client } from '../types';
+import type { User } from '../context/AuthContext';
 
 /**
  * Extended API client with convenience methods

@@ -20,6 +20,7 @@ import {
 import { CurrencyDisplay } from '../components/CurrencyDisplay';
 import { useDateFormat } from '../hooks/useDateFormat';
 import { translateWithParams } from '../utils/translationHelpers';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Order {
   id: string;
@@ -165,10 +166,69 @@ export function OrderTracking() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-[#D91C81] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading order details...</p>
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white shadow-sm sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Skeleton className="w-5 h-5" />
+                <Skeleton className="h-8 w-[88px]" />
+              </div>
+              <Skeleton className="h-10 w-32" />
+            </div>
+          </div>
+        </header>
+
+        <div className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-8">
+              <Skeleton className="h-10 w-64 mx-auto mb-2" />
+              <Skeleton className="h-6 w-80 mx-auto mb-4" />
+              <Skeleton className="h-4 w-64 mx-auto" />
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-6">
+              <Skeleton className="h-6 w-32 mb-6" />
+              <div className="space-y-8">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="flex items-start gap-4">
+                    <Skeleton className="w-12 h-12 rounded-full flex-shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-6 w-40" />
+                      <Skeleton className="h-4 w-64" />
+                      <Skeleton className="h-3 w-48" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-2xl shadow-lg p-6">
+                <Skeleton className="h-6 w-32 mb-4" />
+                <div className="flex gap-4">
+                  <Skeleton className="w-20 h-20 rounded-lg" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-5 w-full" />
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-28" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl shadow-lg p-6">
+                <Skeleton className="h-6 w-40 mb-4" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-2/3" />
+                  <Skeleton className="h-4 w-32 mt-4" />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );

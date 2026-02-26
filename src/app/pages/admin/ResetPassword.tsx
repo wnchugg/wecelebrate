@@ -331,7 +331,7 @@ export default function ResetPassword() {
         </div>
 
         {/* Reset Form */}
-        <form onSubmit={() => void handleSubmit()} className="space-y-6">
+        <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
           {/* New Password Field */}
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">

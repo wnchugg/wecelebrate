@@ -246,7 +246,7 @@ class TokenManager {
    */
   getTokenExpiration(token: string): number | null {
     const parsed = this.parseToken(token);
-    return parsed?.exp ? parsed.exp * 1000 : null;
+    return parsed?.exp && typeof parsed.exp === 'number' ? parsed.exp * 1000 : null;
   }
 
   /**
@@ -366,7 +366,7 @@ export const isValidJWT = (token: string | null | undefined): boolean => {
 
 export const getTokenExpiry = (token: string): number | null => {
   const parsed = parseJWT(token);
-  if (!parsed || !parsed.payload || !parsed.payload.exp) {
+  if (!parsed || !parsed.payload || !parsed.payload.exp || typeof parsed.payload.exp !== 'number') {
     return null;
   }
   return parsed.payload.exp * 1000; // Convert seconds to milliseconds

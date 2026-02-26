@@ -26,5 +26,5 @@ export function PrefetchLink({ prefetchFn, onMouseEnter, ...props }: PrefetchLin
     }
   };
 
-  return <Link {...props} onMouseEnter={() => void handleMouseEnter()} />;
+  return <Link {...props} onMouseEnter={(e) => void handleMouseEnter(e)} />;
 }

@@ -111,7 +111,7 @@ export function BootstrapAdmin() {
           </div>
         )}
 
-        <form onSubmit={() => void handleSubmit()} className="space-y-4">
+        <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
           <div>
             <label htmlFor="bootstrap-email" className="block text-sm font-medium text-gray-700 mb-2">
               Email Address

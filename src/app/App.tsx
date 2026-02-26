@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import { RouterProvider } from 'react-router';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { Toaster } from 'sonner';
+import { Toaster } from '@/components/ui/sonner';
 import { router } from './routes';
 import { LanguageProvider } from './context/LanguageContext';
 import { AdminProvider } from './context/AdminContext';

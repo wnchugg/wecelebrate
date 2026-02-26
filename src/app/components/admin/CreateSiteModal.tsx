@@ -191,7 +191,7 @@ export function CreateSiteModal({ isOpen, onClose, onSuccess, clients }: CreateS
           </div>
         </div>
 
-        <form onSubmit={() => void handleSubmit()} className="flex-1 overflow-y-auto">
+        <form onSubmit={(e) => void handleSubmit(e)} className="flex-1 overflow-y-auto">
           {/* Step 0: Template Selection */}
           {step === 0 && (
             <div className="p-6 space-y-6">

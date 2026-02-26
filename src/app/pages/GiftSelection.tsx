@@ -10,6 +10,10 @@ import { useSite } from '../context/SiteContext';
 import { defaultGiftSelectionConfig } from '../types/siteCustomization';
 import { mergeGiftSelectionConfig } from '../utils/configMerge';
 import { translateWithParams } from '../utils/translationHelpers';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Gift {
   id: string;
@@ -192,10 +196,39 @@ export function GiftSelection() {
   
   if (isLoading) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] py-12 px-4 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-[#D91C81] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">{t('gifts.loadingGifts')}</p>
+      <div className="min-h-screen bg-gray-50">
+        <div className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            {/* Header */}
+            <div className="text-center mb-8 sm:mb-12">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                {t('gifts.title')}
+              </h1>
+              <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
+                {t('gifts.curatedSelection')}
+              </p>
+            </div>
+            
+            {/* Skeleton Loaders */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Card key={i}>
+                  <CardHeader className="p-0">
+                    <Skeleton className="h-64 w-full" />
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <Skeleton className="h-6 w-3/4 mb-2" />
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-5/6 mb-4" />
+                    <div className="flex items-center justify-between">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-4 w-16" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -276,13 +309,15 @@ export function GiftSelection() {
                   {translateWithParams(t, 'gifts.showingCount', { shown: filteredGifts.length, total: gifts.length })}
                 </p>
                 {(searchQuery || selectedCategory !== 'all' || sortBy !== 'name') && (
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={clearFilters}
-                    className="flex items-center gap-2 text-[#D91C81] hover:text-[#B71569] font-medium text-sm transition-colors"
+                    className="gap-2 text-[#D91C81] hover:text-[#B71569]"
                   >
                     <X className="w-4 h-4" />
                     {t('gifts.clearFilters')}
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -297,12 +332,12 @@ export function GiftSelection() {
                 {error || config.messages.noResults}
               </p>
               {!error && (
-                <button
+                <Button
                   onClick={clearFilters}
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-[#D91C81] to-[#B71569] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
+                  className="gap-2 bg-gradient-to-r from-[#D91C81] to-[#B71569]"
                 >
                   {t('gifts.clearAllFilters')}
-                </button>
+                </Button>
               )}
             </div>
           )}
@@ -333,17 +368,24 @@ export function GiftSelection() {
                   '';
 
                 return (
-                  <div
+                  <Card
                     key={gift.id}
-                    className={`bg-white rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl ${hoverClass}`}
+                    className={`overflow-hidden transition-all duration-300 hover:shadow-2xl ${hoverClass} cursor-pointer`}
+                    onClick={() => handleSelectGift(gift.id)}
+                    onMouseEnter={() => setHoveredId(gift.id)}
+                    onMouseLeave={() => setHoveredId(null)}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`Select ${gift.name}`}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleSelectGift(gift.id);
+                      }
+                    }}
                   >
-                    <button
-                      onClick={() => handleSelectGift(gift.id)}
-                      onMouseEnter={() => setHoveredId(gift.id)}
-                      onMouseLeave={() => setHoveredId(null)}
-                      className="w-full text-left focus:outline-none focus:ring-4 focus:ring-[#D91C81] focus:ring-offset-2 rounded-2xl"
-                    >
-                      {/* Image */}
+                    {/* Image */}
+                    <CardHeader className="p-0">
                       <div className={`relative overflow-hidden bg-gray-100 ${
                         config.display.imageAspectRatio === '1:1' ? 'h-64' :
                         config.display.imageAspectRatio === '4:3' ? 'h-48' :
@@ -370,42 +412,46 @@ export function GiftSelection() {
                         )}
                         {/* Category Badge */}
                         <div className="absolute top-4 left-4">
-                          <span className="inline-block bg-white/90 backdrop-blur-sm text-[#D91C81] px-3 py-1 rounded-full text-xs font-semibold">
+                          <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm text-[#D91C81]">
                             {gift.category}
-                          </span>
+                          </Badge>
                         </div>
                       </div>
+                    </CardHeader>
 
-                      {/* Content */}
-                      <div className="p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-2">{gift.name}</h2>
-                        <p className="text-sm text-gray-600 mb-4 line-clamp-2">{gift.description}</p>
-                        
-                        {/* Price (conditional) */}
-                        {config.display.showPrices && gift.value && (
-                          <p className="text-sm font-semibold text-gray-900 mb-2">
-                            ${gift.value.toFixed(2)}
-                          </p>
+                    {/* Content */}
+                    <CardContent className="p-6">
+                      <CardTitle className="text-lg mb-2">{gift.name}</CardTitle>
+                      <CardDescription className="mb-4 line-clamp-2">{gift.description}</CardDescription>
+                      
+                      {/* Price (conditional) */}
+                      {config.display.showPrices && gift.value && (
+                        <p className="text-sm font-semibold text-gray-900 mb-2">
+                          ${gift.value.toFixed(2)}
+                        </p>
+                      )}
+                      
+                      {/* CTA */}
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm font-semibold ${
+                          isHovered ? 'text-[#D91C81]' : 'text-gray-700'
+                        } transition-colors`}>
+                          {t('gifts.viewDetails')} →
+                        </span>
+                        {config.display.showInventory && (
+                          gift.available ? (
+                            <Badge variant="outline" className="text-green-600 border-green-600">
+                              {t('gifts.inStock')}
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-red-600 border-red-600">
+                              {t('gifts.outOfStock')}
+                            </Badge>
+                          )
                         )}
-                        
-                        {/* CTA */}
-                        <div className="flex items-center justify-between">
-                          <span className={`text-sm font-semibold ${
-                            isHovered ? 'text-[#D91C81]' : 'text-gray-700'
-                          } transition-colors`}>
-                            {t('gifts.viewDetails')} →
-                          </span>
-                          {config.display.showInventory && (
-                            gift.available ? (
-                              <span className="text-xs text-green-600 font-medium">{t('gifts.inStock')}</span>
-                            ) : (
-                              <span className="text-xs text-red-600 font-medium">{t('gifts.outOfStock')}</span>
-                            )
-                          )}
-                        </div>
                       </div>
-                    </button>
-                  </div>
+                    </CardContent>
+                  </Card>
                 );
               })}
             </div>

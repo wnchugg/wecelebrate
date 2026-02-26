@@ -124,7 +124,7 @@ export function throttleAsync<T extends (...args: unknown[]) => Promise<unknown>
   return (async (...args: unknown[]) => {
     if (isThrottled) {
       pendingArgs = args;
-      return;
+      return undefined;
     }
     
     isThrottled = true;
@@ -292,7 +292,7 @@ export function memoizeAsync<T extends (...args: unknown[]) => Promise<unknown>>
       cache.delete(key);
     }
     
-    const value = await fn(...args);
+    const value = await fn(...args) as Awaited<ReturnType<T>>;
     cache.set(key, { value, timestamp: Date.now() });
     
     return value;

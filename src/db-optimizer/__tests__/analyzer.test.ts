@@ -70,7 +70,7 @@ describe('IndexAnalyzer', () => {
         expect(opt.schemaName).toBe(schemaName);
         expect(opt.indexToRemove).toBeDefined();
       });
-    }, { numRuns: 100 });
+    });
   });
 
   describe('Property 11: Duplicate Index Preservation', () => {
@@ -115,7 +115,7 @@ describe('IndexAnalyzer', () => {
       
       // At least one index should be preserved
       expect(preservedIndexes.length).toBeGreaterThanOrEqual(1);
-    }, { numRuns: 100 });
+    });
   });
 
   describe('Property 12: Explicit Name Preference', () => {
@@ -178,7 +178,7 @@ describe('IndexAnalyzer', () => {
         );
         expect(hasExplicitPreserved).toBe(true);
       }
-    }, { numRuns: 100 });
+    });
   });
 
   describe('Property 13: Constraint-Backed Index Preservation', () => {
@@ -230,7 +230,7 @@ describe('IndexAnalyzer', () => {
       // Note: Without actual DB connection, we can't verify constraint backing,
       // but the implementation should handle this correctly
       expect(removedIndexNames).toBeDefined();
-    }, { numRuns: 100 });
+    });
   });
 
   describe('Property 14: Unindexed Foreign Key Detection', () => {
@@ -274,7 +274,7 @@ describe('IndexAnalyzer', () => {
       expect(fkOpt.schemaName).toBe(schemaName);
       expect(fkOpt.indexToCreate).toBeDefined();
       expect(fkOpt.indexToCreate?.columns.length).toBe(columnCount);
-    }, { numRuns: 100 });
+    });
   });
 
   describe('Property 15: Foreign Key Index Column Order', () => {
@@ -323,7 +323,7 @@ describe('IndexAnalyzer', () => {
         // Verify columns are in order (for mock data: column_1, column_2, etc.)
         expect(columns[i]).toBeDefined();
       }
-    }, { numRuns: 100 });
+    });
   });
 
   describe('Property 16: Composite Foreign Key Indexes', () => {
@@ -385,7 +385,7 @@ describe('IndexAnalyzer', () => {
       expect(fkOpt.tableName).toBe(tableName);
       expect(fkOpt.schemaName).toBe(schemaName);
       expect(fkOpt.estimatedImpact).toBeDefined();
-    }, { numRuns: 100 });
+    });
   });
 
   describe('Property 17: Unused Index Detection', () => {
@@ -428,7 +428,7 @@ describe('IndexAnalyzer', () => {
       
       // Verify the optimization is for removing an unused index
       expect(removal.type).toBe('remove_unused');
-    }, { numRuns: 100 });
+    });
   });
 
   describe('Property 18: Unused Duplicate Prioritization', () => {
@@ -468,8 +468,8 @@ describe('IndexAnalyzer', () => {
 
       // Create mock DB connection with usage stats
       const mockDbConnection = {
-        getIndexDefinition: async () => null,
-        getIndexUsageStats: async (schema: string, table: string, indexName: string) => {
+        getIndexDefinition: async (): Promise<null> => null,
+        getIndexUsageStats: async (schema: string, table: string, indexName: string): Promise<{ idx_scan: number } | null> => {
           // Return usage stats based on whether index is in used or unused list
           if (usedIndexNames.includes(indexName)) {
             return { idx_scan: 100 }; // Used index
@@ -478,7 +478,7 @@ describe('IndexAnalyzer', () => {
           }
           return null;
         },
-        executeQuery: async () => [], // No constraint backing
+        executeQuery: async (): Promise<any[]> => [], // No constraint backing
       };
 
       const analyzer = new IndexAnalyzer(mockDbConnection);
@@ -530,7 +530,7 @@ describe('IndexAnalyzer', () => {
           }
         }
       }
-    }, { numRuns: 100 });
+    });
   });
 
   describe('Property 19: Recent Index Protection', () => {
@@ -558,9 +558,9 @@ describe('IndexAnalyzer', () => {
       
       // Create mock DB connection that returns creation time and usage stats
       const mockDbConnection = {
-        getIndexDefinition: async () => null,
-        getIndexUsageStats: async () => ({ idx_scan: 0 }), // Unused index
-        executeQuery: async (query: string) => {
+        getIndexDefinition: async (): Promise<null> => null,
+        getIndexUsageStats: async (): Promise<{ idx_scan: number }> => ({ idx_scan: 0 }), // Unused index
+        executeQuery: async (query: string): Promise<any[]> => {
           // Return empty for constraint check (not constraint-backed)
           if (query.includes('pg_constraint')) {
             return [];
@@ -604,7 +604,7 @@ describe('IndexAnalyzer', () => {
         expect(removal.estimatedImpact).not.toContain('flagged for manual review');
         expect(removal.estimatedImpact).toContain('Removes unused index');
       }
-    }, { numRuns: 100 });
+    });
   });
 });
 

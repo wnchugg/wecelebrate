@@ -83,7 +83,7 @@ describe('Catalog API Service', () => {
         description: 'Test description',
         type: 'erp' as const,
         status: 'active' as const,
-        source: {
+        source: { type: "api" as const,
           sourceSystem: 'TestERP',
           sourceId: 'TEST-001',
           apiEndpoint: 'https://api.test.com',
@@ -96,7 +96,7 @@ describe('Catalog API Service', () => {
         },
       };
 
-      const result = await createCatalog(newCatalogData);
+      const result = await createCatalog(newCatalogData as any);
 
       expect(result).toBeDefined();
       expect(result.catalog.id).toBeDefined();

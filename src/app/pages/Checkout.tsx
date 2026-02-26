@@ -101,7 +101,7 @@ export function Checkout() {
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Form Section */}
         <div className="lg:col-span-2">
-          <form onSubmit={() => void handleSubmit()} className="space-y-6">
+          <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
             {/* Shipping Type */}
             {shippingType && (
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center gap-3">

@@ -40,37 +40,37 @@ describe('Button Component', () => {
     it('should render default variant', () => {
       renderWithRouter(<Button variant="default">Default</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-primary');
+      expect(button.className).toContain('bg-primary');
     });
 
     it('should render destructive variant', () => {
       renderWithRouter(<Button variant="destructive">Delete</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-destructive');
+      expect(button.className).toContain('bg-destructive');
     });
 
     it('should render outline variant', () => {
       renderWithRouter(<Button variant="outline">Outline</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('border');
+      expect(button.className).toContain('border');
     });
 
     it('should render secondary variant', () => {
       renderWithRouter(<Button variant="secondary">Secondary</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-secondary');
+      expect(button.className).toContain('bg-secondary');
     });
 
     it('should render ghost variant', () => {
       renderWithRouter(<Button variant="ghost">Ghost</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('hover:bg-accent');
+      expect(button.className).toContain('hover:bg-accent');
     });
 
     it('should render link variant', () => {
       renderWithRouter(<Button variant="link">Link</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('underline-offset-4');
+      expect(button.className).toContain('underline-offset-4');
     });
   });
 

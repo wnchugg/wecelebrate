@@ -135,13 +135,13 @@ export function BrandsManagement() {
       const data = await apiRequest('/v2/brands/extract-colors', {
         method: 'POST',
         body: JSON.stringify({ url: extractUrl }),
-      });
+      }) as { success: boolean; error?: string; colors?: string[] };
       
       if (!data.success) {
         throw new Error(data.error || 'Failed to extract colors from website');
       }
 
-      setExtractedColors(data.colors || []);
+      setExtractedColors((data.colors || []) as any);
       
       if (data.colors && data.colors.length > 0) {
         showSuccessToast(`Extracted ${data.colors.length} colors from website`);
@@ -390,7 +390,7 @@ export function BrandsManagement() {
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={() => void handleCreateOrUpdate()}>
+          <form onSubmit={(e) => void handleCreateOrUpdate(e)}>
             <div className="space-y-4">
               <div>
                 <Label htmlFor="clientId">Client *</Label>

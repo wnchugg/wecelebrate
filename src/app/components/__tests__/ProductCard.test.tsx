@@ -25,7 +25,7 @@ vi.mock('../../hooks/useUnits', () => ({
 }));
 
 vi.mock('../../components/CurrencyDisplay', () => ({
-  CurrencyDisplay: ({ amount }: { amount: number }) => <span>{amount}</span>,
+  CurrencyDisplay: ({ amount }: { amount: number }) => <span>${amount}</span>,
 }));
 
 // Mock out of stock product

@@ -353,7 +353,7 @@ export function ProductBulkImport() {
                 ref={fileInputRef}
                 type="file"
                 accept=".csv,.xlsx,.xls,.txt"
-                onChange={() => void handleFileSelect()}
+                onChange={(e) => void handleFileSelect(e)}
                 className="hidden"
                 id="file-upload"
               />

@@ -672,7 +672,7 @@ export function AccessManagement({
             loading={loading}
             onEditUser={handleEditUser}
             onSetPassword={handleSetPassword}
-            onProxyLogin={() => void handleProxyLogin()}
+            onProxyLogin={handleProxyLogin}
             hasProxyPermission={hasProxyPermission}
           />
         </div>
@@ -808,7 +808,7 @@ export function AccessManagement({
           setShowEditUserModal(false);
           setSelectedUser(null);
         }}
-        onSave={() => void handleSaveUser()}
+        onSave={handleSaveUser}
       />
 
       <SetPasswordModal
@@ -818,7 +818,7 @@ export function AccessManagement({
           setShowSetPasswordModal(false);
           setSelectedUser(null);
         }}
-        onSetPassword={() => void handleSavePassword()}
+        onSetPassword={handleSavePassword}
       />
     </div>
   );

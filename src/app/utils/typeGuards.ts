@@ -386,7 +386,7 @@ export function safeGet<T>(
     current = current[key];
   }
   
-  return isDefined(current) ? current : defaultValue;
+  return isDefined(current) ? (current as T) : defaultValue;
 }
 
 export function safeSet<T extends Record<string, unknown>>(
@@ -407,7 +407,7 @@ export function safeSet<T extends Record<string, unknown>>(
     if (!isObject(current[key])) {
       current[key] = {};
     }
-    current = current[key];
+    current = current[key] as Record<string, unknown>;
   }
   
   current[lastKey] = value;

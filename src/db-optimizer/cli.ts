@@ -374,7 +374,7 @@ async function analyzeIndexesCommand() {
       for (const fk of unindexedFKs) {
         // Parse fk_columns if it's a string (PostgreSQL array format)
         const columns = typeof fk.fk_columns === 'string' 
-          ? fk.fk_columns.replace(/[{}]/g, '').split(',').map(c => c.trim())
+          ? (fk.fk_columns as string).replace(/[{}]/g, '').split(',').map((c: string) => c.trim())
           : fk.fk_columns;
         
         console.log(`   ${fk.table_name}.${fk.fk_name}`);
@@ -472,7 +472,7 @@ async function generateIndexMigrationsCommand() {
     for (const fk of unindexedFKs) {
       // Parse fk_columns if it's a string (PostgreSQL array format)
       const columns = typeof fk.fk_columns === 'string' 
-        ? fk.fk_columns.replace(/[{}]/g, '').split(',').map(c => c.trim())
+        ? (fk.fk_columns as string).replace(/[{}]/g, '').split(',').map((c: string) => c.trim())
         : fk.fk_columns;
       
       const indexName = `idx_${fk.table_name}_fk_${columns.join('_')}`;

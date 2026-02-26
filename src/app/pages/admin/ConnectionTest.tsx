@@ -11,7 +11,24 @@ export function ConnectionTest() {
 
   const runDiagnostics = async () => {
     setIsLoading(true);
-    const results: Record<string, unknown> = {
+    
+    interface ConnectionTest {
+      name: string;
+      projectId: string;
+      url: string;
+      status: number | string;
+      ok: boolean;
+      data?: unknown;
+      error?: string;
+    }
+    
+    const results: {
+      timestamp: string;
+      figmaMakeConfig: Record<string, unknown>;
+      currentEnvironment: unknown;
+      allEnvironments: unknown;
+      connectionTests: ConnectionTest[];
+    } = {
       timestamp: new Date().toISOString(),
       figmaMakeConfig: {
         projectId,

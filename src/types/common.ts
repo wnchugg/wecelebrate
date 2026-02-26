@@ -327,12 +327,15 @@ export function isErrorResponse(response: ApiResponse<unknown>): response is Err
 
 export function isPaginatedResponse<T>(response: unknown): response is PaginatedResponse<T> {
   return (
-    response &&
+    response !== null &&
+    response !== undefined &&
     typeof response === 'object' &&
-    response.success === true &&
-    Array.isArray(response.data) &&
-    response.pagination &&
-    typeof response.pagination === 'object'
+    'success' in response &&
+    (response as Record<string, unknown>).success === true &&
+    'data' in response &&
+    Array.isArray((response as Record<string, unknown>).data) &&
+    'pagination' in response &&
+    typeof (response as Record<string, unknown>).pagination === 'object'
   );
 }
 

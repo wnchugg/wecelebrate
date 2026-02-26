@@ -154,7 +154,8 @@ export function AdminHelper() {
     }
   };
 
-  const handleDiagnostic = async () => {
+  const handleDiagnostic = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsDiagnosing(true);
     setDiagnosticResult(null);
 
@@ -274,7 +275,7 @@ export function AdminHelper() {
             </div>
           </div>
 
-          <form onSubmit={() => void handleDiagnostic()} className="space-y-4">
+          <form onSubmit={(e) => void handleDiagnostic(e)} className="space-y-4">
             <div>
               <label htmlFor="helper-diagnostic-identifier" className="block text-sm font-medium text-gray-700 mb-2">
                 Diagnostic Identifier
@@ -325,7 +326,7 @@ export function AdminHelper() {
               </div>
             </div>
 
-            <form onSubmit={() => void handleLogin()} className="space-y-4">
+            <form onSubmit={(e) => void handleLogin(e)} className="space-y-4">
               <div>
                 <label htmlFor="helper-login-email" className="block text-sm font-medium text-gray-700 mb-2">
                   Email Address
@@ -384,7 +385,7 @@ export function AdminHelper() {
               </div>
             </div>
 
-            <form onSubmit={() => void handleSignup()} className="space-y-4">
+            <form onSubmit={(e) => void handleSignup(e)} className="space-y-4">
               <div>
                 <label htmlFor="helper-signup-name" className="block text-sm font-medium text-gray-700 mb-2">
                   Full Name

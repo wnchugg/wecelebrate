@@ -270,7 +270,7 @@ export function CreateGiftModal({ giftId, onClose }: CreateGiftModalProps) {
                 <Input
                   type="file"
                   accept="image/*"
-                  onChange={() => void handleImageUpload()}
+                  onChange={(e) => void handleImageUpload(e)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
                 />
               </div>

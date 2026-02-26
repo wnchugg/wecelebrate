@@ -56,7 +56,7 @@ export function useSiteContent() {
           console.warn(`[useSiteContent] Invalid path structure at "${part}" in path "${path}"`);
           return fallback;
         }
-        current = current[part];
+        current = (current as Record<string, unknown>)[part];
       }
 
       // Check if we reached a translations object (should have language keys)
@@ -73,28 +73,28 @@ export function useSiteContent() {
 
       // Implement fallback chain
       // 1. Try current language
-      if (current[currentLang] && typeof current[currentLang] === 'string' && current[currentLang].trim()) {
-        return current[currentLang];
+      if ((current as Record<string, unknown>)[currentLang] && typeof (current as Record<string, unknown>)[currentLang] === 'string' && ((current as Record<string, unknown>)[currentLang] as string).trim()) {
+        return (current as Record<string, unknown>)[currentLang] as string;
       }
 
       // 2. Try default language
-      if (currentLang !== defaultLang && current[defaultLang] && typeof current[defaultLang] === 'string' && current[defaultLang].trim()) {
+      if (currentLang !== defaultLang && (current as Record<string, unknown>)[defaultLang] && typeof (current as Record<string, unknown>)[defaultLang] === 'string' && ((current as Record<string, unknown>)[defaultLang] as string).trim()) {
         console.warn(`[useSiteContent] Translation not found for "${path}" in language "${currentLang}", using default language "${defaultLang}"`);
-        return current[defaultLang];
+        return (current as Record<string, unknown>)[defaultLang] as string;
       }
 
       // 3. Try English
-      if (defaultLang !== 'en' && current['en'] && typeof current['en'] === 'string' && current['en'].trim()) {
+      if (defaultLang !== 'en' && (current as Record<string, unknown>)['en'] && typeof (current as Record<string, unknown>)['en'] === 'string' && ((current as Record<string, unknown>)['en'] as string).trim()) {
         console.warn(`[useSiteContent] Translation not found for "${path}" in languages "${currentLang}" or "${defaultLang}", using English`);
-        return current['en'];
+        return (current as Record<string, unknown>)['en'] as string;
       }
 
       // 4. Try first available translation
-      const availableKeys = Object.keys(current);
+      const availableKeys = Object.keys(current as Record<string, unknown>);
       for (const key of availableKeys) {
-        if (typeof current[key] === 'string' && current[key].trim()) {
+        if (typeof (current as Record<string, unknown>)[key] === 'string' && ((current as Record<string, unknown>)[key] as string).trim()) {
           console.warn(`[useSiteContent] Translation not found for "${path}" in preferred languages, using first available: "${key}"`);
-          return current[key];
+          return (current as Record<string, unknown>)[key] as string;
         }
       }
 

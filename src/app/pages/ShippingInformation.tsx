@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Building2, ArrowRight, MapPin, Package, Globe } from 'lucide-react';
 import { companyConfig } from '../data/config';
 import { useOrder } from '../context/OrderContext';
@@ -8,6 +10,30 @@ import { countries, getCountryByCode, Country } from '../utils/countries';
 import { useLanguage } from '../context/LanguageContext';
 import { AddressAutocomplete, AddressData } from '../components/ui/address-autocomplete';
 import { toast } from 'sonner';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../components/ui/form';
+import { Input } from '../components/ui/input';
+import { Button } from '../components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select';
+import {
+  shippingSchema,
+  companyShippingSchema,
+  type ShippingFormValues,
+  type CompanyShippingFormValues,
+} from '../schemas/shipping.schema';
 
 export function ShippingInformation() {
   const navigate = useNavigate();
@@ -15,36 +41,49 @@ export function ShippingInformation() {
   const { currentSite } = usePublicSite();
   const { t } = useLanguage();
   
-  const [formData, setFormData] = useState({
-    fullName: '',
-    street: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: companyConfig.defaultCountry || 'US',
-    phone: '',
-  });
+  // Determine if using company shipping
+  const isCompanyShipping = companyConfig.shippingMethod === 'company';
   
   // Get available countries based on site configuration
   const availableCountries = companyConfig.allowedCountries.length 
     ? countries.filter(c => companyConfig.allowedCountries.includes(c.code))
     : countries;
   
-  // Get current country details
-  const selectedCountry = getCountryByCode(formData.country);
+  // Initialize form with appropriate schema
+  const form = useForm<ShippingFormValues | CompanyShippingFormValues>({
+    resolver: zodResolver((isCompanyShipping ? companyShippingSchema : shippingSchema) as any),
+    defaultValues: isCompanyShipping
+      ? {
+          fullName: '',
+          phone: '',
+        }
+      : {
+          fullName: '',
+          phone: '',
+          street: '',
+          city: '',
+          state: '',
+          zipCode: '',
+          country: companyConfig.defaultCountry || 'US',
+        },
+  });
+  
+  // Get current country details for employee shipping
+  const selectedCountry = !isCompanyShipping 
+    ? getCountryByCode(form.watch('country') as string)
+    : null;
 
   // Handle address autocomplete selection — auto-fills all address fields
   const handleAddressSelect = (address: AddressData) => {
-    setFormData(prev => ({
-      ...prev,
-      street: address.line1,
-      city: address.city || prev.city,
-      state: address.state || prev.state,
-      zipCode: address.postalCode || prev.zipCode,
-      ...(address.country && availableCountries.some(c => c.code === address.country)
-        ? { country: address.country }
-        : {}),
-    }));
+    if (!isCompanyShipping) {
+      form.setValue('street', address.line1);
+      if (address.city) form.setValue('city', address.city);
+      if (address.state) form.setValue('state', address.state);
+      if (address.postalCode) form.setValue('zipCode', address.postalCode);
+      if (address.country && availableCountries.some(c => c.code === address.country)) {
+        form.setValue('country', address.country);
+      }
+    }
   };
 
   useEffect(() => {
@@ -53,25 +92,17 @@ export function ShippingInformation() {
     }
   }, [selectedGift, navigate]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Validate street address when not using company shipping
-    if (companyConfig.shippingMethod !== 'company' && !formData.street.trim()) {
-      toast.error(t('shipping.streetRequired'));
-      return;
-    }
-
-    if (companyConfig.shippingMethod === 'company' && companyConfig.companyAddress) {
+  const onSubmit = (data: ShippingFormValues | CompanyShippingFormValues) => {
+    if (isCompanyShipping && companyConfig.companyAddress) {
       // Use company address
       setShippingAddress({
-        fullName: formData.fullName,
+        fullName: data.fullName,
         ...companyConfig.companyAddress,
-        phone: formData.phone,
+        phone: data.phone,
       });
     } else {
       // Use employee-provided address
-      setShippingAddress(formData);
+      setShippingAddress(data as ShippingFormValues);
     }
     
     // Check if review page should be skipped
@@ -85,15 +116,6 @@ export function ShippingInformation() {
       void navigate('../review-order');
     }
   };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const isCompanyShipping = companyConfig.shippingMethod === 'company';
 
   return (
     <div className="min-h-[calc(100vh-4rem)] py-12 px-4 sm:px-6 lg:px-8">
@@ -135,41 +157,45 @@ export function ShippingInformation() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-8">
-          <div className="space-y-6">
-            {/* Full Name - Always required */}
-            <div>
-              <label htmlFor="fullName" className="block text-sm font-semibold text-gray-700 mb-2">
-                {t('shipping.fullName')} *
-              </label>
-              <input
-                type="text"
-                id="fullName"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="bg-white rounded-2xl shadow-lg p-8">
+            <div className="space-y-6">
+              {/* Full Name - Always required */}
+              <FormField
+                control={form.control}
                 name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#D91C81] focus:ring-4 focus:ring-pink-100 transition-all outline-none"
-                placeholder={t('shipping.enterFullName')}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('shipping.fullName')} *</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={t('shipping.enterFullName')}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            {/* Phone - Always required */}
-            <div>
-              <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
-                {t('shipping.phone')} *
-              </label>
-              <input
-                type="tel"
-                id="phone"
+              {/* Phone - Always required */}
+              <FormField
+                control={form.control}
                 name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#D91C81] focus:ring-4 focus:ring-pink-100 transition-all outline-none"
-                placeholder="(555) 123-4567"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('shipping.phone')} *</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="tel"
+                        placeholder="(555) 123-4567"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
             {/* Company Address Display */}
             {isCompanyShipping && companyConfig.companyAddress && (
@@ -196,118 +222,144 @@ export function ShippingInformation() {
             {!isCompanyShipping && (
               <>
                 {/* Country Selection - Show first for better UX */}
-                <div>
-                  <label htmlFor="country" className="block text-sm font-semibold text-gray-700 mb-2">
-                    <div className="flex items-center gap-2">
-                      <Globe className="w-4 h-4" />
-                      {t('shipping.country')} *
-                    </div>
-                  </label>
-                  <select
-                    id="country"
-                    name="country"
-                    value={formData.country}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#D91C81] focus:ring-4 focus:ring-pink-100 transition-all outline-none"
-                  >
-                    {availableCountries.map((country: Country) => (
-                      <option key={country.code} value={country.code}>
-                        {country.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <FormField
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        <div className="flex items-center gap-2">
+                          <Globe className="w-4 h-4" />
+                          {t('shipping.country')} *
+                        </div>
+                      </FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={t('shipping.selectCountry')} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {availableCountries.map((country: Country) => (
+                            <SelectItem key={country.code} value={country.code}>
+                              {country.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               
-                <div>
-                  <label htmlFor="shipping-address-line1" className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('shipping.address')} *
-                  </label>
-                  <AddressAutocomplete
-                    id="shipping-address-line1"
-                    onSelect={handleAddressSelect}
-                    onChange={(value) => setFormData(prev => ({ ...prev, street: value }))}
-                    country={formData.country}
-                    placeholder={t('shipping.enterStreet')}
-                    inputClassName="h-auto py-3 border-2 border-gray-200 rounded-xl focus:border-[#D91C81] focus:ring-4 focus:ring-pink-100 transition-all outline-none"
-                  />
-                </div>
+                <FormField
+                  control={form.control}
+                  name="street"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('shipping.address')} *</FormLabel>
+                      <FormControl>
+                        <AddressAutocomplete
+                          id="shipping-address-line1"
+                          onSelect={handleAddressSelect}
+                          onChange={field.onChange}
+                          country={form.watch('country') as string}
+                          placeholder={t('shipping.enterStreet')}
+                          inputClassName="h-auto py-3 border-2 border-gray-200 rounded-xl focus:border-[#D91C81] focus:ring-4 focus:ring-pink-100 transition-all outline-none"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <div className="grid sm:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="city" className="block text-sm font-semibold text-gray-700 mb-2">
-                      {t('shipping.city')} *
-                    </label>
-                    <input
-                      type="text"
-                      id="city"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#D91C81] focus:ring-4 focus:ring-pink-100 transition-all outline-none"
-                      placeholder={selectedCountry?.code === 'GB' ? 'London' : selectedCountry?.code === 'FR' ? 'Paris' : 'San Francisco'}
-                    />
-                  </div>
+                  <FormField
+                    control={form.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('shipping.city')} *</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder={selectedCountry?.code === 'GB' ? 'London' : selectedCountry?.code === 'FR' ? 'Paris' : 'San Francisco'}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
                   {selectedCountry?.hasStates && (
-                    <div>
-                      <label htmlFor="state" className="block text-sm font-semibold text-gray-700 mb-2">
-                        {selectedCountry?.stateLabel || t('shipping.state')} *
-                      </label>
-                      <input
-                        type="text"
-                        id="state"
-                        name="state"
-                        value={formData.state}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#D91C81] focus:ring-4 focus:ring-pink-100 transition-all outline-none"
-                        placeholder={selectedCountry?.code === 'CA' ? 'ON' : selectedCountry?.code === 'AU' ? 'NSW' : 'CA'}
-                      />
-                    </div>
+                    <FormField
+                      control={form.control}
+                      name="state"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{selectedCountry?.stateLabel || t('shipping.state')} *</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder={selectedCountry?.code === 'CA' ? 'ON' : selectedCountry?.code === 'AU' ? 'NSW' : 'CA'}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   )}
                 </div>
 
-                <div>
-                  <label htmlFor="zipCode" className="block text-sm font-semibold text-gray-700 mb-2">
-                    {selectedCountry?.postalCodeLabel || t('shipping.zipCode')} *
-                  </label>
-                  <input
-                    type="text"
-                    id="zipCode"
-                    name="zipCode"
-                    value={formData.zipCode}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#D91C81] focus:ring-4 focus:ring-pink-100 transition-all outline-none"
-                    placeholder={
-                      selectedCountry?.code === 'US' ? '94105' :
-                      selectedCountry?.code === 'GB' ? 'SW1A 1AA' :
-                      selectedCountry?.code === 'CA' ? 'M5H 2N2' :
-                      selectedCountry?.code === 'AU' ? '2000' :
-                      '12345'
-                    }
-                  />
-                </div>
+                <FormField
+                  control={form.control}
+                  name="zipCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{selectedCountry?.postalCodeLabel || t('shipping.zipCode')} *</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={
+                            selectedCountry?.code === 'US' ? '94105' :
+                            selectedCountry?.code === 'GB' ? 'SW1A 1AA' :
+                            selectedCountry?.code === 'CA' ? 'M5H 2N2' :
+                            selectedCountry?.code === 'AU' ? '2000' :
+                            '12345'
+                          }
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </>
             )}
           </div>
 
           {/* Submit Button */}
           <div className="mt-8 flex justify-end">
-            <button
+            <Button
               type="submit"
-              className="flex items-center gap-3 bg-gradient-to-r from-[#D91C81] to-[#B71569] text-white px-10 py-4 rounded-xl font-bold text-lg transition-all hover:gap-4"
-              style={{ boxShadow: '0 4px 12px rgba(217, 28, 129, 0.3)' }}
-              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 6px 16px rgba(217, 28, 129, 0.4)'}
-              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(217, 28, 129, 0.3)'}
+              size="lg"
+              disabled={form.formState.isSubmitting}
+              className="gap-3"
             >
-              {t('shipping.continueToReview')}
-              <ArrowRight className="w-6 h-6" />
-            </button>
+              {form.formState.isSubmitting ? (
+                <>
+                  <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  {t('common.processing')}
+                </>
+              ) : (
+                <>
+                  {t('shipping.continueToReview')}
+                  <ArrowRight className="w-6 h-6" />
+                </>
+              )}
+            </Button>
           </div>
         </form>
+      </Form>
       </div>
     </div>
   );

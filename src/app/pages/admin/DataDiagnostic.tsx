@@ -21,7 +21,7 @@ export function DataDiagnostic() {
         hasToken: !!token,
         token: token ? `${token.substring(0, 20)}...` : 'No token',
       },
-      endpoints: {},
+      endpoints: {} as Record<string, unknown>,
     };
 
     // Test endpoints
@@ -69,14 +69,14 @@ export function DataDiagnostic() {
           data = { raw: responseText, parseError };
         }
 
-        diagnosticResults.endpoints[endpoint.name] = {
+        (diagnosticResults.endpoints as Record<string, unknown>)[endpoint.name] = {
           status: response.status,
           ok: response.ok,
           data: data,
           error: parseError,
         };
       } catch (error: unknown) {
-        diagnosticResults.endpoints[endpoint.name] = {
+        (diagnosticResults.endpoints as Record<string, unknown>)[endpoint.name] = {
           status: 0,
           ok: false,
           error: error instanceof Error ? error.message : 'Unknown error',

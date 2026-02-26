@@ -448,7 +448,7 @@ function ScheduleFormModal({
           </button>
         </div>
 
-        <form onSubmit={() => void handleSubmit()} className="p-6 space-y-6">
+        <form onSubmit={(e) => void handleSubmit(e)} className="p-6 space-y-6">
           {/* Basic Info */}
           <div>
             <label htmlFor="sched-name" className="block text-sm font-medium text-gray-700 mb-2">

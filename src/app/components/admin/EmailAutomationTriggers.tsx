@@ -225,7 +225,7 @@ export function EmailAutomationTriggers({ siteId, templates }: EmailAutomationTr
         toast.success('Automation rule updated successfully');
       } else {
         // Create new rule
-        const newRule = await createAutomationRule(ruleData);
+        const newRule = await createAutomationRule(ruleData as any);
         setRules([...rules, newRule]);
         toast.success('Automation rule created successfully');
       }

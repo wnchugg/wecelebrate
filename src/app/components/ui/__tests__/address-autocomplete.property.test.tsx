@@ -24,9 +24,10 @@ vi.mock('../../config/deploymentEnvironments', () => ({
 const originalFetch = global.fetch;
 
 /**
- * Creates a fetch mock for the two-step address API:
- * 1. GET /search?q=... → { suggestions: [{ placeId, description, mainText }] }
- * 2. GET /details/:placeId → { address: { line1, city, ... } }
+ * Creates a fetch mock for the address API:
+ * GET /search?q=... → { suggestions: [{ placeId, description, mainText, address: {...} }] }
+ * 
+ * The backend now embeds full address data in the search response.
  */
 function createTwoStepFetchMock(suggestions: AddressSuggestion[]) {
   return vi.fn().mockImplementation((url: string) => {
@@ -38,26 +39,20 @@ function createTwoStepFetchMock(suggestions: AddressSuggestion[]) {
             placeId: s.id,
             description: s.description,
             mainText: s.line1,
+            address: {
+              line1: s.line1,
+              line2: s.line2,
+              city: s.city,
+              state: s.state,
+              postalCode: s.postalCode,
+              country: s.country,
+            },
           })),
         }),
       } as Response);
     }
-    // Details endpoint: match by placeId in URL
-    const suggestion = suggestions.find(s => String(url).includes(String(s.id))) || suggestions[0];
-    if (!suggestion) return Promise.resolve({ ok: false, status: 404 } as Response);
-    return Promise.resolve({
-      ok: true,
-      json: async () => ({
-        address: {
-          line1: suggestion.line1,
-          line2: suggestion.line2,
-          city: suggestion.city,
-          state: suggestion.state,
-          postalCode: suggestion.postalCode,
-          country: suggestion.country,
-        },
-      }),
-    } as Response);
+    // Fallback for any other requests
+    return Promise.resolve({ ok: false, status: 404 } as Response);
   });
 }
 

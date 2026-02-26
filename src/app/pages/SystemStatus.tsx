@@ -16,7 +16,30 @@ export function SystemStatus() {
 
   const checkSystemStatus = async () => {
     setLoading(true);
-    const checks: Record<string, unknown> = {
+    
+    interface BackendCheck {
+      reachable: boolean;
+      hasData: boolean;
+      sitesCount?: number;
+      error?: string;
+    }
+    
+    const checks: {
+      timestamp: string;
+      environment: {
+        current: string;
+        available: string[];
+      };
+      auth: {
+        hasToken: boolean;
+        tokenPreview?: string;
+      };
+      backend: BackendCheck;
+      localStorage: {
+        keys: string[];
+        size: number;
+      };
+    } = {
       timestamp: new Date().toISOString(),
       environment: {
         current: localStorage.getItem('jala_environment') || 'production',

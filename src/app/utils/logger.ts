@@ -238,5 +238,5 @@ export default logger;
 // Make logger globally available as a fallback for edge cases
 // This prevents "logger is not defined" errors during module loading
 if (typeof window !== 'undefined') {
-  (window as Record<string, unknown>).__logger = logger;
+  (window as unknown as Record<string, unknown>).__logger = logger;
 }

@@ -48,23 +48,24 @@ export default defineConfig({
       '**/supabase/functions/server/tests/dashboard_api.test.ts',  // Deno test
       '**/supabase/functions/server/tests/helpers.test.ts',        // Deno test
       '**/supabase/functions/server/tests/validation.test.ts',     // Deno test
+      '**/src/app/__tests__/bugfix/**/*.exploration.test.ts',      // Meta-tests that run test suite
+      '**/src/app/__tests__/bugfix/**/*.preservation.test.ts',     // Meta-tests that run test suite
     ],
     
     // ==================== RESOURCE LIMITS ====================
-    // Prevent system crashes by limiting parallel execution
-    maxConcurrency: 4,        // Max 4 test files running at once
-    pool: 'forks',            // Use process pool for better isolation
+    // Ultra-conservative defaults for local development (MacBook-friendly)
+    // CI can override with higher limits via command-line flags
+    maxConcurrency: 1,        // Max 1 test file at a time (prevents CPU overload)
     poolOptions: {
-      forks: {
-        maxForks: 4,          // Max 4 worker processes
-        minForks: 1,          // Keep at least 1 worker
-        singleFork: false,    // Allow multiple forks
+      threads: {
+        maxThreads: 1,        // Single worker thread (minimal resource usage)
+        minThreads: 1,        // Keep at least 1 worker
+        singleThread: true,   // Force single-threaded execution
       }
     },
     
-    // Limit workers to prevent CPU overload
-    maxWorkers: 4,            // Max 4 workers
-    minWorkers: 1,            // Min 1 worker
+    // Limit workers to prevent CPU overload (safe for local dev)
+    // CI can override with --poolOptions.threads.maxThreads=4 for better performance
     
     // Timeout protection
     testTimeout: 10000,       // 10s max per test
@@ -72,7 +73,10 @@ export default defineConfig({
     teardownTimeout: 10000,   // 10s max for teardown
     
     // Memory optimization
-    isolate: true,            // Isolate tests (safer but uses more memory)
+    // isolate: false for local dev (memory-efficient), true for CI (test isolation)
+    // CI should override with --isolate=true for better test isolation
+    isolate: false,           // Share context between tests (reduces memory usage)
+    pool: 'threads',          // Use threads pool (more efficient than forks)
     
     // Cleanup
     clearMocks: true,         // Clear mocks between tests
@@ -82,6 +86,18 @@ export default defineConfig({
     // Cache for faster re-runs
     cache: {
       dir: '.vitest/cache'
+    },
+    
+    // Dependency optimization for faster module loading
+    deps: {
+      optimizer: {
+        web: {
+          enabled: true,      // Enable web dependency optimization
+        },
+        ssr: {
+          enabled: true,      // Enable SSR dependency optimization
+        },
+      },
     },
     
     // ==================== COVERAGE ====================

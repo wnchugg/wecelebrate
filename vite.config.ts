@@ -29,6 +29,13 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
+      // More specific aliases must come before general ones
+      '@/components': path.resolve(__dirname, './src/app/components'),
+      '@/utils': path.resolve(__dirname, './src/app/utils'),
+      '@/context': path.resolve(__dirname, './src/app/context'),
+      '@/pages': path.resolve(__dirname, './src/app/pages'),
+      '@/app': path.resolve(__dirname, './src/app'),
+      '@/styles': path.resolve(__dirname, './src/styles'),
       '@': path.resolve(__dirname, './src'),
       '/utils': path.resolve(__dirname, './utils'),
     },

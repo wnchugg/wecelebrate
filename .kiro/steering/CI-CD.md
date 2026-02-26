@@ -14,9 +14,10 @@ inclusion: always
 - `test.yml.example` - Comprehensive test suite template (not active)
 
 ### Test Execution Strategy
-- Local development: `npm run test:safe` (2 workers, 2 max concurrency)
-- CI environment: `npm run test:full` (4 workers, 4 max concurrency)
+- Local development: `npm run test:safe` (1 worker, 1 max concurrency, single-threaded)
+- CI environment: `npm run test:full` (6 workers, 6 max concurrency via command-line overrides)
 - Comprehensive: `npm run test:all` (runs all test categories sequentially)
+- Kill lingering processes: `npm run test:kill` (terminates all Vitest processes)
 
 ## Pre-Commit Quality Gates
 
@@ -82,6 +83,21 @@ inclusion: always
 - Property-based tests: MUST annotate with `**Validates: Requirements X.Y**`
 - Backend tests: Run with Deno in `supabase/functions/server/tests/`
 - E2E tests: Run with Playwright in `e2e/` directory
+- Bugfix tests: Include both exploration tests (verify bug exists) and preservation tests (verify no regressions)
+
+### Preservation Testing for Configuration Changes
+
+When modifying test configuration (vitest.config.ts, package.json scripts), create preservation tests to ensure:
+
+1. **CI Performance Preserved**: Verify `test:full` maintains high resource limits via command-line overrides
+2. **Watch Mode Preserved**: Verify watch commands omit `--run` flag
+3. **Single-Run Behavior Preserved**: Verify non-watch commands include `--run` flag
+4. **Coverage Generation Preserved**: Verify coverage commands have proper flags
+5. **Configuration Structure Preserved**: Verify config file maintains expected structure
+
+Example preservation test location: `src/app/__tests__/bugfix/[feature].preservation.test.ts`
+
+See `docs/05-testing/property-based-tests.md` for detailed patterns and examples.
 
 ### Coverage
 - Generate coverage: `npm run test:coverage` or `npm run test:all:coverage`
@@ -157,6 +173,7 @@ inclusion: always
 - **E2E tests flaky**: Review Playwright report artifacts
 
 ### Debug Commands
+- Kill all Vitest processes: `npm run test:kill` (use when tests hang or spawn too many processes)
 - Verbose lint validation: `npm run lint:validate:verbose`
 - Verbose test output: `npm run test:all:verbose`
 - Watch mode for tests: `npm run test:watch`

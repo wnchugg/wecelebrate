@@ -16,6 +16,10 @@ config();
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
+  vi.clearAllTimers();
+  // Reset any global state that might leak between tests
+  document.body.innerHTML = '';
+  document.head.innerHTML = '';
 });
 
 // Mock window.matchMedia
@@ -87,6 +91,27 @@ if (typeof HTMLElement !== 'undefined') {
 
 // Mock scrollTo
 window.scrollTo = vi.fn();
+
+// Mock window.location with default values (tests can override if needed)
+if (!window.location.pathname) {
+  Object.defineProperty(window, 'location', {
+    writable: true,
+    value: {
+      pathname: '/test',
+      search: '',
+      hash: '',
+      href: 'http://localhost:3000/test',
+      origin: 'http://localhost:3000',
+      protocol: 'http:',
+      host: 'localhost:3000',
+      hostname: 'localhost',
+      port: '3000',
+      assign: vi.fn(),
+      replace: vi.fn(),
+      reload: vi.fn(),
+    },
+  });
+}
 
 // Override HTMLFormElement.prototype.requestSubmit (JSDOM has it but throws "Not implemented")
 if (typeof HTMLFormElement !== 'undefined') {

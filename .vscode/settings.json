@@ -21,6 +21,27 @@
         "npm run db-optimizer:analyze",
         "npm run db-optimizer:generate",
         "./deploy-backend.sh dev",
-        "./deploy-backend.sh prod"
+        "./deploy-backend.sh prod",
+        "npm *",
+        "ls *",
+        "npx eslint *",
+        "npx vitest *",
+        "grep *",
+        "npx tsc *",
+        "echo *",
+        "cat *",
+        "sed *",
+        "wc *",
+        "timeout *",
+        "ps aux *",
+        "pkill *",
+        "sleep *",
+        "chmod *",
+        "for *",
+        "find src *",
+        "time npm *",
+        "tail *",
+        "find *",
+        "which *"
     ]
 }

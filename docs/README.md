@@ -65,6 +65,7 @@ Common issues and their solutions.
 ### [09 - Reference](./09-reference/)
 Quick reference materials and API documentation.
 - API Reference
+- Build Configuration
 - Quick Reference Cards
 - Configuration Reference
 - Code Examples

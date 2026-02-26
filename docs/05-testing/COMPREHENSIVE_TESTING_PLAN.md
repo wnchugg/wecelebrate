@@ -174,7 +174,8 @@ describe('Button Component', () => {
   
   it('should apply variant classes', () => {
     const { getByRole } = render(<Button variant="destructive">Delete</Button>);
-    expect(getByRole('button')).toHaveClass('bg-destructive');
+    const button = getByRole('button');
+    expect(button.className).toContain('bg-destructive');
   });
 });
 ```

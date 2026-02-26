@@ -107,7 +107,7 @@ Create `.vscode/settings.json`:
 
 ```bash
 # Development
-npm run dev              # Start dev server
+npm run dev              # Start dev server (Vite)
 npm run build            # Production build
 npm run preview          # Preview production build
 
@@ -123,6 +123,56 @@ npm run format           # Prettier formatting
 # Testing
 npm test                 # Run tests once
 npm run test:watch       # Watch mode
+```
+
+### Build Configuration
+
+The project uses **Vite 6.4.1** as the build tool with the following configuration:
+
+#### Path Aliases
+Import paths are configured with aliases for cleaner imports:
+
+```typescript
+// Available path aliases (configured in vite.config.ts)
+'@'           → './src'
+'@/app'       → './src/app'
+'@/components' → './src/app/components'
+'@/utils'     → './src/app/utils'
+'@/context'   → './src/app/context'
+'@/pages'     → './src/app/pages'
+'@/styles'    → './src/styles'
+'/utils'      → './utils'
+```
+
+**Always use path aliases instead of relative imports:**
+
+```typescript
+// ✅ Good - Use path aliases
+import { Button } from '@/components/ui/button'
+import { useLanguage } from '@/context/LanguageContext'
+import { formatDate } from '@/utils/date'
+
+// ❌ Bad - Relative imports
+import { Button } from '../../../components/ui/button'
+import { useLanguage } from '../../context/LanguageContext'
+```
+
+#### Vite Plugins
+- **@vitejs/plugin-react** - React Fast Refresh and JSX support
+- **@tailwindcss/vite** - Tailwind CSS v4 integration
+- **figmaAssetPlugin** - Custom plugin for Figma asset resolution
+
+#### Environment Variables
+- All client-side environment variables must be prefixed with `VITE_`
+- Configured via `envPrefix: 'VITE_'` in vite.config.ts
+- Access in code: `import.meta.env.VITE_VARIABLE_NAME`
+
+```typescript
+// ✅ Good - Properly prefixed
+const apiUrl = import.meta.env.VITE_API_URL
+
+// ❌ Bad - Won't be exposed to client
+const apiUrl = import.meta.env.API_URL
 ```
 
 ---
@@ -163,8 +213,21 @@ jala2/
 │       └── server/         # Backend code
 ├── docs/                   # Documentation
 ├── scripts/                # Deployment scripts
+├── vite.config.ts          # Vite build configuration
 └── package.json
 ```
+
+### Key Files
+
+#### `/vite.config.ts`
+Vite build configuration with:
+- Path aliases for clean imports (`@/`, `@/components`, etc.)
+- React plugin with Fast Refresh
+- Tailwind CSS v4 integration
+- Custom Figma asset plugin
+- Environment variable prefix (`VITE_`)
+
+**Important**: Always use configured path aliases instead of relative imports.
 
 ### Key Directories
 

@@ -338,13 +338,15 @@ it('should inspect storage', () => {
 
 **Force cleanup mid-test:**
 ```typescript
-import { resetAllMocks } from '@/setupTests';
+import { cleanup } from '@testing-library/react';
+import { vi } from 'vitest';
 
 it('should reset between operations', () => {
   localStorage.setItem('key', 'value1');
   expect(localStorage.getItem('key')).toBe('value1');
   
-  resetAllMocks(); // Manual reset
+  cleanup(); // Cleanup React components
+  vi.clearAllMocks(); // Clear mock call history
   
   expect(localStorage.getItem('key')).toBeNull();
 });
@@ -409,6 +411,38 @@ mockFetch.mockResolvedValueOnce(/* ... */ as any);
 import { mocks } from '@/setupTests';
 vi.mocked(mocks.fetch).mockResolvedValueOnce(/* ... */);
 ```
+
+### Issue 5: Need to Mock window.location Before Imports
+
+**Problem:** Component uses `window.location` during module initialization, causing errors in tests
+
+**Solution:** Define `window.location` mock **before any imports** that might use it:
+```typescript
+// Mock window.location before any imports that might use it
+Object.defineProperty(window, 'location', {
+  writable: true,
+  value: {
+    pathname: '/gift-selection',
+    search: '',
+    hash: '',
+    href: 'http://localhost:3000/gift-selection',
+  },
+});
+
+// Now safe to import components that use window.location
+import { Header } from '../Header';
+```
+
+**Why this is needed:**
+- Some components access `window.location` during module initialization
+- Imports execute immediately, before test setup runs
+- The mock must exist before the component module loads
+- This pattern ensures the mock is available when the component imports
+
+**When to use:**
+- Component accesses `window.location` at the top level (not in functions)
+- Getting "Cannot read properties of undefined" errors related to location
+- Component uses location during render or in hooks that run on mount
 
 ---
 
@@ -513,6 +547,62 @@ it('should handle special case', async () => {
   // ... rest of test
 });
 ```
+
+### 5. **Use beforeAll for Global Mock Setup** ✅
+```typescript
+// ✅ DO this - Set up global mocks once per test suite
+const mockFetch = vi.fn();
+
+beforeAll(() => {
+  global.fetch = mockFetch;
+});
+
+beforeEach(() => {
+  vi.clearAllMocks(); // Clear call history, but keep the mock
+});
+
+// ❌ DON'T do this - Reassigning in beforeEach can cause issues
+beforeEach(() => {
+  global.fetch = vi.fn(); // Creates new mock each time
+});
+```
+
+**Why this matters:**
+- `beforeAll` runs once before all tests in the suite
+- `beforeEach` runs before every single test
+- Global mocks (like `global.fetch`) should be set up once in `beforeAll`
+- Use `vi.clearAllMocks()` in `beforeEach` to reset call history without recreating the mock
+- This prevents issues with mock references becoming stale between tests
+
+### Advanced Pattern: Selective Mock Clearing
+
+When you need more control over which mocks are cleared, use `.mockClear()` on individual mocks:
+
+```typescript
+const mockGetData = vi.fn();
+const mockUpdateData = vi.fn();
+
+beforeEach(() => {
+  // Clear call history but preserve implementations
+  mockGetData.mockClear();
+  mockUpdateData.mockClear();
+  
+  // Re-setup mock return values
+  mockGetData.mockResolvedValue(mockData);
+  mockUpdateData.mockResolvedValue({ success: true });
+});
+```
+
+**When to use `.mockClear()` instead of `vi.clearAllMocks()`:**
+- When you have complex mock setups that you want to preserve
+- When global `afterEach` already calls `vi.clearAllMocks()` (like in our setup)
+- When you need to re-setup specific mock return values after clearing
+- When you want explicit control over which mocks are cleared
+
+**Benefits:**
+- More explicit about which mocks are being reset
+- Prevents accidental clearing of mocks set up in outer scopes
+- Makes test setup more maintainable and easier to debug
 
 ---
 

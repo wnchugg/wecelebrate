@@ -79,8 +79,9 @@ export function CelebrationTest() {
       } else {
         updateResult('health', 'error', '✗ Health check failed', data);
       }
-    } catch (error: any) {
-      updateResult('health', 'error', `✗ Error: ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      updateResult('health', 'error', `✗ Error: ${message}`);
     }
   };
 
@@ -125,8 +126,9 @@ export function CelebrationTest() {
       } else {
         updateResult('create', 'error', `✗ Failed: ${data.error || 'Unknown error'}`, data);
       }
-    } catch (error: any) {
-      updateResult('create', 'error', `✗ Error: ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      updateResult('create', 'error', `✗ Error: ${message}`);
     }
   };
 
@@ -147,8 +149,9 @@ export function CelebrationTest() {
       } else {
         updateResult('fetch', 'error', `✗ Failed: ${data.error || 'Unknown error'}`, data);
       }
-    } catch (error: any) {
-      updateResult('fetch', 'error', `✗ Error: ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      updateResult('fetch', 'error', `✗ Error: ${message}`);
     }
   };
 
@@ -176,8 +179,9 @@ export function CelebrationTest() {
       } else {
         updateResult('invite', 'error', `✗ Failed: ${data.error || 'Unknown error'}`, data);
       }
-    } catch (error: any) {
-      updateResult('invite', 'error', `✗ Error: ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      updateResult('invite', 'error', `✗ Error: ${message}`);
     }
   };
 
@@ -203,8 +207,9 @@ export function CelebrationTest() {
       } else {
         updateResult('like', 'error', `✗ Failed: ${data.error || 'Unknown error'}`, data);
       }
-    } catch (error: any) {
-      updateResult('like', 'error', `✗ Error: ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      updateResult('like', 'error', `✗ Error: ${message}`);
     }
   };
 
@@ -229,8 +234,9 @@ export function CelebrationTest() {
       } else {
         updateResult('single', 'error', `✗ Failed: ${data.error || 'Unknown error'}`, data);
       }
-    } catch (error: any) {
-      updateResult('single', 'error', `✗ Error: ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      updateResult('single', 'error', `✗ Error: ${message}`);
     }
   };
 

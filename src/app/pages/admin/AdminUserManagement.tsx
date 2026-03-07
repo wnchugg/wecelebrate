@@ -161,9 +161,10 @@ export function AdminUserManagement() {
 
       const data = await response.json();
       setAdminUsers(data.users || []);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
       logger.error('Error fetching admin users:', err);
-      setError(err.message);
+      setError(message);
     } finally {
       setIsLoading(false);
     }
@@ -263,10 +264,11 @@ export function AdminUserManagement() {
 
       // Refresh the list
       await fetchAdminUsers();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
       logger.error('Error saving admin user:', err);
-      setError(err.message);
-      alert(`Error: ${err.message}`);
+      setError(message);
+      alert(`Error: ${message}`);
     } finally {
       setIsSaving(false);
     }
@@ -303,10 +305,11 @@ export function AdminUserManagement() {
       
       // Refresh the list
       await fetchAdminUsers();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
       logger.error('Error deleting admin user:', err);
-      setError(err.message);
-      alert(`Error: ${err.message}`);
+      setError(message);
+      alert(`Error: ${message}`);
     } finally {
       setIsSaving(false);
     }
@@ -345,10 +348,11 @@ export function AdminUserManagement() {
       
       // Refresh the list
       await fetchAdminUsers();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
       logger.error('Error updating user status:', err);
-      setError(err.message);
-      alert(`Error: ${err.message}`);
+      setError(message);
+      alert(`Error: ${message}`);
     } finally {
       setIsSaving(false);
     }
@@ -404,10 +408,11 @@ export function AdminUserManagement() {
       setNewPassword('');
       setConfirmNewPassword('');
       setRequireChangeOnNextLogin(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
       logger.error('Error resetting password:', err);
-      setError(err.message);
-      alert(`Error: ${err.message}`);
+      setError(message);
+      alert(`Error: ${message}`);
     } finally {
       setIsSaving(false);
     }

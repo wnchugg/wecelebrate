@@ -71,8 +71,9 @@ export function BrandEdit() {
         status,
       });
       showSuccessToast('Brand updated successfully');
-    } catch (err: any) {
-      showErrorToast(err.message || 'Failed to update brand');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to update brand';
+      showErrorToast(message);
     } finally {
       setIsSaving(false);
     }

@@ -38,8 +38,9 @@ export function InitializeDatabase() {
         setError(data.error || 'Failed to seed database');
         console.error('Seed failed:', data);
       }
-    } catch (err: any) {
-      setError(err.message || 'Network error occurred');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Network error occurred';
+      setError(message);
       console.error('Seed error:', err);
     } finally {
       setIsSeeding(false);

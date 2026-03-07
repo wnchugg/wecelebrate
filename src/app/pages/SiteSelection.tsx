@@ -39,9 +39,10 @@ export function SiteSelection() {
       if (savedSiteId && loadedSites.find((s: PublicSite) => s.id === savedSiteId)) {
         setSelectedSite(savedSiteId);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to load available sites';
       logger.error('Failed to load sites:', err);
-      setError(err.message || 'Failed to load available sites');
+      setError(message);
     } finally {
       setIsLoading(false);
     }

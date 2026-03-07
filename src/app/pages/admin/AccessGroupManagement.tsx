@@ -98,9 +98,10 @@ export function AccessGroupManagement() {
 
       const data = await response.json();
       setPermissions(data.permissions || []);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
       console.error('Error fetching permissions:', err);
-      setError(err.message);
+      setError(message);
     }
   };
 
@@ -128,9 +129,10 @@ export function AccessGroupManagement() {
 
       const data = await response.json();
       setAccessGroups(data.accessGroups || []);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
       console.error('Error fetching access groups:', err);
-      setError(err.message);
+      setError(message);
     } finally {
       setIsLoading(false);
     }
@@ -208,10 +210,11 @@ export function AccessGroupManagement() {
 
       // Refresh the list
       await fetchAccessGroups();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
       console.error('Error saving access group:', err);
-      setError(err.message);
-      toast.error(`Error: ${err.message}`);
+      setError(message);
+      toast.error(`Error: ${message}`);
     } finally {
       setIsSaving(false);
     }
@@ -248,10 +251,11 @@ export function AccessGroupManagement() {
       
       // Refresh the list
       await fetchAccessGroups();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
       console.error('Error deleting access group:', err);
-      setError(err.message);
-      toast.error(`Error: ${err.message}`);
+      setError(message);
+      toast.error(`Error: ${message}`);
     } finally {
       setIsSaving(false);
     }

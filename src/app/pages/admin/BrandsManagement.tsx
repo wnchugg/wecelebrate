@@ -89,8 +89,9 @@ export function BrandsManagement() {
       }
       setShowBrandModal(false);
       setEditingBrand(null);
-    } catch (err: any) {
-      showErrorToast(err.message || 'Failed to save brand');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to save brand';
+      showErrorToast(message);
     }
   };
 
@@ -101,8 +102,9 @@ export function BrandsManagement() {
     try {
       await deleteBrand(brandId);
       showSuccessToast(`"${brandName}" deleted successfully`);
-    } catch (err: any) {
-      showErrorToast(err.message || 'Failed to delete brand');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to delete brand';
+      showErrorToast(message);
     } finally {
       setIsDeleting(false);
     }
@@ -148,9 +150,10 @@ export function BrandsManagement() {
       } else {
         showErrorToast('No colors found on the website. Try a different URL.');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to extract branding';
       console.error('Extract colors error:', err);
-      showErrorToast(err.message || 'Failed to extract branding');
+      showErrorToast(message);
     } finally {
       setIsExtracting(false);
     }

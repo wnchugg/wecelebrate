@@ -52,8 +52,9 @@ export function EmailTemplatesManagement() {
       }
       setShowTemplateModal(false);
       setEditingTemplate(null);
-    } catch (err: any) {
-      showErrorToast(err.message || 'Failed to save template');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to save template';
+      showErrorToast(message);
     }
   };
 
@@ -64,8 +65,9 @@ export function EmailTemplatesManagement() {
     try {
       await deleteTemplate(templateId);
       showSuccessToast(`"${templateName}" deleted successfully`);
-    } catch (err: any) {
-      showErrorToast(err.message || 'Failed to delete template');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to delete template';
+      showErrorToast(message);
     } finally {
       setIsDeleting(false);
     }
@@ -79,8 +81,9 @@ export function EmailTemplatesManagement() {
         isDefault: false,
       });
       showSuccessToast('Template duplicated successfully');
-    } catch (err: any) {
-      showErrorToast(err.message || 'Failed to duplicate template');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to duplicate template';
+      showErrorToast(message);
     }
   };
 

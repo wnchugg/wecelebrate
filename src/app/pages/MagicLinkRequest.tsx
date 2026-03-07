@@ -105,15 +105,16 @@ export function MagicLinkRequest() {
       setIsSending(false);
       setLinkSent(true);
       toast.success(t('notification.success.magicLinkSent'));
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : t('notification.error.failedToSendMagicLink');
       logger.error('Magic link request error:', error);
-      toast.error(error.message || t('notification.error.failedToSendMagicLink'));
+      toast.error(message);
       setIsSending(false);
       
       logSecurityEvent({
         action: 'magic_link_error',
         status: 'failure',
-        details: { email: sanitizedEmail, error: error.message }
+        details: { email: sanitizedEmail, error: message }
       });
     }
   };

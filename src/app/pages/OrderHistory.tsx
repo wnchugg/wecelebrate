@@ -54,10 +54,11 @@ export function OrderHistory() {
         setOrders([]);
         
         toast.info(t('notification.info.orderHistoryComingSoon'));
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Failed to load order history';
         logger.error('Failed to load orders:', error);
-        setError(error.message || 'Failed to load order history');
-        toast.error(error.message || t('notification.error.failedToLoadOrders'));
+        setError(message);
+        toast.error(message || t('notification.error.failedToLoadOrders'));
       } finally {
         setIsLoading(false);
       }

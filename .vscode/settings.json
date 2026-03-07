@@ -50,6 +50,7 @@
         "git add *",
         "git diff *",
         "git status *",
-        "awk *"
+        "awk *",
+        "git push *"
     ]
 }

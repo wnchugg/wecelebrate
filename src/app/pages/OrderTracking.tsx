@@ -100,10 +100,11 @@ export function OrderTracking() {
         }
         
         setOrder(data.order);
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Failed to load order details';
         logger.error('Failed to load order:', error);
-        setError(error.message || 'Failed to load order details');
-        toast.error(error.message || t('notification.error.failedToLoadOrder'));
+        setError(message);
+        toast.error(message || t('notification.error.failedToLoadOrder'));
       } finally {
         setIsLoading(false);
       }

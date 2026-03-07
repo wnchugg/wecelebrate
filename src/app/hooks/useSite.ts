@@ -240,22 +240,23 @@ export function useSite(forceSiteId?: string): UseSiteResult {
       setCachedSite(siteId, data.site);
       setSite(data.site);
       
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Don't log errors during initial load when no site ID is present
       const isMissingSiteId = !forceSiteId && !detectSiteId();
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load site configuration';
       
       // Only log actual fetch errors, not "no siteId" scenarios
       if (!isMissingSiteId) {
         // Check if this is a network/server error vs expected error (404, inactive)
-        const isExpectedError = err.message?.includes('not found') || err.message?.includes('inactive');
+        const isExpectedError = errorMessage.includes('not found') || errorMessage.includes('inactive');
         if (!isExpectedError) {
           console.error('[useSite] Site fetch error:', err);
         } else {
-          console.warn('[useSite]', err.message);
+          console.warn('[useSite]', errorMessage);
         }
       }
       
-      setError(err.message || 'Failed to load site configuration');
+      setError(errorMessage);
       setSite(null);
     } finally {
       setIsLoading(false);

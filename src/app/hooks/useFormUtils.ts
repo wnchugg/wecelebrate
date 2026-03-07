@@ -49,7 +49,7 @@ export function useForm<T extends Record<string, any>>(
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const validateField = useCallback(
-    (name: keyof T, value: any): FieldError => {
+    (name: keyof T, value: T[keyof T]): FieldError => {
       const validator = validationSchema?.[name];
       return validator ? validator(value) : null;
     },
@@ -102,7 +102,7 @@ export function useForm<T extends Record<string, any>>(
   );
   
   const setFieldValue = useCallback(
-    (name: keyof T, value: any) => {
+    (name: keyof T, value: T[keyof T]) => {
       setValues(prev => ({ ...prev, [name]: value }));
       
       if (touched[name]) {
@@ -208,8 +208,8 @@ export function useForm<T extends Record<string, any>>(
  * Common validation rules
  */
 export const validators = {
-  required: (message: string = 'This field is required'): ValidationFunction<any> => {
-    return (value: any) => {
+  required: (message: string = 'This field is required'): ValidationFunction<unknown> => {
+    return (value: unknown) => {
       if (value === null || value === undefined || value === '') {
         return message;
       }
@@ -324,7 +324,7 @@ export const validators = {
     fieldName: string,
     message?: string
   ): ValidationFunction<string> => {
-    return (value: string, allValues?: any) => {
+    return (value: string, allValues?: Record<string, unknown>) => {
       if (!value) return null;
       const otherValue = allValues?.[fieldName];
       return value === otherValue

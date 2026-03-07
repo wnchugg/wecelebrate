@@ -127,7 +127,7 @@ export async function getUserPermissions(userId: string): Promise<UserPermission
       return [];
     }
     
-    return (data || []).map((p: any) => ({
+    return (data || []).map((p: { permission: string; description: string; category: string; granted_at: string; expires_at: string | null }) => ({
       permission: p.permission,
       description: p.description,
       category: p.category,

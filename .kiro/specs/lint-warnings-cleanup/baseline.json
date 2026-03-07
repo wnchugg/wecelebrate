@@ -1,27 +1,27 @@
 {
-  "timestamp": "2026-03-07T23:38:33.142Z",
-  "totalWarnings": 3836,
+  "timestamp": "2026-03-07T23:42:06.065Z",
+  "totalWarnings": 3779,
   "totalErrors": 7,
   "totalFiles": 350,
-  "totalIssues": 3843,
+  "totalIssues": 3786,
   "warningsByRule": [
     {
       "rule": "@typescript-eslint/no-unsafe-member-access",
-      "count": 1247,
+      "count": 1225,
       "severity": "warning",
-      "fileCount": 119
+      "fileCount": 118
     },
     {
       "rule": "@typescript-eslint/no-explicit-any",
-      "count": 639,
+      "count": 629,
       "severity": "warning",
-      "fileCount": 152
+      "fileCount": 151
     },
     {
       "rule": "@typescript-eslint/no-unsafe-assignment",
-      "count": 584,
+      "count": 573,
       "severity": "warning",
-      "fileCount": 132
+      "fileCount": 131
     },
     {
       "rule": "unused-imports/no-unused-vars",
@@ -31,9 +31,9 @@
     },
     {
       "rule": "@typescript-eslint/no-unsafe-argument",
-      "count": 297,
+      "count": 294,
       "severity": "warning",
-      "fileCount": 93
+      "fileCount": 92
     },
     {
       "rule": "@typescript-eslint/no-floating-promises",
@@ -43,9 +43,9 @@
     },
     {
       "rule": "@typescript-eslint/no-unsafe-call",
-      "count": 115,
+      "count": 105,
       "severity": "warning",
-      "fileCount": 38
+      "fileCount": 37
     },
     {
       "rule": "@typescript-eslint/no-unsafe-return",
@@ -120,16 +120,16 @@
       "fileCount": 4
     },
     {
-      "rule": "promise/catch-or-return",
-      "count": 4,
-      "severity": "warning",
-      "fileCount": 4
-    },
-    {
       "rule": "@typescript-eslint/no-duplicate-type-constituents",
       "count": 4,
       "severity": "error",
       "fileCount": 2
+    },
+    {
+      "rule": "promise/catch-or-return",
+      "count": 3,
+      "severity": "warning",
+      "fileCount": 3
     },
     {
       "rule": "unknown",
@@ -157,13 +157,13 @@
     }
   ],
   "categoryCounts": {
-    "@typescript-eslint/no-unsafe-member-access": 1247,
-    "@typescript-eslint/no-explicit-any": 639,
-    "@typescript-eslint/no-unsafe-assignment": 584,
+    "@typescript-eslint/no-unsafe-member-access": 1225,
+    "@typescript-eslint/no-explicit-any": 629,
+    "@typescript-eslint/no-unsafe-assignment": 573,
     "unused-imports/no-unused-vars": 365,
-    "@typescript-eslint/no-unsafe-argument": 297,
+    "@typescript-eslint/no-unsafe-argument": 294,
     "@typescript-eslint/no-floating-promises": 119,
-    "@typescript-eslint/no-unsafe-call": 115,
+    "@typescript-eslint/no-unsafe-call": 105,
     "@typescript-eslint/no-unsafe-return": 100,
     "@typescript-eslint/no-unnecessary-type-assertion": 68,
     "react-hooks/exhaustive-deps": 59,
@@ -176,8 +176,8 @@
     "@typescript-eslint/no-redundant-type-constituents": 15,
     "no-useless-escape": 13,
     "promise/param-names": 11,
-    "promise/catch-or-return": 4,
     "@typescript-eslint/no-duplicate-type-constituents": 4,
+    "promise/catch-or-return": 3,
     "unknown": 1,
     "prefer-const": 1,
     "no-case-declarations": 1,

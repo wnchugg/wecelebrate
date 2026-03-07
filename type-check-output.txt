@@ -1,0 +1,307 @@
+
+> wecelebrate-app@2.0.0 type-check
+> tsc --noEmit
+
+src/app/components/admin/EmailAutomationTriggers.tsx(228,52): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'Omit<AutomationRule, "id" | "createdAt" | "updatedAt">'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'Omit<AutomationRule, "id" | "createdAt" | "updatedAt">': enabled, name, description, siteId, and 2 more.
+src/app/lib/apiClientExtended.ts(7,59): error TS2305: Module '"../types"' has no exported member 'User'.
+src/app/pages/__tests__/ShippingInformation.shadcn.test.tsx(29,54): error TS2345: Argument of type '{ selectedGift: { id: string; name: string; description: string; category: string; image: string; sku: string; price: number; status: "active"; }; quantity: number; selectGift: Mock<Procedure>; setQuantity: Mock<...>; clearOrder: Mock<...>; }' is not assignable to parameter of type 'OrderContextType'.
+  Type '{ selectedGift: { id: string; name: string; description: string; category: string; image: string; sku: string; price: number; status: "active"; }; quantity: number; selectGift: Mock<Procedure>; setQuantity: Mock<...>; clearOrder: Mock<...>; }' is missing the following properties from type 'OrderContextType': shippingAddress, setShippingAddress, submitOrder
+src/app/pages/__tests__/ShippingInformation.shadcn.test.tsx(48,7): error TS2322: Type 'string' is not assignable to type 'Language'.
+src/app/pages/__tests__/ShippingInformation.shadcn.test.tsx(299,9): error TS2353: Object literal may only specify known properties, and 'shippingMode' does not exist in type 'OrderContextType'.
+src/app/pages/__tests__/ShippingInformation.shadcn.test.tsx(335,9): error TS2353: Object literal may only specify known properties, and 'shippingMode' does not exist in type 'OrderContextType'.
+src/app/pages/__tests__/Welcome.shadcn.test.tsx(37,9): error TS2353: Object literal may only specify known properties, and 'role' does not exist in type 'User'.
+src/app/pages/__tests__/Welcome.shadcn.test.tsx(46,7): error TS2322: Type 'string' is not assignable to type 'Language'.
+src/app/pages/AccessValidation.tsx(72,27): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(schema: Zod3Type<unknown, { email: string; employeeId?: undefined; serialCard?: undefined; } | { employeeId: string; email?: undefined; serialCard?: undefined; } | { serialCard: string; email?: undefined; employeeId?: undefined; }>, schemaOptions?: ParseParams, resolverOptions?: NonRawResolverOptions): Resolver<...>', gave the following error.
+    Argument of type 'ZodObject<{ email: ZodString; }>' is not assignable to parameter of type 'Zod3Type<unknown, { email: string; employeeId?: undefined; serialCard?: undefined; } | { employeeId: string; email?: undefined; serialCard?: undefined; } | { serialCard: string; email?: undefined; employeeId?: undefined; }>'.
+      Property '_def' is missing in type 'ZodObject<{ email: ZodString; }>' but required in type 'Zod3Type<unknown, { email: string; employeeId?: undefined; serialCard?: undefined; } | { employeeId: string; email?: undefined; serialCard?: undefined; } | { serialCard: string; email?: undefined; employeeId?: undefined; }>'.
+  Overload 2 of 4, '(schema: $ZodType<unknown, FieldValues, $ZodTypeInternals<unknown, FieldValues>>, schemaOptions?: ParseContext<$ZodIssue>, resolverOptions?: NonRawResolverOptions): Resolver<...>', gave the following error.
+    Argument of type 'ZodObject<{ email: ZodString; }>' is not assignable to parameter of type '$ZodType<unknown, FieldValues, $ZodTypeInternals<unknown, FieldValues>>'.
+      Type 'ZodObject<{ email: ZodString; }>' is missing the following properties from type '$ZodType<unknown, FieldValues, $ZodTypeInternals<unknown, FieldValues>>': _zod, "~standard"
+src/app/pages/AccessValidation.tsx(309,17): error TS2322: Type 'Control<{ email: string; employeeId?: undefined; serialCard?: undefined; } | { employeeId: string; email?: undefined; serialCard?: undefined; } | { serialCard: string; email?: undefined; employeeId?: undefined; }, unknown, unknown>' is not assignable to type 'Control<unknown, any, unknown>'.
+  The types of '_options.resolver' are incompatible between these types.
+    Type 'Resolver<{ email: string; employeeId?: undefined; serialCard?: undefined; } | { employeeId: string; email?: undefined; serialCard?: undefined; } | { serialCard: string; email?: undefined; employeeId?: undefined; }, unknown, unknown>' is not assignable to type 'Resolver<unknown, any, unknown>'.
+      Types of parameters 'options' and 'options' are incompatible.
+        Type 'ResolverOptions<unknown>' is not assignable to type 'ResolverOptions<{ email: string; employeeId?: undefined; serialCard?: undefined; } | { employeeId: string; email?: undefined; serialCard?: undefined; } | { serialCard: string; email?: undefined; employeeId?: undefined; }>'.
+          Type 'unknown' is not assignable to type '{ email: string; employeeId?: undefined; serialCard?: undefined; } | { employeeId: string; email?: undefined; serialCard?: undefined; } | { serialCard: string; email?: undefined; employeeId?: undefined; }'.
+src/app/pages/AccessValidation.tsx(310,17): error TS2322: Type '"email" | "employeeId" | "serialCard"' is not assignable to type 'never'.
+  Type '"email"' is not assignable to type 'never'.
+src/app/pages/admin/BrandsManagement.tsx(144,26): error TS2345: Argument of type 'string[]' is not assignable to parameter of type 'SetStateAction<{ color: string; count: number; usage: string; }[]>'.
+  Type 'string[]' is not assignable to type '{ color: string; count: number; usage: string; }[]'.
+    Type 'string' is not assignable to type '{ color: string; count: number; usage: string; }'.
+src/app/pages/admin/SiteConfiguration.tsx(1135,7): error TS2345: Argument of type 'Record<string, TranslationValue>' is not assignable to parameter of type 'Record<string, Record<string, string>>'.
+  'string' index signatures are incompatible.
+    Type 'TranslationValue' is not assignable to type 'Record<string, string>'.
+      Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(1386,7): error TS2345: Argument of type 'Record<string, TranslationValue>' is not assignable to parameter of type 'Record<string, Record<string, string>>'.
+  'string' index signatures are incompatible.
+    Type 'TranslationValue' is not assignable to type 'Record<string, string>'.
+      Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(3200,21): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(3210,21): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(3220,21): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(3229,21): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(3238,21): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(3247,21): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(3316,21): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(3326,21): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(3335,21): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(3344,21): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(4151,21): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(4161,21): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(4170,21): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(4231,25): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(4241,25): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(4251,25): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(4476,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(4486,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(4496,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(4506,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(4516,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(4867,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(4877,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(4887,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(4897,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(4906,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(4915,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5195,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5205,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5215,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5224,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5233,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5243,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5346,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5356,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5366,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5375,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5384,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5405,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5414,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5423,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5432,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5441,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5450,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5471,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5481,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5490,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5499,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5508,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5517,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5538,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5548,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5557,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5567,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5576,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5585,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5594,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5603,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5612,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5621,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5630,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5639,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5648,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5657,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5678,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5688,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5698,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5707,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5717,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5726,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5735,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5744,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5753,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5762,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5771,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5792,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5802,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5811,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5820,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5829,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5838,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5848,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5857,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5867,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5876,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5886,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5895,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5905,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5914,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5923,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5932,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5941,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5950,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5959,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5980,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(5990,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(6000,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(6009,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(6018,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(6039,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(6049,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(6058,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(6067,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(6077,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(6086,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(6095,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(6104,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(6113,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(6122,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(6143,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(6153,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(6163,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SiteConfiguration.tsx(6173,17): error TS2322: Type 'string | {}' is not assignable to type 'Record<string, string>'.
+  Type 'string' is not assignable to type 'Record<string, string>'.
+src/app/pages/admin/SitesDiagnostic.tsx(153,11): error TS2353: Object literal may only specify known properties, and 'url' does not exist in type 'DirectFetchResult'.
+src/app/pages/admin/SitesDiagnostic.tsx(161,9): error TS2741: Property 'success' is missing in type '{ error: any; }' but required in type 'DirectFetchResult'.
+src/app/pages/admin/SitesDiagnostic.tsx(167,33): error TS2353: Object literal may only specify known properties, and 'general' does not exist in type '{ endpoint: string; error: string; }'.
+src/app/pages/AuthDiagnostic.tsx(93,9): error TS2353: Object literal may only specify known properties, and 'statusText' does not exist in type 'TestResult'.
+src/app/pages/AuthDiagnostic.tsx(104,9): error TS2353: Object literal may only specify known properties, and 'failed' does not exist in type 'TestResult'.
+src/app/pages/AuthDiagnostic.tsx(122,9): error TS2353: Object literal may only specify known properties, and 'statusText' does not exist in type 'TestResult'.
+src/app/pages/AuthDiagnostic.tsx(133,9): error TS2353: Object literal may only specify known properties, and 'failed' does not exist in type 'TestResult'.
+src/app/pages/ShippingInformation.tsx(54,27): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(schema: Zod3Type<unknown, FieldValues>, schemaOptions?: ParseParams, resolverOptions?: NonRawResolverOptions): Resolver<FieldValues, unknown, unknown>', gave the following error.
+    Argument of type 'ZodObject<{ fullName: ZodString; phone: ZodString; street: ZodString; city: ZodString; state: ZodString; zipCode: ZodString; country: ZodString; }>' is not assignable to parameter of type 'Zod3Type<unknown, FieldValues>'.
+      Property '_def' is missing in type 'ZodObject<{ fullName: ZodString; phone: ZodString; street: ZodString; city: ZodString; state: ZodString; zipCode: ZodString; country: ZodString; }>' but required in type 'Zod3Type<unknown, FieldValues>'.
+  Overload 2 of 4, '(schema: $ZodType<unknown, FieldValues, $ZodTypeInternals<unknown, FieldValues>>, schemaOptions?: ParseContext<$ZodIssue>, resolverOptions?: NonRawResolverOptions): Resolver<...>', gave the following error.
+    Argument of type 'ZodObject<{ fullName: ZodString; phone: ZodString; street: ZodString; city: ZodString; state: ZodString; zipCode: ZodString; country: ZodString; }>' is not assignable to parameter of type '$ZodType<unknown, FieldValues, $ZodTypeInternals<unknown, FieldValues>>'.
+      Type 'ZodObject<{ fullName: ZodString; phone: ZodString; street: ZodString; city: ZodString; state: ZodString; zipCode: ZodString; country: ZodString; }>' is missing the following properties from type '$ZodType<unknown, FieldValues, $ZodTypeInternals<unknown, FieldValues>>': _zod, "~standard"
+src/app/types/index.ts(15,1): error TS2308: Module './admin' has already exported a member named 'SftpConfig'. Consider explicitly re-exporting to resolve the ambiguity.
+src/app/types/index.ts(15,1): error TS2308: Module './shippingConfig' has already exported a member named 'StoreLocation'. Consider explicitly re-exporting to resolve the ambiguity.
+src/db-optimizer/__tests__/validator.test.ts(77,5): error TS2322: Type 'string' is not assignable to type '"user_id = auth.uid()" | "auth.uid() = user_id" | "auth.role() = role_name" | "current_setting('request.jwt.claims', true)::json->>'sub' = user_id" | "auth.uid() = user_id AND status = true" | "auth.uid() = user_id AND auth.role() = role_name" | "auth.uid() = user_id OR auth.uid() = owner_id"'.
+src/db-optimizer/__tests__/validator.test.ts(83,5): error TS2322: Type 'string' is not assignable to type '"user_id = auth.uid()" | "auth.uid() = user_id" | "auth.role() = role_name" | "current_setting('request.jwt.claims', true)::json->>'sub' = user_id" | "auth.uid() = user_id AND status = true" | "auth.uid() = user_id AND auth.role() = role_name" | "auth.uid() = user_id OR auth.uid() = owner_id"'.
+src/db-optimizer/__tests__/validator.test.ts(84,5): error TS2322: Type 'string' is not assignable to type '"user_id = auth.uid()" | "auth.uid() = user_id" | "auth.role() = role_name" | "current_setting('request.jwt.claims', true)::json->>'sub' = user_id" | "auth.uid() = user_id AND status = true" | "auth.uid() = user_id AND auth.role() = role_name" | "auth.uid() = user_id OR auth.uid() = owner_id"'.
+src/db-optimizer/__tests__/validator.test.ts(85,5): error TS2322: Type 'string' is not assignable to type '"user_id = auth.uid()" | "auth.uid() = user_id" | "auth.role() = role_name" | "current_setting('request.jwt.claims', true)::json->>'sub' = user_id" | "auth.uid() = user_id AND status = true" | "auth.uid() = user_id AND auth.role() = role_name" | "auth.uid() = user_id OR auth.uid() = owner_id"'.
+src/db-optimizer/__tests__/validator.test.ts(88,7): error TS2322: Type '{ tableName: "users" | "posts" | "comments" | "profiles"; schemaName: "public"; policyName: string; authFunctions: readonly ["auth.uid()"] | readonly ["auth.jwt()"] | readonly ["auth.role()"] | readonly ["auth.uid()", "auth.role()"]; }' is not assignable to type 'RLSAuthWarning'.
+  Types of property 'authFunctions' are incompatible.
+    Type 'readonly ["auth.uid()"] | readonly ["auth.jwt()"] | readonly ["auth.role()"] | readonly ["auth.uid()", "auth.role()"]' is not assignable to type 'string[]'.
+      The type 'readonly ["auth.uid()"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+src/db-optimizer/__tests__/validator.test.ts(510,7): error TS2322: Type '{ tableName: "users" | "posts" | "comments" | "profiles"; schemaName: "public"; policyName: string; authFunctions: readonly ["auth.uid()"] | readonly ["auth.jwt()"] | readonly ["auth.role()"]; }' is not assignable to type 'RLSAuthWarning'.
+  Types of property 'authFunctions' are incompatible.
+    Type 'readonly ["auth.uid()"] | readonly ["auth.jwt()"] | readonly ["auth.role()"]' is not assignable to type 'string[]'.
+      The type 'readonly ["auth.uid()"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+src/db-optimizer/__tests__/validator.test.ts(701,9): error TS2322: Type '{ tableName: "users" | "posts" | "comments"; schemaName: "public"; policyName: string; authFunctions: readonly ["auth.uid()"] | readonly ["auth.jwt()"]; }' is not assignable to type 'RLSAuthWarning'.
+  Types of property 'authFunctions' are incompatible.
+    Type 'readonly ["auth.uid()"] | readonly ["auth.jwt()"]' is not assignable to type 'string[]'.
+      The type 'readonly ["auth.uid()"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+src/db-optimizer/__tests__/validator.test.ts(823,9): error TS2322: Type '{ tableName: "users" | "posts" | "comments"; schemaName: "public"; policyName: string; authFunctions: readonly ["auth.uid()"] | readonly ["auth.jwt()"]; }' is not assignable to type 'RLSAuthWarning'.
+  Types of property 'authFunctions' are incompatible.
+    Type 'readonly ["auth.uid()"] | readonly ["auth.jwt()"]' is not assignable to type 'string[]'.
+      The type 'readonly ["auth.uid()"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+src/db-optimizer/cli.ts(377,27): error TS2339: Property 'replace' does not exist on type 'never'.
+src/db-optimizer/cli.ts(475,25): error TS2339: Property 'replace' does not exist on type 'never'.
+src/services/__tests__/catalogApi.test.ts(99,42): error TS2345: Argument of type '{ name: string; description: string; type: "erp"; status: "active"; source: { sourceSystem: string; sourceId: string; apiEndpoint: string; authMethod: "oauth"; }; settings: { autoSync: boolean; syncFrequency: "daily"; syncTime: string; }; }' is not assignable to parameter of type 'Partial<Catalog>'.
+  Types of property 'source' are incompatible.
+    Property 'type' is missing in type '{ sourceSystem: string; sourceId: string; apiEndpoint: string; authMethod: "oauth"; }' but required in type 'CatalogSource'.

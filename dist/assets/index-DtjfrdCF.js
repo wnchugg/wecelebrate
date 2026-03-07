@@ -1,0 +1,1 @@
+import{r as e,Y as s}from"./index-T2_ofn0k.js";import{a as u}from"./index-oawSx7db.js";var c=s.useId||(()=>{}),n=0;function i(t){const[r,a]=e.useState(c());return u(()=>{a(o=>o??String(n++))},[t]),t||(r?`radix-${r}`:"")}export{i as u};

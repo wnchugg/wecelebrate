@@ -76,7 +76,7 @@ export function BrandsManagement() {
       bodyTextColorLight: bodyTextColorLight,
       accentColor1: accentColor1 || undefined,
       accentColor2: accentColor2 || undefined,
-      status: (formData.get('status') as string) || 'active',
+      status: (formData.get('status') as 'active' | 'inactive') || 'active',
     };
 
     try {

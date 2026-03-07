@@ -42,6 +42,14 @@
         "time npm *",
         "tail *",
         "find *",
-        "which *"
+        "which *",
+        "git stash *",
+        "git log *",
+        "git reflog *",
+        "git checkout *",
+        "git add *",
+        "git diff *",
+        "git status *",
+        "awk *"
     ]
 }

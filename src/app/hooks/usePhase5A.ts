@@ -4,7 +4,17 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { phase5aApi, Brand, EmailTemplate, SiteGiftConfig } from '../lib/apiClientPhase5A';
+import { 
+  phase5aApi, 
+  Brand, 
+  EmailTemplate, 
+  SiteGiftConfig,
+  CreateBrandInput,
+  UpdateBrandInput,
+  CreateEmailTemplateInput,
+  UpdateEmailTemplateInput,
+  UpdateSiteGiftConfigInput
+} from '../lib/apiClientPhase5A';
 
 // ==================== BRANDS HOOKS ====================
 
@@ -29,8 +39,9 @@ export function useBrands(filters?: {
       const response = await phase5aApi.brands.list(filters);
       setBrands(response.data);
       setTotal(response.total);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch brands');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to fetch brands';
+      setError(message);
       console.error('Error fetching brands:', err);
     } finally {
       setLoading(false);
@@ -41,23 +52,25 @@ export function useBrands(filters?: {
     fetchBrands();
   }, [fetchBrands]);
 
-  const createBrand = async (input: any) => {
+  const createBrand = async (input: CreateBrandInput) => {
     try {
       const response = await phase5aApi.brands.create(input);
       await fetchBrands(); // Refresh list
       return response.data;
-    } catch (err: any) {
-      throw new Error(err.message || 'Failed to create brand');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to create brand';
+      throw new Error(message);
     }
   };
 
-  const updateBrand = async (id: string, updates: any) => {
+  const updateBrand = async (id: string, updates: UpdateBrandInput) => {
     try {
       const response = await phase5aApi.brands.update(id, updates);
       await fetchBrands(); // Refresh list
       return response.data;
-    } catch (err: any) {
-      throw new Error(err.message || 'Failed to update brand');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to update brand';
+      throw new Error(message);
     }
   };
 
@@ -65,8 +78,9 @@ export function useBrands(filters?: {
     try {
       await phase5aApi.brands.delete(id);
       await fetchBrands(); // Refresh list
-    } catch (err: any) {
-      throw new Error(err.message || 'Failed to delete brand');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to delete brand';
+      throw new Error(message);
     }
   };
 
@@ -103,8 +117,9 @@ export function useBrand(id: string | null) {
         setError(null);
         const response = await phase5aApi.brands.get(id);
         setBrand(response.data);
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch brand');
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Failed to fetch brand';
+        setError(message);
         console.error('Error fetching brand:', err);
       } finally {
         setLoading(false);
@@ -143,8 +158,9 @@ export function useEmailTemplates(filters?: {
       const response = await phase5aApi.emailTemplates.list(filters);
       setTemplates(response.data);
       setTotal(response.total);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch email templates');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to fetch email templates';
+      setError(message);
       console.error('Error fetching email templates:', err);
     } finally {
       setLoading(false);
@@ -163,23 +179,25 @@ export function useEmailTemplates(filters?: {
     fetchTemplates();
   }, [fetchTemplates]);
 
-  const createTemplate = async (input: any) => {
+  const createTemplate = async (input: CreateEmailTemplateInput) => {
     try {
       const response = await phase5aApi.emailTemplates.create(input);
       await fetchTemplates(); // Refresh list
       return response.data;
-    } catch (err: any) {
-      throw new Error(err.message || 'Failed to create email template');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to create email template';
+      throw new Error(message);
     }
   };
 
-  const updateTemplate = async (id: string, updates: any) => {
+  const updateTemplate = async (id: string, updates: UpdateEmailTemplateInput) => {
     try {
       const response = await phase5aApi.emailTemplates.update(id, updates);
       await fetchTemplates(); // Refresh list
       return response.data;
-    } catch (err: any) {
-      throw new Error(err.message || 'Failed to update email template');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to update email template';
+      throw new Error(message);
     }
   };
 
@@ -187,8 +205,9 @@ export function useEmailTemplates(filters?: {
     try {
       await phase5aApi.emailTemplates.delete(id);
       await fetchTemplates(); // Refresh list
-    } catch (err: any) {
-      throw new Error(err.message || 'Failed to delete email template');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to delete email template';
+      throw new Error(message);
     }
   };
 
@@ -225,8 +244,9 @@ export function useEmailTemplate(id: string | null) {
         setError(null);
         const response = await phase5aApi.emailTemplates.get(id);
         setTemplate(response.data);
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch email template');
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Failed to fetch email template';
+        setError(message);
         console.error('Error fetching email template:', err);
       } finally {
         setLoading(false);
@@ -261,8 +281,9 @@ export function useSiteGiftConfig(siteId: string | null) {
       setError(null);
       const response = await phase5aApi.siteGiftConfig.get(siteId);
       setConfig(response.data);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch site gift configuration');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to fetch site gift configuration';
+      setError(message);
       console.error('Error fetching site gift config:', err);
     } finally {
       setLoading(false);
@@ -273,7 +294,7 @@ export function useSiteGiftConfig(siteId: string | null) {
     fetchConfig();
   }, [fetchConfig]);
 
-  const updateConfig = async (updates: any) => {
+  const updateConfig = async (updates: UpdateSiteGiftConfigInput) => {
     if (!siteId) {
       throw new Error('Site ID is required');
     }
@@ -282,8 +303,9 @@ export function useSiteGiftConfig(siteId: string | null) {
       const response = await phase5aApi.siteGiftConfig.update(siteId, updates);
       setConfig(response.data);
       return response.data;
-    } catch (err: any) {
-      throw new Error(err.message || 'Failed to update site gift configuration');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to update site gift configuration';
+      throw new Error(message);
     }
   };
 
@@ -310,7 +332,7 @@ export function useSiteGifts(
     offset?: number;
   }
 ) {
-  const [gifts, setGifts] = useState<any[]>([]);
+  const [gifts, setGifts] = useState<Array<Record<string, unknown>>>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -329,8 +351,9 @@ export function useSiteGifts(
       const response = await phase5aApi.siteGiftConfig.getGifts(siteId, filters);
       setGifts(response.data);
       setTotal(response.total);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch site gifts');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to fetch site gifts';
+      setError(message);
       console.error('Error fetching site gifts:', err);
     } finally {
       setLoading(false);

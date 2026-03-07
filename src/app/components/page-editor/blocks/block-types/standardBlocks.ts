@@ -58,7 +58,7 @@ export const heroBlockDefinition: BlockDefinition = {
       block.content.buttonText && React.createElement('button', { key: 'button' }, block.content.buttonText),
     ]);
   },
-  renderEditor: (_block, _onChange) => {
+  renderEditor: (block, onChange) => {
     return React.createElement('div', null, 'Hero editor placeholder');
   },
 };
@@ -87,7 +87,7 @@ export const textBlockDefinition: BlockDefinition = {
       dangerouslySetInnerHTML: { __html: sanitizedText },
     });
   },
-  renderEditor: (_block, _onChange) => {
+  renderEditor: (block, onChange) => {
     return React.createElement('div', null, 'Text editor placeholder');
   },
 };
@@ -125,7 +125,7 @@ export const imageBlockDefinition: BlockDefinition = {
       block.content.caption && React.createElement('p', { key: 'caption' }, block.content.caption),
     ]);
   },
-  renderEditor: (_block, _onChange) => {
+  renderEditor: (block, onChange) => {
     return React.createElement('div', null, 'Image editor placeholder');
   },
 };
@@ -155,7 +155,7 @@ export const videoBlockDefinition: BlockDefinition = {
       style: { textAlign: 'center', padding: '20px' },
     }, 'Video: ' + (block.content.url || 'No URL'));
   },
-  renderEditor: (_block, _onChange) => {
+  renderEditor: (block, onChange) => {
     return React.createElement('div', null, 'Video editor placeholder');
   },
 };
@@ -188,7 +188,7 @@ export const ctaButtonBlockDefinition: BlockDefinition = {
       React.createElement('button', null, block.content.text || 'Button')
     );
   },
-  renderEditor: (_block, _onChange) => {
+  renderEditor: (block, onChange) => {
     return React.createElement('div', null, 'Button editor placeholder');
   },
 };
@@ -218,7 +218,7 @@ export const spacerBlockDefinition: BlockDefinition = {
       },
     });
   },
-  renderEditor: (_block, _onChange) => {
+  renderEditor: (block, onChange) => {
     return React.createElement('div', null, 'Spacer editor placeholder');
   },
 };
@@ -248,7 +248,7 @@ export const customHtmlBlockDefinition: BlockDefinition = {
       dangerouslySetInnerHTML: { __html: sanitizedHtml },
     });
   },
-  renderEditor: (_block, _onChange) => {
+  renderEditor: (block, onChange) => {
     return React.createElement('div', null, 'Custom HTML editor placeholder');
   },
 };
@@ -296,7 +296,7 @@ export const celebrationWallBlockDefinition: BlockDefinition = {
       React.createElement('p', { key: 'desc', style: { color: '#666' } }, 'Celebration wall will display here'),
     ]);
   },
-  renderEditor: (_block, _onChange) => {
+  renderEditor: (block, onChange) => {
     return React.createElement('div', null, 'Celebration wall editor placeholder');
   },
 };
@@ -337,7 +337,7 @@ export const testimonialBlockDefinition: BlockDefinition = {
       block.content.role && React.createElement('div', { key: 'role', style: { color: '#666', fontSize: '14px' } }, block.content.role),
     ]);
   },
-  renderEditor: (_block, _onChange) => {
+  renderEditor: (block, onChange) => {
     return React.createElement('div', null, 'Testimonial editor placeholder');
   },
 };
@@ -376,7 +376,7 @@ export const giftPreviewBlockDefinition: BlockDefinition = {
       ),
     ]);
   },
-  renderEditor: (_block, _onChange) => {
+  renderEditor: (block, onChange) => {
     return React.createElement('div', null, 'Gift preview editor placeholder');
   },
 };
@@ -431,7 +431,7 @@ export const layoutBlockDefinition: BlockDefinition = {
       }, `Column ${i + 1}`)
     ));
   },
-  renderEditor: (_block, _onChange) => {
+  renderEditor: (block, onChange) => {
     const content = block.content as any;
     return React.createElement('div', { className: 'space-y-3' }, [
       React.createElement('div', { key: 'columns' }, [

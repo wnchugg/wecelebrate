@@ -39,7 +39,7 @@ export function EmailTemplatesManagement() {
       bodyText: formData.get('bodyText') as string,
       fromName: formData.get('fromName') as string,
       fromEmail: formData.get('fromEmail') as string,
-      status: (formData.get('status') as string) || 'active',
+      status: (formData.get('status') as 'active' | 'inactive' | 'draft') || 'active',
     };
 
     try {

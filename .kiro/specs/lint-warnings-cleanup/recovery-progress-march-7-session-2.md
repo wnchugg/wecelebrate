@@ -10,10 +10,10 @@
 - Gap: 3,144 warnings to fix
 
 ### Current Status
-- Warnings: 3,843
-- Reduction: 329 warnings fixed in this session
-- Progress: 10.5% toward target
-- Remaining: 2,815 warnings to fix
+- Warnings: 3,786
+- Reduction: 386 warnings fixed in this session
+- Progress: 12.3% toward target
+- Remaining: 2,758 warnings to fix
 
 ### Work Completed
 
@@ -26,7 +26,7 @@
 - Fixed `EmailTemplatesManagement.tsx`: Status field type assertion (`'active' | 'inactive' | 'draft'`)
 - All type checks passing
 
-#### Batch 2-8: Catch Block Error Handling (191 fixes)
+#### Batch 2-9: Catch Block Error Handling & Function Parameters (248 fixes)
 Fixed catch blocks across 20+ files, replacing `error: any` with `error: unknown` and proper type guards:
 - `permissionService.ts` (3 catch blocks)
 - `QuickDiagnostic.tsx` (1 catch block)
@@ -69,8 +69,10 @@ Pattern: `error: unknown` with `error instanceof Error ? error.message : 'fallba
 6. `fix: replace any with unknown in catch blocks across 7 admin files (17 fixes)` (59 fixes)
 7. `fix: replace any with unknown in catch blocks in 4 page files (4 fixes)` (11 fixes)
 8. `chore: update lint baseline to 3,843 warnings`
+9. `fix: replace any with proper types in utility hooks and services (57 fixes)` (57 fixes)
+10. `chore: update lint baseline to 3,786 warnings`
 
-### Files Modified (29 files)
+### Files Modified (32 files)
 - `src/app/hooks/usePhase5A.ts`
 - `src/app/pages/admin/BrandsManagement.tsx`
 - `src/app/pages/admin/EmailTemplatesManagement.tsx`
@@ -91,16 +93,20 @@ Pattern: `error: unknown` with `error instanceof Error ? error.message : 'fallba
 - `src/app/pages/SiteSelection.tsx`
 - `src/app/pages/InitializeDatabase.tsx`
 - `src/app/pages/AdminAccountsList.tsx`
+- `src/app/hooks/useFormUtils.ts` (4 function parameters)
+- `src/app/hooks/usePerformanceUtils.ts` (3 any types + floating promise fix)
+- `src/app/services/permissionService.ts` (map function parameter)
 - Plus 9 more files from earlier batches
 
 ### Remaining Work
 
 #### High-Impact Categories
-1. **@typescript-eslint/no-unsafe-member-access**: 1,247 warnings (119 files)
-2. **@typescript-eslint/no-explicit-any**: 639 warnings (152 files) - down from 674
-3. **@typescript-eslint/no-unsafe-assignment**: 584 warnings (132 files)
+1. **@typescript-eslint/no-unsafe-member-access**: 1,225 warnings (118 files) - down from 1,296
+2. **@typescript-eslint/no-explicit-any**: 629 warnings (151 files) - down from 674
+3. **@typescript-eslint/no-unsafe-assignment**: 573 warnings (131 files) - down from 594
 4. **unused-imports/no-unused-vars**: 365 warnings (162 files)
-5. **@typescript-eslint/no-unsafe-argument**: 297 warnings (93 files) - down from 318
+5. **@typescript-eslint/no-unsafe-argument**: 294 warnings (92 files) - down from 318
+6. **@typescript-eslint/no-unsafe-call**: 105 warnings (37 files) - down from 115
 
 #### Next Steps
 1. Continue fixing remaining catch blocks in other files
@@ -123,10 +129,10 @@ Following the complete recovery guide patterns:
 - Commit frequently to prevent future loss
 
 ### Performance Metrics
-- Total fixes this session: 329
-- Average fixes per commit: ~47
+- Total fixes this session: 386
+- Average fixes per commit: ~43
 - Time per batch: ~5-10 minutes
-- Estimated time to target (2,815 remaining): ~8-12 hours at current pace
+- Estimated time to target (2,758 remaining): ~7-10 hours at current pace
 
 ## Next Session Goals
 1. Continue fixing catch blocks in remaining files (target: 50+ fixes)

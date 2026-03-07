@@ -171,9 +171,10 @@ export async function grantPermission(
     await logPermissionGrant(user.id, userId, permission, expiresAt);
     
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error granting permission:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: message };
   }
 }
 
@@ -205,9 +206,10 @@ export async function revokePermission(
     await logPermissionRevoke(user.id, userId, permission);
     
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error revoking permission:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: message };
   }
 }
 
@@ -256,8 +258,9 @@ export async function cleanupExpiredPermissions(): Promise<{ success: boolean; d
     }
     
     return { success: true, deletedCount: data };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error cleaning up expired permissions:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: message };
   }
 }

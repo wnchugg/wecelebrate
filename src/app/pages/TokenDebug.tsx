@@ -92,11 +92,12 @@ export default function TokenDebug() {
         payload,
         tokenPreview: token.substring(0, 50) + '...'
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       setTokenInfo({
         exists: true,
         valid: false,
-        error: 'Failed to decode token: ' + error.message,
+        error: 'Failed to decode token: ' + message,
         recommendation: 'Token is malformed. Clear and login again.'
       });
     }

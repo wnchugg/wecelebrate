@@ -168,10 +168,11 @@ export function InitialSeed() {
           error: data.error_description || 'Login failed'
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       setResult({
         success: false,
-        error: error.message
+        error: message
       });
     } finally {
       setLoading(false);
@@ -247,10 +248,11 @@ export function InitialSeed() {
         data,
         status: response.status,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       setResult({
         success: false,
-        error: error.message,
+        error: message,
         status: 0,
       });
     } finally {
@@ -284,10 +286,11 @@ export function InitialSeed() {
         data,
         status: response.status,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       setDemoResult({
         success: false,
-        error: error.message,
+        error: message,
         status: 0,
       });
     } finally {
@@ -321,10 +324,11 @@ export function InitialSeed() {
         data,
         status: response.status,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       setProductResult({
         success: false,
-        error: error.message,
+        error: message,
         status: 0,
       });
     } finally {

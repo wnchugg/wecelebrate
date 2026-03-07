@@ -153,7 +153,7 @@ export function Welcome() {
       } else {
         throw new Error(data.error || 'Failed to load celebrations');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading celebrations:', error);
       // Don't show error toast - just log it and show empty state
       // This allows the page to work even if no celebrations exist

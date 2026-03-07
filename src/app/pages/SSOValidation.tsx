@@ -90,13 +90,14 @@ export function SSOValidation() {
           details: { provider: ssoProvider }
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       console.error('SSO callback error:', error);
       setError('An error occurred during authentication. Please try again.');
       logSecurityEvent({
         action: 'sso_authentication_error',
         status: 'failure',
-        details: { error: error.message }
+        details: { error: message }
       });
     }
   };
@@ -138,14 +139,15 @@ export function SSOValidation() {
         setError(data.error || 'Failed to initiate SSO. Please try again.');
         setIsInitiating(false);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       console.error('SSO initiation error:', error);
       setError('Failed to connect to authentication service. Please try again.');
       setIsInitiating(false);
       logSecurityEvent({
         action: 'sso_initiate_error',
         status: 'failure',
-        details: { error: error.message }
+        details: { error: message }
       });
     }
   };

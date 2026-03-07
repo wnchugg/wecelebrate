@@ -36,7 +36,7 @@ export function BackendTest() {
         'access-control-allow-methods': response3.headers.get('access-control-allow-methods'),
       });
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error testing backend:', error);
     }
   };

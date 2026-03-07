@@ -114,9 +114,10 @@ export default function ClientPortal() {
 
         const sitesData = await sitesResponse.json();
         setSites(sitesData.data || []);
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Failed to load client data';
         console.error('Error fetching client data:', err);
-        setError(err.message || 'Failed to load client data');
+        setError(message);
         toast.error(t('notification.error.failedToLoadSites'));
       } finally {
         setLoading(false);

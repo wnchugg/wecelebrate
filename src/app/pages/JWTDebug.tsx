@@ -27,8 +27,9 @@ export function JWTDebug() {
 
         const data = await response.json();
         setJwtConfig(data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        setError(message);
       } finally {
         setLoading(false);
       }

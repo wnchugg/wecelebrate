@@ -83,8 +83,9 @@ export function SystemStatus() {
       } else {
         checks.backend.error = await response.text();
       }
-    } catch (error: any) {
-      checks.backend.error = error.message;
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      checks.backend.error = message;
     }
 
     setStatus(checks);

@@ -111,9 +111,10 @@ export default function SiteCatalogConfiguration() {
         // No config yet, that's okay
         console.warn('No existing site catalog config');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to load data';
       console.error('Error loading data:', err);
-      setError(err.message || 'Failed to load data');
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -157,9 +158,10 @@ export default function SiteCatalogConfiguration() {
       
       // Reload to get updated config
       await loadData();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to save configuration';
       console.error('Error saving configuration:', err);
-      setError(err.message || 'Failed to save configuration');
+      setError(message);
     } finally {
       setSaving(false);
     }

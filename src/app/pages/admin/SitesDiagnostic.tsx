@@ -77,8 +77,9 @@ export function SitesDiagnostic() {
             expiresAt: new Date(payload.exp * 1000).toISOString(),
             isExpired: payload.exp < Math.floor(Date.now() / 1000),
           };
-        } catch (err: any) {
-          diagnostics.token = { exists: true, error: err.message };
+        } catch (err: unknown) {
+          const message = err instanceof Error ? err.message : 'Unknown error';
+          diagnostics.token = { exists: true, error: message };
         }
       } else {
         diagnostics.token = { exists: false };
@@ -95,13 +96,17 @@ export function SitesDiagnostic() {
           hasSuccessFlag: 'success' in sitesResponse,
           hasDataProperty: 'data' in sitesResponse,
         };
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        const status = (err && typeof err === 'object' && ('status' in err || 'statusCode' in err)) 
+          ? ((err as Record<string, unknown>).status || (err as Record<string, unknown>).statusCode) 
+          : undefined;
         diagnostics.apiCalls.sites = {
           success: false,
-          error: err.message,
-          status: err.status || err.statusCode,
+          error: message,
+          status,
         };
-        diagnostics.errors.push({ endpoint: '/sites', error: err.message });
+        diagnostics.errors.push({ endpoint: '/sites', error: message });
       }
 
       console.warn('🔍 Testing /clients endpoint...');
@@ -114,13 +119,17 @@ export function SitesDiagnostic() {
           hasSuccessFlag: 'success' in clientsResponse,
           hasDataProperty: 'data' in clientsResponse,
         };
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        const status = (err && typeof err === 'object' && ('status' in err || 'statusCode' in err)) 
+          ? ((err as Record<string, unknown>).status || (err as Record<string, unknown>).statusCode) 
+          : undefined;
         diagnostics.apiCalls.clients = {
           success: false,
-          error: err.message,
-          status: err.status || err.statusCode,
+          error: message,
+          status,
         };
-        diagnostics.errors.push({ endpoint: '/clients', error: err.message });
+        diagnostics.errors.push({ endpoint: '/clients', error: message });
       }
 
       // Test direct fetch to see raw response
@@ -156,15 +165,17 @@ export function SitesDiagnostic() {
           rawText: responseText.substring(0, 500),
           parsedJson: parsedResponse,
         } as DirectFetchResult;
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
         diagnostics.apiCalls.directFetch = {
           success: false,
-          error: err.message,
+          error: message,
         } as DirectFetchResult;
       }
 
-    } catch (err: any) {
-      diagnostics.errors.push({ endpoint: 'general', error: err.message });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      diagnostics.errors.push({ endpoint: 'general', error: message });
     }
 
     setResults(diagnostics);

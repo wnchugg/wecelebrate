@@ -61,10 +61,11 @@ export default function ResetPassword() {
 
         setIsTokenValid(true);
         logger.info('[ResetPassword] Token is valid');
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Invalid or expired reset token';
         logger.error('[ResetPassword] Token validation failed:', err);
         setIsTokenValid(false);
-        setError('Invalid or expired reset token');
+        setError(message);
         
         logSecurityEvent({
           type: 'invalid_reset_token',
@@ -173,15 +174,15 @@ export default function ResetPassword() {
         void navigate('/admin/login');
       }, 3000);
 
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to reset password. Please try again.';
       logger.error('[ResetPassword] Error:', err);
-      const errorMsg = err.message || 'Failed to reset password. Please try again.';
-      setError(errorMsg);
+      setError(message);
       showErrorToast(err);
       
       logSecurityEvent({
         type: 'password_reset_error',
-        details: `Password reset error: ${err.message}`,
+        details: `Password reset error: ${message}`,
         severity: 'high'
       });
     } finally {

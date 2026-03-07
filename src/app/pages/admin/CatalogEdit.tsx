@@ -74,9 +74,10 @@ export default function CatalogEdit() {
       setRequireApproval(catalog.settings.requireApproval || false);
       setNotifyOnSync(catalog.settings.notifyOnSync || false);
       setNotifyOnError(catalog.settings.notifyOnError !== false);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to load catalog';
       console.error('Error loading catalog:', err);
-      setError(err.message || 'Failed to load catalog');
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -136,9 +137,10 @@ export default function CatalogEdit() {
       }
       
       void navigate('/admin/catalogs');
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to save catalog';
       console.error('Error saving catalog:', err);
-      setError(err.message || 'Failed to save catalog');
+      setError(message);
       setSaving(false);
     }
   }

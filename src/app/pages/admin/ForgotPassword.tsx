@@ -95,7 +95,8 @@ export default function ForgotPassword() {
         details: `Password reset requested for ${sanitizedEmail}`,
         severity: 'low'
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
       logger.error('[ForgotPassword] Error:', err);
       
       // For security, don't reveal if email exists or not
@@ -104,7 +105,7 @@ export default function ForgotPassword() {
       
       logSecurityEvent({
         type: 'password_reset_error',
-        details: `Password reset error for ${email}: ${err.message}`,
+        details: `Password reset error for ${email}: ${message}`,
         severity: 'medium'
       });
     } finally {

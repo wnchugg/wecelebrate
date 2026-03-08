@@ -256,13 +256,13 @@ export function onEscape(handler: () => void): KeyDownHandler {
 /**
  * Helper: Debounce a handler
  */
-export function debounceHandler<T extends (...args: any[]) => any>(
+export function debounceHandler<T extends (...args: never[]) => unknown>(
   handler: T,
   delay: number
 ): T {
   let timeoutId: NodeJS.Timeout;
   
-  return ((...args: any[]) => {
+  return ((...args: Parameters<T>) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => handler(...args), delay);
   }) as T;
@@ -271,13 +271,13 @@ export function debounceHandler<T extends (...args: any[]) => any>(
 /**
  * Helper: Throttle a handler
  */
-export function throttleHandler<T extends (...args: any[]) => any>(
+export function throttleHandler<T extends (...args: never[]) => unknown>(
   handler: T,
   delay: number
 ): T {
   let lastCall = 0;
   
-  return ((...args: any[]) => {
+  return ((...args: Parameters<T>) => {
     const now = Date.now();
     if (now - lastCall >= delay) {
       lastCall = now;
@@ -289,11 +289,11 @@ export function throttleHandler<T extends (...args: any[]) => any>(
 /**
  * Helper: Async handler wrapper with error handling
  */
-export function asyncHandler<T extends (...args: any[]) => Promise<any>>(
+export function asyncHandler<T extends (...args: never[]) => Promise<unknown>>(
   handler: T,
   onError?: (error: Error) => void
 ): T {
-  return (async (...args: any[]) => {
+  return (async (...args: Parameters<T>) => {
     try {
       return await handler(...args);
     } catch (error) {
@@ -310,10 +310,10 @@ export function asyncHandler<T extends (...args: any[]) => Promise<any>>(
 /**
  * Helper: Compose multiple handlers
  */
-export function composeHandlers<T extends (...args: any[]) => any>(
+export function composeHandlers<T extends (...args: never[]) => unknown>(
   ...handlers: Array<T | undefined>
 ): T {
-  return ((...args: any[]) => {
+  return ((...args: Parameters<T>) => {
     handlers.forEach(handler => {
       if (handler) {
         handler(...args);

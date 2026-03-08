@@ -296,7 +296,7 @@ export interface SiteSettings {
     requireValidation: boolean;
   };
   // Landing Page Configuration (extended)
-  landingPageConfig?: any;
+  landingPageConfig?: Record<string, unknown>;
 }
 
 export interface Site {

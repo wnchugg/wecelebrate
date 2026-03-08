@@ -18,7 +18,6 @@
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { SemanticValidator, type UserContext } from '../validator';
-import type { RLSOptimization, PolicyConsolidation } from '../models';
 import { DatabaseConnection } from '../db-utils';
 
 // Check if database configuration is available

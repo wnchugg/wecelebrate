@@ -9,7 +9,7 @@ import { logger } from '../utils/logger';
 import { useDateFormat } from '../hooks/useDateFormat';
 import { translateWithParams } from '../utils/translationHelpers';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 interface Order {

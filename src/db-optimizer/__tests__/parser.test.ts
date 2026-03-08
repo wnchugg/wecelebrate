@@ -6,7 +6,7 @@ import { describe, it, expect } from 'vitest';
 import { test } from '@fast-check/vitest';
 import * as fc from 'fast-check';
 import { LinterOutputParser } from '../parser';
-import type { LinterWarning, ParsedOutput } from '../models';
+import type { LinterWarning } from '../models';
 
 describe('LinterOutputParser', () => {
   const parser = new LinterOutputParser();

@@ -9,11 +9,9 @@ import { usePublicSite } from '../context/PublicSiteContext';
 import { countries, getCountryByCode, Country } from '../utils/countries';
 import { useLanguage } from '../context/LanguageContext';
 import { AddressAutocomplete, AddressData } from '../components/ui/address-autocomplete';
-import { toast } from 'sonner';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,

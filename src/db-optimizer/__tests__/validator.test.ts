@@ -6,7 +6,6 @@ import { describe, it, expect, vi } from 'vitest';
 import { test } from '@fast-check/vitest';
 import * as fc from 'fast-check';
 import { SemanticValidator, type UserContext } from '../validator';
-import type { RLSOptimization, PolicyConsolidation, RLSAuthWarning, MultiplePermissiveWarning, PolicyDefinition } from '../models';
 import { DatabaseConnection } from '../db-utils';
 
 describe('SemanticValidator', () => {

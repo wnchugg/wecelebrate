@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-03-08T00:19:04.011Z",
-  "totalWarnings": 3771,
+  "timestamp": "2026-03-08T00:22:16.983Z",
+  "totalWarnings": 3762,
   "totalErrors": 7,
-  "totalFiles": 347,
-  "totalIssues": 3778,
+  "totalFiles": 345,
+  "totalIssues": 3769,
   "warningsByRule": [
     {
       "rule": "@typescript-eslint/no-unsafe-member-access",
@@ -96,12 +96,6 @@
       "fileCount": 9
     },
     {
-      "rule": "unused-imports/no-unused-imports",
-      "count": 15,
-      "severity": "warning",
-      "fileCount": 9
-    },
-    {
       "rule": "@typescript-eslint/no-redundant-type-constituents",
       "count": 15,
       "severity": "warning",
@@ -118,6 +112,12 @@
       "count": 11,
       "severity": "warning",
       "fileCount": 4
+    },
+    {
+      "rule": "unused-imports/no-unused-imports",
+      "count": 6,
+      "severity": "warning",
+      "fileCount": 3
     },
     {
       "rule": "@typescript-eslint/no-duplicate-type-constituents",
@@ -172,10 +172,10 @@
     "@typescript-eslint/no-empty-object-type": 30,
     "@typescript-eslint/no-misused-promises": 26,
     "@typescript-eslint/no-base-to-string": 18,
-    "unused-imports/no-unused-imports": 15,
     "@typescript-eslint/no-redundant-type-constituents": 15,
     "no-useless-escape": 13,
     "promise/param-names": 11,
+    "unused-imports/no-unused-imports": 6,
     "@typescript-eslint/no-duplicate-type-constituents": 4,
     "promise/catch-or-return": 3,
     "unknown": 1,

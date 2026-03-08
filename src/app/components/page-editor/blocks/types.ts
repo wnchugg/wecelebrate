@@ -87,7 +87,7 @@ export interface BlockStyles {
  * Base block content (extended by specific block types)
  */
 export interface BlockContent {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**
@@ -129,7 +129,7 @@ export interface ContentSchema {
   [key: string]: {
     type: string;
     required?: boolean;
-    default?: any;
+    default?: unknown;
   };
 }
 

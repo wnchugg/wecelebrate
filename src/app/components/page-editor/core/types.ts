@@ -31,7 +31,7 @@ export interface PageMetadata {
  * Visual mode configuration
  */
 export interface VisualConfiguration {
-  [key: string]: any; // Dynamic fields based on VisualEditorConfig
+  [key: string]: unknown; // Dynamic fields based on VisualEditorConfig
 }
 
 /**
@@ -151,9 +151,9 @@ export type ValidationRuleType = 'required' | 'minLength' | 'maxLength' | 'patte
  */
 export interface ValidationRule {
   type: ValidationRuleType;
-  value?: any;
+  value?: unknown;
   message: string;
-  validator?: (value: any) => boolean;
+  validator?: (value: unknown) => boolean;
 }
 
 /**

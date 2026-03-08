@@ -4,7 +4,7 @@
  */
 
 import { ValidationRule } from '../core/types';
-import { BlockType } from '../blocks/types';
+import { BlockType, Block } from '../blocks/types';
 
 /**
  * Field types for visual editor
@@ -26,7 +26,7 @@ export type FieldType =
 export interface ConditionalRule {
   field: string;
   operator: 'equals' | 'notEquals' | 'contains' | 'notContains';
-  value: any;
+  value: unknown;
 }
 
 /**
@@ -36,13 +36,13 @@ export interface VisualField {
   id: string;
   label: string;
   type: FieldType;
-  defaultValue: any;
+  defaultValue: unknown;
   validation?: ValidationRule[];
   conditional?: ConditionalRule;
   placeholder?: string;
   helpText?: string;
-  options?: Array<{ label: string; value: any }>; // For select fields
-  customComponent?: React.ComponentType<any>; // For custom field types
+  options?: Array<{ label: string; value: unknown }>; // For select fields
+  customComponent?: React.ComponentType<unknown>; // For custom field types
 }
 
 /**
@@ -67,8 +67,8 @@ export interface VisualEditorConfig {
  */
 export interface VisualEditorProps {
   config: VisualEditorConfig;
-  values: Record<string, any>;
-  onChange: (values: Record<string, any>) => void;
+  values: Record<string, unknown>;
+  onChange: (values: Record<string, unknown>) => void;
   errors?: Record<string, string>;
 }
 
@@ -76,8 +76,8 @@ export interface VisualEditorProps {
  * Props for BlocksEditor component
  */
 export interface BlocksEditorProps {
-  blocks: any[]; // Block[] from blocks/types
-  onChange: (blocks: any[]) => void;
+  blocks: Block[];
+  onChange: (blocks: Block[]) => void;
   allowedBlockTypes?: BlockType[];
   enableDragDrop?: boolean;
   enableLayouts?: boolean;

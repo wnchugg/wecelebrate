@@ -106,7 +106,7 @@ interface CopyCodeBlockProps {
  */
 export function CopyCodeBlock({
   code,
-  language = 'bash',
+  language: _language = 'bash',
   showLineNumbers = false,
   className = '',
 }: CopyCodeBlockProps) {

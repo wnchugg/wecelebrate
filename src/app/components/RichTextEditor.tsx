@@ -20,7 +20,7 @@ export function RichTextEditor({
   minHeight = '200px',
   className = '',
   availableVariables = [],
-  onInsertVariable,
+  onInsertVariable: _onInsertVariable,
   label = '',
   showLabel = false
 }: RichTextEditorProps) {

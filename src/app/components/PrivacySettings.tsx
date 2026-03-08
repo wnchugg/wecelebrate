@@ -26,7 +26,7 @@ export function PrivacySettings() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       toast.success('Your data has been exported successfully');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to export data');
     }
   };

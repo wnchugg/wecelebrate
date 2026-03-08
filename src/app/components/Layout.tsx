@@ -1,11 +1,10 @@
-import { Outlet, Link, useNavigate } from 'react-router';
+import { Outlet, Link } from 'react-router';
 import { ShoppingCart, Gift, User, Menu, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useState } from 'react';
 
 export function Layout() {
   const { getCartCount } = useCart();
-  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const cartCount = getCartCount();
 

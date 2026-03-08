@@ -25,7 +25,7 @@ export function SecureForm({
   showRateLimitWarning = true
 }: SecureFormProps) {
   const { token: csrfToken } = useCsrfToken();
-  const { isAllowed, remainingAttempts, checkLimit } = useFormRateLimit(formName);
+  const { isAllowed: _isAllowed, remainingAttempts, checkLimit } = useFormRateLimit(formName);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {

@@ -11,7 +11,7 @@ export function TokenErrorHandler() {
   const [errorCount, setErrorCount] = useState(0);
 
   useEffect(() => {
-    const handle401 = (event: Event) => {
+    const handle401 = (_event: Event) => {
       // CRITICAL: Don't handle 401 errors on public routes
       // Use window.location.pathname directly to avoid stale location from useLocation hook
       const currentPath = window.location.pathname;

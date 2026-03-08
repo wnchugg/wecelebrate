@@ -37,9 +37,9 @@ export function DraggableGiftCard({
   gift,
   index,
   moveGift,
-  onEdit,
+  onEdit: _onEdit,
   onDelete,
-  onPreview,
+  onPreview: _onPreview,
 }: DraggableGiftCardProps) {
   const ref = useRef<HTMLDivElement>(null);
 

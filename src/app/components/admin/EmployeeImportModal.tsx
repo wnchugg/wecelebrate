@@ -81,7 +81,7 @@ export function EmployeeImportModal({ open, onClose, validationType, onImport }:
         .filter(row => Array.isArray(row) && row.length > 0) // Filter out empty rows
         .map((row, index) => {
           // Type guard: treat row as array and create object from it
-          const rowArray = row as any[];
+          const rowArray = row as unknown[];
           // Assuming standard Excel column order: Email, Employee ID, First Name, Last Name, Department, Serial Card
           const record: EmployeeRecord = {
             id: `temp-${index}`,
@@ -224,7 +224,7 @@ export function EmployeeImportModal({ open, onClose, validationType, onImport }:
         });
         
         // Style the header row
-        const headerRow = worksheet.getRow(1) as any;
+        const headerRow = worksheet.getRow(1) as { font: { bold: boolean }; fill: { type: string; pattern: string; fgColor: { argb: string } } };
         headerRow.font = { bold: true };
         headerRow.fill = {
           type: 'pattern',

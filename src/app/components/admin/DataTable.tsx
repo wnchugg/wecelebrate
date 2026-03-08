@@ -21,7 +21,7 @@ export interface DataTableProps<T> {
   actions?: (item: T) => React.ReactNode;
 }
 
-export function DataTable<T extends Record<string, any> = Record<string, any>>({
+export function DataTable<T extends Record<string, unknown> = Record<string, unknown>>({
   data,
   columns,
   keyExtractor,

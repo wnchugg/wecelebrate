@@ -284,7 +284,7 @@ export interface Site extends Omit<GlobalSite, 'settings'> {
 
   // Draft/Live Mode Flags
   _hasUnpublishedChanges?: boolean; // True when draft_settings is populated
-  _draftSettings?: any; // Copy of draft_settings for reference
+  _draftSettings?: Record<string, unknown>; // Copy of draft_settings for reference
 
   createdAt: string;
   updatedAt: string;

@@ -19,7 +19,7 @@ export interface OrderContextType {
   selectGift: (gift: Gift) => void;
   setQuantity: (quantity: number) => void;
   setShippingAddress: (address: ShippingAddress) => void;
-  submitOrder: (orderData: any) => Promise<string>; // Returns order ID
+  submitOrder: (orderData: Record<string, unknown>) => Promise<string>; // Returns order ID
   clearOrder: () => void;
 }
 
@@ -42,7 +42,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
     setShippingAddressState(address);
   };
 
-  const submitOrder = async (orderData: any): Promise<string> => {
+  const submitOrder = async (orderData: Record<string, unknown>): Promise<string> => {
     try {
       const { order } = await orderApi.create({
         ...orderData,
@@ -55,9 +55,10 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       clearOrder();
       
       return order.id;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to submit order';
       console.error('Failed to submit order:', error);
-      throw new Error(error.message || 'Failed to submit order');
+      throw new Error(message);
     }
   };
 

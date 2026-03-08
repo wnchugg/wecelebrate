@@ -65,7 +65,7 @@ interface ExecutionLog {
   recordsProcessed: number;
   recordsFailed: number;
   error?: string;
-  details?: any;
+  details?: Record<string, unknown>;
 }
 
 interface ScheduleManagerProps {

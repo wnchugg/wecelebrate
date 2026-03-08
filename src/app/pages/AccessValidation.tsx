@@ -26,6 +26,7 @@ import {
   emailAccessSchema,
   employeeIdAccessSchema,
   serialCardAccessSchema,
+  type AccessFormValues,
 } from '../schemas/access.schema';
 
 export function AccessValidation() {
@@ -68,8 +69,8 @@ export function AccessValidation() {
   };
 
   // Initialize form with appropriate schema
-  const form = useForm({
-    resolver: zodResolver(getSchema() as any),
+  const form = useForm<AccessFormValues>({
+    resolver: zodResolver(getSchema()),
     defaultValues: validationMethod === 'email'
       ? { email: '' }
       : validationMethod === 'employee_id'
@@ -306,7 +307,7 @@ export function AccessValidation() {
           <Form {...form}>
             <form onSubmit={(e) => { e.preventDefault(); void onSubmit(); }} className="space-y-6">
               <FormField
-                control={form.control as any}
+                control={form.control}
                 name={fieldName}
                 render={({ field }) => (
                   <FormItem>

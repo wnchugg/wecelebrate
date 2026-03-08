@@ -5,8 +5,8 @@ import { Button } from './ui/button';
 interface Change {
   field: string;
   category: string;
-  oldValue: any;
-  newValue: any;
+  oldValue: unknown;
+  newValue: unknown;
   type: 'added' | 'modified' | 'removed';
 }
 
@@ -38,12 +38,13 @@ export function PublishConfirmationModal({
     return groups;
   }, [changes]);
 
-  const formatValue = (value: any): string => {
+  const formatValue = (value: unknown): string => {
     if (value === null || value === undefined || value === '') return '(empty)';
     if (typeof value === 'boolean') return value ? 'Yes' : 'No';
     if (typeof value === 'object') return JSON.stringify(value, null, 2);
     if (typeof value === 'string' && value.length > 100) return value.substring(0, 100) + '...';
-    return String(value);
+    if (typeof value === 'string' || typeof value === 'number') return String(value);
+    return '(unknown type)';
   };
 
   if (!isOpen) return null;  return (

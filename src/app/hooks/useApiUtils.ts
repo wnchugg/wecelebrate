@@ -69,7 +69,7 @@ export function useApi<T>(
 /**
  * Use lazy API (fetch on demand)
  */
-export function useLazyApi<T, A extends any[] = []>(
+export function useLazyApi<T, A extends unknown[] = []>(
   fetcher: (...args: A) => Promise<T>
 ): [
   (...args: A) => Promise<void>,
@@ -122,7 +122,7 @@ export function useLazyApi<T, A extends any[] = []>(
 /**
  * Use mutation (for POST, PUT, DELETE, etc.)
  */
-export function useMutation<T, A extends any[] = []>(
+export function useMutation<T, A extends unknown[] = []>(
   mutationFn: (...args: A) => Promise<T>,
   options?: {
     onSuccess?: (data: T) => void;

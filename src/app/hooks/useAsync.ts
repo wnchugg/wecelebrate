@@ -13,12 +13,12 @@ export interface UseAsyncState<T> {
   isError: boolean;
 }
 
-export interface UseAsyncReturn<T, Args extends any[]> extends UseAsyncState<T> {
+export interface UseAsyncReturn<T, Args extends unknown[]> extends UseAsyncState<T> {
   execute: (...args: Args) => Promise<T | null>;
   reset: () => void;
 }
 
-export function useAsync<T, Args extends any[] = []>(
+export function useAsync<T, Args extends unknown[] = []>(
   asyncFunction: (...args: Args) => Promise<T>,
   immediate: boolean = false
 ): UseAsyncReturn<T, Args> {

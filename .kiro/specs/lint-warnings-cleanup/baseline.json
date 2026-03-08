@@ -1,25 +1,25 @@
 {
-  "timestamp": "2026-03-08T00:22:16.983Z",
-  "totalWarnings": 3762,
-  "totalErrors": 7,
-  "totalFiles": 345,
-  "totalIssues": 3769,
+  "timestamp": "2026-03-08T00:39:17.123Z",
+  "totalWarnings": 3707,
+  "totalErrors": 13,
+  "totalFiles": 342,
+  "totalIssues": 3720,
   "warningsByRule": [
     {
       "rule": "@typescript-eslint/no-unsafe-member-access",
-      "count": 1225,
+      "count": 1221,
       "severity": "warning",
-      "fileCount": 118
+      "fileCount": 117
     },
     {
       "rule": "@typescript-eslint/no-explicit-any",
-      "count": 629,
+      "count": 616,
       "severity": "warning",
-      "fileCount": 151
+      "fileCount": 148
     },
     {
       "rule": "@typescript-eslint/no-unsafe-assignment",
-      "count": 573,
+      "count": 536,
       "severity": "warning",
       "fileCount": 131
     },
@@ -31,9 +31,9 @@
     },
     {
       "rule": "@typescript-eslint/no-unsafe-argument",
-      "count": 294,
+      "count": 283,
       "severity": "warning",
-      "fileCount": 92
+      "fileCount": 91
     },
     {
       "rule": "@typescript-eslint/no-floating-promises",
@@ -49,9 +49,9 @@
     },
     {
       "rule": "@typescript-eslint/no-unsafe-return",
-      "count": 100,
+      "count": 99,
       "severity": "warning",
-      "fileCount": 34
+      "fileCount": 33
     },
     {
       "rule": "@typescript-eslint/no-unnecessary-type-assertion",
@@ -84,16 +84,16 @@
       "fileCount": 5
     },
     {
+      "rule": "@typescript-eslint/no-base-to-string",
+      "count": 29,
+      "severity": "warning",
+      "fileCount": 13
+    },
+    {
       "rule": "@typescript-eslint/no-misused-promises",
       "count": 26,
       "severity": "warning",
       "fileCount": 20
-    },
-    {
-      "rule": "@typescript-eslint/no-base-to-string",
-      "count": 18,
-      "severity": "warning",
-      "fileCount": 9
     },
     {
       "rule": "@typescript-eslint/no-redundant-type-constituents",
@@ -120,6 +120,12 @@
       "fileCount": 3
     },
     {
+      "rule": "@typescript-eslint/restrict-template-expressions",
+      "count": 6,
+      "severity": "error",
+      "fileCount": 4
+    },
+    {
       "rule": "@typescript-eslint/no-duplicate-type-constituents",
       "count": 4,
       "severity": "error",
@@ -144,43 +150,44 @@
       "fileCount": 1
     },
     {
-      "rule": "no-case-declarations",
+      "rule": "@typescript-eslint/restrict-plus-operands",
       "count": 1,
       "severity": "error",
       "fileCount": 1
     },
     {
-      "rule": "@typescript-eslint/restrict-template-expressions",
+      "rule": "no-case-declarations",
       "count": 1,
       "severity": "error",
       "fileCount": 1
     }
   ],
   "categoryCounts": {
-    "@typescript-eslint/no-unsafe-member-access": 1225,
-    "@typescript-eslint/no-explicit-any": 629,
-    "@typescript-eslint/no-unsafe-assignment": 573,
+    "@typescript-eslint/no-unsafe-member-access": 1221,
+    "@typescript-eslint/no-explicit-any": 616,
+    "@typescript-eslint/no-unsafe-assignment": 536,
     "unused-imports/no-unused-vars": 357,
-    "@typescript-eslint/no-unsafe-argument": 294,
+    "@typescript-eslint/no-unsafe-argument": 283,
     "@typescript-eslint/no-floating-promises": 119,
     "@typescript-eslint/no-unsafe-call": 105,
-    "@typescript-eslint/no-unsafe-return": 100,
+    "@typescript-eslint/no-unsafe-return": 99,
     "@typescript-eslint/no-unnecessary-type-assertion": 68,
     "react-hooks/exhaustive-deps": 59,
     "@typescript-eslint/require-await": 57,
     "react-refresh/only-export-components": 53,
     "@typescript-eslint/no-empty-object-type": 30,
+    "@typescript-eslint/no-base-to-string": 29,
     "@typescript-eslint/no-misused-promises": 26,
-    "@typescript-eslint/no-base-to-string": 18,
     "@typescript-eslint/no-redundant-type-constituents": 15,
     "no-useless-escape": 13,
     "promise/param-names": 11,
     "unused-imports/no-unused-imports": 6,
+    "@typescript-eslint/restrict-template-expressions": 6,
     "@typescript-eslint/no-duplicate-type-constituents": 4,
     "promise/catch-or-return": 3,
     "unknown": 1,
     "prefer-const": 1,
-    "no-case-declarations": 1,
-    "@typescript-eslint/restrict-template-expressions": 1
+    "@typescript-eslint/restrict-plus-operands": 1,
+    "no-case-declarations": 1
   }
 }

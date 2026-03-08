@@ -6,7 +6,7 @@ import { useRef, useEffect, useCallback } from 'react';
  * @param delay - The delay in milliseconds (default: 500ms)
  * @returns The throttled callback function
  */
-export function useThrottle<T extends (...args: any[]) => any>(
+export function useThrottle<T extends (...args: never[]) => unknown>(
   callback: T,
   delay: number = 500
 ): (...args: Parameters<T>) => void {

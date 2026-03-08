@@ -12,7 +12,7 @@ import { projectId, publicAnonKey } from '../../../utils/supabase/info';
 interface TestResult {
   status: 'pending' | 'running' | 'success' | 'error';
   message: string;
-  data?: any;
+  data?: unknown;
 }
 
 interface Stats {

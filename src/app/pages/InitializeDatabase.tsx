@@ -6,7 +6,7 @@ import { getCurrentEnvironment, buildApiUrl } from '../config/deploymentEnvironm
 export function InitializeDatabase() {
   const navigate = useNavigate();
   const [isSeeding, setIsSeeding] = useState(false);
-  const [result, setResult] = useState<{ success: boolean; message: string; credentials?: any } | null>(null);
+  const [result, setResult] = useState<{ success: boolean; message: string; credentials?: { email: string; password: string } } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleInitialSeed = async () => {

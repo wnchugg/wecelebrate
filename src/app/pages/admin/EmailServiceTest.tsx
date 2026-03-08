@@ -58,8 +58,9 @@ export function EmailServiceTest() {
       } else {
         toast.error('Failed to send test email');
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to send test email');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to send test email';
+      toast.error(message);
       console.error(error);
     } finally {
       setIsSending(false);

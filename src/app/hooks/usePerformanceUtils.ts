@@ -84,13 +84,13 @@ export function useRenderTime(componentName: string = 'Component') {
 /**
  * Use why did you update (debug re-renders)
  */
-export function useWhyDidYouUpdate(name: string, props: Record<string, any>) {
-  const previousProps = useRef<Record<string, any>>();
+export function useWhyDidYouUpdate(name: string, props: Record<string, unknown>) {
+  const previousProps = useRef<Record<string, unknown>>();
   
   useEffect(() => {
     if (previousProps.current) {
       const allKeys = Object.keys({ ...previousProps.current, ...props });
-      const changedProps: Record<string, { from: any; to: any }> = {};
+      const changedProps: Record<string, { from: unknown; to: unknown }> = {};
       
       allKeys.forEach(key => {
         if (previousProps.current[key] !== props[key]) {
@@ -126,7 +126,7 @@ export function useConstant<T>(initializer: () => T): T {
 /**
  * Use event callback (stable callback reference)
  */
-export function useEventCallback<T extends (...args: any[]) => any>(
+export function useEventCallback<T extends (...args: never[]) => unknown>(
   fn: T
 ): T {
   const ref = useRef<T>(fn);
@@ -201,7 +201,7 @@ export function useVirtualList<T>(
 /**
  * Use batch state updates
  */
-export function useBatchState<T extends Record<string, any>>(
+export function useBatchState<T extends Record<string, unknown>>(
   initialState: T
 ): [T, (updates: Partial<T>) => void, () => void] {
   const [state, setState] = useState(initialState);

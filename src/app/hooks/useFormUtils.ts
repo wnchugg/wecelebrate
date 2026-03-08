@@ -39,7 +39,7 @@ export type ValidationSchema<T> = {
 /**
  * Use form with validation
  */
-export function useForm<T extends Record<string, any>>(
+export function useForm<T extends Record<string, unknown>>(
   initialValues: T,
   validationSchema?: ValidationSchema<T>
 ) {

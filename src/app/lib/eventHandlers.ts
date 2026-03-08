@@ -135,7 +135,7 @@ export type SortChangeHandler = (sortBy: string, order: 'asc' | 'desc') => void;
 /**
  * Filter handlers
  */
-export type FilterChangeHandler = (filters: Record<string, any>) => void;
+export type FilterChangeHandler = (filters: Record<string, unknown>) => void;
 
 /**
  * Search handlers

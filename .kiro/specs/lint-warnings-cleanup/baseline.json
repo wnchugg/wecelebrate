@@ -1,25 +1,25 @@
 {
-  "timestamp": "2026-03-08T13:08:00.204Z",
-  "totalWarnings": 3593,
+  "timestamp": "2026-03-08T13:11:57.706Z",
+  "totalWarnings": 3572,
   "totalErrors": 13,
-  "totalFiles": 331,
-  "totalIssues": 3606,
+  "totalFiles": 329,
+  "totalIssues": 3585,
   "warningsByRule": [
     {
       "rule": "@typescript-eslint/no-unsafe-member-access",
-      "count": 1196,
+      "count": 1192,
       "severity": "warning",
-      "fileCount": 112
+      "fileCount": 111
     },
     {
       "rule": "@typescript-eslint/no-explicit-any",
-      "count": 560,
+      "count": 548,
       "severity": "warning",
-      "fileCount": 131
+      "fileCount": 127
     },
     {
       "rule": "@typescript-eslint/no-unsafe-assignment",
-      "count": 525,
+      "count": 522,
       "severity": "warning",
       "fileCount": 127
     },
@@ -31,9 +31,9 @@
     },
     {
       "rule": "@typescript-eslint/no-unsafe-argument",
-      "count": 275,
+      "count": 274,
       "severity": "warning",
-      "fileCount": 90
+      "fileCount": 89
     },
     {
       "rule": "@typescript-eslint/no-floating-promises",
@@ -49,9 +49,9 @@
     },
     {
       "rule": "@typescript-eslint/no-unsafe-return",
-      "count": 95,
+      "count": 94,
       "severity": "warning",
-      "fileCount": 30
+      "fileCount": 29
     },
     {
       "rule": "@typescript-eslint/no-unnecessary-type-assertion",
@@ -163,14 +163,14 @@
     }
   ],
   "categoryCounts": {
-    "@typescript-eslint/no-unsafe-member-access": 1196,
-    "@typescript-eslint/no-explicit-any": 560,
-    "@typescript-eslint/no-unsafe-assignment": 525,
+    "@typescript-eslint/no-unsafe-member-access": 1192,
+    "@typescript-eslint/no-explicit-any": 548,
+    "@typescript-eslint/no-unsafe-assignment": 522,
     "unused-imports/no-unused-vars": 350,
-    "@typescript-eslint/no-unsafe-argument": 275,
+    "@typescript-eslint/no-unsafe-argument": 274,
     "@typescript-eslint/no-floating-promises": 119,
     "@typescript-eslint/no-unsafe-call": 99,
-    "@typescript-eslint/no-unsafe-return": 95,
+    "@typescript-eslint/no-unsafe-return": 94,
     "@typescript-eslint/no-unnecessary-type-assertion": 69,
     "react-hooks/exhaustive-deps": 59,
     "@typescript-eslint/require-await": 57,

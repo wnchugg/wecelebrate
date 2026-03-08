@@ -22,14 +22,6 @@ interface DragItem {
   index: number;
 }
 
-interface DragCollectedProps {
-  handlerId: string | symbol | null;
-}
-
-interface DropCollectedProps {
-  isDragging: boolean;
-}
-
 export interface DraggableGiftCardProps {
   gift: Gift;
   index: number;

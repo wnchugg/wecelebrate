@@ -13,7 +13,7 @@ export interface BackendConnectionStatusProps {
   showQuickFix?: boolean;
 }
 
-export function BackendConnectionStatus({ showQuickFix = true }: BackendConnectionStatusProps) {
+export function BackendConnectionStatus({ showQuickFix: _showQuickFix = true }: BackendConnectionStatusProps) {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>({
     status: 'checking',
     message: 'Checking backend connection...',

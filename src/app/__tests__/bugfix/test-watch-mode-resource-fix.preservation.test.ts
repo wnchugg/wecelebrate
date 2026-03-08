@@ -373,7 +373,7 @@ describe('Test Watch Mode Resource Fix - Preservation Properties', () => {
         expectedMaxConcurrency: fc.constantFrom(2, 4),
         expectedMaxWorkers: fc.constantFrom(2, 4),
       })
-    ])('should verify command-line overrides take precedence (property-based)', ({ command, expectedMaxConcurrency, expectedMaxWorkers }) => {
+    ])('should verify command-line overrides take precedence (property-based)', ({ command, expectedMaxConcurrency: _expectedMaxConcurrency, expectedMaxWorkers: _expectedMaxWorkers }) => {
       /**
        * Property-based test: Verify command-line overrides work correctly
        * 

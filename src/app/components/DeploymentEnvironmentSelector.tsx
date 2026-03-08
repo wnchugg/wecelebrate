@@ -20,7 +20,7 @@ export function DeploymentEnvironmentSelector({
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [hasCredentials, setHasCredentials] = useState(false);
-  const [showWarning, setShowWarning] = useState(false);
+  const [_showWarning, setShowWarning] = useState(false);
 
   // Close dropdown when clicking outside
   useEffect(() => {

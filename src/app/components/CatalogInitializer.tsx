@@ -8,8 +8,8 @@ import { ensureCatalogInitialized } from '../lib/apiClient';
 import { logger } from '../utils/logger';
 
 export function CatalogInitializer(): null {
-  const [isInitializing, setIsInitializing] = useState(false);
-  const [initError, setInitError] = useState<string | null>(null);
+  const [_isInitializing, setIsInitializing] = useState(false);
+  const [_initError, setInitError] = useState<string | null>(null);
 
   useEffect(() => {
     const initialize = async () => {

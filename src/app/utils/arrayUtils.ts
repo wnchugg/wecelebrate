@@ -28,8 +28,8 @@ export function uniqueBy<T>(array: T[], key: keyof T): T[] {
 /**
  * Flatten array
  */
-export function flatten<T>(array: any[]): T[] {
-  return array.flat(Infinity);
+export function flatten<T>(array: unknown[]): T[] {
+  return array.flat(Infinity) as T[];
 }
 
 /**

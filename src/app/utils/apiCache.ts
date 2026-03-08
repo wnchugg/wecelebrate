@@ -20,7 +20,7 @@ interface CacheConfig {
 }
 
 class APICache {
-  private cache: Map<string, CacheEntry<any>>;
+  private cache: Map<string, CacheEntry<unknown>>;
   private config: CacheConfig;
 
   constructor(config?: Partial<CacheConfig>) {
@@ -36,7 +36,7 @@ class APICache {
   /**
    * Generate cache key from URL and params
    */
-  private generateKey(url: string, params?: Record<string, any>): string {
+  private generateKey(url: string, params?: Record<string, unknown>): string {
     const paramString = params ? JSON.stringify(params) : '';
     return `${url}:${paramString}`;
   }
@@ -44,7 +44,7 @@ class APICache {
   /**
    * Check if cache entry is expired
    */
-  private isExpired(entry: CacheEntry<any>): boolean {
+  private isExpired(entry: CacheEntry<unknown>): boolean {
     return Date.now() - entry.timestamp > entry.ttl;
   }
 
@@ -78,7 +78,7 @@ class APICache {
   set<T>(
     url: string, 
     data: T, 
-    params?: Record<string, any>, 
+    params?: Record<string, unknown>, 
     ttl?: number
   ): void {
     const key = this.generateKey(url, params);
@@ -103,7 +103,7 @@ class APICache {
   /**
    * Get cache entry
    */
-  get<T>(url: string, params?: Record<string, any>): T | undefined {
+  get<T>(url: string, params?: Record<string, unknown>): T | undefined {
     const key = this.generateKey(url, params);
     const entry = this.cache.get(key);
 
@@ -132,7 +132,7 @@ class APICache {
   /**
    * Check if cache has valid entry
    */
-  has(url: string, params?: Record<string, any>): boolean {
+  has(url: string, params?: Record<string, unknown>): boolean {
     const data = this.get(url, params);
     return data !== undefined;
   }
@@ -140,7 +140,7 @@ class APICache {
   /**
    * Invalidate specific cache entry
    */
-  invalidate(url: string, params?: Record<string, any>): void {
+  invalidate(url: string, params?: Record<string, unknown>): void {
     const key = this.generateKey(url, params);
     const deleted = this.cache.delete(key);
 
@@ -296,7 +296,7 @@ export const getCacheStats = () => ({
 });
 
 // Additional standalone functions for testing
-export const deleteEntry = (url: string, params?: Record<string, any>) => {
+export const deleteEntry = (url: string, params?: Record<string, unknown>) => {
   apiCache.invalidate(url, params);
 };
 

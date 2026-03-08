@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-export interface ValidationRule<T = any> {
+export interface ValidationRule<T = unknown> {
   validate: (value: T) => boolean;
   message: string;
 }
@@ -15,7 +15,7 @@ export interface ValidationResult {
  * @param rules - Array of validation rules
  * @returns Validation function and result
  */
-export function useFormValidation<T = any>(
+export function useFormValidation<T = unknown>(
   rules: ValidationRule<T>[]
 ): [(value: T) => ValidationResult, ValidationResult | null] {
   const [result, setResult] = useState<ValidationResult | null>(null);

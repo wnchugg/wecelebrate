@@ -17,9 +17,9 @@ import { logger } from '../utils/logger';
 export function BackendConnectionDiagnostic() {
   const [status, setStatus] = useState<'checking' | 'success' | 'warning' | 'error'>('checking');
   const [message, setMessage] = useState('Checking connection...');
-  const [details, setDetails] = useState<any>(null);
+  const [details, setDetails] = useState<Record<string, unknown> | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [rawResponse, setRawResponse] = useState<any>(null);
+  const [rawResponse, setRawResponse] = useState<Record<string, unknown> | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const checkConnection = async () => {

@@ -49,13 +49,13 @@ export function useMountTime(componentName: string, enabled = true) {
 /**
  * Hook to track re-renders and their causes
  */
-export function useWhyDidYouUpdate(name: string, props: Record<string, any>) {
-  const previousProps = useRef<Record<string, any>>();
+export function useWhyDidYouUpdate(name: string, props: Record<string, unknown>) {
+  const previousProps = useRef<Record<string, unknown>>();
 
   useEffect(() => {
     if (previousProps.current) {
       const allKeys = Object.keys({ ...previousProps.current, ...props });
-      const changedProps: Record<string, { from: any; to: any }> = {};
+      const changedProps: Record<string, { from: unknown; to: unknown }> = {};
 
       allKeys.forEach((key) => {
         if (previousProps.current[key] !== props[key]) {
@@ -207,8 +207,8 @@ export function useWindowSize() {
 export function useIdleCallback(callback: () => void, deps: React.DependencyList) {
   useEffect(() => {
     if ('requestIdleCallback' in window) {
-      const id = (window as any).requestIdleCallback(callback);
-      return () => (window as any).cancelIdleCallback(id);
+      const id = (window as Window & { requestIdleCallback: (cb: () => void) => number }).requestIdleCallback(callback);
+      return () => (window as Window & { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(id);
     } else {
       // Fallback for browsers without requestIdleCallback
       const timeout = setTimeout(callback, 1);

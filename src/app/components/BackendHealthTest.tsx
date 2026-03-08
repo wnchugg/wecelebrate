@@ -5,7 +5,7 @@ import { getCurrentEnvironment } from '../config/deploymentEnvironments';
 export function BackendHealthTest() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
-  const [response, setResponse] = useState<any>(null);
+  const [response, setResponse] = useState<Record<string, unknown> | null>(null);
   const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {

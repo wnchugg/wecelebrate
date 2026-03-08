@@ -216,7 +216,7 @@ export class ConfigurationValidator {
   /**
    * Validate a field value against validation rules
    */
-  validateField(field: VisualField, value: any): ValidationResult {
+  validateField(field: VisualField, value: unknown): ValidationResult {
     const errors: ValidationError[] = [];
 
     if (!field.validation || field.validation.length === 0) {
@@ -239,7 +239,7 @@ export class ConfigurationValidator {
   /**
    * Validate a single validation rule
    */
-  private validateRule(rule: ValidationRule, value: any, fieldLabel: string): ValidationError | null {
+  private validateRule(rule: ValidationRule, value: unknown, fieldLabel: string): ValidationError | null {
     switch (rule.type) {
       case 'required':
         if (value === null || value === undefined || value === '') {

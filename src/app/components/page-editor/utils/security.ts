@@ -129,7 +129,7 @@ export const getIframeCSP = (): string => {
 /**
  * Validate block content based on block type
  */
-export const validateBlockContent = (blockType: string, content: any): {
+export const validateBlockContent = (blockType: string, content: Record<string, unknown>): {
   valid: boolean;
   errors: string[];
 } => {

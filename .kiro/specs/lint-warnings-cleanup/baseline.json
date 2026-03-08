@@ -1,25 +1,25 @@
 {
-  "timestamp": "2026-03-08T13:11:57.706Z",
-  "totalWarnings": 3572,
+  "timestamp": "2026-03-08T13:24:46.823Z",
+  "totalWarnings": 3557,
   "totalErrors": 13,
-  "totalFiles": 329,
-  "totalIssues": 3585,
+  "totalFiles": 326,
+  "totalIssues": 3570,
   "warningsByRule": [
     {
       "rule": "@typescript-eslint/no-unsafe-member-access",
-      "count": 1192,
+      "count": 1190,
       "severity": "warning",
-      "fileCount": 111
+      "fileCount": 110
     },
     {
       "rule": "@typescript-eslint/no-explicit-any",
-      "count": 548,
+      "count": 536,
       "severity": "warning",
-      "fileCount": 127
+      "fileCount": 123
     },
     {
       "rule": "@typescript-eslint/no-unsafe-assignment",
-      "count": 522,
+      "count": 520,
       "severity": "warning",
       "fileCount": 127
     },
@@ -79,9 +79,9 @@
     },
     {
       "rule": "@typescript-eslint/no-base-to-string",
-      "count": 31,
+      "count": 32,
       "severity": "warning",
-      "fileCount": 14
+      "fileCount": 15
     },
     {
       "rule": "@typescript-eslint/no-empty-object-type",
@@ -163,9 +163,9 @@
     }
   ],
   "categoryCounts": {
-    "@typescript-eslint/no-unsafe-member-access": 1192,
-    "@typescript-eslint/no-explicit-any": 548,
-    "@typescript-eslint/no-unsafe-assignment": 522,
+    "@typescript-eslint/no-unsafe-member-access": 1190,
+    "@typescript-eslint/no-explicit-any": 536,
+    "@typescript-eslint/no-unsafe-assignment": 520,
     "unused-imports/no-unused-vars": 350,
     "@typescript-eslint/no-unsafe-argument": 274,
     "@typescript-eslint/no-floating-promises": 119,
@@ -175,7 +175,7 @@
     "react-hooks/exhaustive-deps": 59,
     "@typescript-eslint/require-await": 57,
     "react-refresh/only-export-components": 53,
-    "@typescript-eslint/no-base-to-string": 31,
+    "@typescript-eslint/no-base-to-string": 32,
     "@typescript-eslint/no-empty-object-type": 30,
     "@typescript-eslint/no-misused-promises": 26,
     "@typescript-eslint/no-redundant-type-constituents": 15,

@@ -356,8 +356,8 @@ export function sanitizeInput(input: string, maxLength = 1000): string {
  * Comprehensive form validation
  */
 export function validateForm(
-  data: Record<string, any>,
-  schema: Record<string, (value: any) => { valid: boolean; error?: string }>
+  data: Record<string, unknown>,
+  schema: Record<string, (value: unknown) => { valid: boolean; error?: string }>
 ): { valid: boolean; errors: Record<string, string> } {
   const errors: Record<string, string> = {};
 

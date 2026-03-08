@@ -95,7 +95,7 @@ export function canPublishTranslations(
   for (const field of requiredFields) {
     // Handle dot-notation paths (e.g., 'welcomePage.title')
     const parts = field.split('.');
-    let current: any = translations;
+    let current: unknown = translations;
     
     // Navigate through nested structure
     for (const part of parts) {
@@ -103,7 +103,7 @@ export function canPublishTranslations(
         current = undefined;
         break;
       }
-      current = current[part];
+      current = (current as Record<string, unknown>)[part];
     }
 
     // Check if we have a translation object with the default language

@@ -17,7 +17,7 @@ export type NonNullableFields<T> = {
 };
 
 // Async function type
-export type AsyncFunction<T = void> = (...args: any[]) => Promise<T>;
+export type AsyncFunction<T = void> = (...args: never[]) => Promise<T>;
 
 // Extract promise result type
 export type PromiseType<T> = T extends Promise<infer U> ? U : T;

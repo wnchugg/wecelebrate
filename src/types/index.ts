@@ -91,7 +91,7 @@ export interface Site {
   
   // Multi-language content support (camelCase)
   availableLanguages?: string[];
-  translations?: Record<string, any>;
+  translations?: Record<string, unknown>;
   draftAvailableLanguages?: string[];
   _draftSettings?: Record<string, unknown>;
   

@@ -104,7 +104,7 @@ export type BooleanChangeHandler = (value: boolean) => void;
 /**
  * Generic value change handler
  */
-export type ValueChangeHandler<T = any> = (value: T) => void;
+export type ValueChangeHandler<T = unknown> = (value: T) => void;
 
 // ==================== Async Event Handlers ====================
 

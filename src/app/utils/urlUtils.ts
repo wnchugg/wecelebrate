@@ -29,7 +29,7 @@ export function parseQueryString(queryString: string): Record<string, string> {
 /**
  * Build query string from object
  */
-export function buildQueryString(params: Record<string, any>): string {
+export function buildQueryString(params: Record<string, unknown>): string {
   const parts: string[] = [];
   
   for (const [key, value] of Object.entries(params)) {

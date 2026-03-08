@@ -9,7 +9,7 @@ export interface TestResult {
   testName: string;
   passed: boolean;
   message: string;
-  details?: any;
+  details?: unknown;
 }
 
 export class ValidationTester {

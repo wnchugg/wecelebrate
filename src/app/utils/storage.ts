@@ -155,7 +155,7 @@ export function isSupabaseStorageUrl(url: string): boolean {
 /**
  * Sets an item in localStorage with JSON serialization
  */
-export function setItem(key: string, value: any): void {
+export function setItem(key: string, value: unknown): void {
   try {
     const serialized = JSON.stringify(value);
     localStorage.setItem(key, serialized);

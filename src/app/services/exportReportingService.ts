@@ -11,7 +11,7 @@ export interface ReportTemplate {
   recipients: number;
   status: 'active' | 'paused';
   dataSource: string[];
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
 }
 
 export interface GeneratedReport {
@@ -54,7 +54,7 @@ export interface CustomReportConfig {
   name: string;
   description?: string;
   metrics: string[];
-  filters: Record<string, any>;
+  filters: Record<string, unknown>;
   groupBy?: string[];
   sortBy?: string;
   format: 'pdf' | 'csv' | 'xlsx';
@@ -140,7 +140,7 @@ class ExportReportingService {
   async generateReport(
     templateId: string,
     format?: 'pdf' | 'csv' | 'xlsx',
-    filters?: Record<string, any>
+    filters?: Record<string, unknown>
   ): Promise<GeneratedReport> {
     try {
       const response = await fetch(`${this.baseUrl}/reports/generate`, {

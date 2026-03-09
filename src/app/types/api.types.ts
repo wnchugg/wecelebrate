@@ -318,7 +318,7 @@ export interface Site {
   
   // Multi-language content support
   availableLanguages?: string[];          // Languages enabled for this site (default: ['en'])
-  translations?: Record<string, any>;     // JSONB column storing all translations
+  translations?: Record<string, unknown>;     // JSONB column storing all translations
   draftAvailableLanguages?: string[];     // Draft languages (before publish)
   
   // NEW: UX Customization (can override client defaults)
@@ -384,7 +384,7 @@ export interface CreateSiteRequest {
   
   // Multi-language content support
   availableLanguages?: string[];          // Languages enabled for this site (default: ['en'])
-  translations?: Record<string, any>;     // JSONB column storing all translations
+  translations?: Record<string, unknown>;     // JSONB column storing all translations
   draftAvailableLanguages?: string[];     // Draft languages (before publish)
   
   // Phase 1: ERP Integration Fields (CRITICAL for ERP sync)
@@ -442,7 +442,7 @@ export interface UpdateSiteRequest {
   
   // Multi-language content support
   availableLanguages?: string[];          // Languages enabled for this site (default: ['en'])
-  translations?: Record<string, any>;     // JSONB column storing all translations
+  translations?: Record<string, unknown>;     // JSONB column storing all translations
   draftAvailableLanguages?: string[];     // Draft languages (before publish)
   
   // Phase 1: ERP Integration Fields (CRITICAL for ERP sync)

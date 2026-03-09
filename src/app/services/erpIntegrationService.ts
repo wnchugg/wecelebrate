@@ -69,11 +69,11 @@ export interface ERPSyncSettings {
   syncOnDemand: boolean;
   conflictResolution: 'erp_wins' | 'system_wins' | 'newest_wins' | 'manual';
   fieldMapping?: Record<string, string>;
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
   transformations?: Array<{
     field: string;
     operation: string;
-    value?: any;
+    value?: unknown;
   }>;
 }
 
@@ -89,7 +89,7 @@ export interface ERPSyncLog {
   recordsSuccess: number;
   recordsFailed: number;
   errorMessage?: string;
-  errorDetails?: any;
+  errorDetails?: unknown;
   duration?: number; // seconds
 }
 
@@ -183,7 +183,7 @@ export interface ERPConnectionTestResult {
   success: boolean;
   message: string;
   responseTime?: number;
-  details?: any;
+  details?: unknown;
   errors?: string[];
 }
 

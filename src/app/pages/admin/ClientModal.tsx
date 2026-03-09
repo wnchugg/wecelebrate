@@ -123,7 +123,7 @@ export function ClientModal({ open, onClose, client, onSave }: ClientModalProps)
     setActiveTab('basic');
   }, [client, open]);
 
-  const validateField = (name: string, value: any): string | undefined => {
+  const validateField = (name: string, value: unknown): string | undefined => {
     switch (name) {
       case 'name': {
         const nameValidation = validateRequired(value, 'Client name');
@@ -173,7 +173,7 @@ export function ClientModal({ open, onClose, client, onSave }: ClientModalProps)
     }
   };
 
-  const handleChange = (name: string, value: any) => {
+  const handleChange = (name: string, value: unknown) => {
     setFormData({ ...formData, [name]: value });
     // Clear error when user starts typing
     if (touched[name] && errors[name]) {
@@ -261,7 +261,7 @@ export function ClientModal({ open, onClose, client, onSave }: ClientModalProps)
           
           // Include field if it has changed
           if (currentValue !== originalValue) {
-            (dataToSend as any)[key] = currentValue;
+            (dataToSend as Record<string, unknown>)[key] = currentValue;
           }
         });
         
@@ -277,13 +277,14 @@ export function ClientModal({ open, onClose, client, onSave }: ClientModalProps)
         };
         
         if (JSON.stringify(clientAddress) !== JSON.stringify(originalAddress)) {
-          (dataToSend as any).clientAddressLine1 = clientAddress.line1;
-          (dataToSend as any).clientAddressLine2 = clientAddress.line2;
-          (dataToSend as any).clientAddressLine3 = clientAddress.line3;
-          (dataToSend as any).clientCity = clientAddress.city;
-          (dataToSend as any).clientCountryState = clientAddress.state;
-          (dataToSend as any).clientPostalCode = clientAddress.postalCode;
-          (dataToSend as any).clientCountry = clientAddress.country;
+          const dataRecord = dataToSend as Record<string, unknown>;
+          dataRecord.clientAddressLine1 = clientAddress.line1;
+          dataRecord.clientAddressLine2 = clientAddress.line2;
+          dataRecord.clientAddressLine3 = clientAddress.line3;
+          dataRecord.clientCity = clientAddress.city;
+          dataRecord.clientCountryState = clientAddress.state;
+          dataRecord.clientPostalCode = clientAddress.postalCode;
+          dataRecord.clientCountry = clientAddress.country;
         }
       } else {
         // Create mode - send all populated fields including address

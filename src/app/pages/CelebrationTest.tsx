@@ -34,7 +34,7 @@ export function CelebrationTest() {
 
   const [stats, setStats] = useState<Stats>({ total: 0, passed: 0, failed: 0, created: 0 });
   const [celebrationId, setCelebrationId] = useState<string>('');
-  const [celebrations, setCelebrations] = useState<any[]>([]);
+  const [celebrations, setCelebrations] = useState<unknown[]>([]);
   const [runningAll, setRunningAll] = useState(false);
 
   // Form values
@@ -47,7 +47,7 @@ export function CelebrationTest() {
 
   const API_BASE = `https://us-central1-jala-2.cloudfunctions.net/make-server-6fcaeea3`;
 
-  const updateResult = (testId: string, status: 'running' | 'success' | 'error', message: string, data?: any) => {
+  const updateResult = (testId: string, status: 'running' | 'success' | 'error', message: string, data?: unknown) => {
     setResults(prev => ({
       ...prev,
       [testId]: { status, message, data }

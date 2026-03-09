@@ -38,7 +38,7 @@ interface DebugInfo {
   token: {
     exists: boolean;
     raw?: string;
-    decoded?: any;
+    decoded?: unknown;
     algorithm?: string;
     issuedAt?: string;
     expiresAt?: string;
@@ -66,7 +66,7 @@ interface DebugInfo {
     tested: boolean;
     success?: boolean;
     error?: string;
-    response?: any;
+    response?: unknown;
   };
 }
 

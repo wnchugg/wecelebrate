@@ -35,7 +35,7 @@ class DashboardPerformanceMonitor {
   /**
    * Start timing an operation
    */
-  startTimer(name: string, metadata?: Record<string, any>) {
+  startTimer(name: string, metadata?: Record<string, unknown>) {
     if (!this.enabled) return;
 
     const startTime = performance.now();
@@ -47,7 +47,7 @@ class DashboardPerformanceMonitor {
   /**
    * End timing an operation and record the metric
    */
-  endTimer(name: string, metadata?: Record<string, any>) {
+  endTimer(name: string, metadata?: Record<string, unknown>) {
     if (!this.enabled) return;
 
     const startTime = this.timers.get(name);
@@ -81,7 +81,7 @@ class DashboardPerformanceMonitor {
   /**
    * Mark a specific point in time
    */
-  mark(name: string, metadata?: Record<string, any>) {
+  mark(name: string, metadata?: Record<string, unknown>) {
     if (!this.enabled) return;
 
     performance.mark(name);
@@ -230,7 +230,7 @@ class DashboardPerformanceMonitor {
   /**
    * Monitor a function execution
    */
-  async monitorAsync<T>(name: string, fn: () => Promise<T>, metadata?: Record<string, any>): Promise<T> {
+  async monitorAsync<T>(name: string, fn: () => Promise<T>, metadata?: Record<string, unknown>): Promise<T> {
     this.startTimer(name, metadata);
     try {
       const result = await fn();
@@ -245,7 +245,7 @@ class DashboardPerformanceMonitor {
   /**
    * Monitor a synchronous function execution
    */
-  monitor<T>(name: string, fn: () => T, metadata?: Record<string, any>): T {
+  monitor<T>(name: string, fn: () => T, metadata?: Record<string, unknown>): T {
     this.startTimer(name, metadata);
     try {
       const result = fn();
@@ -263,7 +263,7 @@ export const dashboardPerformanceMonitor = new DashboardPerformanceMonitor();
 
 // Expose to window for debugging in console
 if (typeof window !== 'undefined') {
-  (window as any).dashboardPerfMon = dashboardPerformanceMonitor;
+  (window as Record<string, unknown>).dashboardPerfMon = dashboardPerformanceMonitor;
 }
 
 /**
@@ -271,20 +271,20 @@ if (typeof window !== 'undefined') {
  */
 export function usePerformanceMonitor() {
   return {
-    startTimer: (name: string, metadata?: Record<string, any>) =>
+    startTimer: (name: string, metadata?: Record<string, unknown>) =>
       dashboardPerformanceMonitor.startTimer(name, metadata),
-    endTimer: (name: string, metadata?: Record<string, any>) =>
+    endTimer: (name: string, metadata?: Record<string, unknown>) =>
       dashboardPerformanceMonitor.endTimer(name, metadata),
-    mark: (name: string, metadata?: Record<string, any>) =>
+    mark: (name: string, metadata?: Record<string, unknown>) =>
       dashboardPerformanceMonitor.mark(name, metadata),
     measure: (name: string, startMark: string, endMark: string) =>
       dashboardPerformanceMonitor.measure(name, startMark, endMark),
     getReport: () => dashboardPerformanceMonitor.getReport(),
     printReport: () => dashboardPerformanceMonitor.printReport(),
     clear: () => dashboardPerformanceMonitor.clear(),
-    monitorAsync: <T,>(name: string, fn: () => Promise<T>, metadata?: Record<string, any>) =>
+    monitorAsync: <T,>(name: string, fn: () => Promise<T>, metadata?: Record<string, unknown>) =>
       dashboardPerformanceMonitor.monitorAsync(name, fn, metadata),
-    monitor: <T,>(name: string, fn: () => T, metadata?: Record<string, any>) =>
+    monitor: <T,>(name: string, fn: () => T, metadata?: Record<string, unknown>) =>
       dashboardPerformanceMonitor.monitor(name, fn, metadata),
   };
 }

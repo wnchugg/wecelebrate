@@ -1,27 +1,27 @@
 {
-  "timestamp": "2026-03-09T12:57:49.561Z",
-  "totalWarnings": 3387,
+  "timestamp": "2026-03-09T19:23:20.966Z",
+  "totalWarnings": 3367,
   "totalErrors": 13,
-  "totalFiles": 319,
-  "totalIssues": 3400,
+  "totalFiles": 317,
+  "totalIssues": 3380,
   "warningsByRule": [
     {
       "rule": "@typescript-eslint/no-unsafe-member-access",
-      "count": 1137,
+      "count": 1136,
       "severity": "warning",
-      "fileCount": 106
+      "fileCount": 105
     },
     {
       "rule": "@typescript-eslint/no-unsafe-assignment",
-      "count": 492,
+      "count": 490,
       "severity": "warning",
-      "fileCount": 124
+      "fileCount": 123
     },
     {
       "rule": "@typescript-eslint/no-explicit-any",
-      "count": 472,
+      "count": 456,
       "severity": "warning",
-      "fileCount": 105
+      "fileCount": 102
     },
     {
       "rule": "unused-imports/no-unused-vars",
@@ -31,9 +31,9 @@
     },
     {
       "rule": "@typescript-eslint/no-unsafe-argument",
-      "count": 257,
+      "count": 256,
       "severity": "warning",
-      "fileCount": 82
+      "fileCount": 81
     },
     {
       "rule": "@typescript-eslint/no-floating-promises",
@@ -163,11 +163,11 @@
     }
   ],
   "categoryCounts": {
-    "@typescript-eslint/no-unsafe-member-access": 1137,
-    "@typescript-eslint/no-unsafe-assignment": 492,
-    "@typescript-eslint/no-explicit-any": 472,
+    "@typescript-eslint/no-unsafe-member-access": 1136,
+    "@typescript-eslint/no-unsafe-assignment": 490,
+    "@typescript-eslint/no-explicit-any": 456,
     "unused-imports/no-unused-vars": 350,
-    "@typescript-eslint/no-unsafe-argument": 257,
+    "@typescript-eslint/no-unsafe-argument": 256,
     "@typescript-eslint/no-floating-promises": 119,
     "@typescript-eslint/no-unsafe-call": 94,
     "@typescript-eslint/no-unsafe-return": 90,

@@ -95,7 +95,7 @@ class SecurityLogger {
   logEvent(
     type: SecurityEventType,
     severity: SecuritySeverity,
-    details?: any,
+    details?: unknown,
     success: boolean = true
   ): void {
     const event: SecurityEvent = {
@@ -358,10 +358,10 @@ export const securityLogger = new SecurityLogger();
 export const logSecurityEvent = (
   type: SecurityEventType,
   severity: SecuritySeverity,
-  details?: any,
+  details?: unknown,
   success: boolean = true
 ) => securityLogger.logEvent(type, severity, details, success);
 
-export const getSecurityEvents = (filters?: any) => securityLogger.getEvents(filters);
+export const getSecurityEvents = (filters?: unknown) => securityLogger.getEvents(filters);
 export const getSecuritySummary = (timeWindow?: number) => securityLogger.getSummary(timeWindow);
 export const clearSecurityEvents = () => securityLogger.clearAll();

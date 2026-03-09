@@ -77,7 +77,7 @@ export class EventEmitter<T extends Record<string, unknown> = Record<string, unk
 /**
  * Create a custom event
  */
-export function createCustomEvent<T = any>(
+export function createCustomEvent<T = unknown>(
   name: string,
   detail?: T,
   options?: EventInit
@@ -93,7 +93,7 @@ export function createCustomEvent<T = any>(
 /**
  * Dispatch a custom event
  */
-export function dispatchCustomEvent<T = any>(
+export function dispatchCustomEvent<T = unknown>(
   element: Element | Document | Window,
   name: string,
   detail?: T,

@@ -55,7 +55,7 @@ interface Order {
   status: string;
   quantity?: number;
   totalAmount?: number;
-  shippingAddress?: any;
+  shippingAddress?: unknown;
   trackingNumber?: string;
   createdAt: string;
   updatedAt?: string;

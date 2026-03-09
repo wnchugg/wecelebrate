@@ -25,7 +25,7 @@ interface Celebration {
   type: string;
   date: string;
   status: string;
-  metadata?: any;
+  metadata?: unknown;
   createdAt: string;
 }
 
@@ -35,7 +35,7 @@ interface Order {
   status: string;
   totalAmount?: number;
   createdAt: string;
-  metadata?: any;
+  metadata?: unknown;
 }
 
 interface Employee {

@@ -1,8 +1,8 @@
 interface Change {
   field: string;
   category: string;
-  oldValue: any;
-  newValue: any;
+  oldValue: unknown;
+  newValue: unknown;
   type: 'added' | 'modified' | 'removed';
 }
 

@@ -71,7 +71,7 @@ export function downloadTextFile(content: string, filename: string, mimeType: st
 /**
  * Download JSON as file
  */
-export function downloadJSON(data: any, filename: string): void {
+export function downloadJSON(data: unknown, filename: string): void {
   const json = JSON.stringify(data, null, 2);
   downloadTextFile(json, filename, 'application/json');
 }

@@ -9,7 +9,7 @@ const preloadedRoutes = new Set<string>();
 /**
  * Preload a lazy-loaded route component
  */
-export async function preloadRoute(importFn: () => Promise<any>): Promise<void> {
+export async function preloadRoute(importFn: () => Promise<unknown>): Promise<void> {
   const routeKey = importFn.toString();
   
   // Skip if already preloaded

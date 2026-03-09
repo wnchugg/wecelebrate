@@ -398,7 +398,7 @@ export async function publicSiteLoader({ params }: LoaderFunctionArgs): Promise<
  * Profile loader
  */
 export async function profileLoader(): Promise<LoaderResult<{
-  user: any;
+  user: unknown;
   orders: Order[];
 }>> {
   try {

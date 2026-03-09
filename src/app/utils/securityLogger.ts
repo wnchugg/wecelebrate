@@ -64,7 +64,7 @@ interface SecurityEvent {
   userAgent?: string;
   resource?: string;
   action?: string;
-  details?: any;
+  details?: unknown;
   success: boolean;
 }
 

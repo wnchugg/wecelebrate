@@ -6,8 +6,8 @@
 /**
  * Simple event emitter
  */
-export class EventEmitter<T extends Record<string, any> = Record<string, any>> {
-  private events: Map<keyof T, Set<(...args: any[]) => void>> = new Map();
+export class EventEmitter<T extends Record<string, unknown> = Record<string, unknown>> {
+  private events: Map<keyof T, Set<(...args: never[]) => void>> = new Map();
   
   /**
    * Subscribe to an event

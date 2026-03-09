@@ -363,7 +363,7 @@ export function validateSiteConfiguration(data: SiteConfigData): ValidationResul
 /**
  * Quick validation for individual fields
  */
-export function validateField(fieldName: string, value: any): string | null {
+export function validateField(fieldName: string, value: unknown): string | null {
   switch (fieldName) {
     case 'siteName':
       if (!value?.trim()) return 'Required';

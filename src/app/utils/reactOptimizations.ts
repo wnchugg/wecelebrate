@@ -46,7 +46,7 @@ export function usePrevious<T>(value: T): T | undefined {
  * Custom hook for stable callback reference
  * Alternative to useCallback that doesn't require dependency array
  */
-export function useStableCallback<T extends (...args: any[]) => any>(
+export function useStableCallback<T extends (...args: never[]) => unknown>(
   callback: T
 ): T {
   const callbackRef = useRef(callback);

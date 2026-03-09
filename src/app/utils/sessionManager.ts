@@ -276,7 +276,7 @@ interface SessionData {
   createdAt: string;
   expiresAt: number;
   lastActivity?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const SESSION_KEY = 'user_session';

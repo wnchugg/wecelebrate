@@ -355,7 +355,7 @@ export function validateClientConfiguration(data: ClientConfigData): ValidationR
 /**
  * Quick validation for individual fields (for real-time feedback)
  */
-export function validateField(fieldName: string, value: any): string | null {
+export function validateField(fieldName: string, value: string): string | null {
   switch (fieldName) {
     case 'clientName':
       if (!value?.trim()) return 'Required';

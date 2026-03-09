@@ -24,7 +24,7 @@ export interface ProductData {
 export interface ValidationError {
   row: number;
   field: string;
-  value: any;
+  value: unknown;
   message: string;
 }
 
@@ -61,7 +61,7 @@ export const FIELD_MAPPINGS = {
 const REQUIRED_FIELDS = ['name', 'category', 'value'];
 
 // Parse CSV file
-export async function parseCSVFile(file: File): Promise<any[]> {
+export async function parseCSVFile(file: File): Promise<Record<string, unknown>[]> {
   return new Promise((resolve, reject) => {
     Papa.parse(file, {
       header: true,
@@ -82,7 +82,7 @@ export async function parseCSVFile(file: File): Promise<any[]> {
 }
 
 // Parse pipe-delimited TXT file
-export async function parsePipeDelimitedFile(file: File): Promise<any[]> {
+export async function parsePipeDelimitedFile(file: File): Promise<Record<string, unknown>[]> {
   return new Promise((resolve, reject) => {
     Papa.parse(file, {
       header: true,
@@ -104,7 +104,7 @@ export async function parsePipeDelimitedFile(file: File): Promise<any[]> {
 }
 
 // Parse Excel file
-export async function parseExcelFile(file: File): Promise<any[]> {
+export async function parseExcelFile(file: File): Promise<Record<string, unknown>[]> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     
@@ -210,7 +210,7 @@ export function detectFieldMapping(headers: string[]): Record<string, string> {
 }
 
 // Validate product data
-export function validateProductData(data: any[], mapping: Record<string, string>): ImportResult {
+export function validateProductData(data: Record<string, unknown>[], mapping: Record<string, string>): ImportResult {
   const errors: ValidationError[] = [];
   const validData: ProductData[] = [];
   
@@ -222,7 +222,7 @@ export function validateProductData(data: any[], mapping: Record<string, string>
     Object.entries(mapping).forEach(([targetField, sourceField]) => {
       if (row[sourceField] !== undefined && row[sourceField] !== '') {
         // Type-safe assignment using Record indexing
-        (product as any)[targetField] = row[sourceField];
+        (product as Record<string, unknown>)[targetField] = row[sourceField];
       }
     });
     

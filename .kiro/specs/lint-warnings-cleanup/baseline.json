@@ -1,27 +1,27 @@
 {
-  "timestamp": "2026-03-09T12:29:34.633Z",
-  "totalWarnings": 3490,
+  "timestamp": "2026-03-09T12:33:59.277Z",
+  "totalWarnings": 3454,
   "totalErrors": 13,
-  "totalFiles": 321,
-  "totalIssues": 3503,
+  "totalFiles": 319,
+  "totalIssues": 3467,
   "warningsByRule": [
     {
       "rule": "@typescript-eslint/no-unsafe-member-access",
-      "count": 1183,
+      "count": 1169,
       "severity": "warning",
-      "fileCount": 109
-    },
-    {
-      "rule": "@typescript-eslint/no-explicit-any",
-      "count": 505,
-      "severity": "warning",
-      "fileCount": 114
+      "fileCount": 108
     },
     {
       "rule": "@typescript-eslint/no-unsafe-assignment",
-      "count": 499,
+      "count": 495,
       "severity": "warning",
       "fileCount": 125
+    },
+    {
+      "rule": "@typescript-eslint/no-explicit-any",
+      "count": 495,
+      "severity": "warning",
+      "fileCount": 112
     },
     {
       "rule": "unused-imports/no-unused-vars",
@@ -31,9 +31,9 @@
     },
     {
       "rule": "@typescript-eslint/no-unsafe-argument",
-      "count": 270,
+      "count": 266,
       "severity": "warning",
-      "fileCount": 86
+      "fileCount": 85
     },
     {
       "rule": "@typescript-eslint/no-floating-promises",
@@ -43,9 +43,9 @@
     },
     {
       "rule": "@typescript-eslint/no-unsafe-call",
-      "count": 99,
+      "count": 94,
       "severity": "warning",
-      "fileCount": 35
+      "fileCount": 34
     },
     {
       "rule": "@typescript-eslint/no-unsafe-return",
@@ -79,9 +79,9 @@
     },
     {
       "rule": "@typescript-eslint/no-base-to-string",
-      "count": 32,
+      "count": 33,
       "severity": "warning",
-      "fileCount": 15
+      "fileCount": 16
     },
     {
       "rule": "@typescript-eslint/no-empty-object-type",
@@ -163,19 +163,19 @@
     }
   ],
   "categoryCounts": {
-    "@typescript-eslint/no-unsafe-member-access": 1183,
-    "@typescript-eslint/no-explicit-any": 505,
-    "@typescript-eslint/no-unsafe-assignment": 499,
+    "@typescript-eslint/no-unsafe-member-access": 1169,
+    "@typescript-eslint/no-unsafe-assignment": 495,
+    "@typescript-eslint/no-explicit-any": 495,
     "unused-imports/no-unused-vars": 350,
-    "@typescript-eslint/no-unsafe-argument": 270,
+    "@typescript-eslint/no-unsafe-argument": 266,
     "@typescript-eslint/no-floating-promises": 119,
-    "@typescript-eslint/no-unsafe-call": 99,
+    "@typescript-eslint/no-unsafe-call": 94,
     "@typescript-eslint/no-unsafe-return": 90,
     "@typescript-eslint/no-unnecessary-type-assertion": 69,
     "react-hooks/exhaustive-deps": 59,
     "@typescript-eslint/require-await": 57,
     "react-refresh/only-export-components": 53,
-    "@typescript-eslint/no-base-to-string": 32,
+    "@typescript-eslint/no-base-to-string": 33,
     "@typescript-eslint/no-empty-object-type": 30,
     "@typescript-eslint/no-misused-promises": 26,
     "@typescript-eslint/no-redundant-type-constituents": 15,

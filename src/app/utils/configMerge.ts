@@ -3,7 +3,7 @@ import type { HeaderFooterConfig, BrandingAssets, GiftSelectionConfig, ReviewScr
 /**
  * Deep merge helper that properly handles nested objects
  */
-function deepMerge<T extends Record<string, any>>(target: T, ...sources: Partial<T>[]): T {
+function deepMerge<T extends Record<string, unknown>>(target: T, ...sources: Partial<T>[]): T {
   if (!sources.length) return target;
   
   const source = sources.shift();
@@ -18,8 +18,8 @@ function deepMerge<T extends Record<string, any>>(target: T, ...sources: Partial
         key in target && typeof targetValue === 'object' && targetValue !== null && !Array.isArray(targetValue)) {
       // Recursively merge nested objects
       Object.assign(sourceValue, deepMerge(
-        targetValue as Record<string, any>,
-        sourceValue as Record<string, any>
+        targetValue as Record<string, unknown>,
+        sourceValue as Record<string, unknown>
       ));
     }
   }

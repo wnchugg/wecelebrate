@@ -55,7 +55,7 @@ export function useStableCallback<T extends (...args: never[]) => unknown>(
     callbackRef.current = callback;
   });
 
-  return useCallback((...args: any[]) => {
+  return useCallback((...args: unknown[]) => {
     return callbackRef.current(...args);
   }, []) as T;
 }
@@ -172,7 +172,7 @@ export function batchUpdates(callback: () => void): void {
 /**
  * Shallow comparison for props/state
  */
-export function shallowEqual(obj1: any, obj2: any): boolean {
+export function shallowEqual(obj1: unknown, obj2: unknown): boolean {
   if (obj1 === obj2) return true;
   
   if (

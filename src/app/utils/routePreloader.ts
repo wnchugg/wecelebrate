@@ -28,7 +28,7 @@ export async function preloadRoute(importFn: () => Promise<unknown>): Promise<vo
 /**
  * Preload multiple routes in sequence with a small delay between each
  */
-export async function preloadRoutes(importFns: Array<() => Promise<any>>, delayMs = 50): Promise<void> {
+export async function preloadRoutes(importFns: Array<() => Promise<unknown>>, delayMs = 50): Promise<void> {
   for (const importFn of importFns) {
     await preloadRoute(importFn);
     // Small delay to avoid blocking the main thread

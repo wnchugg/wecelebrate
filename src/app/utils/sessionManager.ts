@@ -285,7 +285,7 @@ const DEFAULT_SESSION_DURATION = 60 * 60 * 1000; // 1 hour
 /**
  * Creates a new session with user data
  */
-export function createSession(userData: any, metadata?: any): SessionData {
+export function createSession(userData: unknown, metadata?: unknown): SessionData {
   const sessionId = generateSessionId();
   const now = new Date().toISOString();
   const expiresAt = Date.now() + DEFAULT_SESSION_DURATION;

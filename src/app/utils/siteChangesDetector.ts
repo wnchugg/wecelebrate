@@ -15,8 +15,8 @@ interface SiteData {
     secondaryColor?: string;
     tertiaryColor?: string;
   };
-  settings?: Record<string, any>;
-  [key: string]: any;
+  settings?: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
 const FIELD_CATEGORIES: Record<string, string> = {
@@ -156,13 +156,13 @@ const FIELD_LABELS: Record<string, string> = {
   ssoProvider: 'SSO Provider',
 };
 
-function getNestedValue(obj: any, path: string): unknown {
+function getNestedValue(obj: unknown, path: string): unknown {
   return path.split('.').reduce((current, key) => current?.[key], obj);
 }
 
-function areValuesEqual(val1: any, val2: any): boolean {
+function areValuesEqual(val1: unknown, val2: unknown): boolean {
   // Handle null/undefined/empty string as equivalent
-  const isEmptyValue = (val: any) => val === null || val === undefined || val === '';
+  const isEmptyValue = (val: unknown) => val === null || val === undefined || val === '';
   
   if (isEmptyValue(val1) && isEmptyValue(val2)) return true;
   if (val1 === val2) return true;
@@ -283,7 +283,7 @@ export function detectSiteChanges(
     
     if (!areValuesEqual(oldValue, newValue)) {
       // Helper to check if value is truly empty
-      const isEmptyValue = (val: any) => val === null || val === undefined || val === '';
+      const isEmptyValue = (val: unknown) => val === null || val === undefined || val === '';
       
       // Skip if both values are effectively empty (null, undefined, or empty string)
       if (isEmptyValue(oldValue) && isEmptyValue(newValue)) {

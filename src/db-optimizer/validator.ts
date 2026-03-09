@@ -11,7 +11,7 @@ import { DatabaseConnection } from './db-utils';
 export interface UserContext {
   userId: string;
   role: string;
-  jwtClaims?: Record<string, any>;
+  jwtClaims?: Record<string, unknown>;
 }
 
 /**

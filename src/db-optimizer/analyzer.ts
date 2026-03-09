@@ -14,9 +14,9 @@ import type {
 } from './models';
 
 export class RLSAnalyzer {
-  private dbConnection: any;
+  private dbConnection: unknown;
 
-  constructor(dbConnection?: any) {
+  constructor(dbConnection?: unknown) {
     this.dbConnection = dbConnection;
   }
 

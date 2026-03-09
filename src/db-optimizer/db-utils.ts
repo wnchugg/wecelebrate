@@ -86,7 +86,7 @@ export class DatabaseConnection {
   /**
    * Execute a query and return results.
    */
-  async executeQuery<T = any>(query: string, params?: any[]): Promise<T[]> {
+  async executeQuery<T = unknown>(query: string, params?: unknown[]): Promise<T[]> {
     if (!this.pool) {
       await this.connect();
     }

@@ -9,7 +9,7 @@ export interface LinterWarning {
   level: 'WARN' | 'INFO';
   categories: string[];
   detail: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   cache_key: string;
 }
 

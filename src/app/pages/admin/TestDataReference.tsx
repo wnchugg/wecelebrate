@@ -319,7 +319,7 @@ export function TestDataReference() {
                     Test Accounts
                   </h4>
                   <div className="space-y-2">
-                    {scenario.testAccounts.map((account: any, idx: number) => (
+                    {scenario.testAccounts.map((account: unknown, idx: number) => (
                       <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div className="flex-1">
                           {account.email && (

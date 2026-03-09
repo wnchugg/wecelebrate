@@ -43,7 +43,7 @@ export function ProductBulkImport() {
   
   const [currentStep, setCurrentStep] = useState<ImportStep>('upload');
   const [file, setFile] = useState<File | null>(null);
-  const [parsedData, setParsedData] = useState<any[]>([]);
+  const [parsedData, setParsedData] = useState<Record<string, unknown>[]>([]);
   const [fieldMapping, setFieldMapping] = useState<Record<string, string>>({});
   const [validationResult, setValidationResult] = useState<ImportResult | null>(null);
   const [importProgress, setImportProgress] = useState({

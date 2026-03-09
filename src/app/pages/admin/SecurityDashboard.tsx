@@ -19,7 +19,7 @@ interface SecurityEvent {
   description: string;
   ip?: string;
   userId?: string;
-  details?: any;
+  details?: unknown;
 }
 
 interface SecurityMetrics {

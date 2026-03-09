@@ -33,8 +33,8 @@ interface ERPConnection {
   status: 'active' | 'inactive';
   lastSync?: string;
   createdAt?: string;
-  credentials: any;
-  settings: any;
+  credentials: unknown;
+  settings: unknown;
 }
 
 interface ERPSyncLog {
@@ -275,7 +275,7 @@ export function ERPConnectionManagement() {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as 'connections' | 'sync' | 'assignments')}
                 className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors ${
                   activeTab === tab.id
                     ? 'bg-[#D91C81] text-white'

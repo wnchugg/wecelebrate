@@ -342,7 +342,7 @@ export const mockGiftApi = {
   /**
    * Submit order (mock submission)
    */
-  async submitOrder(orderData: any): Promise<{
+  async submitOrder(orderData: unknown): Promise<{
     orderId: string;
     orderNumber: string;
     estimatedDelivery: string;

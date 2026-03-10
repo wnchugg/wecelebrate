@@ -188,7 +188,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       logger.info('[AdminContext] Password length:', password.length);
       
       const response = await authApi.login({ emailOrUsername: identifier, password });
-      const { access_token, user } = response as any;
+      const responseData = response as { access_token?: string; user?: unknown };
+      const { access_token, user } = responseData;
       
       logger.info('[AdminContext] Login API response received');
       logger.info('[AdminContext] Access token exists:', !!access_token);
@@ -229,16 +230,18 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       preloadAdminRoutes();
       
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('[AdminContext] Login error', { error });
-      logger.error('[AdminContext] Error message:', error.message);
-      logger.error('[AdminContext] Error stack:', error.stack);
+      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      logger.error('[AdminContext] Error message:', errorMessage);
+      logger.error('[AdminContext] Error stack:', errorStack);
       
       // Classify the error type for better handling
-      const isNetworkError = error instanceof TypeError && error.message.includes('fetch');
-      const errorMessage = isNetworkError 
+      const isNetworkError = error instanceof TypeError && errorMessage.includes('fetch');
+      const displayMessage = isNetworkError 
         ? 'Unable to connect to server. Please ensure the backend is running.'
-        : error.message;
+        : errorMessage;
       
       logSecurityEvent({
         action: 'admin_login_failed',
@@ -250,8 +253,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         }
       });
       
-      // Throw error so the component can display specific error messages
-      throw error;
+      // Throw error with user-friendly message
+      throw new Error(displayMessage);
     }
   };
 

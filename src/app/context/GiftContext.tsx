@@ -131,9 +131,10 @@ export function GiftProvider({ children }: { children: ReactNode }) {
     try {
       const { gift } = await giftApi.create(giftData);
       setGifts(prev => [...prev, gift]);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to create gift:', error);
-      throw new Error(error.message || 'Failed to create gift');
+      const message = error instanceof Error ? error.message : 'Failed to create gift';
+      throw new Error(message);
     }
   };
 
@@ -141,9 +142,10 @@ export function GiftProvider({ children }: { children: ReactNode }) {
     try {
       const { gift } = await giftApi.update(id, updates);
       setGifts(prev => prev.map(g => g.id === id ? gift : g));
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to update gift:', error);
-      throw new Error(error.message || 'Failed to update gift');
+      const message = error instanceof Error ? error.message : 'Failed to update gift';
+      throw new Error(message);
     }
   };
 
@@ -151,9 +153,10 @@ export function GiftProvider({ children }: { children: ReactNode }) {
     try {
       await giftApi.delete(id);
       setGifts(prev => prev.filter(g => g.id !== id));
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to delete gift:', error);
-      throw new Error(error.message || 'Failed to delete gift');
+      const message = error instanceof Error ? error.message : 'Failed to delete gift';
+      throw new Error(message);
     }
   };
 
@@ -161,9 +164,10 @@ export function GiftProvider({ children }: { children: ReactNode }) {
     try {
       await giftApi.bulkDelete(ids);
       setGifts(prev => prev.filter(g => !ids.includes(g.id)));
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to delete gifts:', error);
-      throw new Error(error.message || 'Failed to delete gifts');
+      const message = error instanceof Error ? error.message : 'Failed to delete gifts';
+      throw new Error(message);
     }
   };
 
@@ -183,9 +187,10 @@ export function GiftProvider({ children }: { children: ReactNode }) {
           return [...prev, updatedConfig];
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to update site configuration:', error);
-      throw new Error(error.message || 'Failed to update site configuration');
+      const message = error instanceof Error ? error.message : 'Failed to update site configuration';
+      throw new Error(message);
     }
   };
 

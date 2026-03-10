@@ -3,24 +3,25 @@
 ## Session: March 10, 2026 (Continued Recovery)
 
 ### Current State
-- **Current Warnings**: 3,317 (down from 4,172 at incident peak)
-- **Fixes This Session**: 855 warnings
+- **Current Warnings**: 3,316 (down from 4,172 at incident peak)
+- **Fixes This Session**: 856 warnings
 - **Original Goal**: 1,028 warnings (achieved before git checkout incident)
-- **Remaining to Goal**: 2,289 warnings
+- **Remaining to Goal**: 2,288 warnings
 
 ### Progress Summary
 
-**Batches Completed This Session**: 35-37 (3 batches)
+**Batches Completed This Session**: 35-38 (4 batches)
 - Batch 35: 19 fixes (utils: storage, validation, events, types)
 - Batch 36: 5 fixes (admin components, logger)
 - Batch 37: 11 fixes (hooks: usePerformanceUtils)
+- Batch 38: 1 fix (ui/chart: payload type)
 
-**Total This Session**: 35 warnings fixed
+**Total This Session**: 36 warnings fixed
 
 ### Category Breakdown (Current)
 1. `no-unsafe-member-access`: 1,114 warnings (largest category)
 2. `no-unsafe-assignment`: 486 warnings
-3. `no-explicit-any`: 426 warnings (down from 443)
+3. `no-explicit-any`: 425 warnings (down from 443)
 4. `unused-imports/no-unused-vars`: 350 warnings (quick wins available)
 5. `no-unsafe-argument`: 250 warnings
 

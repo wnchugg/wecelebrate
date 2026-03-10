@@ -934,13 +934,13 @@ export const clientApi = {
 // Export an orderApi object for order management
 export const orderApi = {
   async getAll() {
-    return apiRequest<{ orders: any[] }>('/orders', {
+    return apiRequest<{ orders: Order[] }>('/orders', {
       method: 'GET',
     });
   },
   
   async getById(id: string) {
-    return apiRequest<{ order: any }>(`/orders/${id}`, {
+    return apiRequest<{ order: Order }>(`/orders/${id}`, {
       method: 'GET',
     });
   },
@@ -966,13 +966,13 @@ export const orderApi = {
   },
   
   async getUserOrders(userId: string) {
-    return apiRequest<{ orders: any[] }>(`/orders?user_id=${userId}`, {
+    return apiRequest<{ orders: Order[] }>(`/orders?user_id=${userId}`, {
       method: 'GET',
     });
   },
   
   async updateStatus(id: string, status: string) {
-    return apiRequest<{ order: any }>(`/orders/${id}`, {
+    return apiRequest<{ order: Order }>(`/orders/${id}`, {
       method: 'PUT',
       body: JSON.stringify({ status }),
     });

@@ -4,6 +4,7 @@
  */
 
 import { apiRequest } from '../utils/api';
+import type { Gift } from '../../types';
 
 // ==================== TYPES ====================
 
@@ -273,7 +274,7 @@ export const siteGiftConfigApi = {
     if (filters?.offset) params.append('offset', filters.offset.toString());
     
     const query = params.toString() ? `?${params.toString()}` : '';
-    return apiRequest<{ success: boolean; data: any[]; total: number }>(`/v2/sites/${siteId}/gifts${query}`);
+    return apiRequest<{ success: boolean; data: Gift[]; total: number }>(`/v2/sites/${siteId}/gifts${query}`);
   },
 };
 

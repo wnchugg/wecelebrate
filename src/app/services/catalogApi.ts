@@ -344,12 +344,15 @@ export async function getMigrationStatus(): Promise<Record<string, unknown>> {
   return data.status;
 }
 
-export async function runMigration(): Promise<{
+interface MigrationResponse {
   success: boolean;
   message: string;
-  result?: any;
+  result?: unknown;
   skipped?: boolean;
-}> {
+  warning?: string;
+}
+
+export async function runMigration(): Promise<MigrationResponse> {
   const response = await fetch(`${API_BASE}/migration/run`, {
     method: 'POST',
     headers: getAuthHeaders(),
@@ -363,12 +366,7 @@ export async function runMigration(): Promise<{
   return response.json();
 }
 
-export async function rollbackMigration(): Promise<{
-  success: boolean;
-  message: string;
-  result?: any;
-  warning?: string;
-}> {
+export async function rollbackMigration(): Promise<MigrationResponse> {
   const response = await fetch(`${API_BASE}/migration/rollback`, {
     method: 'POST',
     headers: getAuthHeaders(),

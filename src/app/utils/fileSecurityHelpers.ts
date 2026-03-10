@@ -108,7 +108,7 @@ export interface FileSecurityCheckResult {
 
 export function performSecurityChecks(
   file: File,
-  data: any[],
+  data: Record<string, unknown>[],
   options: {
     maxSizeMB?: number;
     allowedExtensions?: string[];
@@ -149,7 +149,23 @@ export function performSecurityChecks(
   for (let i = 0; i < Math.min(data.length, 100); i++) {
     const row = data[i];
     for (const key in row) {
-      const value = String(row[key] ?? '');
+      const cellValue = row[key];
+      // Convert to string safely - handle null, undefined, primitives, and objects
+      let value: string;
+      if (cellValue == null) {
+        value = '';
+      } else if (typeof cellValue === 'string') {
+        value = cellValue;
+      } else if (typeof cellValue === 'number' || typeof cellValue === 'boolean') {
+        value = String(cellValue);
+      } else {
+        // For objects and any other types, use JSON.stringify with error handling
+        try {
+          value = JSON.stringify(cellValue);
+        } catch {
+          value = '[Complex Value]';
+        }
+      }
       
       if (value.length > maxCellLength) {
         cellValidationErrors++;

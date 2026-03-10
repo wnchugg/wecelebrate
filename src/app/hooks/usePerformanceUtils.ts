@@ -136,7 +136,7 @@ export function useEventCallback<T extends (...args: never[]) => unknown>(
   }, [fn]);
   
   return useCallback(
-    ((...args: any[]) => ref.current(...args)) as T,
+    ((...args: never[]) => ref.current(...args)) as T,
     []
   );
 }
@@ -379,7 +379,7 @@ export function useMemoryStatus() {
     if (!('memory' in performance)) return () => {}; // Return empty cleanup
     
     const updateMemory = () => {
-      const mem = (performance as any).memory;
+      const mem = (performance as unknown as { memory: { jsHeapSizeLimit: number; totalJSHeapSize: number; usedJSHeapSize: number } }).memory;
       setMemory({
         jsHeapSizeLimit: mem.jsHeapSizeLimit,
         totalJSHeapSize: mem.totalJSHeapSize,

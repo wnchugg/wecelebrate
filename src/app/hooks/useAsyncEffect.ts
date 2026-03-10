@@ -17,7 +17,7 @@ export function useAsyncEffect(
       cleanup = await effect();
     };
     
-    runEffect();
+    void runEffect();
     
     return () => {
       cancelled = true;

@@ -126,7 +126,7 @@ export function useBrand(id: string | null) {
       }
     };
 
-    fetchBrand();
+    void fetchBrand();
   }, [id]);
 
   return { brand, loading, error };
@@ -176,7 +176,7 @@ export function useEmailTemplates(filters?: {
   ]);
 
   useEffect(() => {
-    fetchTemplates();
+    void fetchTemplates();
   }, [fetchTemplates]);
 
   const createTemplate = async (input: CreateEmailTemplateInput) => {

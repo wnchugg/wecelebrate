@@ -58,8 +58,12 @@ class PerformanceMonitor {
     try {
       const fidObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        entries.forEach((entry: any) => {
-          this.recordWebVital('FID', entry.processingStart - entry.startTime);
+        entries.forEach((entry) => {
+          // PerformanceEventTiming has processingStart property
+          const eventEntry = entry as PerformanceEntry & { processingStart?: number };
+          if (eventEntry.processingStart !== undefined) {
+            this.recordWebVital('FID', eventEntry.processingStart - entry.startTime);
+          }
         });
       });
       fidObserver.observe({ type: 'first-input', buffered: true });
@@ -72,9 +76,11 @@ class PerformanceMonitor {
       let clsValue = 0;
       const clsObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        entries.forEach((entry: any) => {
-          if (!entry.hadRecentInput) {
-            clsValue += entry.value;
+        entries.forEach((entry) => {
+          // LayoutShift entries have hadRecentInput and value properties
+          const layoutEntry = entry as PerformanceEntry & { hadRecentInput?: boolean; value?: number };
+          if (!layoutEntry.hadRecentInput && layoutEntry.value !== undefined) {
+            clsValue += layoutEntry.value;
           }
         });
         this.recordWebVital('CLS', clsValue);

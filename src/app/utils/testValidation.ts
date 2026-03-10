@@ -107,8 +107,8 @@ export class ValidationTester {
         message: `Backend returned status ${response.status}`,
         details: { status: response.status, statusText: response.statusText },
       };
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') {
         return {
           testName: 'Backend Connection',
           passed: false,
@@ -116,10 +116,15 @@ export class ValidationTester {
         };
       }
 
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : typeof error === 'string' 
+          ? error 
+          : 'Unknown error';
       return {
         testName: 'Backend Connection',
         passed: false,
-        message: `Connection failed: ${error.message || String(error)}`,
+        message: `Connection failed: ${errorMessage}`,
       };
     }
   }

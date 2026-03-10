@@ -126,17 +126,17 @@ export async function parseExcelFile(file: File): Promise<Record<string, unknown
         const headers: string[] = [];
         
         // Get headers from first row
-        const headerRow = worksheet.getRow(1) as any;
-        headerRow.eachCell((cell: any, colNumber: any) => {
+        const headerRow = worksheet.getRow(1);
+        headerRow.eachCell((cell, colNumber) => {
           headers[colNumber - 1] = String(cell.value || '');
         });
         
         // Get data rows (skip header row)
-        worksheet.eachRow((row: any, rowNumber: any) => {
+        worksheet.eachRow((row, rowNumber) => {
           if (rowNumber === 1) return; // Skip header row
           
           const rowData: Record<string, unknown> = {};
-          row.eachCell((cell: any, colNumber: any) => {
+          row.eachCell((cell, colNumber) => {
             const header = headers[colNumber - 1];
             if (header) {
               rowData[header] = cell.value;

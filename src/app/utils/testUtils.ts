@@ -69,8 +69,8 @@ export function assertDefined<T>(value: T | null | undefined): asserts value is 
 /**
  * Type guard for React elements
  */
-export function isReactElement(value: any): value is ReactElement {
-  return value && typeof value === 'object' && '$$typeof' in value;
+export function isReactElement(value: unknown): value is ReactElement {
+  return value !== null && typeof value === 'object' && '$$typeof' in value;
 }
 
 /**
@@ -79,10 +79,10 @@ export function isReactElement(value: any): value is ReactElement {
 export function createDeferred<T = void>(): {
   promise: Promise<T>;
   resolve: (value: T) => void;
-  reject: (error: any) => void;
+  reject: (error: unknown) => void;
 } {
   let resolve!: (value: T) => void;
-  let reject!: (error: any) => void;
+  let reject!: (error: unknown) => void;
   
   const promise = new Promise<T>((res, rej) => {
     resolve = res;

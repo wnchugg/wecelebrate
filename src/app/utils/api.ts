@@ -4,6 +4,7 @@ import type {
   Client,
   SiteGiftConfiguration,
   AdminUser,
+  Order,
 } from '../../types';
 import type {
   CreateERPConnectionRequest,
@@ -944,15 +945,15 @@ export const orderApi = {
     });
   },
   
-  async create(orderData: any) {
-    return apiRequest<{ order: any }>('/orders', {
+  async create(orderData: Partial<Order>) {
+    return apiRequest<{ order: Order }>('/orders', {
       method: 'POST',
       body: JSON.stringify(orderData),
     });
   },
   
-  async update(id: string, updates: any) {
-    return apiRequest<{ order: any }>(`/orders/${id}`, {
+  async update(id: string, updates: Partial<Order>) {
+    return apiRequest<{ order: Order }>(`/orders/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updates),
     });

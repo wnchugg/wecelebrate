@@ -87,7 +87,7 @@ export function getQueryParam(url: string, key: string): string | null {
 /**
  * Update query parameter in URL
  */
-export function updateQueryParam(url: string, key: string, value: any): string {
+export function updateQueryParam(url: string, key: string, value: unknown): string {
   const [baseUrl, queryString] = url.split('?');
   const params = queryString ? parseQueryString(queryString) : {};
   

@@ -14,11 +14,11 @@ export interface LogContext {
   service?: string;
   url?: string;
   siteId?: string;
-  stats?: any;
+  stats?: unknown;
   count?: number;
-  config?: any;
-  metadata?: Record<string, any>;
-  [key: string]: any; // Allow any additional properties
+  config?: unknown;
+  metadata?: Record<string, unknown>;
+  [key: string]: unknown; // Allow any additional properties
 }
 
 class Logger {

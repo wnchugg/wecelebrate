@@ -39,7 +39,7 @@ interface ScheduleExecutionLog {
   recordsProcessed: number;
   recordsFailed: number;
   error?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 interface SchedulesResponse {

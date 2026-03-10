@@ -168,7 +168,7 @@ export function setItem(key: string, value: unknown): void {
 /**
  * Gets an item from localStorage with JSON deserialization
  */
-export function getItem<T = any>(key: string): T | null {
+export function getItem<T = unknown>(key: string): T | null {
   try {
     const item = localStorage.getItem(key);
     if (item === null) return null;
@@ -221,7 +221,7 @@ export function getAllKeys(): string[] {
  * Store encrypted data in sessionStorage
  * Uses a simple encoding for now - can be enhanced with actual encryption
  */
-export function setEncrypted(key: string, value: any): void {
+export function setEncrypted(key: string, value: unknown): void {
   try {
     const serialized = JSON.stringify(value);
     const encoded = btoa(serialized); // Base64 encoding as simple obfuscation
@@ -234,7 +234,7 @@ export function setEncrypted(key: string, value: any): void {
 /**
  * Retrieve encrypted data from sessionStorage
  */
-export function getEncrypted<T = any>(key: string): T | null {
+export function getEncrypted<T = unknown>(key: string): T | null {
   try {
     const encoded = sessionStorage.getItem(key);
     if (!encoded) return null;

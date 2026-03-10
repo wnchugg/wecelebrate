@@ -150,21 +150,21 @@ export type AsyncCallback<T> = (value: T) => Promise<void>;
 /**
  * Check if an event is an input change event
  */
-export function isInputChangeEvent(e: any): e is ChangeEvent<HTMLInputElement> {
+export function isInputChangeEvent(e: unknown): e is ChangeEvent<HTMLInputElement> {
   return e?.target && 'value' in e.target && e.target instanceof HTMLInputElement;
 }
 
 /**
  * Check if an event is a select change event
  */
-export function isSelectChangeEvent(e: any): e is ChangeEvent<HTMLSelectElement> {
+export function isSelectChangeEvent(e: unknown): e is ChangeEvent<HTMLSelectElement> {
   return e?.target && 'value' in e.target && e.target instanceof HTMLSelectElement;
 }
 
 /**
  * Check if an event is a textarea change event
  */
-export function isTextareaChangeEvent(e: any): e is ChangeEvent<HTMLTextAreaElement> {
+export function isTextareaChangeEvent(e: unknown): e is ChangeEvent<HTMLTextAreaElement> {
   return e?.target && 'value' in e.target && e.target instanceof HTMLTextAreaElement;
 }
 

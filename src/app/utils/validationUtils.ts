@@ -283,7 +283,7 @@ export const validators = {
     error: 'Please enter a valid phone number',
   }),
   
-  required: (value: any) => ({
+  required: (value: unknown) => ({
     isValid: isRequired(value),
     error: 'This field is required',
   }),

@@ -73,7 +73,7 @@ export interface SortConfig<T> {
 export interface FilterConfig<T> {
   field: keyof T;
   operator: 'eq' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'contains';
-  value: any;
+  value: unknown;
 }
 
 // Form types
@@ -128,7 +128,7 @@ export function isApiSuccess<T>(result: ApiResult<T>): result is ApiSuccess<T> {
   return result.success === true;
 }
 
-export function isApiError(result: ApiResult<any>): result is ApiError {
+export function isApiError(result: ApiResult<unknown>): result is ApiError {
   return result.success === false;
 }
 
@@ -152,6 +152,6 @@ export function isObject(value: unknown): value is object {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-export function isArray<T = any>(value: unknown): value is T[] {
+export function isArray<T = unknown>(value: unknown): value is T[] {
   return Array.isArray(value);
 }

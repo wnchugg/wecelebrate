@@ -46,7 +46,7 @@ export function buildQueryString(params: Record<string, unknown>): string {
 /**
  * Add query parameters to a URL
  */
-export function addQueryParams(url: string, params: Record<string, any>): string {
+export function addQueryParams(url: string, params: Record<string, unknown>): string {
   const queryString = buildQueryString(params);
   
   if (!queryString) return url;
@@ -215,7 +215,7 @@ export function buildUrl(components: {
   hostname?: string;
   port?: string;
   pathname?: string;
-  params?: Record<string, any>;
+  params?: Record<string, unknown>;
   hash?: string;
 }): string {
   const {

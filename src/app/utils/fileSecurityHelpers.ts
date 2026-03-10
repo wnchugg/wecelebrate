@@ -65,7 +65,7 @@ export function sanitizeObjectKeys<T extends Record<string, unknown>>(obj: T): T
 /**
  * Sanitizes an array of objects (typical xlsx output)
  */
-export function sanitizeImportedData<T extends Record<string, any>>(
+export function sanitizeImportedData<T extends Record<string, unknown>>(
   data: T[]
 ): T[] {
   return data.map(row => sanitizeObjectKeys(row));

@@ -272,6 +272,7 @@ Lucide React        - Icons
 Sonner              - Toast notifications
 Zod                 - Schema validation
 React Hook Form     - Form handling
+Sentry              - Error tracking & monitoring
 ```
 
 ### Backend Technologies

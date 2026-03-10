@@ -80,7 +80,7 @@ export { Sentry };
 export const SentryErrorBoundary = Sentry.ErrorBoundary;
 
 // Custom error logging
-export function logError(error: Error, context?: Record<string, any>) {
+export function logError(error: Error, context?: Record<string, unknown>) {
   if (import.meta.env.DEV) {
     console.error('Error:', error, context);
   } else {

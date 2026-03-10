@@ -39,7 +39,8 @@ Guides and resources for developers working on the Jala2 Application.
 - **[Quick Test Commands](./QUICK_TEST_COMMANDS.md)** - Test command reference
 - **[Test Setup](./TEST_SETUP_COMPLETE.md)** - Test environment setup
 
-### Debugging
+### Debugging & Monitoring
+- **[Error Tracking Guide](./ERROR_TRACKING_GUIDE.md)** - Sentry integration and error monitoring
 - **[Frontend Database Debug](./FRONTEND_DATABASE_DEBUG.md)** - Database debugging
 - **[Admin Auth Debug](./ADMIN_AUTH_DEBUG_GUIDE.md)** - Authentication debugging
 - **[Backend Issue Diagnosis](./BACKEND_ISSUE_DIAGNOSIS.md)** - Backend debugging

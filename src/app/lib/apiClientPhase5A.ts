@@ -20,7 +20,7 @@ export interface Brand {
   accentColor1?: string;
   accentColor2?: string;
   status: 'active' | 'inactive';
-  settings?: Record<string, any>;
+  settings?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
 }
@@ -37,7 +37,7 @@ export interface CreateBrandInput {
   accentColor1?: string;
   accentColor2?: string;
   status?: 'active' | 'inactive';
-  settings?: Record<string, any>;
+  settings?: Record<string, unknown>;
 }
 
 export type UpdateBrandInput = Partial<CreateBrandInput>;
@@ -93,7 +93,7 @@ export interface SiteGiftConfig {
   excludedCategories: string[];
   minPrice?: number;
   maxPrice?: number;
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -106,7 +106,7 @@ export interface UpdateSiteGiftConfigInput {
   excludedCategories?: string[];
   minPrice?: number;
   maxPrice?: number;
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
 }
 
 // ==================== BRANDS API ====================

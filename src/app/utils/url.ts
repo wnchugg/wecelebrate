@@ -314,7 +314,7 @@ export function sanitizeUrl(url: string): string {
 export function buildUrl(
   base: string,
   path: string,
-  params?: Record<string, any>
+  params?: Record<string, string | number | boolean | string[]>
 ): string {
   try {
     const url = new URL(path, base);

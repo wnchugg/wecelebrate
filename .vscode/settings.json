@@ -51,6 +51,7 @@
         "git diff *",
         "git status *",
         "awk *",
-        "git push *"
+        "git push *",
+        "git restore *"
     ]
 }

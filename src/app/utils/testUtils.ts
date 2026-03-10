@@ -15,14 +15,14 @@ export type MockedObject<T> = {
 /**
  * Create a mocked version of an object
  */
-export function createMockedObject<T extends Record<string, any>>(obj: T): MockedObject<T> {
+export function createMockedObject<T extends Record<string, unknown>>(obj: T): MockedObject<T> {
   const mocked = {} as MockedObject<T>;
   
   for (const key in obj) {
     if (typeof obj[key] === 'function') {
-      (mocked as any)[key] = vi.fn();
+      (mocked as Record<string, unknown>)[key] = vi.fn();
     } else {
-      (mocked as any)[key] = obj[key];
+      (mocked as Record<string, unknown>)[key] = obj[key];
     }
   }
   
@@ -32,11 +32,11 @@ export function createMockedObject<T extends Record<string, any>>(obj: T): Mocke
 /**
  * Spy on a method
  */
-export function createSpy<T extends Record<string, any>, K extends keyof T>(
+export function createSpy<T extends Record<string, unknown>, K extends keyof T>(
   object: T,
   method: K
 ): ReturnType<typeof vi.spyOn> {
-  return vi.spyOn(object, method as any);
+  return vi.spyOn(object, method as string & K);
 }
 
 /**

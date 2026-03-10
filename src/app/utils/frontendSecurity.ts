@@ -541,7 +541,7 @@ export function secureFormData(formData: Record<string, unknown>): Record<string
  * Validate required fields
  */
 export function validateRequiredFields(
-  data: Record<string, any>,
+  data: Record<string, unknown>,
   requiredFields: string[]
 ): { valid: boolean; missingFields: string[] } {
   const missingFields = requiredFields.filter(field => {

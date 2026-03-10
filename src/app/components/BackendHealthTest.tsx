@@ -36,7 +36,7 @@ export function BackendHealthTest() {
         
         try {
           data = text ? JSON.parse(text) : { status: 'ok', message: 'Backend is running' };
-        } catch (parseError) {
+        } catch {
           data = { status: 'ok', message: text || 'Backend is running', rawResponse: text };
         }
         

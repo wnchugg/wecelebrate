@@ -53,7 +53,7 @@ export function sanitizeUrl(url: string): string {
     }
     
     return parsed.toString();
-  } catch (error) {
+  } catch {
     console.warn('Invalid URL provided:', url);
     return '';
   }

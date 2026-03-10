@@ -17,7 +17,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
   externalUrl,
   pageType,
 }) => {
-  const deviceIcons: Record<DeviceMode, React.ComponentType<any>> = {
+  const deviceIcons: Record<DeviceMode, React.ComponentType<{ className?: string }>> = {
     desktop: Monitor,
     tablet: Tablet,
     mobile: Smartphone,

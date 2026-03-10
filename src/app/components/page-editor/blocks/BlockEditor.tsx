@@ -31,7 +31,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
     );
   }
 
-  const handleContentChange = (key: string, value: any) => {
+  const handleContentChange = (key: string, value: unknown) => {
     onChange({
       content: {
         ...block.content,
@@ -40,7 +40,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
     });
   };
 
-  const handleStyleChange = (key: string, value: any) => {
+  const handleStyleChange = (key: string, value: unknown) => {
     onChange({
       styles: {
         ...block.styles,

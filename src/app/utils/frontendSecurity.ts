@@ -97,7 +97,7 @@ export const obfuscatedStorage = {
   /**
    * Set item in obfuscated storage (NOT SECURE)
    */
-  setItem(key: string, value: any, obfuscate: boolean = false): void {
+  setItem(key: string, value: unknown, obfuscate: boolean = false): void {
     try {
       const fullKey = STORAGE_PREFIX + key;
       const stringValue = JSON.stringify(value);

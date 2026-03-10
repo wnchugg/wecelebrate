@@ -17,14 +17,15 @@ import { showErrorToast } from '../../utils/errorHandling';
 import { logger } from '../../utils/logger';
 import { useNavigate } from 'react-router';
 import { useDateFormat } from '../../hooks/useDateFormat';
+import type { Order, Client, Site, Employee, Gift } from '../../../types';
 
 interface DashboardData {
-  orders: any[];
-  clients: any[];
-  sites: any[];
-  employees: any[];
-  gifts: any[];
-  celebrations: any[];
+  orders: Order[];
+  clients: Client[];
+  sites: Site[];
+  employees: Employee[];
+  gifts: Gift[];
+  celebrations: unknown[]; // No Celebration type found, using unknown
 }
 
 const CHART_COLORS = {

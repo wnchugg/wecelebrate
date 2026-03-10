@@ -20,7 +20,7 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
     setLocalValues(values);
   }, [values]);
 
-  const handleFieldChange = (fieldId: string, value: any, field: VisualField) => {
+  const handleFieldChange = (fieldId: string, value: unknown, field: VisualField) => {
     const newValues = { ...localValues, [fieldId]: value };
     setLocalValues(newValues);
 

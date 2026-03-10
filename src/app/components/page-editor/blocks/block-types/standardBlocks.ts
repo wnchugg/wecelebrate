@@ -442,7 +442,7 @@ export const layoutBlockDefinition: BlockDefinition = {
         React.createElement('select', {
           key: 'select',
           value: content.columnCount || 2,
-          onChange: (e: any) => {
+          onChange: (e: React.ChangeEvent<HTMLSelectElement>) => {
             const newCount = Number(e.target.value);
             onChange({
               content: {
@@ -466,7 +466,7 @@ export const layoutBlockDefinition: BlockDefinition = {
           key: 'input',
           type: 'text',
           value: content.gap || '1rem',
-          onChange: (e: any) => onChange({
+          onChange: (e: React.ChangeEvent<HTMLInputElement>) => onChange({
             content: { ...content, gap: e.target.value },
           }),
           placeholder: 'e.g., 1rem, 20px',
@@ -478,7 +478,7 @@ export const layoutBlockDefinition: BlockDefinition = {
           key: 'checkbox',
           type: 'checkbox',
           checked: content.stackOnMobile !== false,
-          onChange: (e: any) => onChange({
+          onChange: (e: React.ChangeEvent<HTMLInputElement>) => onChange({
             content: { ...content, stackOnMobile: e.target.checked },
           }),
           className: 'rounded border-gray-300',

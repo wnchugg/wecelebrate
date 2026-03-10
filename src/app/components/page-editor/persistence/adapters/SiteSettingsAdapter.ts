@@ -5,6 +5,7 @@
  */
 
 import { StorageAdapter, PageConfiguration } from '../../core/types';
+import type { Site } from '@/types';
 
 /**
  * Storage adapter for site settings (Landing/Welcome pages)
@@ -12,8 +13,8 @@ import { StorageAdapter, PageConfiguration } from '../../core/types';
 export class SiteSettingsAdapter implements StorageAdapter {
   constructor(
     private siteId: string,
-    private updateSite: (id: string, updates: any) => Promise<void>,
-    private getCurrentSite: () => any | null
+    private updateSite: (id: string, updates: Partial<Site>) => Promise<void>,
+    private getCurrentSite: () => Site | null
   ) {}
 
   /**

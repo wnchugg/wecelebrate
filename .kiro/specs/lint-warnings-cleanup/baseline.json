@@ -1,27 +1,27 @@
 {
-  "timestamp": "2026-03-10T15:17:46.979Z",
-  "totalWarnings": 3216,
+  "timestamp": "2026-03-10T15:20:13.660Z",
+  "totalWarnings": 3201,
   "totalErrors": 13,
   "totalFiles": 310,
-  "totalIssues": 3229,
+  "totalIssues": 3214,
   "warningsByRule": [
     {
       "rule": "@typescript-eslint/no-unsafe-member-access",
-      "count": 1091,
+      "count": 1085,
       "severity": "warning",
-      "fileCount": 95
+      "fileCount": 94
     },
     {
       "rule": "@typescript-eslint/no-unsafe-assignment",
-      "count": 478,
+      "count": 475,
       "severity": "warning",
-      "fileCount": 119
+      "fileCount": 118
     },
     {
       "rule": "@typescript-eslint/no-explicit-any",
-      "count": 377,
+      "count": 372,
       "severity": "warning",
-      "fileCount": 81
+      "fileCount": 80
     },
     {
       "rule": "unused-imports/no-unused-vars",
@@ -97,9 +97,9 @@
     },
     {
       "rule": "@typescript-eslint/no-redundant-type-constituents",
-      "count": 15,
+      "count": 14,
       "severity": "warning",
-      "fileCount": 8
+      "fileCount": 7
     },
     {
       "rule": "no-useless-escape",
@@ -163,9 +163,9 @@
     }
   ],
   "categoryCounts": {
-    "@typescript-eslint/no-unsafe-member-access": 1091,
-    "@typescript-eslint/no-unsafe-assignment": 478,
-    "@typescript-eslint/no-explicit-any": 377,
+    "@typescript-eslint/no-unsafe-member-access": 1085,
+    "@typescript-eslint/no-unsafe-assignment": 475,
+    "@typescript-eslint/no-explicit-any": 372,
     "unused-imports/no-unused-vars": 350,
     "@typescript-eslint/no-unsafe-argument": 243,
     "@typescript-eslint/no-floating-promises": 119,
@@ -178,7 +178,7 @@
     "@typescript-eslint/no-base-to-string": 33,
     "@typescript-eslint/no-empty-object-type": 30,
     "@typescript-eslint/no-misused-promises": 26,
-    "@typescript-eslint/no-redundant-type-constituents": 15,
+    "@typescript-eslint/no-redundant-type-constituents": 14,
     "no-useless-escape": 13,
     "promise/param-names": 11,
     "unused-imports/no-unused-imports": 6,

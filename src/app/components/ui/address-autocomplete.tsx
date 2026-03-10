@@ -106,7 +106,7 @@ export function AddressAutocomplete({
 
     if (query.length >= minQueryLength && (!isOnlyDigits || isPostcodePrimary)) {
       debounceTimerRef.current = setTimeout(() => {
-        handleSearch(query);
+        void handleSearch(query);
       }, debounceMs);
     } else {
       setSuggestions([]);

@@ -89,7 +89,7 @@ export function SFTPConfiguration({ client, onConfigUpdated }: SFTPConfiguration
   const [testResult, setTestResult] = useState<{ success: boolean; message?: string } | null>(null);
 
   useEffect(() => {
-    loadConfig();
+    void loadConfig();
   }, [client.id]);
 
   const loadConfig = async () => {
@@ -116,7 +116,7 @@ export function SFTPConfiguration({ client, onConfigUpdated }: SFTPConfiguration
       });
       toast.success('SFTP configuration saved successfully');
       onConfigUpdated();
-      loadConfig();
+      void loadConfig();
     } catch (error: unknown) {
       toast.error(`Failed to save configuration: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {

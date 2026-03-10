@@ -46,7 +46,7 @@ export function EmailTemplateProvider({ children }: { children: ReactNode }) {
     
     if (token) {
       console.warn('[EmailTemplateContext] Token found, loading global templates...');
-      refreshGlobalTemplates();
+      void refreshGlobalTemplates();
     } else {
       console.warn('[EmailTemplateContext] No token available, skipping initial load');
     }

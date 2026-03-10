@@ -135,12 +135,12 @@ export function TestEmailModal({ template, onClose }: TestEmailModalProps) {
                 className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:border-[#D91C81] focus:ring-2 focus:ring-pink-100 outline-none"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
-                    handleSendTest();
+                    void handleSendTest();
                   }
                 }}
               />
               <button
-                onClick={() => void handleSendTest()}
+                onClick={() => { void handleSendTest(); }}
                 disabled={isSending}
                 className="inline-flex items-center gap-2 bg-[#D91C81] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#B71569] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >

@@ -41,7 +41,7 @@ export function SSOValidation() {
     }
 
     if (code && state) {
-      handleSSOCallback(code, state);
+      void handleSSOCallback(code, state);
     }
   }, []);
 

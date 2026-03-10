@@ -24,7 +24,7 @@ export function SiteSelection() {
   const returnPath = siteId ? `/access/${siteId}` : '/access';
 
   useEffect(() => {
-    loadSites();
+    void loadSites();
   }, []);
 
   const loadSites = async () => {

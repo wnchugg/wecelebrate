@@ -77,7 +77,7 @@ export function useAsync<T, Args extends unknown[] = []>(
   
   useEffect(() => {
     if (immediate) {
-      execute(...([] as unknown as Args));
+      void execute(...([] as unknown as Args));
     }
   }, [immediate, execute]);
   

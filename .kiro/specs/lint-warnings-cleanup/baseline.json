@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-03-10T15:47:45.874Z",
-  "totalWarnings": 3151,
+  "timestamp": "2026-03-10T18:02:58.988Z",
+  "totalWarnings": 3148,
   "totalErrors": 13,
-  "totalFiles": 308,
-  "totalIssues": 3164,
+  "totalFiles": 306,
+  "totalIssues": 3161,
   "warningsByRule": [
     {
       "rule": "@typescript-eslint/no-unsafe-member-access",
@@ -37,9 +37,9 @@
     },
     {
       "rule": "@typescript-eslint/no-floating-promises",
-      "count": 119,
+      "count": 116,
       "severity": "warning",
-      "fileCount": 62
+      "fileCount": 59
     },
     {
       "rule": "@typescript-eslint/no-unsafe-call",
@@ -168,7 +168,7 @@
     "@typescript-eslint/no-explicit-any": 361,
     "unused-imports/no-unused-vars": 348,
     "@typescript-eslint/no-unsafe-argument": 239,
-    "@typescript-eslint/no-floating-promises": 119,
+    "@typescript-eslint/no-floating-promises": 116,
     "@typescript-eslint/no-unsafe-call": 94,
     "@typescript-eslint/no-unsafe-return": 88,
     "@typescript-eslint/no-unnecessary-type-assertion": 69,

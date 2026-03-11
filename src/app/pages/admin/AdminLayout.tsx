@@ -77,7 +77,7 @@ export function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { adminUser, adminLogout } = useAdmin();
-  const { currentSite, currentClient, sites, clients, setCurrentSite, setCurrentClient, getClientById, isLoading } = useSite();
+  const { currentSite, currentClient, sites, clients, setCurrentSite, _setCurrentClient, getClientById, isLoading } = useSite();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showSiteSelector, setShowSiteSelector] = useState(false);
   
@@ -93,7 +93,7 @@ export function AdminLayout() {
       clients: clients.map(c => ({ id: c.id, name: c.name }))
     });
   }, [sites, clients, currentSite, currentClient, isLoading]);
-  const [showClientSelector, setShowClientSelector] = useState(false);
+  const [_showClientSelector, _setShowClientSelector] = useState(false);
   const [showClientFilter, setShowClientFilter] = useState<string>('all');
   const [siteSettingsOpen, setSiteSettingsOpen] = useState(true);
   const [clientSettingsOpen, setClientSettingsOpen] = useState(true);
@@ -102,7 +102,7 @@ export function AdminLayout() {
   const siteSelectRef = useRef<HTMLDivElement>(null);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
-  const closeSidebar = () => setSidebarOpen(false);
+  const _closeSidebar = () => setSidebarOpen(false);
 
   const handleLogout = () => {
     void adminLogout();

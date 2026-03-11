@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-03-11T17:05:34.897Z",
-  "totalWarnings": 3029,
+  "timestamp": "2026-03-11T20:50:01.440Z",
+  "totalWarnings": 3025,
   "totalErrors": 13,
-  "totalFiles": 300,
-  "totalIssues": 3042,
+  "totalFiles": 299,
+  "totalIssues": 3038,
   "warningsByRule": [
     {
       "rule": "@typescript-eslint/no-unsafe-member-access",
@@ -25,9 +25,9 @@
     },
     {
       "rule": "unused-imports/no-unused-vars",
-      "count": 348,
+      "count": 344,
       "severity": "warning",
-      "fileCount": 152
+      "fileCount": 151
     },
     {
       "rule": "@typescript-eslint/no-unsafe-argument",
@@ -154,7 +154,7 @@
     "@typescript-eslint/no-unsafe-member-access": 1053,
     "@typescript-eslint/no-unsafe-assignment": 474,
     "@typescript-eslint/no-explicit-any": 361,
-    "unused-imports/no-unused-vars": 348,
+    "unused-imports/no-unused-vars": 344,
     "@typescript-eslint/no-unsafe-argument": 239,
     "@typescript-eslint/no-unsafe-call": 94,
     "@typescript-eslint/no-unsafe-return": 88,

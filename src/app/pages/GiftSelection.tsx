@@ -144,7 +144,7 @@ export function GiftSelection() {
       }
     };
     
-    loadGifts();
+    void loadGifts();
   }, [navigate, siteId, publicSite, config.messages]);
 
   // Filter and sort gifts

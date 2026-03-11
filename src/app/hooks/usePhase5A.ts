@@ -253,7 +253,7 @@ export function useEmailTemplate(id: string | null) {
       }
     };
 
-    fetchTemplate();
+    void fetchTemplate();
   }, [id]);
 
   return { template, loading, error };

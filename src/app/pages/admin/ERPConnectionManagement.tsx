@@ -523,7 +523,7 @@ export function ERPConnectionManagement() {
           onClose={() => setShowCreateModal(false)}
           onSave={() => {
             setShowCreateModal(false);
-            loadConnections();
+            void loadConnections();
           }}
         />
       )}
@@ -539,7 +539,7 @@ export function ERPConnectionManagement() {
           onSave={() => {
             setShowEditModal(false);
             setSelectedConnection(null);
-            loadConnections();
+            void loadConnections();
           }}
         />
       )}

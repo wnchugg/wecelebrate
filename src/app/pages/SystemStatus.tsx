@@ -95,7 +95,7 @@ export function SystemStatus() {
   const clearAuth = () => {
     localStorage.removeItem('admin_access_token');
     localStorage.removeItem('admin_user');
-    checkSystemStatus();
+    void checkSystemStatus();
   };
 
   const switchEnvironment = (env: string) => {

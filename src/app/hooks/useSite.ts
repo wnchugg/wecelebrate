@@ -291,7 +291,7 @@ export function useSite(forceSiteId?: string): UseSiteResult {
       return;
     }
     
-    fetchSite(siteId);
+    void fetchSite(siteId);
   }, [forceSiteId, fetchSite]);
   
   return {

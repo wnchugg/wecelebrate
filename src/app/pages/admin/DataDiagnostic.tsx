@@ -107,7 +107,7 @@ export function DataDiagnostic() {
         
         // Re-run diagnostic
         setTimeout(() => {
-          handleRunDiagnostic();
+          void handleRunDiagnostic();
         }, 1000);
       } else {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));

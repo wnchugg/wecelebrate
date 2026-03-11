@@ -264,7 +264,7 @@ export function useAsyncEffect(
   useEffect(() => {
     const cleanup = effect();
     return () => {
-      cleanup.then(cleanupFn => {
+      void cleanup.then(cleanupFn => {
         if (typeof cleanupFn === 'function') {
           cleanupFn();
         }

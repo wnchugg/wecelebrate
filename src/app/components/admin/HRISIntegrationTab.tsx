@@ -445,7 +445,7 @@ export function HRISIntegrationTab({ client, sites, onSyncComplete }: HRISIntegr
           console.error('Error reloading connections:', error);
         });
         if (onSyncComplete) {
-          onSyncComplete();
+          void onSyncComplete();
         }
       }, 2000);
     } catch (error) {

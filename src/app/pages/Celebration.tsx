@@ -73,7 +73,7 @@ export function Celebration() {
     };
 
     if (user?.id) {
-      fetchMilestones();
+      void fetchMilestones();
     }
   }, [user?.id]);
 

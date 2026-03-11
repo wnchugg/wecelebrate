@@ -141,8 +141,8 @@ export function AccessGroupManagement() {
   // Load access groups and permissions on mount
   useEffect(() => {
     if (accessToken) {
-      fetchPermissions();
-      fetchAccessGroups();
+      void fetchPermissions();
+      void fetchAccessGroups();
     }
   }, [accessToken]);
 

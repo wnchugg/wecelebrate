@@ -70,13 +70,13 @@ export function Welcome() {
       }
     };
 
-    checkDatabaseStatus();
+    void checkDatabaseStatus();
   }, [navigate]);
 
   useEffect(() => {
     // Load celebration messages if enabled
     if (celebrationEnabled) {
-      loadCelebrationMessages();
+      void loadCelebrationMessages();
     }
   }, [celebrationEnabled]);
 

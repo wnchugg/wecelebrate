@@ -34,7 +34,7 @@ export function QuickDiagnostic() {
       }
     }
 
-    checkHealth();
+    void checkHealth();
   }, []);
 
   if (loading) {

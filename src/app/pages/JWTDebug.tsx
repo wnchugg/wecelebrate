@@ -35,7 +35,7 @@ export function JWTDebug() {
       }
     }
 
-    checkJWT();
+    void checkJWT();
   }, []);
 
   if (loading) {

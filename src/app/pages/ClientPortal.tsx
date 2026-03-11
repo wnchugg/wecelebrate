@@ -124,7 +124,7 @@ export default function ClientPortal() {
       }
     };
 
-    fetchClientData();
+    void fetchClientData();
   }, [searchParams, navigate]);
 
   // Loading state

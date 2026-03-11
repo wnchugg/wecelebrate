@@ -195,9 +195,9 @@ function seedSimple() {
 
 // Run the appropriate function based on environment
 if (process.env.NODE_ENV === 'test' || process.argv.includes('--simple')) {
-  seedSimple();
+  void seedSimple();
 } else {
-  seed();
+  void seed();
 }
 
 // Export for use in other scripts

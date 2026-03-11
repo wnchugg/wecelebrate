@@ -91,7 +91,7 @@ export function MagicLinkValidation() {
       }
     };
 
-    validateToken();
+    void validateToken();
   }, [searchParams, navigate, authenticate]);
 
   return (

@@ -576,7 +576,7 @@ export function Reports() {
 
       const fileName = `${reportScope === 'client' ? 'Client' : 'Site'}_${scopeName.replace(/[^a-z0-9]/gi, '_')}_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
       
-      workbook.xlsx.writeBuffer().then(buffer => {
+      void workbook.xlsx.writeBuffer().then(buffer => {
         const blob = new Blob([new Uint8Array(buffer as unknown as ArrayBuffer)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');

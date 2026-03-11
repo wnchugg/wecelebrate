@@ -70,7 +70,7 @@ export function DiagnosticTools() {
 
       // Re-check after repair
       setTimeout(() => {
-        checkAdminUsers();
+        void checkAdminUsers();
       }, 1000);
     } catch (error: unknown) {
       logger.error('[Diagnostic] Repair error:', error);

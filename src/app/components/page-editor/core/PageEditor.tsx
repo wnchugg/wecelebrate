@@ -142,7 +142,7 @@ export const PageEditor: React.FC<PageEditorProps> = ({
       }
     };
 
-    loadConfiguration();
+    void loadConfiguration();
   }, [storageAdapter, storageKey, onLoad]);
 
   /**

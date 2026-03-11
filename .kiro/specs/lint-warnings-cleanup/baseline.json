@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-03-11T16:53:47.780Z",
-  "totalWarnings": 3054,
+  "timestamp": "2026-03-11T16:59:25.106Z",
+  "totalWarnings": 3030,
   "totalErrors": 13,
   "totalFiles": 300,
-  "totalIssues": 3067,
+  "totalIssues": 3043,
   "warningsByRule": [
     {
       "rule": "@typescript-eslint/no-unsafe-member-access",
@@ -90,12 +90,6 @@
       "fileCount": 20
     },
     {
-      "rule": "@typescript-eslint/no-floating-promises",
-      "count": 23,
-      "severity": "warning",
-      "fileCount": 20
-    },
-    {
       "rule": "@typescript-eslint/no-redundant-type-constituents",
       "count": 14,
       "severity": "warning",
@@ -132,12 +126,6 @@
       "fileCount": 2
     },
     {
-      "rule": "promise/catch-or-return",
-      "count": 2,
-      "severity": "warning",
-      "fileCount": 2
-    },
-    {
       "rule": "unknown",
       "count": 1,
       "severity": "error",
@@ -153,6 +141,12 @@
       "rule": "@typescript-eslint/restrict-plus-operands",
       "count": 1,
       "severity": "error",
+      "fileCount": 1
+    },
+    {
+      "rule": "@typescript-eslint/no-floating-promises",
+      "count": 1,
+      "severity": "warning",
       "fileCount": 1
     },
     {
@@ -177,17 +171,16 @@
     "@typescript-eslint/no-base-to-string": 33,
     "@typescript-eslint/no-empty-object-type": 30,
     "@typescript-eslint/no-misused-promises": 26,
-    "@typescript-eslint/no-floating-promises": 23,
     "@typescript-eslint/no-redundant-type-constituents": 14,
     "no-useless-escape": 13,
     "promise/param-names": 11,
     "unused-imports/no-unused-imports": 6,
     "@typescript-eslint/restrict-template-expressions": 6,
     "@typescript-eslint/no-duplicate-type-constituents": 4,
-    "promise/catch-or-return": 2,
     "unknown": 1,
     "prefer-const": 1,
     "@typescript-eslint/restrict-plus-operands": 1,
+    "@typescript-eslint/no-floating-promises": 1,
     "no-case-declarations": 1
   }
 }

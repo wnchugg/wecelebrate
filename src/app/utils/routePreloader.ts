@@ -70,7 +70,7 @@ export async function preloadAdminRoutes(): Promise<void> {
   
   // Load secondary routes in the background
   setTimeout(() => {
-    preloadRoutes(secondaryRoutes, 100);
+    void preloadRoutes(secondaryRoutes, 100);
   }, 500);
   
   console.warn('[Route Preloader] Critical admin routes preloaded');

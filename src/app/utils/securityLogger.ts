@@ -130,7 +130,7 @@ class SecurityLogger {
 
     // In production, send to backend
     if (severity === SecuritySeverity.HIGH || severity === SecuritySeverity.CRITICAL) {
-      this.sendToBackend(event);
+      void this.sendToBackend(event);
     }
   }
 

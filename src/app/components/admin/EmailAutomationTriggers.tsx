@@ -89,7 +89,7 @@ export function EmailAutomationTriggers({ siteId, templates }: EmailAutomationTr
       }
     };
 
-    fetchRules();
+    void fetchRules();
   }, [siteId]);
 
   const getTriggerConfig = (trigger: string) => {

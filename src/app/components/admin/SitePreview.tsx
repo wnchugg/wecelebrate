@@ -55,7 +55,7 @@ export function SitePreview({ site, onClose }: SitePreviewProps) {
   const [loadingGifts, setLoadingGifts] = useState(false);
 
   useEffect(() => {
-    loadGifts();
+    void loadGifts();
   }, [site.id]);
 
   const loadGifts = async () => {

@@ -18,7 +18,7 @@ export function EmailHistoryPage() {
 
   useEffect(() => {
     if (currentSite) {
-      loadHistory();
+      void loadHistory();
     }
   }, [currentSite?.id]);
 

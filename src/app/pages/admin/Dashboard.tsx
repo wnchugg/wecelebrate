@@ -93,14 +93,14 @@ export function Dashboard() {
 
   // Initial load and when dependencies change
   useEffect(() => {
-    fetchDashboardData();
+    void fetchDashboardData();
   }, [currentSite?.id, timeRange]);
 
   // Auto-refresh every 5 minutes
   useEffect(() => {
     const interval = setInterval(() => {
       console.warn('[Dashboard] Auto-refreshing data...');
-      fetchDashboardData(false);
+      void fetchDashboardData(false);
     }, 5 * 60 * 1000); // 5 minutes
 
     return () => clearInterval(interval);

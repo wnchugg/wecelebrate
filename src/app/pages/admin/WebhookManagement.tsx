@@ -42,8 +42,8 @@ export function WebhookManagement() {
 
   useEffect(() => {
     if (currentSite) {
-      loadWebhooks();
-      loadDeliveries();
+      void loadWebhooks();
+      void loadDeliveries();
     }
   }, [currentSite?.id]);
 

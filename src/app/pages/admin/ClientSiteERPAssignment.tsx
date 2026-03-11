@@ -46,18 +46,18 @@ export function ClientSiteERPAssignment() {
   ];
 
   useEffect(() => {
-    loadConnections();
+    void loadConnections();
   }, []);
 
   useEffect(() => {
     if (selectedClient) {
-      loadClientAssignment(selectedClient);
+      void loadClientAssignment(selectedClient);
     }
   }, [selectedClient]);
 
   useEffect(() => {
     if (selectedSite) {
-      loadSiteAssignment(selectedSite);
+      void loadSiteAssignment(selectedSite);
     }
   }, [selectedSite]);
 

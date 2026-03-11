@@ -64,7 +64,7 @@ export function OrderHistory() {
       }
     };
     
-    loadOrders();
+    void loadOrders();
   }, [navigate]);
 
   const getStatusBadge = (status: string) => {

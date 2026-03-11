@@ -85,7 +85,7 @@ export function ScheduleManager({ erpConnectionId, erpConnectionName, onClose }:
   const [logsLoading, setLogsLoading] = useState(false);
 
   useEffect(() => {
-    loadSchedules();
+    void loadSchedules();
   }, [erpConnectionId]);
 
   const loadSchedules = async () => {

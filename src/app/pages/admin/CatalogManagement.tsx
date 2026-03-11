@@ -23,7 +23,7 @@ export default function CatalogManagement() {
 
   // Load catalogs
   useEffect(() => {
-    loadCatalogs();
+    void loadCatalogs();
   }, [filterType, filterStatus]);
 
   async function loadCatalogs() {

@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-03-11T16:59:25.106Z",
-  "totalWarnings": 3030,
+  "timestamp": "2026-03-11T17:05:34.897Z",
+  "totalWarnings": 3029,
   "totalErrors": 13,
   "totalFiles": 300,
-  "totalIssues": 3043,
+  "totalIssues": 3042,
   "warningsByRule": [
     {
       "rule": "@typescript-eslint/no-unsafe-member-access",
@@ -144,12 +144,6 @@
       "fileCount": 1
     },
     {
-      "rule": "@typescript-eslint/no-floating-promises",
-      "count": 1,
-      "severity": "warning",
-      "fileCount": 1
-    },
-    {
       "rule": "no-case-declarations",
       "count": 1,
       "severity": "error",
@@ -180,7 +174,6 @@
     "unknown": 1,
     "prefer-const": 1,
     "@typescript-eslint/restrict-plus-operands": 1,
-    "@typescript-eslint/no-floating-promises": 1,
     "no-case-declarations": 1
   }
 }

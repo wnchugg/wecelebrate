@@ -105,7 +105,7 @@ export function AdminLayout() {
   const closeSidebar = () => setSidebarOpen(false);
 
   const handleLogout = () => {
-    adminLogout();
+    void adminLogout();
     void navigate('/admin/login');
   };
 

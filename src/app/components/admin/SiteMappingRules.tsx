@@ -62,7 +62,7 @@ export function SiteMappingRules({ client, sites, onRulesUpdated }: SiteMappingR
   });
 
   useEffect(() => {
-    loadRules();
+    void loadRules();
   }, [client.id]);
 
   const loadRules = async () => {

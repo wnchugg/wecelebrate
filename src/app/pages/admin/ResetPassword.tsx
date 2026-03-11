@@ -77,7 +77,7 @@ export default function ResetPassword() {
       }
     };
 
-    validateToken();
+    void validateToken();
   }, [token]);
 
   /**

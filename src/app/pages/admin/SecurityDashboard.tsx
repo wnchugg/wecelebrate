@@ -43,7 +43,7 @@ export function SecurityDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchSecurityData();
+    void fetchSecurityData();
   }, [timeRange]);
 
   const fetchSecurityData = async () => {

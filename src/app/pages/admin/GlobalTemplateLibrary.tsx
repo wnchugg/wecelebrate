@@ -77,7 +77,7 @@ export default function GlobalTemplateLibrary() {
 
   // Load templates on mount
   useEffect(() => {
-    refreshGlobalTemplates();
+    void refreshGlobalTemplates();
   }, []);
 
   // Filter templates

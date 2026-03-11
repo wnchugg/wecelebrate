@@ -51,7 +51,7 @@ export function GiftManagement() {
   const [isDeletingBulk, setIsDeletingBulk] = useState(false);
 
   useEffect(() => {
-    loadGifts();
+    void loadGifts();
   }, []);
 
   const loadGifts = async (retryCount = 0) => {

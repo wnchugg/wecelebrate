@@ -64,7 +64,7 @@ export function EmployeeManagement() {
   // Load employees when client changes
   useEffect(() => {
     if (currentClient) {
-      loadEmployees();
+      void loadEmployees();
     } else {
       setEmployees([]);
     }

@@ -8,7 +8,7 @@ export function QuickAuthCheck() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    checkAuth();
+    void checkAuth();
   }, []);
 
   const checkAuth = async () => {

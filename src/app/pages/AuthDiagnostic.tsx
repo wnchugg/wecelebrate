@@ -8,7 +8,7 @@ export default function AuthDiagnostic() {
   const [testing, setTesting] = useState(false);
 
   useEffect(() => {
-    runDiagnostics();
+    void runDiagnostics();
   }, []);
 
   const runDiagnostics = () => {

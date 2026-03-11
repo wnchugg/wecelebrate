@@ -226,7 +226,7 @@ export function AdminDebug() {
   };
 
   useEffect(() => {
-    runDiagnostics();
+    void runDiagnostics();
   }, []);
 
   const copyToClipboard = async () => {

@@ -100,7 +100,7 @@ export function ERPManagement() {
   const [fieldMappingType, setFieldMappingType] = useState<'orderFields' | 'productFields' | 'inventoryFields'>('orderFields');
 
   useEffect(() => {
-    loadConnections();
+    void loadConnections();
   }, []);
 
   const loadConnections = async () => {

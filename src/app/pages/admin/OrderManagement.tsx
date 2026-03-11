@@ -106,7 +106,7 @@ export function OrderManagement() {
   const ordersPerPage = 10;
 
   useEffect(() => {
-    loadOrders();
+    void loadOrders();
   }, []);
 
   const loadOrders = async () => {

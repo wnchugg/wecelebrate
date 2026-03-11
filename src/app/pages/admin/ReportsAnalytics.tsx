@@ -159,7 +159,7 @@ export function ReportsAnalytics() {
   const [comparisonMode, setComparisonMode] = useState<'none' | 'previous' | 'yoy'>('none');
 
   useEffect(() => {
-    loadAllData();
+    void loadAllData();
   }, []);
 
   const loadAllData = async () => {

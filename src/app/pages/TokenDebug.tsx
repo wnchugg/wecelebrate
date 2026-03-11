@@ -106,7 +106,7 @@ export default function TokenDebug() {
   };
 
   useEffect(() => {
-    analyzeToken();
+    void analyzeToken();
   }, []);
 
   const handleClearToken = () => {

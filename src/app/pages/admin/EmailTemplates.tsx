@@ -157,7 +157,7 @@ export function EmailTemplates() {
   const [testingTemplate, setTestingTemplate] = useState<EmailTemplate | null>(null);
 
   useEffect(() => {
-    loadTemplates();
+    void loadTemplates();
   }, []);
 
   const loadTemplates = async () => {

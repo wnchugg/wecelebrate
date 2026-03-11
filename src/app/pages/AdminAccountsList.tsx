@@ -43,7 +43,7 @@ export default function AdminAccountsList() {
   };
 
   useEffect(() => {
-    fetchAdmins();
+    void fetchAdmins();
   }, []);
 
   const copyToClipboard = (text: string) => {

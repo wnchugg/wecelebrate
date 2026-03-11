@@ -11,7 +11,7 @@ export function SystemStatus() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    checkSystemStatus();
+    void checkSystemStatus();
   }, []);
 
   const checkSystemStatus = async () => {

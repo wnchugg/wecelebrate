@@ -126,7 +126,7 @@ export function JWTDiagnosticBanner() {
   };
 
   useEffect(() => {
-    runDiagnostic();
+    void runDiagnostic();
   }, []);
 
   const handleClearTokens = async () => {

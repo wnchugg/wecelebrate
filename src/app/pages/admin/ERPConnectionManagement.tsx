@@ -79,8 +79,8 @@ export function ERPConnectionManagement() {
   const [activeTab, setActiveTab] = useState<'connections' | 'sync-logs' | 'statistics'>('connections');
 
   useEffect(() => {
-    loadConnections();
-    loadSyncLogs();
+    void loadConnections();
+    void loadSyncLogs();
   }, []);
 
   const loadConnections = async () => {

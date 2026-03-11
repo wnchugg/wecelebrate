@@ -30,7 +30,7 @@ export function EmailNotificationConfiguration() {
   // Refresh site templates when currentSite changes
   useEffect(() => {
     if (currentSite) {
-      refreshSiteTemplates(currentSite.id);
+      void refreshSiteTemplates(currentSite.id);
     }
   }, [currentSite?.id]);
 
@@ -62,7 +62,7 @@ export function EmailNotificationConfiguration() {
 
   const handleResetTemplate = (id: string) => {
     if (confirm('Reset this template to default settings? All customizations will be lost.')) {
-      resetSiteTemplateToDefault(id);
+      void resetSiteTemplateToDefault(id);
       toast.success('Template reset to defaults');
     }
   };
@@ -499,7 +499,7 @@ export function EmailNotificationConfiguration() {
                 </button>
                 <button
                   onClick={() => {
-                    updateSiteTemplate(editingTemplate.id, editingTemplate);
+                    void updateSiteTemplate(editingTemplate.id, editingTemplate);
                     setEditingTemplate(null);
                     toast.success('Template updated successfully');
                   }}

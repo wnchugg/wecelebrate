@@ -95,7 +95,7 @@ export function GiftManagement() {
     try {
       await apiRequest(`/gifts/${giftId}`, { method: 'DELETE' });
       showSuccessToast(`"${giftName}" deleted successfully`);
-      loadGifts();
+      void loadGifts();
     } catch (error: unknown) {
       showErrorToast('Failed to delete gift', parseError(error));
     }
@@ -114,7 +114,7 @@ export function GiftManagement() {
       });
       showSuccessToast(`${selectedGifts.length} gifts deleted successfully`);
       setSelectedGifts([]);
-      loadGifts();
+      void loadGifts();
     } catch (error: unknown) {
       showErrorToast('Failed to delete gifts', parseError(error));
     } finally {
@@ -139,7 +139,7 @@ export function GiftManagement() {
       }
       setShowCreateModal(false);
       setEditingGift(null);
-      loadGifts();
+      void loadGifts();
     } catch (error: unknown) {
       showErrorToast(
         editingGift ? 'Failed to update gift' : 'Failed to create gift',

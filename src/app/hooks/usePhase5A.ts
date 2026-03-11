@@ -49,7 +49,7 @@ export function useBrands(filters?: {
   }, [filters?.status, filters?.search, filters?.limit, filters?.offset]);
 
   useEffect(() => {
-    fetchBrands();
+    void fetchBrands();
   }, [fetchBrands]);
 
   const createBrand = async (input: CreateBrandInput) => {
@@ -291,7 +291,7 @@ export function useSiteGiftConfig(siteId: string | null) {
   }, [siteId]);
 
   useEffect(() => {
-    fetchConfig();
+    void fetchConfig();
   }, [fetchConfig]);
 
   const updateConfig = async (updates: UpdateSiteGiftConfigInput) => {
@@ -369,7 +369,7 @@ export function useSiteGifts(
   ]);
 
   useEffect(() => {
-    fetchGifts();
+    void fetchGifts();
   }, [fetchGifts]);
 
   return {

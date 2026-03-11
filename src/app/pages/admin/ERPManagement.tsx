@@ -154,7 +154,7 @@ export function ERPManagement() {
           'Products Synced',
           `Successfully synced ${result.products?.length || 0} products`
         );
-        loadSyncLogs(connectionId);
+        void loadSyncLogs(connectionId);
       } else {
         showErrorToast('Product Sync Failed', result.error || 'Unknown error');
       }
@@ -175,7 +175,7 @@ export function ERPManagement() {
           'Inventory Synced',
           `Successfully synced ${result.inventory?.length || 0} items`
         );
-        loadSyncLogs(connectionId);
+        void loadSyncLogs(connectionId);
       } else {
         showErrorToast('Inventory Sync Failed', result.error || 'Unknown error');
       }
@@ -194,7 +194,7 @@ export function ERPManagement() {
     try {
       await authApi.deleteERPConnection(id);
       showSuccessToast('ERP Connection Deleted', 'Connection removed successfully');
-      loadConnections();
+      void loadConnections();
     } catch (error: unknown) {
       showErrorToast('Failed to delete connection', error instanceof Error ? error.message : 'Unknown error');
     }
@@ -612,7 +612,7 @@ export function ERPManagement() {
             setShowCreateModal(false);
             setShowEditModal(false);
             setSelectedConnection(null);
-            loadConnections();
+            void loadConnections();
           }}
         />
       )}
@@ -708,7 +708,7 @@ export function ERPManagement() {
                       }
                     } as any);
                     showSuccessToast('Field Mapping Updated', 'Mappings saved successfully');
-                    loadConnections();
+                    void loadConnections();
                   } catch (error: unknown) {
                     showErrorToast('Failed to save mappings', error instanceof Error ? error.message : 'Unknown error');
                   }

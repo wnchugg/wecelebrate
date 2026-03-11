@@ -107,7 +107,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
             // Restart session timer for existing session
             startSessionTimer(adminLogout);
             // Preload admin routes for restored session
-            preloadAdminRoutes();
+            void preloadAdminRoutes();
           } else {
             // Invalid token, clear it
             logger.info('[Session Check] Session returned no user, clearing token');
@@ -136,7 +136,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
 
     // Debounce session check to prevent rapid calls during hot reload
     const timeoutId = setTimeout(() => {
-      checkSession();
+      void checkSession();
     }, 100);
 
     // Track if we're in the middle of a page load to ignore spurious storage events
@@ -227,7 +227,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       }, 5000); // 5 seconds should be enough for navigation to complete
       
       // Preload admin routes
-      preloadAdminRoutes();
+      void preloadAdminRoutes();
       
       return true;
     } catch (error: unknown) {

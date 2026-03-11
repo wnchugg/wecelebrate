@@ -605,7 +605,7 @@ export function SiteConfiguration() {
         }
       };
       
-      loadInitialData();
+      void loadInitialData();
       }
       
       // Fetch live site data for comparison (used in publish modal)
@@ -730,7 +730,7 @@ export function SiteConfiguration() {
         }
       };
       
-      loadLiveData();
+      void loadLiveData();
     }
   }, [currentSite, getSiteLive]);
 
@@ -738,7 +738,7 @@ export function SiteConfiguration() {
   useEffect(() => {
     if (hasChanges && configMode === 'draft' && !isAutoSaving && currentSite) {
       const timer = setTimeout(() => {
-        handleAutoSave();
+        void handleAutoSave();
       }, 10000); // Auto-save every 10 seconds
 
       return () => clearTimeout(timer);
@@ -1637,7 +1637,7 @@ export function SiteConfiguration() {
     setHasChanges(false);
     setShowUnsavedChangesModal(false);
     if (pendingModeSwitch) {
-      handleModeToggle(pendingModeSwitch);
+      void handleModeToggle(pendingModeSwitch);
       setPendingModeSwitch(null);
     }
   };

@@ -118,7 +118,7 @@ export function SiteMappingRules({ client, sites, onRulesUpdated }: SiteMappingR
         editingRule.id ? 'Rule updated' : 'Rule created',
         'Site mapping rule saved successfully'
       );
-      loadRules();
+      void loadRules();
       setShowRuleModal(false);
     } catch (error: unknown) {
       showErrorToast('Failed to save rule', error instanceof Error ? error.message : 'Unknown error');
@@ -131,7 +131,7 @@ export function SiteMappingRules({ client, sites, onRulesUpdated }: SiteMappingR
     try {
       await kv.del(`site_mapping_rule:${ruleId}`);
       showSuccessToast('Mapping rule deleted successfully');
-      loadRules();
+      void loadRules();
     } catch (error: unknown) {
       showErrorToast('Failed to delete rule', error instanceof Error ? error.message : 'Unknown error');
     }
@@ -142,7 +142,7 @@ export function SiteMappingRules({ client, sites, onRulesUpdated }: SiteMappingR
       const updatedRule = { ...rule, isActive: !rule.isActive };
       await kv.set(`site_mapping_rule:${rule.id}`, updatedRule);
       showSuccessToast(`Rule ${!rule.isActive ? 'enabled' : 'disabled'}`);
-      loadRules();
+      void loadRules();
     } catch (error: unknown) {
       showErrorToast('Failed to update rule', error instanceof Error ? error.message : 'Unknown error');
     }

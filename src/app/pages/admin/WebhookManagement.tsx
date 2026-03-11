@@ -115,7 +115,7 @@ export function WebhookManagement() {
       toast.success('Webhook created successfully');
       setShowCreateDialog(false);
       setNewWebhook({ url: '', events: [] });
-      loadWebhooks();
+      void loadWebhooks();
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : 'Unknown error');
     }
@@ -133,7 +133,7 @@ export function WebhookManagement() {
 
       toast.success('Webhook updated successfully');
       setEditingWebhook(null);
-      loadWebhooks();
+      void loadWebhooks();
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : 'Unknown error');
     }
@@ -149,7 +149,7 @@ export function WebhookManagement() {
       if (!response.ok) throw new Error('Failed to delete webhook');
 
       toast.success('Webhook deleted successfully');
-      loadWebhooks();
+      void loadWebhooks();
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : 'Unknown error');
     }
@@ -166,7 +166,7 @@ export function WebhookManagement() {
       if (!response.ok) throw new Error('Failed to update webhook');
 
       toast.success(webhook.enabled ? 'Webhook disabled' : 'Webhook enabled');
-      loadWebhooks();
+      void loadWebhooks();
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : 'Unknown error');
     }

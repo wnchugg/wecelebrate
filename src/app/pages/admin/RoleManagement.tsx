@@ -140,8 +140,8 @@ export function RoleManagement() {
   // Load roles and permissions on mount
   useEffect(() => {
     if (accessToken) {
-      fetchPermissions();
-      fetchRoles();
+      void fetchPermissions();
+      void fetchRoles();
     }
   }, [accessToken]);
 

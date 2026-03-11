@@ -139,7 +139,7 @@ export function ImportExportSettings() {
             if (generateNewIds) {
               clientIdMap.set(client.id, processed.id);
             }
-            addClient(processed);
+            void addClient(processed);
           });
         }
 
@@ -150,7 +150,7 @@ export function ImportExportSettings() {
               ? clientIdMap.get(site.clientId)
               : site.clientId;
             const processed = processSiteImport(site, newClientId, generateNewIds);
-            addSite(processed);
+            void addSite(processed);
           });
         }
 

@@ -501,7 +501,7 @@ export function SiteManagement() {
                                   <button
                                     onClick={() => {
                                       setOpenDropdownId(null);
-                                      handleToggleStatus(site);
+                                      void handleToggleStatus(site);
                                     }}
                                     className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                                   >
@@ -511,7 +511,7 @@ export function SiteManagement() {
                                   <button
                                     onClick={() => {
                                       setOpenDropdownId(null);
-                                      handleDuplicate(site);
+                                      void handleDuplicate(site);
                                     }}
                                     className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                                   >

@@ -57,7 +57,7 @@ export function SiteGiftConfiguration() {
   useEffect(() => {
     if (currentSite) {
       // Load configuration from backend
-      loadConfiguration();
+      void loadConfiguration();
     }
   }, [currentSite]);
 
@@ -65,7 +65,7 @@ export function SiteGiftConfiguration() {
   useEffect(() => {
     if (configMode === 'draft' && currentSite) {
       const timeoutId = setTimeout(() => {
-        handleSaveDraft();
+        void handleSaveDraft();
       }, 1000); // Auto-save 1 second after changes
 
       return () => clearTimeout(timeoutId);
@@ -111,7 +111,7 @@ export function SiteGiftConfiguration() {
   // Load available gifts for this site
   useEffect(() => {
     if (currentSite) {
-      getGiftsBySite(currentSite.id).then(setAvailableGifts);
+      void getGiftsBySite(currentSite.id).then(setAvailableGifts);
     }
   }, [currentSite, getGiftsBySite]);
 
@@ -131,7 +131,7 @@ export function SiteGiftConfiguration() {
       logger.info('[SiteGiftConfiguration] Save successful');
       
       // Also update the context
-      updateSiteConfiguration(config);
+      await updateSiteConfiguration(config);
       
       // Reload configuration from backend to verify it was saved
       await loadConfiguration();
@@ -179,7 +179,7 @@ export function SiteGiftConfiguration() {
       logger.info('[SiteGiftConfiguration] Publish successful');
       
       // Also update the context
-      updateSiteConfiguration(config);
+      await updateSiteConfiguration(config);
       
       // Reload configuration from backend to verify it was saved
       await loadConfiguration();

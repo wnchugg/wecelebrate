@@ -142,7 +142,7 @@ export function OrderManagement() {
       });
       
       showSuccessToast(`Order ${orderId} updated to ${newStatus}`);
-      loadOrders();
+      void loadOrders();
       setEditingOrder(null);
     } catch (error: unknown) {
       showErrorToast('Failed to update order', error instanceof Error ? error.message : 'Unknown error');
@@ -166,7 +166,7 @@ export function OrderManagement() {
       
       showSuccessToast(`${selectedOrders.length} order(s) updated successfully`);
       setSelectedOrders([]);
-      loadOrders();
+      void loadOrders();
     } catch (error: unknown) {
       showErrorToast('Failed to update orders', error instanceof Error ? error.message : 'Unknown error');
     }
@@ -601,7 +601,7 @@ export function OrderManagement() {
         onClose={() => setViewingOrder(null)}
         onStatusUpdate={(status, tracking, carrier) => {
           if (viewingOrder) {
-            handleUpdateStatus(viewingOrder.id, status, tracking, carrier);
+            void handleUpdateStatus(viewingOrder.id, status, tracking, carrier);
           }
         }}
       />
@@ -612,7 +612,7 @@ export function OrderManagement() {
         onClose={() => setEditingOrder(null)}
         onUpdate={(status, tracking, carrier) => {
           if (editingOrder) {
-            handleUpdateStatus(editingOrder.id, status, tracking, carrier);
+            void handleUpdateStatus(editingOrder.id, status, tracking, carrier);
           }
         }}
       />

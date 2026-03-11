@@ -41,17 +41,17 @@ export function BrandManagement() {
     }
     
     if (confirm('Are you sure you want to delete this brand?')) {
-      deleteBrand(brandId);
+      void deleteBrand(brandId);
       toast.success('Brand deleted successfully');
     }
   };
 
   const handleSaveBrand = (brand: Brand) => {
     if (editingBrand) {
-      updateBrand(brand.id, brand);
+      void updateBrand(brand.id, brand);
       toast.success('Brand updated successfully');
     } else {
-      addBrand(brand);
+      void addBrand(brand);
       toast.success('Brand created successfully');
     }
     setShowBrandModal(false);

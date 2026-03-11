@@ -109,7 +109,7 @@ export function Dashboard() {
   // Manual refresh handler
   const handleRefresh = () => {
     console.warn('[Dashboard] Manual refresh triggered');
-    fetchDashboardData(false);
+    void fetchDashboardData(false);
   };
 
   // Time range options

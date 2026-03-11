@@ -119,7 +119,7 @@ export function ScheduleManager({ erpConnectionId, erpConnectionName, onClose }:
         'Schedule Updated',
         `Schedule ${!schedule.enabled ? 'enabled' : 'disabled'} successfully`
       );
-      loadSchedules();
+      void loadSchedules();
     } catch (error: unknown) {
       showErrorToast(error, { operation: 'toggleSchedule' });
     }
@@ -129,7 +129,7 @@ export function ScheduleManager({ erpConnectionId, erpConnectionName, onClose }:
     try {
       await authApi.deleteSchedule(scheduleId);
       showSuccessToast('Schedule Deleted', 'Schedule removed successfully');
-      loadSchedules();
+      void loadSchedules();
     } catch (error: unknown) {
       showErrorToast(error, { operation: 'deleteSchedule' });
     }
@@ -144,7 +144,7 @@ export function ScheduleManager({ erpConnectionId, erpConnectionName, onClose }:
         'Schedule is running. Check logs for results.'
       );
       
-      loadSchedules();
+      void loadSchedules();
     } catch (error: unknown) {
       showErrorToast(error, { operation: 'executeSchedule' });
     }
@@ -153,7 +153,7 @@ export function ScheduleManager({ erpConnectionId, erpConnectionName, onClose }:
   const handleViewLogs = (schedule: Schedule) => {
     setSelectedSchedule(schedule);
     setShowExecutionLogs(true);
-    loadExecutionLogs(schedule.id);
+    void loadExecutionLogs(schedule.id);
   };
 
   const formatDate = (dateString?: string) => {
@@ -338,7 +338,7 @@ export function ScheduleManager({ erpConnectionId, erpConnectionName, onClose }:
             setSelectedSchedule(null);
           }}
           onSuccess={() => {
-            loadSchedules();
+            void loadSchedules();
             setShowCreateModal(false);
             setShowEditModal(false);
             setSelectedSchedule(null);

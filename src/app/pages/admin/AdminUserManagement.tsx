@@ -173,7 +173,7 @@ export function AdminUserManagement() {
   // Load admin users on mount
   useEffect(() => {
     if (adminUser?.role === 'super_admin' && accessToken) {
-      fetchAdminUsers();
+      void fetchAdminUsers();
     }
   }, [adminUser, accessToken]);
 
